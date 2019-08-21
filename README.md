@@ -3,8 +3,8 @@
   <img width="320" height="140" src="/images/logo.png">
 </p>
 <p align="center">
-<img src="/images/esp321.jpg" width="200" />  
-<img src="/images/esp322.jpg" width="200" />  
+<img src="/images/teensybread.jpg" width="200" />  
+<img src="/images/teensy361.jpg" width="200" />  
 </p>
 </p>
 <p align="center">
@@ -23,19 +23,23 @@ Atari2600 (espvcs), Philips Videopac/Odyssey (espo2em), Colecovision (espcolem),
 Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 
 # Minimal requirements:
-- Teensy 3.6/Teensy4.0 or ESP32 Node32S/Wrover sdk chip
+- Teensy 3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
 - ILI9341 or ST7789 SPI display
 - SD card (Teensy uses built-in uSD, ESP32 uses external one connected over SPI, e.g. ILI9341 integrated one)
 - Analog joypad (Arduino or PSP like)
 - 3 buttons (FIRE, USER1 and USER2)
 
 # Optional requirements:
-- I2C custom keyboard (for computers emulators) 
+- I2C custom keyboard (for computers emulators)
+- Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0)
+- VGA output (Teensy 3.6 only)
+
 
 # Wiring
-- see pinout.txt file in the project
+- see pinout.txt file in the respective project (ESP32 or Teensy)
+- Some KICAD image also available for ESP32
 
-# I2C keyboard (best to have)
+# I2C keyboard (best to have for computer emus)
 - see i2ckeyboard sub-directory
 - the I2C keyboard is using a separate atmega328p MCU handling the keys matrix
 - with 10x4 or 10x5 keys
@@ -71,11 +75,11 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 
 # Status and known issues
 - 64:
-  - with sound
+  - Full speed with sound
   - I2C custom keyboard support! 
   - (only few games working)
 - colem:
-  - with sound!
+  - Full speed with sound
 - vcs:
   - no sound yet
   - limited cartridge size support (due to ram constraint)
@@ -83,10 +87,10 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
   - no sound
   - only videopac G7000 games supported (due to ram constraint)
 - nofrendo:
-  - Full speend with sound
+  - Full speed with sound
   - 32k roms only supported except on Teensy 4.0
 - 5200:
-  - with sound
+  - Full speed with sound
   - 16 and 32k roms
 - speccy:
   - SNA support (Z80 to be fixed)
@@ -104,7 +108,7 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 - 800:
   - .rom support (no floppy yet)
   - I2C custom keyboard support!
-  - with sound
+  - Full speed with sound
 - AtariST:
   - floppy support
   - I2C custom keyboard support!
