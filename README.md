@@ -11,9 +11,9 @@ https://youtu.be/6rr2hMqprO0<br>
 <br>
 
 <p align="center">
-<img src="/images/teensybread.jpg" width="200" />  
-<img src="/images/teensy362.jpg" width="200" />  
-<img src="/images/teensy362.jpg" width="200" />  
+<img src="/images/stdesktop.jpg" width="200" />  
+<img src="/images/strobocop.jpg" width="200" />  
+<img src="/images/teensy4SD.jpg" width="200" />  
 </p>
 
 <p align="center">
