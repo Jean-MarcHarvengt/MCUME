@@ -17,6 +17,13 @@ https://youtu.be/jlqoWH2X6gk<br><br>
 This project is a spin-off of the TeensyCEC project https://github.com/Jean-MarcHarvengt/TeensyCEC<br>
 
 # Featuring
+
+System supported and status on various MCU platforms
+| System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
+| --- | --- |--- | --- | --- |
+| Zx81        |  |  |  |  |
+| Zx spectrum |  |  |  |  |
+
 5 game consoles:
 Atari2600 (espvcs), Philips Videopac/Odyssey (espo2em), Colecovision (espcolem), NES (espnofrendo) and Atari5200 (esp5200).<br>
 4 computer cores:
