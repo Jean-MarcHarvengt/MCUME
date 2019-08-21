@@ -66,18 +66,18 @@ Game console systems supported and status on various MCU platforms<br>
 - Format the SD card as FAT32
 - extract the content of SD.zip in the root directory 
 - there must be a sub-directorie for each emulator
-  - "2600" => for atarivcs, put your Atari 2600 roms here (.bin)
+  - "2600" => for atarivcs, put your Atari 2600 roms here (.bin), with sub-dirs or not
   - "5200" => for atari5200, put your Atari 5200 roms here (.bin)
   - "800"  => for atari800, put your Atari 800 cartridges here (.rom)
-  - 'c64"  => for c64, put your C64 programs here (.prg)
+  - 'c64"  => for c64, put your C64 programs here (.prg), with sub-dirs or not
   - "o2em" => for odyssey/videopac, put your Videopac/Odysssey roms here (.bin)
   - "coleco" => for colem, put your Colecovision roms here (.rom, including coleco.rom)
   - "nes"  => for nes/nofrendo, put your .nes files here (e.g. galaga,xevious,mario1...)
   - "spec" => for spectrum, put your ".z80" or ".sna" files here into sub-dirs or not ( max 48K )
-  - "z81"  => for zx81, put your ".p", ".81"(, ".56") ".80" or ".o" files here, into sub-dirs or not ( max 56K ) 
-  - "st"  => for AtariST, put your ".st" files here, into sub-dirs or not
-  - "pc"  => for zx81, put your HDD image ".img" 
-  - "vectrex"  => for Vectrex, put your ".gam" files here, into sub-dirs or not
+  - "z81"  => for zx81, put your ".p", ".81"(, ".56") ".80" or ".o" files here ( max 56K ) 
+  - "st"  => for AtariST, put your floppis ".st" files here
+  - "pc"  => for 8086, put your HDD image ".img" 
+  - "vectrex"  => for Vectrex, put your ".gam" files here
 - insert the card into the SD slot
 
 # Compilation/flashing (Teensy)
