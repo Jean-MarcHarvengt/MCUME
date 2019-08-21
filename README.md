@@ -17,7 +17,6 @@ https://youtu.be/6rr2hMqprO0<br>
 <p align="center">
 <img src="/images/stdesktop.png" width="200" />  
 <img src="/images/strobocop.png" width="200" />  
-<img src="/images/teensy4SD.png" width="200" />  
 </p>
 
 <p align="center">
