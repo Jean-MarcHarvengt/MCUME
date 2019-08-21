@@ -18,27 +18,31 @@ This project is a spin-off of the TeensyCEC project https://github.com/Jean-Marc
 
 # Featuring
 
-System supported and status on various MCU platforms<br>
+Computer systems supported and status on various MCU platforms<br>
 
 | System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
 | --- | --- |--- | --- | --- |
-| Zx81        |  |  |  |  |
-| Zx spectrum |  |  |  |  |
+| Zx81        | X | X | X | X |
+| Zx spectrum | X | X | X | X |
+| Atari 800   | X | X | X | X |
+| C64         | X | X | X | X |
+| Atari 520ST | - | full speed | - | slow |
+| 8086 XT PC  | - | full speed | - | slow |
 
+Game console systems supported and status on various MCU platforms<br>
 
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-
-5 game consoles:
-Atari2600 (espvcs), Philips Videopac/Odyssey (espo2em), Colecovision (espcolem), NES (espnofrendo) and Atari5200 (esp5200).<br>
-4 computer cores:
-Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
+| System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
+| --- | --- |--- | --- | --- |
+| Atari 2600        | X | X | X | X |
+| Odyssey/Videopac  | X | X | X | X |
+| Colecovision      | X | X | X | X |
+| Atari 5200        | X | X | X | X |
+| Nintendo NES      | X | big roms! | X | X |
+| Vectrex           | - | full speed | - | slow |
 
 # Minimal requirements:
 - Teensy 3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
-- ILI9341 or ST7789 SPI display
+- ILI9341 (Teensy/ESP32) or ST7789 (Teensy only) SPI display
 - SD card (Teensy uses built-in uSD, ESP32 uses external one connected over SPI, e.g. ILI9341 integrated one)
 - Analog joypad (Arduino or PSP like)
 - 3 buttons (FIRE, USER1 and USER2)
@@ -47,7 +51,6 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 - I2C custom keyboard (for computers emulators)
 - Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0)
 - VGA output (Teensy 3.6 only)
-
 
 # Wiring
 - see pinout.txt file in the respective project (ESP32 or Teensy)
@@ -88,52 +91,52 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 - make, ./flashapp.sh
 
 # Status and known issues
-- 64:
+- 64 (C64):
   - Full speed with sound
   - I2C custom keyboard support! 
   - (only few games working)
-- colem:
+- colem (Colecovision):
   - Full speed with sound
-- vcs:
+- vcs (Atari 2600):
   - no sound yet
   - limited cartridge size support (due to ram constraint)
-- o2em:
+- o2em (Videopac/Odyssey):
   - no sound
   - only videopac G7000 games supported (due to ram constraint)
-- nofrendo:
+- nofrendo (Nintendo NES):
   - Full speed with sound
   - 32k roms only supported except on Teensy 4.0
-- 5200:
+- 5200 (Atari 5200):
   - Full speed with sound
   - 16 and 32k roms
-- speccy:
+- speccy (Zx spectrum):
   - SNA support (Z80 to be fixed)
   - YM and preliminary buzz sound support
   - 48k games only supported
   - kempston joystick supported but on screen keyboard may not answer in some games
   - I2C custom keyboard support!
-- 81:
+- 81 (Zx81):
   - zx80 and zx81 
   - .P, .81 and .80 format support (rename .56 for Zx81 hires game that requires 48k or more)
   - I2C custom keyboard support!
   - HIRES support for zx81
   - zx80 support
   - YM sound support for zx81
-- 800:
+- 800 (Atari 400/800/XE/XL):
   - .rom support (no floppy yet)
   - I2C custom keyboard support!
   - Full speed with sound
-- AtariST:
+- Castaway (AtariST):
   - floppy support
   - I2C custom keyboard support!
   - with sound
   - full speed on Teensy4.0 only!!
-- PC:
+- 8086 (XT PC):
   - HDD image support
   - I2C custom keyboard support!
   - no sound
   - full speed on Teensy4.0 only!!
-- Vectrex:
+- Vectrex (MB Vectrex):
   - .gam roms support
   - no sound
   - full speed on Teensy4.0 only!!
