@@ -1,0 +1,53 @@
+Teensy 4.0 (2x14 pins) or Teensy 3.6 (2x24 pins inc bottom part)  
+----------------------------------------------------------------
+
+                                  GND X           VIn  (NC)
+                           (NC)    00             Ang  (NC)
+                           (NC)    01           X 3.3v
+                VGA Blue (OPT2)    02           X 23   DISPLAY - CS (also RST for ST7789!)
+               Key USER1 (OPT1)    03 X           22   VGA Hsync (OPT2)
+               Key USER2 (OPT1)    04 X           21   VGA Red   (OPT2)
+                 VGA Red (OPT2)    05             20   VGA Red   (OPT2)
+               VGA Green (OPT2)    06             19   I2C CLK   (OPT1)
+               VGA Green (OPT2)    07             18   I2C DAT   (OPT1)
+               VGA Green (OPT2)    08           X 17   JOY2 Fire
+                   DISPLAY - DC    09 X         X 16   JOY2 AnalogY-A2
+       Audio MSQL for T4 (OPT0)    10           X 15   JOY2 AnalogX-A1
+                 DISPLAY - MOSI    11 X           14   VGA Blue  (OPT2)
+   MISO (Touch) for T3.6 (OPT2)    12           X 13   DISPLAY - SCK
+
+
+
+                           (NC)    3.3v           GND
+                           (NC)    24             DAC1 Audio R for T3.6 (OPT0)
+                           (NC)    25             DAC0 Audio L for T3.6 (OPT0)
+                           (NC)    26             39   Key USER4 (OPT1)
+                           (NC)    27             38   T_CS (Touch) for T3.6 (OPT2)
+                           (NC)    28             37   T_IRQ (Touch) for T3.6 (OPT2)
+               VGA Vsync (OPT2)    29             36    
+                                   30             35    
+                                   31             34   
+                                   32             33   Key USER3 (OPT1)
+
+
+Display: ILI9341/ST7789 (SPI connected,  MISO not connected)
+Storage: SD build-in (external SD requires extra CS)
+
+(X)    mandatory pins to connect for the minimum set-up
+(OPT0) audio output
+(OPT1) keys required to play 'better' as for e.g. computer (I2C keyboard, 2 extra joystick buttons) 
+(OPT2) for VGA output and ILI touch screen (for T3.6 only). ILI touch on same SPI as DISPLAY
+
+
+The keys (all) are using internal pull-up so just connect the other side to the GND
+The Analog joypad also needs VCC and GND connections !
+The Touch (OPT) part of the ILI: T_DIN,T_DO,T_CLK,T_CS (SPI) but also T_IRQ must be connected
+The Display pins: SDI,SCK,CS but also DC,VCC and GND must be connected
+The i2ckeyboard : I2C CLK, I2C DAT, VCC and GND
+
+Everything is powered over the USB connector of the Teensy!
+
+
+======= !!!!! Please select display type in "tft_t_dma_config.h" and verify IO config in "iopins.h" !!!!! =======
+
+

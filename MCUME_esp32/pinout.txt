@@ -1,0 +1,30 @@
+pinout ESP32s board (2x15 pins) GPIO#
+-------------------------------
+            (NC)       EN           X 23 ILI SDI+T_DIN-SPI MOSI
+        Key USER4      36             22 (NC)
+        Key USER3      39             01 (NC)
+        Key USER2      34 X           03 (NC)
+        Key USER1      35 X         X 21 ILI DC 
+        JOY2 Fire      32 X         X 19 ILI SDO+T_DO-SPI MISO
+             (NC)      33           X 18 ILI SCK+T_CLK-SPI SCK
+       AUDIO DAC1      25 O         O 05 I2C SCL
+             (NC)      26           X 17 ILI CS-SPI CS
+     JOY2 AnalogX      27 X           16 (NC)
+   SD SCK-SPI CLK      14 X         O 04 I2C SDA
+ SD MISO-SPI MISO      12 X         X 02 JOY2 AnalogY
+ SD MOSI-SPI MISO      13 X         X 15 SD CS-SPI CS
+                      GND           X GND
+                      Vin    IUSBI  X 3.3v
+
+
+
+(X) mandatory pins to connect for the minimum set-up
+(O) optional connections for audio and I2C keyboard support
+
+The keys (all) are using internal pullup so just connect the other side to the GND
+I2C SDA,SCL, USER1 and USER2 requires external pullup.
+The Analog joypad also needs VCC and GND connections !
+The Display part of the ILI: SDI,SDO,SCK,CS but also DC,VCC and GND must be connected
+The i2ckeyboard : I2C SCL, I2C SDA, VCC and GND
+
+Everything is powered over the USB connector of the ESP32!

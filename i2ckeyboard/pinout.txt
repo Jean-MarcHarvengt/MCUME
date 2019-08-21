@@ -1,0 +1,18 @@
+pinout Atmega328p (2x14 pins) as I2C keyboard slave
+---------------------------------------------------
+
+
+                     01        28 I2C SCL
+                     02        27 I2C SDA
+                     03        26 A3 COL3 OUT (kbd row0)
+                     04        24 A2 COL2 OUT (kbd row1)
+  COL4 OUT (kbd row4)05        25 A1 COL1 OUT (kbd row2)
+9 ROW9 IN (kbd col9) 06        23 A0 COL0 OUT (kbd row3)
+               V3.3v 07        22  
+                 GND 08        21
+                     09        20
+                     10        19 4 ROW4 IN (kbd col4)
+8 ROW8 IN (kbd col8) 11        18 3 ROW3 IN (kbd col3)
+7 ROW7 IN (kbd col7) 12        17 0 ROW0 IN (kbd col0)
+6 ROW6 IN (kbd col6) 13        16 1 ROW1 IN (kbd col1)
+5 ROW5 IN (kbd col5) 14        15 2 ROW2 IN (kbd col2)
