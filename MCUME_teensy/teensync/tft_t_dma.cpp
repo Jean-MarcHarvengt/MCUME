@@ -426,13 +426,19 @@ void TFT_T_DMA::stopDMA(void) {
   delay(50);
   cancelled = false;  
   dmatx.detachInterrupt();
+  fillScreen(RGBVAL16(0x00,0x00,0x00));
   SPI.end();
+#ifdef ST7789  
+  begin();
+#endif
+#ifdef ILI9341 
   SPI.begin();
   digitalWrite(_cs, 0);
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));  
   SPI.endTransaction();
   digitalWrite(_cs, 1);
   digitalWrite(_dc, 1); 
+#endif    
   setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);    
 }
 
