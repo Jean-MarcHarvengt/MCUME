@@ -52,12 +52,13 @@ Game console systems supported and status on various MCU platforms<br>
 - I2C custom keyboard (for computers emulators)
 - Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0)
 - VGA output (Teensy 3.6 only)
+- 2 extra buttons (USER3 and USER4) mostly for NES emu
 
 # Wiring
 - see pinout.txt file in the respective project (ESP32 or Teensy)
 - Some KICAD image also available for ESP32
 
-# I2C keyboard (best to have for computer emus)
+# I2C keyboard (for computer emus)
 - see i2ckeyboard sub-directory
 - the I2C keyboard is using a separate atmega328p MCU handling the keys matrix
 - with 10x4 or 10x5 keys
