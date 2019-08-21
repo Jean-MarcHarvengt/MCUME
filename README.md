@@ -2,11 +2,22 @@
 <p align="center">
   <img width="320" height="140" src="/images/logo.png">
 </p>
+# News
+Teensy 4.0 now running Atari 520ST emulator (68k core based)!!! <br>
+https://youtu.be/UCOaOGmYYso
+https://youtu.be/6rr2hMqprO0
+
+<p align="center">
+<img src="/images/teensybread.jpg" width="200" />  
+<img src="/images/teensy362.jpg" width="200" />  
+<img src="/images/teensy362.jpg" width="200" />  
+</p>
+
 <p align="center">
 <img src="/images/teensybread.jpg" width="200" />  
 <img src="/images/teensy362.jpg" width="200" />  
 </p>
-</p>
+
 <p align="center">
 <img src="/images/esp321.jpg" width="200" />  
 <img src="/images/esp322.jpg" width="200" />  
