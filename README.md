@@ -15,6 +15,7 @@ A collection of 80th game Console and Computer emulators ported to Teensy and ES
 Have a look at the video:
 https://youtu.be/jlqoWH2X6gk<br><br>
 This project is a spin-off of the TeensyCEC project https://github.com/Jean-MarcHarvengt/TeensyCEC<br>
+Now ported to much more MCUs! <br>
 
 # Featuring
 
