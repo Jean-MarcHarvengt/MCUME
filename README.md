@@ -82,6 +82,8 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Compilation/flashing (Teensy)
 - open the respective ino file with Arduino SDK
+- select DISPLAY MODULE in tft_t_dma_config.h (ST7789 or ILI9341)!!!!
+- double check iopins.h for pins configuration!!!!
 - compile and install from there.
 
 # Compilation/flashing (ESP32)
