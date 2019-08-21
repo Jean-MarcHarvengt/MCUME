@@ -26,8 +26,8 @@ Computer systems supported and status on various MCU platforms<br>
 | Zx spectrum | X | X | X | X |
 | Atari 800   | X | X | X | X |
 | C64         | X | X | X | X |
-| Atari 520ST | - | full speed | - | slow |
-| 8086 XT PC  | - | full speed | - | slow |
+| Atari 520ST | - | full speed! | - | slow |
+| 8086 XT PC  | - | full speed! | - | slow |
 
 Game console systems supported and status on various MCU platforms<br>
 
@@ -38,10 +38,10 @@ Game console systems supported and status on various MCU platforms<br>
 | Colecovision      | X | X | X | X |
 | Atari 5200        | X | X | X | X |
 | Nintendo NES      | X | big roms! | X | X |
-| Vectrex           | - | full speed | - | slow |
+| Vectrex           | - | full speed! | - | slow |
 
 # Minimal requirements:
-- Teensy 3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
+- Teensy3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
 - ILI9341 (Teensy/ESP32) or ST7789 (Teensy only) SPI display
 - SD card (Teensy uses built-in uSD, ESP32 uses external one connected over SPI, e.g. ILI9341 integrated one)
 - Analog joypad (Arduino or PSP like)
