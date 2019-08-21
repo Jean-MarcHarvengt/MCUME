@@ -6,12 +6,15 @@
 <img src="/images/esp321.jpg" width="200" />  
 <img src="/images/esp322.jpg" width="200" />  
 </p>
-A collection of 80th game Console and Computer emulators for the ESP32 MCU.<br>
+</p>
+<p align="center">
+<img src="/images/esp321.jpg" width="200" />  
+<img src="/images/esp322.jpg" width="200" />  
+</p>
+A collection of 80th game Console and Computer emulators ported to Teensy and ESP32 MCUs.<br>
 Have a look at the video:
 https://youtu.be/jlqoWH2X6gk<br><br>
 This project is a spin-off of the TeensyCEC project https://github.com/Jean-MarcHarvengt/TeensyCEC<br>
-I plan to bring back the Teensy3.6 code under the umbrella of this project soon<br>
-My goal is that M.CU.M.E get ported on multiple MCU platforms, to be able to expand it with more!<br>
 
 # Featuring
 5 game consoles:
@@ -20,8 +23,9 @@ Atari2600 (espvcs), Philips Videopac/Odyssey (espo2em), Colecovision (espcolem),
 Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 
 # Minimal requirements:
-- ESP32 Node32S sdk chip
-- ILI9341 display with SD card (2.2/2.8 inches version)
+- Teensy 3.6/Teensy4.0 or ESP32 Node32S/Wrover sdk chip
+- ILI9341 or ST7789 SPI display
+- SD card (Teensy uses built-in uSD, ESP32 uses external one connected over SPI, e.g. ILI9341 integrated one)
 - Analog joypad (Arduino or PSP like)
 - 3 buttons (FIRE, USER1 and USER2)
 
@@ -32,8 +36,9 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 - see pinout.txt file in the project
 
 # I2C keyboard (best to have)
-- see pinout.txt file in i2ckeyboard sub-directory
+- see i2ckeyboard sub-directory
 - the I2C keyboard is using a separate atmega328p MCU handling the keys matrix
+- with 10x4 or 10x5 keys
 
 # Installation
 - Format the SD card as FAT32
@@ -45,12 +50,19 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
   - 'c64"  => for c64, put your C64 programs here (.prg)
   - "o2em" => for odyssey/videopac, put your Videopac/Odysssey roms here (.bin)
   - "coleco" => for colem, put your Colecovision roms here (.rom, including coleco.rom)
-  - "nes"  => for nes/nofrendo, put your .nes files here, onlt 32k games are supported (galaga,xevious,mario1...)
+  - "nes"  => for nes/nofrendo, put your .nes files here (e.g. galaga,xevious,mario1...)
   - "spec" => for spectrum, put your ".z80" or ".sna" files here into sub-dirs or not ( max 48K )
   - "z81"  => for zx81, put your ".p", ".81"(, ".56") ".80" or ".o" files here, into sub-dirs or not ( max 56K ) 
-- insert the SD into the ILI9341 SD slot
+  - "st"  => for AtariST, put your ".st" files here, into sub-dirs or not
+  - "pc"  => for zx81, put your HDD image ".img" 
+  - "vectrex"  => for Vectrex, put your ".gam" files here, into sub-dirs or not
+- insert the card into the SD slot
 
-# Compilation/flashing
+# Compilation/flashing (Teensy)
+- open the respective ino file with Arduino SDK
+- compile and install from there.
+
+# Compilation/flashing (ESP32)
 - go to espboot directory first:
 - make, make flash => this will install custom partition table, bootloader and app selector 
 - go to any other directory (one by one!):
@@ -61,7 +73,7 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 - 64:
   - with sound
   - I2C custom keyboard support! 
-  - Many games crashe
+  - (only few games working)
 - colem:
   - with sound!
 - vcs:
@@ -72,7 +84,7 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
   - only videopac G7000 games supported (due to ram constraint)
 - nofrendo:
   - Full speend with sound
-  - 32k roms only supported
+  - 32k roms only supported except on Teensy 4.0
 - 5200:
   - with sound
   - 16 and 32k roms
@@ -93,9 +105,23 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
   - .rom support (no floppy yet)
   - I2C custom keyboard support!
   - with sound
+- AtariST:
+  - floppy support
+  - I2C custom keyboard support!
+  - with sound
+  - full speed on Teensy4.0 only!!
+- PC:
+  - HDD image support
+  - I2C custom keyboard support!
+  - no sound
+  - full speed on Teensy4.0 only!!
+- Vectrex:
+  - .gam roms support
+  - no sound
+  - full speed on Teensy4.0 only!!
   
 # Running
-- Select the emulator from the app selector screen and press FIRE (wait a bit that the SD get mounted)
+- ESP32 only: Select the emulator from the app selector screen and press FIRE (wait a bit that the SD get mounted)
 - For the launched emulator you should see the roms of the SD card being listed
 - you can select the rom with up/down 
 - you can start the game by pressing the FIRE key
@@ -107,6 +133,6 @@ Zx80/Zx81 (esp81), Zx Spectrum (espspeccy), Atari800 (esp800)and C64 (esp64)
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo and jun52 projects!
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu and 8086 Arduino projects!
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
