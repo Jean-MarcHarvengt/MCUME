@@ -1,0 +1,31 @@
+pinout ESP32-WROVERs ILS board (2x17 pins) GPIO#
+------------------------------------------
+                      3v3            GND
+            (NC)       EN           X 23 ILI SDI+T_DIN-SPI MOSI
+                       VP           X 22 ILI CS-SPI CS
+                       VN             TX (NC)
+        Key USER2      34 X           RX (NC)
+        Key USER1      35 X         X 21 ILI DC 
+        JOY2 Fire      32 X         X 19 ILI SDO+T_DO-SPI MISO
+             (NC)      33           X 18 ILI SCK+T_CLK-SPI SCK
+       AUDIO DAC1      25 O         O 05 I2C SCL
+             (NC)      26           O 04 I2C SDA
+     JOY2 AnalogX      27 X           00 (NC)
+   SD SCK-SPI CLK      14 X         X 02 JOY2 AnalogY
+ SD MISO-SPI MISO      12 X         X 15 SD CS-SPI CS
+ SD MOSI-SPI MISO      13 X           GND 
+                      GND             5v
+                      BAT             Vin
+                      GND   IUSBI     3V3
+
+
+(X) mandatory pins to connect for the minimum set-up
+(O) optional connections for audio and I2C keyboard support
+
+The keys (all) are using internal pullup so just connect the other side to the GND
+I2C SDA,SCL, USER1 and USER2 requires external pullup (2.7k)
+The Analog joypad also needs VCC and GND connections !
+The Display part of the ILI: SDI,SDO,SCK,CS but also DC,VCC and GND must be connected
+The i2ckeyboard : I2C SCL, I2C SDA, VCC and GND
+
+Everything is powered over the USB connector of the ESP32!
