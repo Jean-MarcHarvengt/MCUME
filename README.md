@@ -47,6 +47,8 @@ Computer systems supported and status on various MCU platforms<br>
 | Atari 520ST | - | full speed! | - | slow |
 | 8086 XT PC  | - | full speed! | - | slow |
 
+Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
+
 Game console systems supported and status on various MCU platforms<br>
 
 | System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
