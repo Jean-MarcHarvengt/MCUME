@@ -175,6 +175,6 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu and 8086 Arduino projects!
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name) and  Mike Chambers for his 8086 Arduino project!
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
