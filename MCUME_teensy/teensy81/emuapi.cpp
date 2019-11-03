@@ -530,7 +530,7 @@ void emu_init(void)
     byte b = Wire.read(); // receive a byte
     msg[i++] = b;        
   }
-  /*     
+/*
   Serial.println(msg[0], BIN);
   Serial.println(msg[1], BIN);
   Serial.println(msg[2], BIN);
@@ -538,7 +538,7 @@ void emu_init(void)
   Serial.println(msg[4], BIN);
   Serial.println(msg[5], BIN);
   Serial.println(msg[6], BIN);
-  */  
+*/    
   if ( (msg[0] == 0xff) && (msg[1] == 0xff) && 
        (msg[2] == 0xff) && (msg[3] == 0xff) && 
        (msg[4] == 0xff) && (msg[5] == 0xff) && (msg[6] == 0xff)) {

@@ -10,8 +10,8 @@
 #ifdef ST7789
 // ST7789
 #define TFT_SCLK        13
-#define TFT_MOSI        12
-#define TFT_MISO        11
+#define TFT_MOSI        11
+#define TFT_MISO        12
 #define TFT_TOUCH_CS    255
 #define TFT_TOUCH_INT   255
 #define TFT_DC          9
@@ -20,8 +20,8 @@
 #else
 // ILI9341
 #define TFT_SCLK        13
-#define TFT_MOSI        12
-#define TFT_MISO        11
+#define TFT_MOSI        11
+#define TFT_MISO        12
 #define TFT_TOUCH_CS    255 //38
 #define TFT_TOUCH_INT   255 //37
 #define TFT_DC          9
@@ -32,8 +32,8 @@
 
 // SD
 #define SD_SCLK        13
-#define SD_MOSI        12
-#define SD_MISO        11  
+#define SD_MOSI        11
+#define SD_MISO        12  
 #define SD_CS          BUILTIN_SDCARD
 
 // I2C keyboard
