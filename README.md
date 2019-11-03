@@ -5,7 +5,7 @@
 
 # News
 
-Nov 2019: PC-Engine'tiny' emulator running using extra 8MB SPI RAM on Teensy 4.0 <br>
+Nov 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI RAM (PSRAM)  <br>
 https://youtu.be/Ot9RgDMqdF4<br>
 <br>
 Sep 2019: Teensy 4.0 now running Atari 520ST emulator (68k core based)!!! <br>
