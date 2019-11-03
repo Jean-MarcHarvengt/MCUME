@@ -9,8 +9,9 @@ Nov 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI
 https://youtu.be/Ot9RgDMqdF4<br>
 <br>
 <p align="center">
-<img src="/images/t4piggy.png" width="200" />  
-T4 with PSRAM piggy back
+<img src="/images/t4piggy.png" width="240" />  
+<br>
+T4 with PSRAM piggy back!
 </p>
 
 <br>
