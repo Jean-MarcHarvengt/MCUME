@@ -6,7 +6,8 @@
 #include "font8x8.h"
 
 
-#define SPICLOCK 144e6 //Just a number..max speed
+//#define SPICLOCK 144e6 //Just a number..max speed
+#define SPICLOCK 60000000
 #ifdef ILI9341
 #define SPI_MODE SPI_MODE0
 #endif

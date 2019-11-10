@@ -12,7 +12,7 @@ extern uint16 *objramw;
 
 
 #define BG_CACHE_SIZE  0x20000
-#define OBJ_CACHE_SIZE 0x60000 //0x7E800 //0x80000
+#define OBJ_CACHE_SIZE 0x40000 //0x60000 //0x7E800 //0x80000
 
 extern uint8 * bg_pattern_cache;
 extern uint8 * obj_pattern_cache;

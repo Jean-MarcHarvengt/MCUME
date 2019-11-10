@@ -9,7 +9,8 @@
 
 #define SPI SPI2
 
-#define SPICLOCK 104000000 
+//#define SPICLOCK 104000000 
+#define SPICLOCK 60000000 
 //#define SPICLOCK 144e6 //Just a number..max speed
 #define SPI_MODE SPI_MODE0
 

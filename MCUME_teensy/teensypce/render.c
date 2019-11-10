@@ -106,7 +106,7 @@ int make_sprite_list(void)
 
             xflip = (attr >> 11) & 1;
             yflip = (attr >> 15) & 1;
-            flip = ((xflip << 9) | (yflip << 10)) & 0x600;
+            flip = ((xflip << 9) /*| (yflip << 10)*/) & 0x600;
 
             name = (name >> 1) & 0x1FF;
             name &= ~((cgy << 1) | cgx);
@@ -215,12 +215,12 @@ void update_obj_pattern_cache(void)
                     c = (i3 << 3 | i2 << 2 | i1 << 1 | i0);
 
                     obj_pattern_cache[(name << 8) | (y << 4) | (x)] = (c);
-                    if (OBJ_CACHE_SIZE > 0x20000)
+                    //if (OBJ_CACHE_SIZE > 0x20000)
                         obj_pattern_cache[0x20000 | (name << 8) | (y << 4) | (x ^ 0x0F)] = (c);
-                    if (OBJ_CACHE_SIZE > 0x40000)
-                        obj_pattern_cache[0x40000 | (name << 8) | ((y ^ 0x0F) << 4) | (x)] = (c);
-                    if (OBJ_CACHE_SIZE > 0x60000)
-                        obj_pattern_cache[0x60000 | (name << 8) | ((y ^ 0x0F) << 4) | (x ^ 0x0F)] = (c);
+                    //if (OBJ_CACHE_SIZE > 0x40000)
+                    //    obj_pattern_cache[0x40000 | (name << 8) | ((y ^ 0x0F) << 4) | (x)] = (c);
+                    //if (OBJ_CACHE_SIZE > 0x60000)
+                    //    obj_pattern_cache[0x60000 | (name << 8) | ((y ^ 0x0F) << 4) | (x ^ 0x0F)] = (c);
                 }
             }
         }
@@ -341,8 +341,8 @@ void render_obj_16(int line)
             name_mask = ((nt_line >> 4) & 3) << 1;
             name = (p->name_left | name_mask);
             v_line &= 0x0F;
-
-            src = &obj_pattern_cache[(name << 8) | ((v_line & 0x0f) << 4)];
+            //src = &obj_pattern_cache[(name << 8) | ((v_line & 0x0f) << 4)];
+            src = &obj_pattern_cache[(name << 8) | ( (p->flags & FLAG_YFLIP?v_line ^ 0x0F:v_line) << 4)];
             dst = (uint16 *)&linebuf[((XOFFSET+p->xpos) & 0x1ff)]; //&bitmap.data[(line * bitmap.pitch) + (((XOFFSET+p->xpos) & 0x1ff) * (bitmap.granularity))];
             for(x = 0; x < 0x10; x += 1)
             {
@@ -354,7 +354,8 @@ void render_obj_16(int line)
             if(p->flags & FLAG_CGX)
             {
                 name = (p->name_right | name_mask);
-                src = &obj_pattern_cache[(name << 8) | ((v_line & 0x0f) << 4)];
+                //src = &obj_pattern_cache[(name << 8) | ((v_line & 0x0f) << 4)];
+                src = &obj_pattern_cache[(name << 8) | ( (p->flags & FLAG_YFLIP?v_line^ 0x0F:v_line) << 4)];
                 dst += 0x10;
 
                 for(x = 0; x < 0x10; x += 1)
