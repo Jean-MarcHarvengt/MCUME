@@ -7,11 +7,13 @@
 
 Nov 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI RAM (PSRAM)  <br>
 https://youtu.be/Ot9RgDMqdF4<br>
+GFX bug due to objs cache limitation is now fixed!
 <br>
 <p align="center">
 <img src="/images/t4piggy.png" width="240" />  
+<img src="/images/pcbT4.png" width="480" />  
 <br>
-T4 with PSRAM piggy back!
+T4 with PSRAM piggy back and latest T4 pcb!
 </p>
 
 <br>
