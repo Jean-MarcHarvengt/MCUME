@@ -52,27 +52,28 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
-| --- | --- |--- | --- | --- |
-| Zx81        | X | X | X | X |
-| Zx spectrum | X | X | X | X |
-| Atari 800   | X | X | X | X |
-| C64         | X | X | X | X |
-| Atari 520ST | - | full speed! | - | slow |
-| 8086 XT PC  | - | full speed! | - | slow |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | ESP32 | ESP32-Wrover |
+| --- | --- |--- | --- | --- | --- |
+| Zx81        | X | X | X | X | X |
+| Zx spectrum | X | X | X | X | X |
+| Atari 800   | X | X | X | X | X |
+| C64         | X | X | X | X | X |
+| Atari 520ST | - | full speed! | X | - | slow |
+| 8086 XT PC  | - | full speed! | X | - | slow |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
 
 Game console systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | ESP32 | ESP32-Wrover |
-| --- | --- |--- | --- | --- |
-| Atari 2600        | X | X | X | X |
-| Odyssey/Videopac  | X | X | X | X |
-| Colecovision      | X | X | X | X |
-| Atari 5200        | X | X | X | X |
-| Nintendo NES      | X | big roms! | X | X |
-| Vectrex           | - | full speed! | - | slow |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | ESP32 | ESP32-Wrover |
+| --- | --- |--- | --- | --- | --- |
+| Atari 2600        | X | X | X | X | X |
+| Odyssey/Videopac  | X | X | X | X | X |
+| Colecovision      | X | X | X | X | X |
+| Atari 5200        | X | X | X | X | X |
+| Nintendo NES      | X | big roms! | X | X | X |
+| Vectrex           | - | full speed! | X | - | slow |
+| PC Engine         | - | - | X | - | - |
 
 # Minimal requirements:
 - Teensy3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
@@ -112,6 +113,7 @@ Game console systems supported and status on various MCU platforms<br>
   - "st"  => for AtariST, put your floppis ".st" files here
   - "pc"  => for 8086, put your HDD image ".img" 
   - "vectrex"  => for Vectrex, put your ".gam" files here
+  - "pce"  => for PC Engine, put your ".pce" files here  
 - insert the card into the SD slot
 
 # Compilation/flashing (Teensy)
@@ -177,6 +179,11 @@ Game console systems supported and status on various MCU platforms<br>
   - .gam roms support
   - no sound
   - full speed on Teensy4.0 only!!
+- PCE (PC Engine):
+  - .pce roms support
+  - Nearly full speed with sound
+  - Some games hang or do not start as Outrun, Powerdrift...
+  
   
 # Running
 - ESP32 only: Select the emulator from the app selector screen and press FIRE (wait a bit that the SD get mounted)
@@ -191,6 +198,6 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name) and  Mike Chambers for his 8086 Arduino project!
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu) and  Mike Chambers for his 8086 Arduino project!
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
