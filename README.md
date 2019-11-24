@@ -5,7 +5,9 @@
 
 # News
 
-Nov 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI RAM (PSRAM)  <br>
+Nov 2019: Gameboy, Sega Master System/ GameGear and Megadrive/Genesis emulator running with extra 8MB SPI RAM (PSRAM) <br>
+
+Oct 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI RAM (PSRAM)  <br>
 https://youtu.be/Ot9RgDMqdF4<br>
 GFX bug due to objs cache limitation is now fixed!
 <br>
@@ -67,13 +69,16 @@ Game console systems supported and status on various MCU platforms<br>
 
 | System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | ESP32 | ESP32-Wrover |
 | --- | --- |--- | --- | --- | --- |
-| Atari 2600        | X | X | X | X | X |
-| Odyssey/Videopac  | X | X | X | X | X |
-| Colecovision      | X | X | X | X | X |
-| Atari 5200        | X | X | X | X | X |
-| Nintendo NES      | X | big roms! | X | X | X |
-| Vectrex           | - | full speed! | X | - | slow |
-| PC Engine         | - | - | X | - | - |
+| Atari 2600                   | X | X | X | X | X |
+| Odyssey/Videopac             | X | X | X | X | X |
+| Colecovision                 | X | X | X | X | X |
+| Atari 5200                   | X | X | X | X | X |
+| Nintendo NES                 | X | big roms! | X | X | X |
+| Vectrex                      | - | full speed! | X | - | slow |
+| PC Engine                    | - | - | X | - | - |
+| Gameboy/GBColor              | - | - | X | - | - |
+| Sega Master System/Game Gear | - | - | X | - | - |
+| Sega Genesis/Megadrive       | - | - | X | - | - |
 
 # Minimal requirements:
 - Teensy3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
@@ -114,7 +119,10 @@ Game console systems supported and status on various MCU platforms<br>
   - "pc"  => for 8086, put your HDD image ".img" 
   - "vectrex"  => for Vectrex, put your ".gam" files here
   - "pce"  => for PC Engine, put your ".pce" files here  
-- insert the card into the SD slot
+  - "gameboy"  => for Gameboy and GBColor, put your ".gb"/"gbc" files here  
+  - "sms"  => for Sega Master System/Game Gear, put your ".sms"/"gg" files here  
+  - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here  
+-- insert the card into the SD slot
 
 # Compilation/flashing (Teensy)
 - open the respective ino file with Arduino SDK
@@ -183,6 +191,15 @@ Game console systems supported and status on various MCU platforms<br>
   - .pce roms support
   - Nearly full speed with sound
   - Some games hang or do not start as Outrun, Powerdrift...
+- SMS/GG (Sega Master System/Game Gear):
+  - Full speed with sound
+- Gameboy (and Game Boy Color):
+  - Full speed with sound
+  - Major missing background issue
+- Genesis (Sega Megadrive):
+  - Nearly Full speed with rarely sound
+  - Some background  rotation issue
+  - Some games do not start
   
   
 # Running
