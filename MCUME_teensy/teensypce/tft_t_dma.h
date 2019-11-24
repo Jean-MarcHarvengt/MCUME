@@ -20,6 +20,7 @@
 #define G16(rgb) ((rgb>>3)&0xfc) 
 #define B16(rgb) ((rgb<<3)&0xf8) 
 
+#define PAL_COLOR_MASK 0xff
 
 #define TFT_HEIGHT     240
 

@@ -79,7 +79,7 @@ typedef struct
 
 
 /* Square wave look up table */
-PROGMEM static const int SquareWave[16] = { 127,127,127,127,127,127,127,127, -128,-128,-128,-128,-128,-128,-128,-128 };
+static const int SquareWave[16] = { 127,127,127,127,127,127,127,127, -128,-128,-128,-128,-128,-128,-128,-128 };
 
 
 static long RandomNum;
@@ -177,7 +177,7 @@ void Sound_ClearMixBuffer(void)
   Find how many samples to generate and store in 'nSamplesToGenerate'
   Also update 'SoundCycles' to store how many we actually did so generates set amount each frame
 */
-PROGMEM static void Sound_SetSamplesPassed(void)
+static void Sound_SetSamplesPassed(void)
 {
   int nSampleCycles;
   int nSamplesPerFrame;
@@ -369,7 +369,7 @@ static void Sound_GenerateChannel(int *pBuffer, unsigned char ToneFine, unsigned
   *pChannelFreq = ToneFreq;
 }
 
-
+#ifdef XXX
 /*-----------------------------------------------------------------------*/
 /*
   Generate samples for all channels during this time-frame
@@ -423,20 +423,6 @@ void Sound_Update(void)
 
 }
 
-
-/*-----------------------------------------------------------------------*/
-/*
-  On each VBL (50fps) complete samples.
-*/
-void Sound_Update_VBL(void)
-{
-  //Sound_Update();
-
-  /* Clear write to register '13', used for YM file saving */
-  bEnvelopeFreqFlag = FALSE;
-}
-
-
 /*-----------------------------------------------------------------------*/
 /*
   This is called from the audio callback function to create enough samples
@@ -452,10 +438,65 @@ void Sound_UpdateFromAudioCallBack(void)
   nSamplesToGenerate = SOUND_BUFFER_SIZE - nGeneratedSamples;
 
   Sound_GenerateSamples();
+Serial.println("vvv");  
 }
+
+
+#endif
+
+void Sound_Update(void)
+{
+ int Dec=1;
+
+  /* Check how many cycles have passed, as we use this to help find out if we are playing sample data */
+
+  /* First, add decay to channel amplitude variables */
+  if (SoundCycles>(CYCLES_PER_FRAME/4))
+    Dec = 16;                            /* Been long time between sound writes, must be normal tone sound */
+
+  if (!bWriteChannelAAmp)                /* Not written to amplitude, decay value */
+  {
+    ChannelAmpDecayTime[0]-=Dec;
+    if (ChannelAmpDecayTime[0]<0)  ChannelAmpDecayTime[0] = 0;
+  }
+  if (!bWriteChannelBAmp)
+  {
+    ChannelAmpDecayTime[1]-=Dec;
+    if (ChannelAmpDecayTime[1]<0)  ChannelAmpDecayTime[1] = 0;
+  }
+  if (!bWriteChannelCAmp)
+  {
+    ChannelAmpDecayTime[2]-=Dec;
+    if (ChannelAmpDecayTime[2]<0)  ChannelAmpDecayTime[2] = 0;
+  }
+  
+  //Sound_Update();
+
+  /* Clear write to register '13', used for YM file saving */
+  //bEnvelopeFreqFlag = FALSE;
+
+    /* Reset the write to register '13' flag */
+    bWriteEnvelopeFreq = FALSE;
+    /* And amplitude write flags */
+    bWriteChannelAAmp = bWriteChannelBAmp = bWriteChannelCAmp = FALSE;
+  
+}
+
+/*-----------------------------------------------------------------------*/
+/*
+  On each VBL (50fps) complete samples.
+*/
+void Sound_Update_VBL(void)
+{
+ }
+
+
+
 
 void Sound_UpdateFromCallBack16(short *pBuffer, int len)
 {
+  len = len >> 1; 
+  
   int *pChannelA=Channel_A_Buffer, *pChannelB=Channel_B_Buffer, *pChannelC=Channel_C_Buffer;
   int i;
   nSamplesToGenerate = len;
@@ -471,18 +512,25 @@ void Sound_UpdateFromCallBack16(short *pBuffer, int len)
 
   /* Mix channels together, using table to clip and also convert to 'unsigned char' */
   for(i=0; i<len; i++) {
-    short s = ((*pChannelA++) +(*pChannelB++) + (*pChannelC++))<<4; 
-    *pBuffer++ = s; 
-    *pBuffer++ = s;
+    //short s = ((*pChannelA++) +(*pChannelB++) + (*pChannelC++))<<4; 
+    //*pBuffer++ = s; 
+    //*pBuffer++ = s;
     //char s = pMixTable[(*pChannelA++) + (*pChannelB++) + (*pChannelC++)];
-    //*pBuffer++ = ((short)s << 8);
-    //*pBuffer++ = ((short)s << 8);
+    short s = (*pChannelA++) + (*pChannelB++) + (*pChannelC++);
+    *pBuffer++ = (short)s << 7;
+    s = (*pChannelA++) + (*pChannelB++) + (*pChannelC++);
+
+//    s = pMixTable[(*pChannelA++) + (*pChannelB++) + (*pChannelC++)];
+    *pBuffer++ = (short)s << 7;
+    //*pBuffer++ = (short)s << 8;
+    //*pBuffer++ = 0;
+    //
   }
 
-  /* Reset the write to register '13' flag */
-  bWriteEnvelopeFreq = FALSE;
-  /* And amplitude write flags */
-  bWriteChannelAAmp = bWriteChannelBAmp = bWriteChannelCAmp = FALSE;
+    bWriteEnvelopeFreq = FALSE;
+    /* And amplitude write flags */
+    bWriteChannelAAmp = bWriteChannelBAmp = bWriteChannelCAmp = FALSE;
+
 }
 
 #else

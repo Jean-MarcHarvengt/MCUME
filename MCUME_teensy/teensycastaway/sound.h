@@ -21,7 +21,7 @@
 #ifdef DINGOO
 #define SOUND_FREQ 16000
 #else
-#define SOUND_FREQ 11025 //22050 //11025 //22050
+#define SOUND_FREQ 22050 //22050 //11025 //22050
 #endif
 
 #define SOUND_BUFFER_SIZE 1024

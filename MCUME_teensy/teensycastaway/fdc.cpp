@@ -22,6 +22,7 @@ static char     sccsid[] = "$Id: fdc.c,v 1.2 2002/06/08 23:31:58 jhoenig Exp $";
 #include "m68k_intrf.h"
 
 #include "emuapi.h"
+#include "diskapi.h"
 
 
 //#define MEMDISC 1
@@ -110,12 +111,14 @@ PROGMEM int discread(unsigned long address,int a,int len,int discn)
 #endif
 
 #else
+
 	LOG("disc read: ",len);
 	uint8 buf[256];
 	int totlen = len; 
 	while (totlen>=256) {
 		//fread(buf,1,256,disk[discn].file);
-    emu_FileRead(buf,256);
+    disk_Read(buf,256);
+		
 		LOG("b read: ",buf[0]);
 		totlen -= 256;		
 		for (i=0; i<256; i++) {
@@ -125,7 +128,7 @@ PROGMEM int discread(unsigned long address,int a,int len,int discn)
 	}
 	if (totlen) {
 		//fread(buf,1,totlen,disk[discn].file);
-		emu_FileRead(buf,totlen);
+		disk_Read(buf,totlen);
 		LOG("b: ",buf[0]);
 		for (i=0; i<totlen; i++) {
 			SetMemBBB(address, buf[i]);
@@ -168,7 +171,7 @@ int discseek(int discn,int pos,int a)
 	discpos[discn]=pos;
 #ifdef MEMDISC
 #else
-	if (disk[discn].file) emu_FileSeek(pos); //fseek(disk[discn].file,pos,SEEK_SET);
+	if (disk[discn].file) disk_Seek(pos); //fseek(disk[discn].file,pos,SEEK_SET);
 #endif    
 	return 0;
 }
@@ -195,8 +198,8 @@ PROGMEM int FDCInit(int i)
 		//len=ftell(disk[i].file);
 		//disk[i].disksize = len;
 		//fseek(disk[i].file,0,SEEK_SET);
-		len = emu_FileSize(disk[i].name);
-    disk[i].file = emu_FileOpen(disk[i].name);  
+		len = disk_Size(disk[i].name);
+    disk[i].file = disk_Open(disk[i].name);  
     buf=&disc[i][0];
     disk[i].disksize = len;    
 #ifdef MEMDISC      
@@ -206,8 +209,8 @@ PROGMEM int FDCInit(int i)
 		if (disk[i].file) {
 	    //fread(buf,1,256,disk[i].file);
 			//fseek(disk[i].file,0,SEEK_SET);
-      emu_FileRead(buf, 256);
-      emu_FileSeek(0);
+      disk_Read(buf, 256);
+      disk_Seek(0);
     }	
 #endif        
 		

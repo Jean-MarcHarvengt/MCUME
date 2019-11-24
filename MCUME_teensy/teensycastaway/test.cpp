@@ -7,6 +7,13 @@
 #include "st.h"
 #include "mem.h"
 #include "m68k_intrf.h"
+#include "iopins.h"
+
+
+#include "psram_t.h"
+#ifdef PSRAM_CS
+PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
+#endif
 
 #ifndef NO_SOUND  
 #include "sound.h"
@@ -160,6 +167,7 @@ static int joynum = 1;
 static int hk = 0;
 static int prev_hk = 0;
 static int k = 0;
+static int prev_k = 0;
 
 extern void ast_Input(int click) {
   hk = emu_ReadI2CKeyboard();
@@ -168,15 +176,30 @@ extern void ast_Input(int click) {
 
 static void do_events(void) 
 {
+  int bClick = k & ~prev_k;
+  prev_k = k;
+
+  // Toggle mouse/joystick
+  if (bClick & MASK_KEY_USER1) {
+    if (isMouse) isMouse = false;
+    else isMouse = true;
+  
+  }
+  // Toggle keymap
+  if (bClick & MASK_KEY_USER2) {
+    emu_setKeymap(0);
+  }
+  
+  
   if (hk != prev_hk) {
     prev_hk == hk;
     if ( (hk != 0) && (hk != prev_key) ) {
       prev_key = hk;
       IkbdKeyPress ( hk );
-      if (hk == 68) {
-        if (isMouse) isMouse = false;
-        else isMouse = true;
-      }
+      //if (hk == 68) {
+      //  if (isMouse) isMouse = false;
+      //  else isMouse = true;
+      //}
       //IkbdLoop(); 
       //Serial.print("press ");
       //Serial.println(hk);
@@ -189,6 +212,9 @@ static void do_events(void)
       //Serial.println(hk);
       prev_key = 0;
   }           
+
+
+
 
   if (!isMouse)
   {
@@ -497,12 +523,97 @@ void ast_Step(void)
   }
 }
 
+#ifdef PSRAM_CS
+
+// disk IO mapped to PSRAM
+
+extern "C" uint8 read_rom(int address) {
+  //emu_printh(address);
+  return (psram.psread(address)); 
+}
+
+extern "C" void  write_rom(int address, uint8 val)  {
+  psram.pswrite(address,val); 
+}
+
+static int disksize = 0;
+static int diskpt = 0;
+
+int disk_Size(char * filename) {
+  //emu_printf("disk size");
+  //emu_printi(disksize);
+  return disksize;
+}
+
+int disk_Open(char * filename) {
+  //emu_printf("disk reset pt");
+  diskpt = 0;
+  return 1;
+}
+
+int disk_Read(char * buf, int size) {
+  //emu_printf("disk read");
+  //emu_printi(size);
+  int i = 0;
+  while ( ( i < size) && (diskpt < disksize) ) {
+    buf[i++] = read_rom(diskpt++);
+  }
+  return i;
+}
+
+int disk_Seek(int seek) {
+  //emu_printf("disk seek");
+  //emu_printi(seek);
+  diskpt = seek; 
+  return diskpt;
+}
+
+#else
+
+// disk IO mapped to File
+
+int disk_Size(char * filename) {
+  return emu_FileSize(filename);
+}
+
+int disk_Open(char * filename) {
+  return emu_FileOpen(filename);
+}
+
+int disk_Read(char * buf, int size) {
+  return emu_FileRead(buf, size);
+}
+
+int disk_Seek(int seek) {
+  return emu_FileSeek(seek);
+}
+#endif
+
 
 
 void ast_Start(char * filename)
 {
   emu_printf("init started");
   strncpy (disk[0].name, filename, sizeof(disk[0].name));
+
+#ifdef PSRAM_CS
+  char iobuf[512];
+  int iopos = 0;
+  disksize = 0;
+  int n;  
+
+  psram.begin();
+  if (emu_FileOpen(filename)) {
+    while ( (n = emu_FileRead(&iobuf[0],sizeof(iobuf)) ) ) {
+      disksize += n;
+      for (int i=0; i<n; i++) {
+        write_rom(iopos++,iobuf[i]);
+      }        
+    }
+    emu_FileClose();
+  }
+  emu_printf("psram loaded");
+#endif
   
   initialize_memmap();
   FDCInit(0);

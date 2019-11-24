@@ -7,28 +7,31 @@
 
 #include "tft_t_dma.h"
 //#include "logo.h"
-#//include "bmpjoy.h"
-#//include "bmpvbar.h"
+//#include "bmpjoy.h"
+//#include "bmpvbar.h"
 //#include "bmpvga.h"
 //#include "bmptft.h"
 
 #ifndef SD_CS
-#define USE_SDFAT 1
+#define USE_SDFS 1
 #endif
 
 #ifdef HAS_I2CKBD
 #include <Wire.h>
 #endif
 
-#ifdef USE_SDFAT
-#include <SdFat.h>
-static SdFatSdio SD;
+#ifdef USE_SDFS
+#define SDFSDEV "2:"
+
+#include "uSDFS.h"
+static FATFS fatfs;
+static FIL file; 
 #else
 #include <SD.h>
+static File file;
 #endif
 
 extern TFT_T_DMA tft;
-static File file;
 static char romspath[64];
 static int16_t calMinX=-1,calMinY=-1,calMaxX=-1,calMaxY=-1;
 static bool i2cKeyboardPresent = false;
@@ -36,10 +39,15 @@ const uint16_t deflogo[] = {
   0x0000,0x0000
 };
 static const uint16_t * logo = deflogo;
+static unsigned short * keys;
+static int keyMap;
 
+#ifdef USE_SDFS
+#define CALIBRATION_FILE    SDFSDEV "/cal.cfg"
+#else
 #define CALIBRATION_FILE    "/cal.cfg"
-
-#define MAX_FILES           32
+#endif
+#define MAX_FILES           128
 #define MAX_FILENAME_SIZE   28
 #define MAX_MENULINES       (MKEY_L9)
 #define TEXT_HEIGHT         16
@@ -105,11 +113,36 @@ static int topFile=0;
 static char selection[MAX_FILENAME_SIZE+1]="";
 static uint8_t prev_zt=0; 
 
-
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 
 static int readNbFiles(void) {
   int totalFiles = 0;
+
+#ifdef USE_SDFS
+  DIR dir;
+  FILINFO entry; 
+  f_opendir(&dir, romspath);  
+  while ( (true) && (totalFiles<MAX_FILES) ) {
+    f_readdir(&dir, &entry);
+    if (!entry.fname[0]) {
+      // no more files
+      break;
+    }
+    char * filename = entry.fname;
+    Serial.println(filename);     
+    if ( !(entry.fattrib & AM_DIR) ) {
+      strncpy(&files[totalFiles][0], filename, MAX_FILENAME_SIZE-1);
+      totalFiles++;
+    }
+    else {
+      if ( (strcmp(filename,".")) && (strcmp(filename,"..")) ) {
+        strncpy(&files[totalFiles][0], filename, MAX_FILENAME_SIZE-1);
+        totalFiles++;
+      }
+    }  
+  } 
+  f_closedir(&dir);
+#else  
   File entry;    
   file = SD.open(romspath);
   while ( (true) && (totalFiles<MAX_FILES) ) {
@@ -118,12 +151,7 @@ static int readNbFiles(void) {
       // no more files
       break;
     }
-#ifdef USE_SDFAT
-  char filename[MAX_FILENAME_SIZE];
-  entry.getName(&filename[0], MAX_FILENAME_SIZE); 
-#else
-  char * filename = entry.name();
-#endif 
+    char * filename = entry.name();
     Serial.println(filename); 
     if (!entry.isDirectory())  {
       strncpy(&files[totalFiles][0], filename, MAX_FILENAME_SIZE-1);
@@ -138,6 +166,7 @@ static int readNbFiles(void) {
     entry.close();
   }
   file.close();
+#endif  
   return totalFiles;  
 }  
 
@@ -246,6 +275,19 @@ static void callibrationInit(void)
 static void readCallibration(void) 
 {
   char fileBuffer[64];
+
+#ifdef USE_SDFS
+  FIL file;
+  int retval;          
+  if( !(f_open(&file, CALIBRATION_FILE, FA_READ)) ) {
+    if( !(f_read (&file, fileBuffer, 64, &retval)) ) {
+      if (retval == 64) { 
+        sscanf(fileBuffer,"%d %d %d %d", &calMinX,&calMinY,&calMaxX,&calMaxY); 
+      }
+    }
+    f_close(&file);    
+  }
+#else
   File file = SD.open(CALIBRATION_FILE, O_READ);  
   if (file) {
     if ( file.read(fileBuffer, 64) ) {
@@ -261,12 +303,26 @@ static void readCallibration(void)
   else {
     Serial.println("Callibration read error");
   }  
+#endif  
   tft.callibrateTouch(calMinX,calMinY,calMaxX,calMaxY);   
 }
 
 static void writeCallibration(void) 
 {
   tft.callibrateTouch(calMinX,calMinY,calMaxX,calMaxY);
+#ifdef USE_SDFS
+  FIL file; 
+  int retval;       
+  if( !(f_open(&file, CALIBRATION_FILE, FA_WRITE)) ) {
+    //if( !(f_read (&file, fileBuffer, 64, &retval)) ) {
+    //  if (retval == 64) { 
+    //    sscanf(fileBuffer,"%d %d %d %d", &calMinX,&calMinY,&calMaxX,&calMaxY); 
+    //  }
+    //}
+    f_close(&file);    
+  }
+
+#else
   File file = SD.open(CALIBRATION_FILE, O_WRITE | O_CREAT | O_TRUNC);
   if (file) {
     file.print(calMinX);
@@ -280,7 +336,8 @@ static void writeCallibration(void)
   }
   else {
     Serial.println("Callibration write error");
-  }  
+  }
+#endif  
 }
 
 
@@ -379,12 +436,18 @@ int handleMenu(uint16_t bClick)
   char c = captureTouchZone(menutouchareas, menutouchactions, &rx,&ry,&rw,&rh);
  
   if ( (bClick & MASK_JOY2_BTN) || (c == MKEY_TFT) ) {
-      File file = SD.open(newpath);
       emu_printf(newpath);
+#ifdef USE_SDFS
+      FILINFO entry;
+      f_stat(newpath, &entry);
+      if ( (entry.fattrib & AM_DIR) ) {
+#else
+      File file = SD.open(newpath);
       if (file.isDirectory())  {
+#endif    
         strcpy(romspath,newpath);
         curFile = 0;
-        nbFiles = readNbFiles();             
+        nbFiles = readNbFiles();            
       }
       else {
         action = ACTION_RUNTFT;               
@@ -494,14 +557,22 @@ void emu_init(void)
 {
   Serial.begin(115200);
   //while (!Serial) {}
-#ifdef USE_SDFAT
-  if (!SD.begin()) {
+#ifdef USE_SDFS
+  strcpy(romspath,SDFSDEV);
+  strcat(romspath,ROMSDIR);    
+  FRESULT rc;
+  if((rc = f_mount (&fatfs, romspath, 1))) {
+    emu_printf("Fail mounting SDFS");  
+  }
+  else { 
+    rc = f_chdrive(ROMSDIR);
+  }
 #else
   if (!SD.begin(SD_CS)) {
-#endif    
     emu_printf("SdFat.begin() failed");
   }
   strcpy(romspath,ROMSDIR);
+#endif    
   nbFiles = readNbFiles(); 
 
   Serial.print("SD initialized, files found: ");
@@ -543,6 +614,9 @@ void emu_init(void)
     Serial.println("i2C keyboard found");            
   }
 #endif
+
+  keys = key_map3;
+  keyMap = 2;
 }
 
 
@@ -561,12 +635,28 @@ void emu_printi(int val)
   Serial.println(val);
 }
 
+void emu_printh(int val)
+{
+  Serial.println(val,HEX);
+}
+
+static int malbufpt = 0;
+static char malbuf[EXTRA_HEAP];
+
 void * emu_Malloc(int size)
 {
   void * retval =  malloc(size);
   if (!retval) {
-    emu_printf("failled to allocate ");
+    emu_printf("failled to allocate");
     emu_printf(size);
+    emu_printf("fallback");
+    if ( (malbufpt+size) < sizeof(malbuf) ) {
+      retval = (void *)&malbuf[malbufpt];
+      malbufpt += size;      
+    }
+    else {
+      emu_printf("failure to allocate");
+    }
   }
   else {
     emu_printf("could allocate ");
@@ -593,8 +683,11 @@ int emu_FileOpen(char * filename)
   strcat(filepath, filename);
   emu_printf("FileOpen...");
   emu_printf(filepath);
-    
+#ifdef USE_SDFS
+  if( !(f_open(&file, filepath, FA_READ)) ) {
+#else    
   if ((file = SD.open(filepath, O_READ))) {
+#endif
     retval = 1;  
   }
   else {
@@ -608,29 +701,38 @@ int emu_FileRead(char * buf, int size)
   unsigned char buffer[256];
   
   int remaining = size;
-  int byteread = 0; 
-  while (remaining >= 256) {
-    int retval = file.read(buffer, 256);
+  int byteread = 0;
+  int retval=0; 
+  while (remaining>0) {
+#ifdef USE_SDFS
+    if( !(f_read (&file, buffer, 256, &retval)) )
+    //f_read (&file, buffer, 256, &retval);
+#else
+    retval = file.read(buffer, 256);
+#endif
     if (retval>0) {
+      //emu_printi(retval);
       memcpy(buf,buffer,retval);
       buf += retval;
       byteread += retval;     
       remaining -= retval;
     }
-  }
-  if (remaining) {
-    int retval = file.read(buffer, remaining);
-    if (retval>0) {
-      memcpy(buf,buffer,retval);
-      byteread += retval;
+    else {
+      break;
     }
-  }    
+  }
+
   return byteread; 
 }
 
 unsigned char emu_FileGetc(void) {
   unsigned char c;
+#ifdef USE_SDFS
+  int retval=0;
+  if( !(f_read (&file, &c, 1, &retval)) )
+#else
   int retval = file.read(&c, 1);
+#endif  
   if (retval != 1) {
     emu_printf("emu_FileGetc failed");
   }  
@@ -640,7 +742,11 @@ unsigned char emu_FileGetc(void) {
 
 void emu_FileClose(void)
 {
+#ifdef USE_SDFS
+  f_close(&file); 
+#else
   file.close();  
+#endif  
 }
 
 int emu_FileSize(char * filename) 
@@ -652,7 +758,11 @@ int emu_FileSize(char * filename)
   strcat(filepath, filename);
   emu_printf("FileSize...");
   emu_printf(filepath);
-
+#ifdef USE_SDFS
+  FILINFO entry;
+  f_stat(filepath, &entry);
+  filesize = entry.fsize; 
+#else
   if ((file = SD.open(filepath, O_READ))) 
   {
     emu_printf("filesize is...");
@@ -660,15 +770,30 @@ int emu_FileSize(char * filename)
     emu_printf(filesize);
     file.close();    
   }
+#endif
  
   return(filesize);    
 }
 
 int emu_FileSeek(int seek) 
 {
+#ifdef USE_SDFS
+  f_lseek(&file, seek);
+#else
   file.seek(seek);
+#endif
   return (seek);
 }
+
+int emu_FileTell(void) 
+{
+#ifdef USE_SDFS
+  return (f_tell(&file));
+#else
+  return (50);
+#endif
+}
+
 
 int emu_LoadFile(char * filename, char * buf, int size)
 {
@@ -680,7 +805,20 @@ int emu_LoadFile(char * filename, char * buf, int size)
   strcat(filepath, filename);
   emu_printf("LoadFile...");
   emu_printf(filepath);
-  
+#ifdef USE_SDFS
+  if( !(f_open(&file, filepath, FA_READ)) ) {
+    filesize = f_size(&file);
+    emu_printf(filesize);
+    if (size >= filesize)
+    {
+      int retval=0;
+      if( (f_read (&file, buf, filesize, &retval)) ) {
+        emu_printf("File read failed");        
+      }
+    }
+    f_close(&file);
+  }
+#else
   if ((file = SD.open(filepath, O_READ))) 
   {
     filesize = file.size(); 
@@ -695,6 +833,7 @@ int emu_LoadFile(char * filename, char * buf, int size)
     }
     file.close();
   }
+#endif  
   
   return(filesize);
 }
@@ -709,7 +848,22 @@ int emu_LoadFileSeek(char * filename, char * buf, int size, int seek)
   strcat(filepath, filename);
   emu_printf("LoadFileSeek...");
   emu_printf(filepath);
-  
+#ifdef USE_SDFS
+  if( !(f_open(&file, filepath, FA_READ)) ) {
+    f_lseek(&file, seek);
+    emu_printf(size);
+    if (size >= filesize)
+    {
+      int retval=0;
+      if( (!f_read (&file, buf, size, &retval)) ) 
+      if (retval != size)
+      {
+        emu_printf("File read failed");      
+      }
+    }
+    f_close(&file);
+  }
+#else
   if ((file = SD.open(filepath, O_READ))) 
   {
     file.seek(seek);
@@ -719,6 +873,7 @@ int emu_LoadFileSeek(char * filename, char * buf, int size, int seek)
     }        
     file.close();
   }
+#endif  
   
   return(filesize);
 }
@@ -837,7 +992,7 @@ int emu_ReadKeys(void)
   if ( digitalRead(PIN_KEY_USER4) == LOW ) retval |= MASK_KEY_USER4;
 #endif
 
-  //Serial.println(retval,HEX);
+  //Serial.println(j1,HEX);
 
   return (retval);
 }
@@ -879,7 +1034,7 @@ int emu_ReadI2CKeyboard(void) {
       //Serial.println(match,HEX);  
       for (i=0; i<sizeof(i2ckeys); i++) {
         if (match == i2ckeys[i]) {
-          //Serial.println((int)keys[i]);      
+//          Serial.println((int)keys[i]);      
           return (keys[i]);
         }
       }
@@ -1035,9 +1190,44 @@ void handleVirtualkeyboard() {
 }
 
 int emu_setKeymap(int index) {
-  if (index) {   
+  if (keyMap == 2) {  
+    keyMap = 0;     
+    keys = key_map1;
+    tft.drawText(0, 0, "N1 IN2 IN3 IN4 IN5 IN6 IN7 IN8 IN9 IN10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,24, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,40, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(0,48, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,64, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,72, " z I x I c I v I b I n I m I , I ; ISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,88, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    delay(250);
+  }
+  else if (keyMap == 0) {
+    keyMap = 1;     
+    keys = key_map2;            
+    tft.drawText(0, 0, "F1 IF2 IF3 IF4 IF5 IF6 IF7 IF8 IF9 IF10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,24, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,40, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(0,48, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,64, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,72, " z I x I c I v I b I n I m I , I ; ISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,88, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    delay(250);     
   }
   else {
+    keyMap = 2;     
+    keys = key_map3;    
+    tft.drawText(0, 0, " 1 I 2 I 3 I 4 I 5 I 6 I 7 I 8 I 9 I 10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,24, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,40, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(0,48, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(0,64, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(0,72, " z I x I c I v I b I n I m I , I ; ISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,88, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    delay(250);     
   }
 }
 
