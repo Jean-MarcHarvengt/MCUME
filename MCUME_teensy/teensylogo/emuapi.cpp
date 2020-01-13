@@ -9,9 +9,10 @@ extern "C" {
 #include "logo.h"
 #include "bmpjoy.h"
 #include "bmpvbar.h"
+#ifdef OLD_LAYOUT    
 #include "bmpvga.h"
 #include "bmptft.h"
-
+#endif
 #ifndef SD_CS
 #define USE_SDFAT 1
 #endif
@@ -95,6 +96,13 @@ const unsigned short menutouchactions[] = {
   MKEY_TFT,MKEY_VGA}; 
 
   
+static int keypadval=0; 
+static boolean joySwapped = false;
+static uint16_t bLastState;
+static int xRef;
+static int yRef;
+static uint8_t prev_zt=0; 
+
 static bool menuOn=true;
 static bool callibrationOn=false;
 static int callibrationStep=0;
@@ -103,9 +111,6 @@ static int nbFiles=0;
 static int curFile=0;
 static int topFile=0;
 static char selection[MAX_FILENAME_SIZE+1]="";
-static uint8_t prev_zt=0; 
-
-
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 
 static int readNbFiles(void) {
@@ -221,8 +226,10 @@ void toggleMenu(bool on) {
     tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
     tft.drawTextNoDma(0,0, TITLE, RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);  
     tft.drawSpriteNoDma(MENU_VBAR_XOFFSET,MENU_VBAR_YOFFSET,(uint16_t*)bmpvbar);
+#ifdef OLD_LAYOUT    
     tft.drawSpriteNoDma(MENU_TFT_XOFFSET,MENU_TFT_YOFFSET,(uint16_t*)bmptft);
     tft.drawSpriteNoDma(MENU_VGA_XOFFSET,MENU_VGA_YOFFSET,(uint16_t*)bmpvga);
+#endif    
   } else {
     menuOn = false;    
   }
@@ -508,6 +515,11 @@ void emu_init(void)
   Serial.println(nbFiles);
 
   emu_InitJoysticks();
+#ifdef TEENSYBOY
+  joySwapped = true;   
+#else
+  joySwapped = false;   
+#endif  
   readCallibration();
  
   if ((tft.isTouching()) || (emu_ReadKeys() & MASK_JOY2_BTN) ) {
@@ -723,12 +735,6 @@ int emu_LoadFileSeek(char * filename, char * buf, int size, int seek)
   return(filesize);
 }
 
-static int keypadval=0; 
-static boolean joySwapped = false;
-static uint16_t bLastState;
-static int xRef;
-static int yRef;
-
 
 int emu_ReadAnalogJoyX(int min, int max) 
 {
@@ -802,17 +808,35 @@ int emu_ReadKeys(void)
   uint16_t j2 = 0;
   
   // Second joystick
+#if INVY
+#ifdef PIN_JOY1_1
+  if ( digitalRead(PIN_JOY1_1) == LOW ) j2 |= MASK_JOY2_DOWN;
+#endif
+#ifdef PIN_JOY1_2
+  if ( digitalRead(PIN_JOY1_2) == LOW ) j2 |= MASK_JOY2_UP;
+#endif
+#else
 #ifdef PIN_JOY1_1
   if ( digitalRead(PIN_JOY1_1) == LOW ) j2 |= MASK_JOY2_UP;
 #endif
 #ifdef PIN_JOY1_2
   if ( digitalRead(PIN_JOY1_2) == LOW ) j2 |= MASK_JOY2_DOWN;
 #endif
+#endif
+#if INVX
+#ifdef PIN_JOY1_3
+  if ( digitalRead(PIN_JOY1_3) == LOW ) j2 |= MASK_JOY2_LEFT;
+#endif
+#ifdef PIN_JOY1_4
+  if ( digitalRead(PIN_JOY1_4) == LOW ) j2 |= MASK_JOY2_RIGHT;
+#endif
+#else
 #ifdef PIN_JOY1_3
   if ( digitalRead(PIN_JOY1_3) == LOW ) j2 |= MASK_JOY2_RIGHT;
 #endif
 #ifdef PIN_JOY1_4
   if ( digitalRead(PIN_JOY1_4) == LOW ) j2 |= MASK_JOY2_LEFT;
+#endif
 #endif
 #ifdef PIN_JOY1_BTN
   if ( digitalRead(PIN_JOY1_BTN) == LOW ) j2 |= MASK_JOY2_BTN;

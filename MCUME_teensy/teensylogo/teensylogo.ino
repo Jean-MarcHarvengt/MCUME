@@ -19,7 +19,7 @@ void setup() {
   tft.begin();
   //emu_sndPlaySound(0, 255, 4000);
 
-  emu_init(); 
+  emu_init();
 }
 
 static uint8_t col=0x00;

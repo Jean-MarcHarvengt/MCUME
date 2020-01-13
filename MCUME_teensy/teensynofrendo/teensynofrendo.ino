@@ -185,7 +185,8 @@ void loop(void)
     char * filename = menuSelection();    
     if (action == ACTION_RUNTFT) {
       toggleMenu(false);
-      vgaMode = false;       
+      vgaMode = false;   
+
       emu_Init(filename);
       //digitalWrite(TFT_CS, 1);
       //digitalWrite(SD_CS, 1);       

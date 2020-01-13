@@ -107,9 +107,9 @@ void osd_getinput(void)
   	int hk = emu_ReadI2CKeyboard();  
   	int b=0xffff;
 
-  if ( (j & MASK_KEY_USER3) ) // B
+  if ( (j & MASK_KEY_USER2) ) // B
     b &= ~0x4000;
-  if ( (j & MASK_KEY_USER2) || (hk == 2) ) // SELECT
+  if ( (j & MASK_KEY_USER3) || (hk == 2) ) // SELECT
     b &= ~0x0001;
   if ( (j & MASK_KEY_USER1) || (hk == 3) ) // START
     b &= ~0x0008;
