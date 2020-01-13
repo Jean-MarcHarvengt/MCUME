@@ -6,6 +6,7 @@
 # News
 
 Nov 2019: Gameboy, Sega Master System/ GameGear and Megadrive/Genesis emulator running with extra 8MB SPI RAM (PSRAM) <br>
+https://youtu.be/j2sKw7KYpEo <br>
 
 Oct 2019: PC-Engine 'tiny' emulator running on Teensy 4.0 using an extra 8MB SPI RAM (PSRAM)  <br>
 https://youtu.be/Ot9RgDMqdF4<br>
