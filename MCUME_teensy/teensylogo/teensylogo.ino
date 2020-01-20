@@ -26,21 +26,6 @@ static uint8_t col=0x00;
 
 void loop(void) 
 {
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-#else
-//  if ( ((emu_ReadKeys() & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
-//     || (emu_ReadKeys() & MASK_KEY_USER4 ) )
-//  {  
-//    emu_printf((char*)"esc");
-//    *(volatile uint32_t *)0xE000ED0C = 0x5FA0004;
-//    while (true) {
-//      ;
-//    }    
-//  }
-#endif
-
-
-
   uint16_t bClick = emu_DebounceLocalKeys();
   if (menuActive()) {
     int action = handleMenu(bClick);

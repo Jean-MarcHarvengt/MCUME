@@ -1,8 +1,7 @@
 #ifndef IOPINS_H
 #define IOPINS_H
 
-//#define OLD_LAYOUT 1
-
+#include "platform_config.h"
 #include "tft_t_dma_config.h"
 
 #ifndef OLD_LAYOUT
@@ -37,10 +36,13 @@
 
 // SD
 #define SD_SCLK        13
-#define SD_MOSI        11
-#define SD_MISO        12  
-//#define SD_CS          BUILTIN_SDCARD
+#define SD_MOSI        12
+#define SD_MISO        11 
+#ifdef TEENSYBOY
+#define SD_CS          BUILTIN_SDCARD
+#else
 #define SD_CS          5
+#endif 
 
 // I2C keyboard
 #define I2C_SCL_IO     19
@@ -55,8 +57,17 @@
 //#define PIN_KEY_USER3   255
 //#define PIN_KEY_USER4   255
 
+#ifdef TEENSYBOY
+// Second joystick
+#define PIN_JOY1_BTN     2
+#define PIN_JOY1_1       14 // UP
+#define PIN_JOY1_2       7  // DOWN
+#define PIN_JOY1_3       6  // RIGHT
+#define PIN_JOY1_4       5  // LEFT
+#endif
 
-#else // OLD LAYOUT!!!!
+#else 
+// OLD LAYOUT!!!!
 
 #define HAS_VGA 1
 

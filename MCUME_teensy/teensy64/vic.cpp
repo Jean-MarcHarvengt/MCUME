@@ -1302,6 +1302,9 @@ void vic_do(void) {
     cpu.vic.rasterLine = 0;
     cpu.vic.vcbase = 0;
     cpu.vic.denLatch = 0;
+    //if (cpu.vic.rasterLine == LINECNT)
+    //delay(50);
+    //emu_DrawVsync();  
 
   } else  cpu.vic.rasterLine++;
 

@@ -4,6 +4,14 @@
 
 #include "psram_t.h"
 
+Page PSRAM_T::pages[MAX_PAGES];
+uint8_t PSRAM_T::nbPages=0;
+int8_t PSRAM_T::top=0;
+int8_t PSRAM_T::last=0;
+
+
+#ifdef HAS_PSRAM
+
 #include <SPI.h>
 #include <DMAChannel.h>
 
@@ -20,10 +28,6 @@
 
 
 uint8_t PSRAM_T::_cs, PSRAM_T::_miso, PSRAM_T::_mosi, PSRAM_T::_sclk;
-Page PSRAM_T::pages[MAX_PAGES];
-uint8_t PSRAM_T::nbPages=0;
-int8_t PSRAM_T::top=0;
-int8_t PSRAM_T::last=0;
 
 
 PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
@@ -229,6 +233,35 @@ Serial.printf("D") ; Serial.flush();
 }
 #endif
 
+
+
+#else
+
+
+#include "emuapi.h"
+
+
+PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
+{
+}
+
+void PSRAM_T::begin(void)
+{
+  emu_FileTempInit();
+}
+
+void PSRAM_T::psram_read_n(uint32_t addr, uint8_t * val, int n) 
+{
+  emu_FileTempRead(addr,val,n);    
+}
+
+
+void PSRAM_T::psram_write(uint32_t addr, uint8_t val) 
+{
+  emu_FileTempWrite(addr,val);  
+}
+
+#endif
 
 
 

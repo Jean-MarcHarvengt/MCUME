@@ -47,7 +47,7 @@ void pce_Start(char * filename)
 {
   emu_printf("init started");
   load_rom(filename, 0,0);
-  
+ 
 #ifdef SOUND_PRESENT
   system_init(22050);
 #ifdef HAS_SND  

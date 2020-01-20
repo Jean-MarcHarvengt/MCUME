@@ -963,11 +963,21 @@ void TFT_T_DMA::writeLine(int width, int height, int y, uint8_t *buf, uint16_t *
     }  
 #endif       
   }
+  else if ((width*2) == TFT_WIDTH) {
+    for (int i=0; i<width; i++)
+    {
+      *dst++=palette16[*buf];
+      *dst++=palette16[*buf++];
+    }       
+  }
   else {
+    if (width <= TFT_WIDTH) {
+      dst += (TFT_WIDTH-width)/2;
+    }
     for (int i=0; i<width; i++)
     {
       *dst++=palette16[*buf++];
-    }      
+    }       
   }
 }
 
@@ -1003,8 +1013,18 @@ void TFT_T_DMA::writeLine(int width, int height, int y, uint16_t *buf) {
     }  
 #endif       
   }
+  else if ((width*2) == TFT_WIDTH) {
+    for (int i=0; i<width; i++)
+    {
+      *dst++=*buf;
+      *dst++=*buf++;
+    }       
+  }
   else {
-     for (int i=0; i<width; i++)
+    if (width <= TFT_WIDTH) {
+      dst += (TFT_WIDTH-width)/2;
+    }
+    for (int i=0; i<width; i++)
     {
       *dst++=*buf++;
     }       

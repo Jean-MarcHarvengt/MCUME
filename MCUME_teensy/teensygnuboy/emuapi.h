@@ -10,8 +10,8 @@
 
 #define EXTRA_HEAP  0x10 //0x9000
 
-// Title:     <                                        >
-#define TITLE "            Gameboy Emulator            "
+// Title:     <                        >
+#define TITLE "    Gameboy Emulator"
 #define ROMSDIR "/gameboy"
 
 #define emu_Init(ROM) {gbe_Init(); gbe_Start(ROM);}
@@ -117,6 +117,10 @@ extern void emu_FileClose(void);
 extern int emu_FileSize(char * filename);
 extern int emu_LoadFile(char * filename, char * buf, int size);
 extern int emu_LoadFileSeek(char * filename, char * buf, int size, int seek);
+extern void emu_FileTempInit(void); 
+extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
+extern void emu_FileTempWrite(int addr, unsigned char val); 
+
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);

@@ -196,7 +196,7 @@ static uint8 nta_buf[0x400];                   /* Plane A / Window line buffer *
 static uint8 ntb_buf[0x400];                   /* Plane B line buffer */
 static uint8 obj_buf[0x400];                   /* Object layer line buffer */
 
-//static uint16 line_buf[0x400];
+static uint16 line_buf[0x400];
 
 
 
@@ -366,9 +366,9 @@ void render_line(int line)
     
 
 
-    //remap_16(lb+0x20, line_buf, pixel_16, width);
-    //emu_DrawLine16(line_buf, width ,256, line); 
-    remap_16(lb+0x20, emu_LineBuffer(line), pixel_16, width);
+    remap_16(lb+0x20, line_buf, pixel_16, width);
+    emu_DrawLine16(line_buf, width ,256, line); 
+    //remap_16(lb+0x20, emu_LineBuffer(line), pixel_16, width);
 }
 /*--------------------------------------------------------------------------*/
 /* Window rendering                                                         */

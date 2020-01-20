@@ -191,13 +191,13 @@ uint16_t addr,size;
 
   Serial.println("loading");
 	//printf("%s,%d,%d:", filename, device, secondaryAddress);
-  //tft.stopDMA();
+  tft.stopDMA();
   //emu_resetSD();
-  //tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
+  tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
 	if (emu_FileOpen(filename) == 0) {
 		//Serial.println("not found");
 		cpu.pc = 0xf530; //Jump to $F530
-    //tft.startDMA(); 
+    tft.startDMA(); 
 		return;
 	}
 
@@ -214,7 +214,7 @@ uint16_t addr,size;
 	cpu.y = 0x49; //Offset for "LOADING"
 	cpu.pc = 0xF12B; //Print and return
 	emu_printf("loaded");
-  //tft.startDMA(); 
+  tft.startDMA(); 
 
 	return;
 }

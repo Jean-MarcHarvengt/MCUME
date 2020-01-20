@@ -7,9 +7,15 @@
 
 #ifdef __cplusplus
 #include <Arduino.h>
+#include "platform_config.h"
 
-#define PAGE_SIZE    16 //16 //32 //2048 //1024
+#ifdef HAS_PSRAM
+#define PAGE_SIZE    16 //32 //2048 //1024
 #define MAX_PAGES    8
+#else
+#define PAGE_SIZE    256
+#define MAX_PAGES    8 
+#endif
 
 struct Page {
    uint8_t  page[PAGE_SIZE];
@@ -25,7 +31,8 @@ class PSRAM_T
     void begin(void);
     void pswrite(uint32_t addr, uint8_t val);
     uint8_t psread(uint32_t addr);
-
+    uint16_t psread_w(uint32_t addr);
+   
   private:
     static uint8_t psram_read(uint32_t addr);
     static void psram_read_n(uint32_t addr, uint8_t * val, int n);

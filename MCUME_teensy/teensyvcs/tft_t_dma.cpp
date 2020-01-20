@@ -6,7 +6,7 @@
 #include "font8x8.h"
 
 
-#define SPICLOCK 144e6 //Just a number..max speed
+#define SPICLOCK 60000000 //144e6 //Just a number..max speed
 #ifdef ILI9341
 #define SPI_MODE SPI_MODE0
 #endif
@@ -218,20 +218,35 @@ TFT_T_DMA::TFT_T_DMA(uint8_t cs, uint8_t dc, uint8_t rst, uint8_t mosi, uint8_t 
 
 
 void TFT_T_DMA::setArea(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2) {
+  int dx=0;
+  int dy=0;
+  
+#ifdef ST7789
+#ifdef ROTATE_SCREEN
+  if (!flipped) {
+    dy += 80;    
+  }
+#else  
+  if (flipped) {
+    dx += 80;    
+  }
+#endif 
+#endif
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
 
   digitalWrite(_dc, 0);
   SPI.transfer(TFT_CASET);
   digitalWrite(_dc, 1);
-  SPI.transfer16(x1);
-  SPI.transfer16(x2);
+
+  SPI.transfer16(x1+dx);
+  SPI.transfer16(x2+dx);
 
   digitalWrite(_dc, 0);
   SPI.transfer(TFT_PASET);
   digitalWrite(_dc, 1);
-  SPI.transfer16(y1);
-  SPI.transfer16(y2);
+  SPI.transfer16(y1+dy);
+  SPI.transfer16(y2+dy);
 
   digitalWrite(_dc, 0);
   SPI.transfer(TFT_RAMWR);
@@ -325,7 +340,6 @@ void TFT_T_DMA::begin(void) {
     }
   }
 #endif
-
   setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
 
   cancelled = false; 
@@ -351,8 +365,11 @@ void TFT_T_DMA::flipscreen(bool flip)
     SPI.transfer(ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR);
 #endif
 #ifdef ST7789
-    //SPI.transfer(ST77XX_MADCTL_RGB);
-    SPI.transfer(ST77XX_MADCTL_MV | ST77XX_MADCTL_RGB);
+#ifdef ROTATE_SCREEN
+    SPI.transfer(ST77XX_MADCTL_RGB);
+#else
+    SPI.transfer(ST77XX_MADCTL_MY | ST77XX_MADCTL_MV |ST77XX_MADCTL_RGB);
+#endif
 #endif    
   }
   else {
@@ -361,7 +378,11 @@ void TFT_T_DMA::flipscreen(bool flip)
     SPI.transfer(ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR);
 #endif
 #ifdef ST7789
+#ifdef ROTATE_SCREEN
+    SPI.transfer(ST77XX_MADCTL_MX | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB);
+#else
     SPI.transfer(ST77XX_MADCTL_MX | ST77XX_MADCTL_MV | ST77XX_MADCTL_RGB);
+#endif
 #endif    
   }
   digitalWrite(_cs, 1);  
@@ -942,11 +963,21 @@ void TFT_T_DMA::writeLine(int width, int height, int y, uint8_t *buf, uint16_t *
     }  
 #endif       
   }
+  else if ((width*2) == TFT_WIDTH) {
+    for (int i=0; i<width; i++)
+    {
+      *dst++=palette16[*buf];
+      *dst++=palette16[*buf++];
+    }       
+  }
   else {
+    if (width <= TFT_WIDTH) {
+      dst += (TFT_WIDTH-width)/2;
+    }
     for (int i=0; i<width; i++)
     {
       *dst++=palette16[*buf++];
-    }      
+    }       
   }
 }
 
@@ -982,8 +1013,18 @@ void TFT_T_DMA::writeLine(int width, int height, int y, uint16_t *buf) {
     }  
 #endif       
   }
+  else if ((width*2) == TFT_WIDTH) {
+    for (int i=0; i<width; i++)
+    {
+      *dst++=*buf;
+      *dst++=*buf++;
+    }       
+  }
   else {
-     for (int i=0; i<width; i++)
+    if (width <= TFT_WIDTH) {
+      dst += (TFT_WIDTH-width)/2;
+    }
+    for (int i=0; i<width; i++)
     {
       *dst++=*buf++;
     }       

@@ -29,7 +29,7 @@
 #define TFT_REALHEIGHT 240
 #endif
 #ifdef ST7789
-#define TFT_WIDTH      256
+#define TFT_WIDTH      240
 #define TFT_REALWIDTH  240
 #define TFT_REALHEIGHT 240
 #endif

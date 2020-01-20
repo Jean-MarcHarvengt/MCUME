@@ -7,8 +7,10 @@
 #define HAS_I2CKBD  1
 //#define TIMER_REND  1
 
-// Title:     <                                        >
-#define TITLE "          ZX81/ZX80 Emulator            "
+#define EXTRA_HEAP  0x10
+
+// Title:     <                        >
+#define TITLE "    ZX81/ZX80 Emulator"
 #define ROMSDIR "z81"
 
 #define emu_Init(ROM) {z81_Start(ROM); z81_Init(); }
@@ -109,6 +111,10 @@ extern void emu_FileClose(void);
 extern int emu_FileSize(char * filename);
 extern int emu_LoadFile(char * filename, char * buf, int size);
 extern int emu_LoadFileSeek(char * filename, char * buf, int size, int seek);
+extern void emu_FileTempInit(void); 
+extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
+extern void emu_FileTempWrite(int addr, unsigned char val); 
+
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);

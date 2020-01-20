@@ -28,6 +28,12 @@
 #define TFT_RST         255
 #endif
 
+// PSRAM
+#define PSRAM_CS      36
+#define PSRAM_MOSI    35
+#define PSRAM_MISO    34
+#define PSRAM_SCLK    37
+
 // SD
 #define SD_SCLK        13
 #define SD_MOSI        12

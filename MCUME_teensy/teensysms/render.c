@@ -170,7 +170,8 @@ void render_line(int line)
             memset(linebuf, BACKDROP_COLOR, 8);
         }
     }
-
+    for (int i=0; i<BMP_WIDTH ;i++)
+      internal_buffer[i] &= 0x1F;
     emu_DrawLine(&internal_buffer[BMP_X_OFFSET], BMP_WIDTH , BMP_HEIGHT, line);
 }
 

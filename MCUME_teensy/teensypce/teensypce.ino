@@ -44,6 +44,8 @@ volatile boolean vbl=true;
 static int skip=0;
 static elapsedMicros tius;
 
+
+
 static void vblCount() { 
   if (vbl) {
     vbl = false;
@@ -158,14 +160,17 @@ void * emu_LineBuffer(int line)
 #endif  
 }
 
+
 // ****************************************************
 // the setup() method runs once, when the sketch starts
 // ****************************************************
 void setup() {
+
   tft.begin(); 
   
   emu_init(); 
 
+  
   myTimer.begin(vblCount, 20000);  //to run every 20ms  
 }
 
@@ -174,19 +179,6 @@ void setup() {
 // ****************************************************
 void loop(void) 
 {
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-#else
- // if ( ((emu_ReadKeys() & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
- //    || (emu_ReadKeys() & MASK_KEY_USER4 ) )
- // {  
- //   emu_printf((char*)"esc");
- //   *(volatile uint32_t *)0xE000ED0C = 0x5FA0004;
- //   while (true) {
- //     ;
- //   }    
- // }
-#endif
-  
   if (menuActive()) {
     uint16_t bClick = emu_DebounceLocalKeys();
     int action = handleMenu(bClick);

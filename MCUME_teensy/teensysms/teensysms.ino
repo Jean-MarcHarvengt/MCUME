@@ -33,6 +33,8 @@ uVGA uvga;
 uint8_t * VGA_frame_buffer;
 #endif
 
+
+
 TFT_T_DMA tft = TFT_T_DMA(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO, TFT_TOUCH_CS, TFT_TOUCH_INT);
 
 bool vgaMode = false;
@@ -175,19 +177,6 @@ void setup() {
 // ****************************************************
 void loop(void) 
 {
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-#else
- // if ( ((emu_ReadKeys() & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
- //    || (emu_ReadKeys() & MASK_KEY_USER4 ) )
- // {  
- //   emu_printf((char*)"esc");
- //   *(volatile uint32_t *)0xE000ED0C = 0x5FA0004;
- //   while (true) {
- //     ;
- //   }    
- // }
-#endif
-  
   if (menuActive()) {
     uint16_t bClick = emu_DebounceLocalKeys();
     int action = handleMenu(bClick);
