@@ -8,18 +8,19 @@ extern "C" {
 #include "mcume.h"
 
 
-
 TFT_T_DMA tft = TFT_T_DMA(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO, TFT_TOUCH_CS, TFT_TOUCH_INT);
 static int xOffLogo=0;
 static int swipeAngle=0;
 
 void setup() {
   //emu_sndInit();
- 
   tft.begin();
   //emu_sndPlaySound(0, 255, 4000);
-
   emu_init();
+  //delay(5000);
+  //toggleMenu(false);
+  //tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
+  //tft.startDMA();  
 }
 
 static uint8_t col=0x00;

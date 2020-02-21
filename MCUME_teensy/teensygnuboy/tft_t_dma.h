@@ -22,18 +22,15 @@
 
 #define PAL_COLOR_MASK 0xff
 
-#define TFT_HEIGHT     144
-
-#ifdef ILI9341
-#define TFT_WIDTH      320
-#define TFT_REALWIDTH  320
-#define TFT_REALHEIGHT 240
-#endif
-#ifdef ST7789
-#define TFT_WIDTH      240
+#ifdef LOHRES
+#define TFT_WIDTH      240 
 #define TFT_REALWIDTH  240
-#define TFT_REALHEIGHT 240
+#else
+#define TFT_WIDTH      320 
+#define TFT_REALWIDTH  320
 #endif
+#define TFT_HEIGHT     144
+#define TFT_REALHEIGHT 240
 
 #define LINES_PER_BLOCK         64
 #define NR_OF_BLOCK             4

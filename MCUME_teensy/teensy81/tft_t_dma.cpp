@@ -107,7 +107,6 @@ PROGMEM static const uint8_t init_commands[] = {
 #endif       
 };
 
-
 static void dmaInterrupt() {
   dmatx.clearInterrupt();
   curTransfer++;
@@ -220,18 +219,41 @@ TFT_T_DMA::TFT_T_DMA(uint8_t cs, uint8_t dc, uint8_t rst, uint8_t mosi, uint8_t 
 void TFT_T_DMA::setArea(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2) {
   int dx=0;
   int dy=0;
-  
 #ifdef ST7789
+  if (TFT_REALWIDTH == TFT_REALHEIGHT)
+  {
 #ifdef ROTATE_SCREEN
-  if (!flipped) {
-    dy += 80;    
-  }
+    if (!flipped) {
+      dy += 80;    
+    }
 #else  
-  if (flipped) {
-    dx += 80;    
+    if (flipped) {
+      dx += 80;    
+    }
+#endif      
   }
-#endif 
-#endif
+#endif  
+
+  digitalWrite(_dc, 0);
+  SPI.transfer(TFT_CASET);
+  digitalWrite(_dc, 1);
+  SPI.transfer16(x1+dx);
+  digitalWrite(_dc, 1);
+  SPI.transfer16(x2+dx);  
+  digitalWrite(_dc, 0);
+  SPI.transfer(TFT_PASET);
+  digitalWrite(_dc, 1);
+  SPI.transfer16(y1+dy);
+  digitalWrite(_dc, 1);
+  SPI.transfer16(y2+dy);  
+
+  digitalWrite(_dc, 0);
+  SPI.transfer(TFT_RAMWR);
+  digitalWrite(_dc, 1);
+  
+  return;
+  
+
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
 
@@ -257,6 +279,8 @@ void TFT_T_DMA::setArea(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2) {
 }
 
 
+
+
 void TFT_T_DMA::begin(void) {
   SPI.setMOSI(_mosi);
   SPI.setMISO(_miso);
@@ -264,16 +288,17 @@ void TFT_T_DMA::begin(void) {
   SPI.begin();
       
   // Initialize display
-  if (_rst < 255) { // toggle RST low to reset
+  if (_rst != 0xff) {
     pinMode(_rst, OUTPUT);
     digitalWrite(_rst, HIGH);
-    delay(5);
+    delay(100);
     digitalWrite(_rst, LOW);
-    delay(20);
+    delay(100);
     digitalWrite(_rst, HIGH);
-    delay(120);
+    delay(200);
   }
-  
+
+
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   const uint8_t *addr = init_commands;
   digitalWrite(_cs, 0);
@@ -307,7 +332,6 @@ void TFT_T_DMA::begin(void) {
   SPI.transfer(ILI9341_DISPON);
   digitalWrite(_dc, 1);
   digitalWrite(_cs, 1);
-  SPI.endTransaction();
 #endif
 #ifdef ST7789 
   uint8_t  numCommands, numArgs;
@@ -332,22 +356,31 @@ void TFT_T_DMA::begin(void) {
     if(ms) {
       ms = *addr++; // Read post-command delay time (ms)
       if(ms == 255) ms = 500;   // If 255, delay for 500 ms
-      SPI.endTransaction();
-      digitalWrite(_dc, 1);
       digitalWrite(_cs, 1);
+      SPI.endTransaction();
       delay(ms);
-      //beginSPITransaction();
+      SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
+      digitalWrite(_cs, 0);
     }
   }
+  digitalWrite(_cs, 1);
 #endif
   setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
+  SPI.endTransaction();
 
-  cancelled = false; 
+  cancelled = false;
+
 #ifdef FLIP_SCREEN          
   flipscreen(true);           
 #else
   flipscreen(false);  
-#endif            
+#endif   
+#ifdef ST7789 
+  if (TFT_REALWIDTH != TFT_REALHEIGHT)
+  {
+    flipscreen(true);      
+  }
+#endif   
 };
 
 
@@ -410,7 +443,7 @@ void TFT_T_DMA::startDMA(void) {
   digitalWrite(_cs, HIGH);
   SPI.begin();
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+ #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #ifdef TFT_DEBUG          
   PRREG(LPSPI4_CCR);
@@ -434,6 +467,7 @@ void TFT_T_DMA::startDMA(void) {
 #endif
   dmatx = dmasettings[0];
   digitalWrite(_cs, 0); 
+  setArea((TFT_REALWIDTH-TFT_WIDTH)/2, (TFT_REALHEIGHT-TFT_HEIGHT)/2, (TFT_REALWIDTH-TFT_WIDTH)/2+TFT_WIDTH-1, (TFT_REALHEIGHT-TFT_HEIGHT)/2+TFT_HEIGHT-1);  
   digitalWrite(_dc, 0);
   SPI.transfer(TFT_RAMWR); 
   digitalWrite(_dc, 1);      
@@ -623,17 +657,17 @@ void TFT_T_DMA::readCal(uint16_t * oX, uint16_t * oY, uint16_t * oZ) {
     No DMA functions
  ***********************************************************************************************/
 void TFT_T_DMA::fillScreenNoDma(uint16_t color) {
-  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
   
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
-  digitalWrite(_dc, 0);
-  SPI.transfer(TFT_RAMWR);
+  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
+  //digitalWrite(_dc, 0);
+  //SPI.transfer(TFT_RAMWR);
   int i,j;
   for (j=0; j<TFT_REALHEIGHT; j++)
   {
     for (i=0; i<TFT_REALWIDTH; i++) {
-      digitalWrite(_dc, 1);
+      //digitalWrite(_dc, 1);
       SPI.transfer16(color);     
     }
   }
@@ -643,24 +677,43 @@ void TFT_T_DMA::fillScreenNoDma(uint16_t color) {
   digitalWrite(_dc, 1);
 #endif
   digitalWrite(_cs, 1);
-  SPI.endTransaction();  
-  
   setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));  
+  SPI.endTransaction();    
 }
 
-
-void TFT_T_DMA::writeScreenNoDma(const uint16_t *pcolors) {
-  setArea(0, 0, TFT_WIDTH-1, TFT_HEIGHT-1);  
-  
+void TFT_T_DMA::drawRectNoDma(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
+  setArea(x,y,x+w-1,y+h-1);
+//  digitalWrite(_dc, 0);
+//  SPI.transfer(TFT_RAMWR);
+  int i;
+  for (i=0; i<(w*h); i++)
+  {
+    //digitalWrite(_dc, 1);
+    SPI.transfer16(color);
+  }
+#ifdef ILI9341  
   digitalWrite(_dc, 0);
-  SPI.transfer(TFT_RAMWR);
+  SPI.transfer(ILI9341_SLPOUT);
+  digitalWrite(_dc, 1);
+#endif
+  digitalWrite(_cs, 1);
+  setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));
+  SPI.endTransaction();    
+}
+
+void TFT_T_DMA::writeScreenNoDma(const uint16_t *pcolors) {  
+  SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
+  digitalWrite(_cs, 0);
+  setArea(0, 0, TFT_WIDTH-1, TFT_HEIGHT-1);  
+  //digitalWrite(_dc, 0);
+  //SPI.transfer(TFT_RAMWR);
   int i,j;
   for (j=0; j<240; j++)
   {
     for (i=0; i<TFT_WIDTH; i++) {
-      digitalWrite(_dc, 1);
+ //     digitalWrite(_dc, 1);
       SPI.transfer16(*pcolors++);     
     }
   }
@@ -670,9 +723,8 @@ void TFT_T_DMA::writeScreenNoDma(const uint16_t *pcolors) {
   digitalWrite(_dc, 1);
 #endif
   digitalWrite(_cs, 1);
-  SPI.endTransaction();  
-  
   setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));  
+  SPI.endTransaction();    
 }
 
 void TFT_T_DMA::drawSpriteNoDma(int16_t x, int16_t y, const uint16_t *bitmap) {
@@ -723,12 +775,12 @@ void TFT_T_DMA::drawSpriteNoDma(int16_t x, int16_t y, const uint16_t *bitmap, ui
     }     
   }
 
-  setArea(arx, ary, arx+arw-1, ary+arh-1);  
   
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
-  digitalWrite(_dc, 0);
-  SPI.transfer(TFT_RAMWR);      
+  setArea(arx, ary, arx+arw-1, ary+arh-1);  
+  //digitalWrite(_dc, 0);
+  //SPI.transfer(TFT_RAMWR);      
 
   bitmap = bitmap + bmp_offy*w + bmp_offx;
   for (int row=0;row<arh; row++)
@@ -737,7 +789,7 @@ void TFT_T_DMA::drawSpriteNoDma(int16_t x, int16_t y, const uint16_t *bitmap, ui
     for (int col=0;col<arw; col++)
     {
         uint16_t color = *bmp_ptr++;
-        digitalWrite(_dc, 1);
+//        digitalWrite(_dc, 1);
         SPI.transfer16(color);             
     } 
     bitmap +=  w;
@@ -747,9 +799,9 @@ void TFT_T_DMA::drawSpriteNoDma(int16_t x, int16_t y, const uint16_t *bitmap, ui
   SPI.transfer(ILI9341_SLPOUT);
   digitalWrite(_dc, 1);
 #endif
+  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
   digitalWrite(_cs, 1);
   SPI.endTransaction();   
-  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
 }
 
 void TFT_T_DMA::drawTextNoDma(int16_t x, int16_t y, const char * text, uint16_t fgcolor, uint16_t bgcolor, bool doublesize) {
@@ -757,20 +809,19 @@ void TFT_T_DMA::drawTextNoDma(int16_t x, int16_t y, const char * text, uint16_t 
   while ((c = *text++)) {
     const unsigned char * charpt=&font8x8[c][0];
 
-    setArea(x,y,x+7,y+(doublesize?15:7));
   
-    //SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
     digitalWrite(_cs, 0);
+    setArea(x,y,x+7,y+(doublesize?15:7));
     //digitalWrite(_dc, 0);
     //SPI.transfer(TFT_RAMWR);
-
-    digitalWrite(_dc, 1);
+    //digitalWrite(_dc, 1);
     for (int i=0;i<8;i++)
     {
       unsigned char bits;
       if (doublesize) {
         bits = *charpt;     
-        digitalWrite(_dc, 1);
+        //digitalWrite(_dc, 1);
         if (bits&0x01) SPI.transfer16(fgcolor);
         else SPI.transfer16(bgcolor);
         bits = bits >> 1;     
@@ -796,7 +847,7 @@ void TFT_T_DMA::drawTextNoDma(int16_t x, int16_t y, const char * text, uint16_t 
         else SPI.transfer16(bgcolor);       
       }
       bits = *charpt++;     
-      digitalWrite(_dc, 1);
+      //digitalWrite(_dc, 1);
       if (bits&0x01) SPI.transfer16(fgcolor);
       else SPI.transfer16(bgcolor);
       bits = bits >> 1;     
@@ -831,32 +882,15 @@ void TFT_T_DMA::drawTextNoDma(int16_t x, int16_t y, const char * text, uint16_t 
     SPI.endTransaction();  
   }
   
-  setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));  
-}
-
-
-void TFT_T_DMA::drawRectNoDma(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
-  setArea(x,y,x+w-1,y+h-1);
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));
   digitalWrite(_cs, 0);
-  digitalWrite(_dc, 0);
-  SPI.transfer(TFT_RAMWR);
-  int i;
-  for (i=0; i<(w*h); i++)
-  {
-    digitalWrite(_dc, 1);
-    SPI.transfer16(color);
-  }
-#ifdef ILI9341  
-  digitalWrite(_dc, 0);
-  SPI.transfer(ILI9341_SLPOUT);
-  digitalWrite(_dc, 1);
-#endif
+  setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));  
   digitalWrite(_cs, 1);
   SPI.endTransaction();  
-  
-  setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));
 }
+
+
+
 
 
 

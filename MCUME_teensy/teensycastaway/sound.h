@@ -37,7 +37,7 @@ enum
   FREQ_44Khz
 };
 
-#define MIXBUFFER_SIZE    8192
+#define MIXBUFFER_SIZE    1024 //8192
 #define SCREEN_START_CYCLE  96          /* Cycle first normal pixel appears on */
 #define SCANLINES_PER_FRAME 313         /* Number of scan lines per frame */
 #define CYCLES_PER_LINE     512         /* Cycles per horiztonal line scan */

@@ -240,6 +240,7 @@ Serial.printf("D") ; Serial.flush();
 
 #include "emuapi.h"
 
+#define MAXPSRAM (256*1024)
 
 PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
 {
@@ -247,17 +248,22 @@ PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
 
 void PSRAM_T::begin(void)
 {
+//  emu_Malloc(MAXPSRAM);
   emu_FileTempInit();
 }
 
 void PSRAM_T::psram_read_n(uint32_t addr, uint8_t * val, int n) 
 {
+  //if (addr >= MAXPSRAM)
+  //  return;
   emu_FileTempRead(addr,val,n);    
 }
 
 
 void PSRAM_T::psram_write(uint32_t addr, uint8_t val) 
 {
+  //if (addr >= MAXPSRAM)
+  //  return;
   emu_FileTempWrite(addr,val);  
 }
 

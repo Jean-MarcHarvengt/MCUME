@@ -2,31 +2,17 @@
 #define IOPINS_H
 
 #include "platform_config.h"
-#include "tft_t_dma_config.h"
 
 #ifndef OLD_LAYOUT
 
-#ifdef ST7789
-// ST7789
 #define TFT_SCLK        13
 #define TFT_MOSI        11
 #define TFT_MISO        12
 #define TFT_TOUCH_CS    255
 #define TFT_TOUCH_INT   255
 #define TFT_DC          9
-#define TFT_CS          255
-#define TFT_RST         23
-#else
-// ILI9341
-#define TFT_SCLK        13
-#define TFT_MOSI        11
-#define TFT_MISO        12
-#define TFT_TOUCH_CS    255 //38
-#define TFT_TOUCH_INT   255 //37
-#define TFT_DC          9
-#define TFT_CS          23
-#define TFT_RST         255
-#endif
+#define TFT_CS          22 // 255 for LORES ST7789 (NO CS)
+#define TFT_RST         23 // 255 for ILI/ST if connected to 3.3V
 
 // PSRAM
 #define PSRAM_CS      36
@@ -38,10 +24,10 @@
 #define SD_SCLK        13
 #define SD_MOSI        12
 #define SD_MISO        11 
-#ifdef TEENSYBOY
-#define SD_CS          BUILTIN_SDCARD
+#ifdef EXTERNAL_SD
+#define SD_CS          8
 #else
-#define SD_CS          5
+#define SD_CS          BUILTIN_SDCARD
 #endif 
 
 // I2C keyboard
@@ -54,17 +40,15 @@
 #define PIN_JOY2_BTN    17
 #define PIN_KEY_USER1   3 //34
 #define PIN_KEY_USER2   4 //35
-//#define PIN_KEY_USER3   255
-//#define PIN_KEY_USER4   255
+//#define PIN_KEY_USER3   33
+//#define PIN_KEY_USER4   39
 
-#ifdef TEENSYBOY
 // Second joystick
 #define PIN_JOY1_BTN     2
 #define PIN_JOY1_1       14 // UP
 #define PIN_JOY1_2       7  // DOWN
 #define PIN_JOY1_3       6  // RIGHT
 #define PIN_JOY1_4       5  // LEFT
-#endif
 
 #else 
 // OLD LAYOUT!!!!

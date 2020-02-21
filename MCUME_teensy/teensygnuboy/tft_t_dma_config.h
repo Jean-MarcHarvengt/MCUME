@@ -1,11 +1,7 @@
 #include "platform_config.h"
 
-#ifdef TEENSYBOY
-#define ST7789         1
-#define ROTATE_SCREEN  1
-#else
-#define ILI9341        1
-#endif
+//#define ST7789         1
+//#define ILI9341        1
 
 #define TFT_LINEARINT  1
 #define LINEARINT_HACK 1

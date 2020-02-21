@@ -4,17 +4,17 @@ Teensy 4.0 (2x14 pins) or Teensy 3.6 (2x24 pins inc bottom part)
                                   GND X           VIn  (NC)
                            (NC)    00             Ang  (NC)
                            (NC)    01           X 3.3v
-                VGA Blue (OPT2)    02           X 23   DISPLAY - CS (also RST for ST7789!)
-               Key USER1 (OPT1)    03 X           22   VGA Hsync (OPT2)
-               Key USER2 (OPT1)    04 X           21   VGA Red   (OPT2)
-                 VGA Red (OPT2)    05             20   VGA Red   (OPT2)
-               VGA Green (OPT2)    06             19   I2C CLK   (OPT1)
-               VGA Green (OPT2)    07             18   I2C DAT   (OPT1)
-               VGA Green (OPT2)    08           X 17   JOY2 Fire
+                       JOY1 Fire   02 X         X 23   RST for ST7789 DISPLAY 
+               Key USER1 (OPT1)    03 X         X 22   DISPLAY - CS 
+               Key USER2 (OPT1)    04 X           21   
+                      JOY1 Left    05 X           20  
+                      JOY1 Right   06 X           19   I2C CLK   (OPT1)
+                      JOY1 Down    07 X           18   I2C DAT   (OPT1)
+                      EXT SD CS    08           X 17   JOY2 Fire
                    DISPLAY - DC    09 X         X 16   JOY2 AnalogY-A2
        Audio MSQL for T4 (OPT0)    10           X 15   JOY2 AnalogX-A1
-                 DISPLAY - MOSI    11 X           14   VGA Blue  (OPT2)
-   MISO (Touch) for T3.6 (OPT2)    12           X 13   DISPLAY - SCK
+          DISPLAY/EXT SD - MOSI    11 X         X 14   JOY1 Up
+   MISO (Touch for T3.6 or EXT SD) 12           X 13   DISPLAY/EXT SD - SCK
 
 
 
@@ -23,21 +23,51 @@ Teensy 4.0 (2x14 pins) or Teensy 3.6 (2x24 pins inc bottom part)
                            (NC)    25             DAC0 Audio L for T3.6 (OPT0)
                            (NC)    26             39   Key USER4 (OPT1)
                            (NC)    27             38   T_CS (Touch) for T3.6 (OPT2)
-                           (NC)    28             37   T_IRQ (Touch) for T3.6 (OPT2)
-               VGA Vsync (OPT2)    29             36    
-                                   30             35    
-                                   31             34   
+                           (NC)    28             37   PSRAM_CLK  (OPT3) / T_IRQ (Touch) for T3.6 (OPT2)
+                                   29             36   PSRAM_CS   (OPT3)
+                                   30             35   PSRAM_MOSI (OPT3)
+                                   31             34   PSRAM_MISO (OPT3)
                                    32             33   Key USER3 (OPT1)
 
 
-Display: ILI9341/ST7789 (SPI connected,  MISO not connected)
-Storage: SD build-in (external SD requires extra CS)
 
-(X)    mandatory pins to connect for the minimum set-up
+Teensy 3.6 old layout with VGA (2x24 pins inc bottom part)  
+----------------------------------------------------------
+                        (NC)      GND             VIn  (NC)
+                        (NC)       00             Ang  (NC)
+                        (NC)       01             3.3v (NC)
+              VGA Blue (OPT)       02           X 23   Key RESET
+               I2C CLK (OPT)       03             22   VGA Hsync (OPT)
+               I2C DAT (OPT)       04             21   VGA Red (OPT)
+               VGA Red (OPT)       05             20   VGA Red (OPT)
+             VGA Green (OPT)       06             19   JOY1 Left (OPT)
+             VGA Green (OPT)       07             18   JOY1 Right (OPT)
+             VGA Green (OPT)       08             17   JOY1 Down (OPT)
+                      ILI DC       09 X           16   JOY1 Up (OPT)
+                      ILI CS       10 X           15   (NC)
+            ILI SDI+T_DIN-SPI MOSI 11 X           14   VGA Blue (OPT)
+            ILI SDO+T_DO-SPI MISO  12 X         X 13   ILI SCK+T_CLK-SPI SCK
+                     ILI VCC     3.3v X         X GND  ILI GND
+                        (NC)       24             DAC1 Audio R (OPT)
+                        (NC)       25             DAC0 Audio L (OPT)
+                        (NC)       26             39   Key USER4 (OPT)
+                        (NC)       27           X 38   ILI T_CS (Touch screen)
+                        (NC)       28           X 37   ILI T_IRQ (Touch screen)
+             VGA Vsync (OPT)       29             36   JOY2 Fire 
+            JOY1 Key FIRE(OPT)     30           X 35   Key USER1 
+            JOY2 AnalogX-A12       31 X           34   Key USER2 (OPT)
+            JOY2 AnalogY-A13       32 X           33   Key USER3 (OPT)
+
+
+
+Display: ILI9341/ST7789 (on main SPI,  MISO not connected, RST optional or to 3.3v)
+Storage: SD build-in (or external SD requires extra CS + main SPI 11,12 and 13)
+
+(X)    mandatory pins to connect for the minimum set-up (note that single joystick as JOY1 or JOY2 is possible via SWAP option)
 (OPT0) audio output
 (OPT1) keys required to play 'better' as for e.g. computer (I2C keyboard, 2 extra joystick buttons) 
-(OPT2) for VGA output and ILI touch screen (for T3.6 only). ILI touch on same SPI as DISPLAY
-
+(OPT2) for VGA output and ILI touch screen (for T3.6 only). ILI touch on main SPI as DISPLAY
+(OPT3) for PSRAM on T4.0 only (with EXT SD only!!!)
 
 The keys (all) are using internal pull-up so just connect the other side to the GND
 The Analog joypad also needs VCC and GND connections !

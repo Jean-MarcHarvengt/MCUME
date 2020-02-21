@@ -1380,7 +1380,7 @@ void emu_init(void)
 
   
   emu_InitJoysticks();
-#ifdef TEENSYBOY
+#ifdef SWAP_JOYSTICK
   joySwapped = true;   
 #else
   joySwapped = false;   
