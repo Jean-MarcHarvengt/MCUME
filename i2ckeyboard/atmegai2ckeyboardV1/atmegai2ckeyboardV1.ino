@@ -5,8 +5,8 @@
 static byte msg[7];
 
 // rows are inputs
-//static byte rows[] = {11, 10, 9, 12, 13, 8, 7, 6, 5, 4}; // {2,3,4};
-static byte rows[] = {4, 5, 6, 7, 8, 13, 12, 9, 10, 11}; // {2,3,4};
+// VERI OLD static byte rows[] = {11, 10, 9, 12, 13, 8, 7, 6, 5, 4}; // VERI OLD
+static byte rows[] = {4, 5, 6, 7, 8, 13, 12, 9, 10, 11}; // Teensy4 ILI 9341 + keyboard
 const int rowCount = sizeof(rows) / sizeof(rows[0]);
 
 // cols are outputs

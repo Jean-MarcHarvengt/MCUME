@@ -1,18 +1,28 @@
 pinout Atmega328p (2x14 pins) as I2C keyboard slave
 ---------------------------------------------------
 
+ V2                  V1              V1          V2
+               RESET    01        28    I2C SCL
+ 9                      02 x      27    I2C SDA
+ 8                      03 x      26 3  ROW OUT  3
+ 7                      04 x      24 2  ROW OUT  2
+ 4     ROW OUT        4 05        25 1  ROW OUT  1
+ 6     COL IN         9 06 x      23 0  ROW OUT  0
+               V3.3v    07        22    GND 
+                 GND    08        21
+                        09        20 
+                        10        19 4  COL IN
+ 5     COL IN         8 11 x      18 3  COL IN
+ 4     COL IN         7 12 x      17 0  COL IN
+ 3     COL IN         6 13 x    x 16 1  COL IN   1
+ 2     COL IN         5 14 x    x 15 2  COL IN   0
 
-               RESET 01        28 I2C SCL
-                     02 x      27 I2C SDA
-                     03 x      26 A3 COL3 OUT (kbd row0)
-                     04 x      24 A2 COL2 OUT (kbd row1)
-  COL4 OUT (kbd row4)05        25 A1 COL1 OUT (kbd row2)
-9 ROW9 IN (kbd col9) 06 x      23 A0 COL0 OUT (kbd row3)
-               V3.3v 07        22 GND 
-                 GND 08        21
-                     09        20
-                     10        19 4 ROW4 IN (kbd col4)
-8 ROW8 IN (kbd col8) 11 x      18 3 ROW3 IN (kbd col3)
-7 ROW7 IN (kbd col7) 12 x      17 0 ROW0 IN (kbd col0)
-6 ROW6 IN (kbd col6) 13 x    x 16 1 ROW1 IN (kbd col1)
-5 ROW5 IN (kbd col5) 14 x    x 15 2 ROW2 IN (kbd col2)
+
+ROW and COLUMNS numbers (for V1 and V2):
+
+  0 1 2 3 4 5 6 7 8 9
+0 x x x x x x x x x x
+1 x x x x x x x x x x
+2 x x x x x x x x x x
+3 x x x x x x x x x x
+4 x x x x x x x x x x

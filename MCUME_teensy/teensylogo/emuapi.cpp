@@ -350,7 +350,7 @@ int emu_SwapJoysticks(int statusOnly) {
 
 int emu_GetPad(void) 
 {
-  return(keypadval|((joySwapped?1:0)<<7));
+  return(keypadval/*|((joySwapped?1:0)<<7)*/);
 }
 
 int emu_ReadKeys(void) 

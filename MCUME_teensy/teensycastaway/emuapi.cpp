@@ -352,7 +352,7 @@ int emu_SwapJoysticks(int statusOnly) {
 
 int emu_GetPad(void) 
 {
-  return(keypadval|((joySwapped?1:0)<<7));
+  return(keypadval/*|((joySwapped?1:0)<<7)*/);
 }
 
 int emu_ReadKeys(void) 
@@ -480,9 +480,9 @@ int emu_ReadI2CKeyboard(void) {
     while (Wire.available() && (i<7) ) { // slave may send less than requested
       byte b = Wire.read(); // receive a byte
       if (b != 0xff) hitindex=i; 
-      msg[i++] = b;        
+      msg[i++] = b;
     }
-    
+ 
     if (hitindex >=0 ) {
       /*
       Serial.println(msg[0], BIN);
@@ -1411,10 +1411,11 @@ void emu_init(void)
   
   emu_InitJoysticks();
 #ifdef SWAP_JOYSTICK
-  joySwapped = true;   
+  joySwapped = true;
 #else
-  joySwapped = false;   
-#endif  
+  joySwapped = false;
+#endif
+ 
   readCallibration();
  
   if ((tft.isTouching()) || (emu_ReadKeys() & MASK_JOY2_BTN) ) {
@@ -1442,7 +1443,7 @@ void emu_init(void)
   Serial.println(msg[4], BIN);
   Serial.println(msg[5], BIN);
   Serial.println(msg[6], BIN);
-  */  
+  */
   if ( (msg[0] == 0xff) && (msg[1] == 0xff) && 
        (msg[2] == 0xff) && (msg[3] == 0xff) && 
        (msg[4] == 0xff) && (msg[5] == 0xff) && (msg[6] == 0xff)) {

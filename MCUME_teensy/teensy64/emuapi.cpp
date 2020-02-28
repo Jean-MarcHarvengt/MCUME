@@ -350,7 +350,7 @@ int emu_SwapJoysticks(int statusOnly) {
 
 int emu_GetPad(void) 
 {
-  return(keypadval|((joySwapped?1:0)<<7));
+  return(keypadval/*|((joySwapped?1:0)<<7)*/);
 }
 
 int emu_ReadKeys(void) 
@@ -479,9 +479,9 @@ int emu_ReadI2CKeyboard(void) {
       if (b != 0xff) hitindex=i; 
       msg[i++] = b;        
     }
-    
+   
     if (hitindex >=0 ) {
-      /*
+      /* 
       Serial.println(msg[0], BIN);
       Serial.println(msg[1], BIN);
       Serial.println(msg[2], BIN);
@@ -491,7 +491,7 @@ int emu_ReadI2CKeyboard(void) {
       Serial.println(msg[6], BIN);
       */
       unsigned short match = (~msg[hitindex])&0x00FF | (hitindex<<8);
-      //Serial.println(match,HEX);  
+      Serial.println(match,HEX);  
       for (i=0; i<sizeof(i2ckeys); i++) {
         if (match == i2ckeys[i]) {
           //Serial.println((int)keys[i]);      

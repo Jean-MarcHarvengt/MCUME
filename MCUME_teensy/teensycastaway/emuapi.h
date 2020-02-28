@@ -10,8 +10,8 @@
 
 #define EXTRA_HEAP  0x10
 
-// Title:     <                                        >
-#define TITLE "           AtariST Emulator             "
+// Title:     <                        >
+#define TITLE "   AtariST Emulator     "
 #define ROMSDIR "/st"
 
 #define emu_Init(ROM) {ast_Init(); ast_Start(ROM);}
