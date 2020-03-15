@@ -9,7 +9,7 @@ March 2020: MSX1/2 emulation on Teensy4.0 (no SDRAM required)<br>
 Mini-console prototype with 40 keys keyboard<br> 
 <br>
 <p align="center">
-<img src="/images/msx.png" width="240" />  
+<img src="/images/msx.png" width="480" />  
 <br>
 https://youtu.be/j2sKw7KYpEo <br>
 
