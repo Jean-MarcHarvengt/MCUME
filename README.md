@@ -5,6 +5,10 @@
 
 # News
 
+May 2020: Amiga emulation on Teensy4.1 (with PSRAM) !!!<br>
+Here is a video of the emulator running on my prototype board.<br>
+https://youtu.be/LE4IWPG5z6g
+
 March 2020: MSX1/2 emulation on Teensy4.0 (no SDRAM required)<br>
 Mini-console prototype with 40 keys keyboard, keypad and 320x240 ST7789 display.
 The prototype supports of course all systems below where keyboard is supported!<br> 
