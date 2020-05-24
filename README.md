@@ -5,6 +5,16 @@
 
 # News
 
+March 2020: MSX1/2 emulation on Teensy4.0 (no SDRAM required)<br>
+Mini-console prototype with 40 keys keyboard, keypad and 320x240 ST7789 display.
+The prototype supports of course all systems below where keyboard is supported!<br> 
+https://youtu.be/YZGbGKmeb6I<br>
+<br>
+<p align="center">
+<img src="/images/msx.png" width="640" />  
+<br>
+
+
 Nov 2019: Gameboy, Sega Master System/ GameGear and Megadrive/Genesis emulator running with extra 8MB SPI RAM (PSRAM) <br>
 https://youtu.be/j2sKw7KYpEo <br>
 
@@ -63,6 +73,7 @@ Computer systems supported and status on various MCU platforms<br>
 | C64         | X | X | X | X | X |
 | Atari 520ST | - | full speed! | X | - | slow |
 | 8086 XT PC  | - | full speed! | X | - | slow |
+| MSX1/2      | - | full speed! | X | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
 
@@ -122,7 +133,9 @@ Game console systems supported and status on various MCU platforms<br>
   - "pce"  => for PC Engine, put your ".pce" files here  
   - "gameboy"  => for Gameboy and GBColor, put your ".gb"/"gbc" files here  
   - "sms"  => for Sega Master System/Game Gear, put your ".sms"/"gg" files here  
-  - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here  
+  - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here 
+  - "msx"  => for MSX roms, put your ".rom"/".msx2" files here. MSX system roms in msx/roms 
+  
 -- insert the card into the SD slot
 
 # Compilation/flashing (Teensy)
@@ -201,6 +214,10 @@ Game console systems supported and status on various MCU platforms<br>
   - Nearly Full speed with rarely sound
   - Some background  rotation issue
   - Some games do not start
+- MSX1/2:
+  - Full speed with sound
+  - up to 256KB roms
+  - some games are not working as uridium2
   
   
 # Running
