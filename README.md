@@ -65,15 +65,16 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | ESP32 | ESP32-Wrover |
-| --- | --- |--- | --- | --- | --- |
-| Zx81        | X | X | X | X | X |
-| Zx spectrum | X | X | X | X | X |
-| Atari 800   | X | X | X | X | X |
-| C64         | X | X | X | X | X |
-| Atari 520ST | - | full speed! | X | - | slow |
-| 8086 XT PC  | - | full speed! | X | - | slow |
-| MSX1/2      | - | full speed! | X | - | - |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0+PSRAM | Teensy4.1+PSRAM | ESP32 | ESP32-Wrover |
+| --- | --- |--- | --- | --- | --- |--- |
+| Zx81        | X | X | X | X | X | X |
+| Zx spectrum | X | X | X | X | X | X |
+| Atari 800   | X | X | X | X | X | X |
+| C64         | X | X | X | X | X | X |
+| Atari 520ST | - | full speed! | X | X | - | slow |
+| 8086 XT PC  | - | full speed! | X | X | - | slow |
+| MSX1/2      | - | full speed! | X | X | - | - |
+| Amiga       | - | - | exp only! | full speed! | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
 
@@ -135,6 +136,7 @@ Game console systems supported and status on various MCU platforms<br>
   - "sms"  => for Sega Master System/Game Gear, put your ".sms"/"gg" files here  
   - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here 
   - "msx"  => for MSX roms, put your ".rom"/".msx2" files here. MSX system roms in msx/roms 
+  - "amiga"  => for Amiga floppies, put your ".adf" files here. 
   
 -- insert the card into the SD slot
 
@@ -218,6 +220,10 @@ Game console systems supported and status on various MCU platforms<br>
   - Full speed with sound
   - up to 256KB roms
   - some games are not working as uridium2
+- Amiga:
+  - Full speed with very preliminary sound
+  - up to 2MB chip RAM + 4MB expand fast RAM roms
+  - compatibility (no AGA, unexpected crash as in shadow of the beast)
   
   
 # Running
