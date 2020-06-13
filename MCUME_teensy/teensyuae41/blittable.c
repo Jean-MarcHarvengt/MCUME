@@ -1,6 +1,8 @@
 #include "shared.h"
 
 #include "custom.h"
+#include "memory.h"
+#include "blitter.h"
 #include "blitfunc.h"
 
 #include "arduinoproto.h"

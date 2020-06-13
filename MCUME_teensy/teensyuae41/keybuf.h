@@ -11,4 +11,5 @@ extern int get_next_key (void);
 extern int keys_available (void);
 extern void record_key (int);
 extern void keybuf_init (void);
-extern void getjoystate(UWORD *dir, int *button);
+extern void getjoystate (int nr, unsigned int *dir, int *button);
+extern void joystick_setting_changed (void);

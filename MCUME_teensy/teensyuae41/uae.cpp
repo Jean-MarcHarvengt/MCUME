@@ -6,47 +6,87 @@
 
 extern "C" {
 #include "dtypes.h"
-
+#include "options.h"
+#include "autoconf.h"
 #include "memory.h"
 #include "custom.h"
-#include "newcpu.h"
+//#include "os.h"
+//#include "newcpu.h"
 #include "disk.h"
-#include "keybuf.h"
 #include "xwin.h"
-#include "gui.h"
-//#include "events.h"
+#include "gensound.h"
+//#include "gui.h"
+#include "events.h"
+#include "sounddep/sound.h"
 #include "keyboard.h"
+void record_key (int);
+void keybuf_init (void);
+extern void serial_init(void);
+extern void init_m68k(void);
+extern void m68k_reset(void);
+extern void m68k_go(int);
 }
+
+#define WIN_W                     TFT_WIDTH
+#define WIN_H                     TFT_HEIGHT
 
 //#define HAS_MEMDISK 1
 
-#define MAX_FILENAME 64
+int version = 100*UAEMAJOR + 10*UAEMINOR + UAEURSAMINOR;
+struct uae_prefs changed_prefs;
+struct uae_prefs currprefs = {
+/* framerate */ 1,
+/* illegal_mem */ 0,
+/* no_xhair */ 0,
+/* use_serial */ 0,
+/* automount_uaedev */ 1,
 
-int framerate = 1;
-int dont_want_aspect = 1;
-int use_debugger = 0;
-int use_slow_mem = 0;
-int use_gfxlib = 0;
-int use_xhair = 0;
-int use_lores = 1;
-int automount_uaedev = 1;
-int produce_sound = 0;
-int fake_joystick = 0;
-int screen_res = 0;
-int color_mode = 0;
+/* fake_joystick */ 2 + (0<<8),
+/* KbdLang keyboard_lang */ KBD_LANG_US,
+/* allow_save */ 0,
+/* emul_accuracy */ 2,
+/* test_drawing_speed */ 0,
+
+/* produce_sound */ 0,
+/* sound_bits */ DEFAULT_SOUND_BITS,
+/* sound_freq */ DEFAULT_SOUND_FREQ,
+/* sound_minbsiz */ DEFAULT_SOUND_MINB,
+/* sound_maxbsiz */ DEFAULT_SOUND_MAXB,
+
+/* gfx_width */ WIN_W,
+/* gfx_height */ WIN_H,
+/* gfx_lores */ 1,
+/* gfx_linedbl */ 0,
+/* gfx_correct_aspect */ 0,
+/* gfx_xcenter */ 40,
+/* gfx_ycenter */ 40,
+/* color_mode */ 0,
+    
+/* immediate_blits */ 0,
+/* blits_32bit_enabled */ 0,
+    
+/* floppies */ { "df0.adf", "df1.adf", "df2.adf", "df3.adf" },
+/* hardfile */ "hardfile", 
+};
+
+char df0[MAX_FILENAME]="df0.adf";
+char df1[MAX_FILENAME]="df1.adf", df2[MAX_FILENAME]="df2.adf", df3[MAX_FILENAME]="df3.adf";
 
 int quit_program = 0;
 int buttonstate[3];
 int lastmx, lastmy;
 int newmousecounters;
-char prtname[MAX_FILENAME] = "lpr ";
-
 xcolnr xcolors[4096];
 struct vidbuf_description gfxvidinfo;
+char romfile[MAX_FILENAME] = "./kick13.rom";
+char prtname[MAX_FILENAME] = "lpr ";
+char sername[MAX_FILENAME] = "";
+char warning_buffer[256];
+static char slinebuf[800];
 
 
 
-#define MOUSE_STEP 2
+#define MOUSE_STEP 4
 static int prev_hk = 0;
 static int hk = 0;
 static int prev_key = 0;
@@ -78,7 +118,7 @@ void uae_Input(int bClick) {
       emu_setKeymap(0);
     }
     else {
-      disk_swap();
+      disk_swap(df0,df1);
     }
   }   
 
@@ -98,7 +138,7 @@ void uae_Input(int bClick) {
   if (isMouse)
   {
     if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
-      if ( lastmx < 320 ) {
+      if ( lastmx < 640 ) {
         lastmx += MOUSE_STEP;
         newmousecounters = 1; 
       } 
@@ -116,7 +156,7 @@ void uae_Input(int bClick) {
       }
     }
     else if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
-      if ( lastmy < 240 ) {
+      if ( lastmy < 480 ) {
         lastmy += MOUSE_STEP;
         newmousecounters = 1;        
       }
@@ -130,11 +170,22 @@ void uae_Input(int bClick) {
 void handle_events(void)
 {
   uae_Input(emu_DebounceLocalKeys());
-    
 } 
 
-extern "C" void read_joystick (UWORD *dir, int *button);
-void read_joystick(UWORD *dir, int *button)
+
+
+
+
+extern "C" {
+
+uae_u16 sndbuffer[sndbufsize];
+uae_u16 * sndbufpt;
+static uae_u32 *sndbuffer32=(uae_u32 *)sndbuffer;
+static uae_u32 sndbufrdpt=sndbufsize/4;
+static uae_u32 sndinc=0x100; // default read increment
+#define sndbufrdmask ((sndbufsize/2-1)<<8)+0xff
+
+void read_joystick(int nr, unsigned int *dir, int *button)
 {
   int left = 0, right = 0, top = 0, bot = 0;
   *dir = 0;
@@ -155,203 +206,41 @@ void read_joystick(UWORD *dir, int *button)
     *dir = bot | (right << 1) | (top << 8) | (left << 9);
   }  
 }
-
-int debuggable(void)
-{
-  return 1;
-}
-
-int needmousehack(void)
-{
-  return 1;
-}
-
-
-CPTR audlc[4], audpt[4];
-UWORD audvol[4], audper[4], audlen[4], audwlen[4];
-int audwper[4];
-UWORD auddat[4];
-int audsnum[4];
-int audst[4];
-
-static short sound_table[256][64];
-static UBYTE snddata[4];
-#define SNDBUFSIZE 8192
-static short buffer[SNDBUFSIZE];
-static int wrpos=0;
-static int rdpos = 0;
-static int wrcount=0;
-static int wrsam=0x3ab;
-static int rdcount=0;
-static int rdsam=0x1c0;
-#define NUM rdsam
-#define DEN wrsam
-
-
-static void init_sound(void)
-{
-  audst[0] = audst[1] = audst[2] = audst[3] = 0;
-  rdpos = 0;
-  wrpos = SNDBUFSIZE/2;
-  //wrpos = (wrpos*NUM);
-    
-  int i,j;
-  for (i = 0; i < 256; i++)
-    for (j = 0; j < 64; j++)
-      sound_table[i][j] = j * (i-127);
-}
-
-
-static void channel_reload (int c)
-{
-    audst[c] = 1;
-    audpt[c] = audlc[c];
-    audwper[c] = 0;
-    audwlen[c] = audlen[c];
-    audsnum[c] = 1;    
-}
-
-extern "C" 
-{
-void do_sound (void)
-{
-  int smplcnt = -227;
-  while (smplcnt < 0) 
-  {
-    smplcnt += 80;
-    int i;
-    for(i = 0; i < 4; i++) 
-    {
-      if (dmaen (1<<i)) {
-        if (audst[i] == 0) {    
-          /* DMA was turned on for this channel */
-          channel_reload (i);
-          continue;
-        }
   
-        if (audwper[i] <= 0) {
-          audwper[i] += audper[i];
-          if (audst[i] == 1) {
-            /*  Starting a sample, cause interrupt */
-            put_word (0xDFF09C, 0x8000 | (0x80 << i));
-            audst[i] = 2;
-          }
-          audsnum[i] ^= 1;
-          if (audsnum[i] == 0) {
-            auddat[i] = get_word (audpt[i]);
-            audpt[i] += 2;
-            audwlen[i]--;
-            if (audwlen[i] == 0) {
-              channel_reload (i);
-            }
-          }
-        }
-        if (adkcon & (0x11 << i)) {
-          snddata[i] = 0;
-          audsnum[i] ^= 2;
-          audsnum[i] |= 1;
-          if (i < 3) {
-            if (adkcon & (0x11 << i)) {
-              if (audsnum[i] & 2)
-                audvol[i+1] = auddat[i];
-              else
-                audper[i+1] = auddat[i];
-            } 
-            else 
-              if (adkcon & (1 << i)) 
-              {
-                audvol[i+1] = auddat[i];
-              } 
-              else 
-              {
-                audper[i+1] = auddat[i];
-              }
-          }
-        } 
-        else 
-        {
-          snddata[i] = audsnum[i] & 1 ? auddat[i] : auddat[i] >> 8;
-        }
-        audwper[i] -= 80;   
-      } 
-      else 
-        audst[i] = snddata[i] = 0;
-    }
-    
-    //short s = snddata[0]*audvol[0]
-    // + snddata[1]*audvol[1] 
-    // + snddata[2]*audvol[2] 
-    // + snddata[3]*audvol[3];
-    
-    int s = (sound_table[snddata[0]][audvol[0]] 
-    + sound_table[snddata[1]][audvol[1]]
-    + sound_table[snddata[2]][audvol[2]] 
-    + sound_table[snddata[3]][audvol[3]]);
-    buffer[wrpos++]=s>>2;
-    wrpos &= (SNDBUFSIZE-1);
-    wrcount++;
-    /*
-    int k = wrpos/DEN;
-    buffer[k] = s>>1;
-    wrpos += NUM;
-    int l = wrpos/DEN;
-    if (l >= SNDBUFSIZE) {
-      wrpos = 0;
-      wrpos = (l-SNDBUFSIZE)*NUM;
-    }
-    //if (k != l)
-      wrcount++;
-    */  
-  } 
-}
-void do_sound_vsync (void)
+void uae_reset (void)
 {
-  wrsam = wrcount;
-  wrcount=0;
-  rdsam = rdcount;
-  rdcount=0;
-  //emu_printf("wr");  
-  //emu_printi(wrsam);  
-  //emu_printf("rd");  
-  //emu_printi(rdsam);  
-}
+  if (quit_program != 1 && quit_program != -1)
+    quit_program = -2;
 }
 
-void SND_Process(void *stream, int len) {
-    short * data = (short*)stream;
-    len = len >> 1; 
-    for (int i=0;i<len;i++)
-    {      
-      short s = buffer[rdpos/rdsam];  
-      *data++ = s;
-      *data++ = s;
-      rdpos += wrsam; 
-      //rdpos &= (SNDBUFSIZE-1);
-      if (rdpos/rdsam >= SNDBUFSIZE) rdpos = (rdpos/rdsam)-SNDBUFSIZE;
-      rdcount++;
-    }
-} 
-
-void gui_led(int led, int on)
-{
-}
-
-void LED(int on)
-{
-}
+void gui_led(int led, int on){}
+int needmousehack(void) { return 1;}
+void LED(int on) {}
+void write_log (const char *buf) { /*fprintf (stderr, buf); */ }
 
 void flush_line(int y)
 {
+    if(y >= 0 && y < WIN_H) {
+      emu_DrawLine16((unsigned short *)slinebuf, WIN_W , 1, y);
+    }  
 }
 
-void flush_block(int ystart,int ystop)
-{
-}
+void flush_block(int ystart,int ystop){}
 
 void flush_screen(int ystart,int ystop)
 {
+  uae_u32 loc = (sndbufpt-sndbuffer)/2;
+  int delta = (sndbufrdpt>>8)-loc;
+  if (delta < 0) delta = (sndbufrdpt>>8) + (sndbufsize/2)-loc;
+  sndinc=((sndbufsize/4)<<8)/delta;
+      
   emu_DrawVsync();    
 }
+
+}
+
+
+
 
 #ifdef HAS_PSRAM
 #include "psram_t.h"
@@ -367,14 +256,50 @@ extern "C" void  write_rom(int address, unsigned char val)  {
 
 }
 #endif
-//char df0[MAX_FILENAME]="Workbench V1.3.ADF";
-char df0[MAX_FILENAME]="";
-char df1[MAX_FILENAME]="", df2[MAX_FILENAME]="df2.adf", df3[MAX_FILENAME]="df3.adf";
+
+
+void SND_Process(void *stream, int len) {  
+    short * data = (short*)stream;
+    len = len >> 1;
+    for (int i=0;i<len;i++)
+    {      
+      uae_u32 s = sndbuffer32[sndbufrdpt>>8];  
+      *data++ = (s >> 16);
+      *data++ = (s & 0xffff);
+      sndbufrdpt += sndinc;
+      sndbufrdpt &= sndbufrdmask;
+    }    
+} 
+
+
+int init_sound (void)
+{
+  currprefs.sound_maxbsiz = sndbufsize;
+  sample_evtime = (long)maxhpos * maxvpos * 50 / currprefs.sound_freq;
+  init_sound_table16 ();
+  eventtab[ev_sample].handler = sample16_handler;
+  int i;
+  for (i=0;i<sndbufsize;i++) {
+    sndbuffer[i] = 0;
+  }
+  sndbufpt = sndbuffer;
+  sndbufrdpt=(sndbufsize/4)<<8;
+  sound_available = 1;  
+  return 1;
+}
+
+
+static int hddfound=0;
 
 void uae_Init(void)
 {
   emu_printf("Init");
+  gfxvidinfo.rowbytes   = WIN_W*2;
   gfxvidinfo.pixbytes   = 2;
+  gfxvidinfo.maxlinetoscr = WIN_W;
+  gfxvidinfo.maxline = WIN_H;
+  gfxvidinfo.linemem = slinebuf;
+  gfxvidinfo.maxblocklines  = 0;
   
   buttonstate[0] = buttonstate[1] = buttonstate[2] = 0;
   lastmx = lastmy = 0;
@@ -387,21 +312,47 @@ void uae_Init(void)
     int b = i & 0xF;
     xcolors[i] = RGBVAL16(r<<4,g<<4,b<<4);
   } 
-  keybuf_init();
-  memory_init();
-  custom_init();
-  DISK_init();
+
+
+
+  quit_program = 2;
+
+#ifdef HAS_HARDFILE
+  rtarea_init ();
+  hardfile_install ();
+#endif
+
+#ifdef SOUND_PRESENT
 #ifdef HAS_SND  
   emu_sndInit();
-//#ifdef SOUND_PRESENT
-  produce_sound = 1;
-  init_sound();
-//#else
-//  produce_sound = 0;
-//#endif   
 #endif  
-  MC68000_reset();
-  MC68000_run();
+  init_sound();
+  currprefs.produce_sound = 2;
+#else
+  currprefs.produce_sound = 0;
+#endif
+
+  keybuf_init();
+#ifdef HAS_EXPANMEM  
+  expansion_init ();
+#endif  
+  memory_init();
+#ifdef HAS_FILESYS
+  filesys_install();
+#endif  
+  custom_init();
+  serial_init();
+  init_m68k();
+  //customreset();
+  // JMH to fix hdd
+  if (!hddfound) {
+    DISK_init();
+    disk_swap(df0,df1);    
+  }
+  emu_printf("cpu reset");
+  m68k_reset();
+  emu_printf("cpu go");
+  m68k_go(1);
 }
 
 #ifdef HAS_MEMDISK
@@ -441,15 +392,28 @@ void uae_Start(char * floppy1, char * floppy2)
   emu_printf("Start");
   emu_printf(floppy1);  
   emu_printf(floppy2);  
-  #ifdef HAS_MEMDISK
+#ifdef HAS_MEMDISK
 #ifdef HAS_PSRAM
   psram.begin();
 #endif 
   floppy_to_mem(floppy1, 0);
   floppy_to_mem(floppy2, 1); 
 #else
-  strcpy(df0,floppy1);
-  strcpy(df1,floppy2);
+  int strl = strlen(floppy1);
+  if ( (strl >= 4) ) {
+    emu_printf(&floppy1[strl-4]);    
+    if ( (!strcmp(&floppy1[strl-4], ".hdf")) || (!strcmp(&floppy1[strl-4], ".HDF")) ) {
+      emu_printf("file is hdd");
+      strcpy(currprefs.hf0,floppy1);
+      hddfound = 1;
+    }
+  }
+  
+  if (!hddfound) {
+    strcpy(df0,floppy1);
+    strcpy(df1,floppy2);  
+  }
+
 #endif  
 
   emu_printf("Start done");

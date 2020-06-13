@@ -9,6 +9,8 @@
 /* First, two dummies */
 #define AK_mousestuff 0x100
 #define AK_inhibit 0x101
+/* This mutates into AK_CTRL in keybuf.c. */
+#define AK_RCTRL 0x103
 
 #define AK_A 0x20
 #define AK_B 0x35
@@ -116,4 +118,3 @@
 #define AK_BACKQUOTE 0x00
 #define AK_MINUS 0x0B
 #define AK_EQUAL 0x0C
-

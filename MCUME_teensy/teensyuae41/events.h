@@ -3,22 +3,14 @@
   *
   * Events
   * 
-  * (c) 1995 Bernd Schmidt
+  * Note that this file must be included after sound.h and sounddep/sound.h,
+  * since DONT_WANT_SOUND can get overridden in those.
+  * 
+  * Copyright 1995, 1996, 1997 Bernd Schmidt
   */
 
-/* This is tunable. 4 gives good results. */
-#ifdef LINUX_SOUND_SLOW_MACHINE
-#define cycles_per_instruction 8
-#else
-#define cycles_per_instruction 4
-#endif
-
-#undef DEFFERED_INT
-#if !defined(NO_FAST_BLITTER)
-#define DEFERRED_INT
-#endif
-
-extern unsigned long int cycles, nextevent, nextev_count;
+extern unsigned long int cycles, nextevent, is_lastline;
+extern unsigned long int sample_evtime;
 typedef void (*evfunc)(void);
 
 struct ev
@@ -30,8 +22,10 @@ struct ev
 
 enum { 
     ev_hsync, ev_copper, ev_cia,
-#ifdef DEFERRED_INT
-    ev_deferint,
+    ev_blitter, ev_diskblk, ev_diskindex,
+#ifndef DONT_WANT_SOUND
+    ev_aud0, ev_aud1, ev_aud2, ev_aud3,
+    ev_sample,
 #endif
     ev_max
 };
@@ -43,36 +37,65 @@ static __inline__ void events_schedule(void)
     int i;
     
     unsigned long int mintime = ~0L;
-    nextevent = cycles + mintime;
     for(i = 0; i < ev_max; i++) {
-	unsigned long int eventtime = eventtab[i].evtime + eventtab[i].oldcycles - cycles;
-	if (eventtab[i].active && eventtime < mintime) {	    
-	    mintime = eventtime;
-	    nextevent = cycles + mintime;
+	if (eventtab[i].active) {	    
+	    unsigned long int eventtime = eventtab[i].evtime - cycles;
+	    if (eventtime < mintime)
+	        mintime = eventtime;
 	}
     }
-    nextev_count = nextevent - cycles;
+    nextevent = cycles + mintime;
 }
 
-static __inline__ void do_cycles(void)
+static __inline__ void do_cycles_slow(void)
 {
-    if (nextev_count <= cycles_per_instruction) {
+#ifdef FRAME_RATE_HACK
+    if (is_lastline && eventtab[ev_hsync].evtime-cycles <= M68K_SPEED
+	&& (long int)(read_processor_time () - vsyncmintime) < 0)
+	return;
+#endif
+    if ((nextevent - cycles) <= M68K_SPEED) {
 	int j;
-	for(j = 0; j < cycles_per_instruction; j++) {
+	for(j = 0; j < M68K_SPEED; j++) {
 	    if (++cycles == nextevent) {
-		unsigned long int old_nextevent = nextevent;
 		int i;
 		
 		for(i = 0; i < ev_max; i++) {
-		    if (eventtab[i].active && (eventtab[i].evtime + eventtab[i].oldcycles) == old_nextevent) {
+		    if (eventtab[i].active && eventtab[i].evtime == cycles) {
 			(*eventtab[i].handler)();
 		    }
 		}
 		events_schedule();
-	    } else nextev_count--;
+	    }
 	}
     } else {
-    	nextev_count -= cycles_per_instruction;
-	cycles += cycles_per_instruction;
+	cycles += M68K_SPEED;
     }
 }
+
+static __inline__ void do_cycles_fast(void)
+{
+#ifdef FRAME_RATE_HACK
+    if (is_lastline && eventtab[ev_hsync].evtime-cycles <= 1
+	&& (long int)(read_processor_time () - vsyncmintime) < 0)
+	return;
+#endif
+    cycles++;
+    if (nextevent == cycles) {
+	int i;
+		
+	for(i = 0; i < ev_max; i++) {
+	    if (eventtab[i].active && eventtab[i].evtime == cycles) {
+		(*eventtab[i].handler)();
+	    }
+	}
+	events_schedule();
+    }
+
+}
+
+#if M68K_SPEED == 1
+#define do_cycles do_cycles_fast
+#else
+#define do_cycles do_cycles_slow
+#endif

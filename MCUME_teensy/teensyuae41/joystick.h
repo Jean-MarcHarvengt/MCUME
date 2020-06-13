@@ -26,7 +26,7 @@
 #define _LINUX_JOYSTICK_H
 
 
-
+#ifdef unused
 
 /*
  * Version
@@ -130,5 +130,6 @@ struct JS_DATA_SAVE_TYPE_64 {
 	struct JS_DATA_TYPE JS_CORR;
 };
 
+#endif
 
 #endif /* _LINUX_JOYSTICK_H */
