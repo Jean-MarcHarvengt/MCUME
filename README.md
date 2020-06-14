@@ -4,6 +4,11 @@
 </p>
 
 # News
+June 2020: Update of UAE (Amiga emulator) on Teensy4.1<br>
+Now with HDD support, better sound and 68020 emulation.<br>
+All for better compatibility...<br>
+https://youtu.be/Ho8qZSCKdLg
+https://youtu.be/vuMYwylYqYs
 
 May 2020: Amiga emulation on Teensy4.1 (with PSRAM) !!!<br>
 Here is a video of the emulator running on my prototype board.<br>
@@ -140,7 +145,7 @@ Game console systems supported and status on various MCU platforms<br>
   - "sms"  => for Sega Master System/Game Gear, put your ".sms"/"gg" files here  
   - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here 
   - "msx"  => for MSX roms, put your ".rom"/".msx2" files here. MSX system roms in msx/roms 
-  - "amiga"  => for Amiga floppies, put your ".adf" files here. 
+  - "amiga"  => for Amiga floppies, put your ".adf" and ".hdf" files here. 
   
 -- insert the card into the SD slot
 
@@ -225,9 +230,10 @@ Game console systems supported and status on various MCU platforms<br>
   - up to 256KB roms
   - some games are not working as uridium2
 - Amiga:
-  - Full speed with very preliminary sound
+  - Full speed with sound
   - up to 2MB chip RAM + 4MB expand fast RAM roms
-  - compatibility (no AGA, unexpected crash as in shadow of the beast)
+  - HDF (Hard Disk) and adf support
+  - Improved compatibility (still no AGA support!)
   
   
 # Running
@@ -243,6 +249,6 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu) and  Mike Chambers for his 8086 Arduino project!
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu), Bernd Schmidt (UAE) and  Mike Chambers for his 8086 Arduino project!
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
