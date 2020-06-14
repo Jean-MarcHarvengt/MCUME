@@ -10,12 +10,9 @@ extern "C" {
 #include "autoconf.h"
 #include "memory.h"
 #include "custom.h"
-//#include "os.h"
-//#include "newcpu.h"
 #include "disk.h"
 #include "xwin.h"
 #include "gensound.h"
-//#include "gui.h"
 #include "events.h"
 #include "sounddep/sound.h"
 #include "keyboard.h"
@@ -85,8 +82,7 @@ char warning_buffer[256];
 static char slinebuf[800];
 
 
-
-#define MOUSE_STEP 4
+#define MOUSE_STEP 3
 static int prev_hk = 0;
 static int hk = 0;
 static int prev_key = 0;
@@ -99,29 +95,26 @@ const int keyconv[] =
   AK_Q,AK_W,AK_E,AK_R,AK_T,AK_Y,AK_U,AK_I,AK_O,AK_P,
   AK_A,AK_S,AK_D,AK_F,AK_G,AK_H,AK_J,AK_K,AK_L,AK_ENT,
   AK_Z,AK_C,AK_C,AK_V,AK_B,AK_N,AK_M,AK_COMMA,AK_BS,AK_SPC,
-  AK_F1,AK_F2,AK_F3,AK_F4,AK_F5,AK_F6,AK_F7,AK_F8,AK_F9,AK_F10,  
+  AK_F1,AK_F2,AK_F3,AK_F4,AK_F5,AK_F6,AK_F7,AK_F8,AK_F9,AK_F10,
+  AK_NPMUL,AK_NPDEL,AK_DEL   
 };
 
 void uae_Input(int bClick) {
   hk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys(); 
   
-  // Toggle mouse/joystick
-  if (bClick & MASK_KEY_USER1) {
+  // Toggle keymap + mouse/joystick
+  if (bClick & MASK_KEY_USER2) {
     if (isMouse) isMouse = false;
     else isMouse = true;
-  }
-
-  // Toggle keymap
-  if (bClick & MASK_KEY_USER2) {
-    if (isMouse) {
-      emu_setKeymap(0);
-    }
-    else {
-      disk_swap(df0,df1);
-    }
+    emu_setKeymap(0);
   }   
 
+  // Diskswap in joystick mode
+  if (bClick & MASK_KEY_USER1) {
+    if (!isMouse) disk_swap(df0,df1); 
+  }
+  
   if (hk != prev_hk) {
     prev_hk = hk;
     if ( (hk != 0) && (hk != prev_key) ) {
@@ -163,7 +156,9 @@ void uae_Input(int bClick) {
     } 
 
     buttonstate[0] = 0;
+    buttonstate[2] = 0;
     if (k & MASK_JOY2_BTN) buttonstate[0] = 1;             
+    if (k & MASK_KEY_USER1) buttonstate[2] = 1;             
   }
 }
 
@@ -198,9 +193,7 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     if (k & MASK_JOY2_LEFT)  left=1;
     if (k & MASK_JOY2_RIGHT) right=1;
     if (k & MASK_JOY2_BTN) *button |=0xFF;
-    //buttonstate[0] = 0;
-    //if (k & MASK_KEY_USER2) buttonstate[0] = 1;  
-  
+
     if (left) top = !top;
     if (right) bot = !bot;
     *dir = bot | (right << 1) | (top << 8) | (left << 9);
@@ -238,8 +231,6 @@ void flush_screen(int ystart,int ystop)
 }
 
 }
-
-
 
 
 #ifdef HAS_PSRAM
@@ -312,8 +303,6 @@ void uae_Init(void)
     int b = i & 0xF;
     xcolors[i] = RGBVAL16(r<<4,g<<4,b<<4);
   } 
-
-
 
   quit_program = 2;
 
@@ -413,9 +402,7 @@ void uae_Start(char * floppy1, char * floppy2)
     strcpy(df0,floppy1);
     strcpy(df1,floppy2);  
   }
-
 #endif  
-
   emu_printf("Start done");
 }
 

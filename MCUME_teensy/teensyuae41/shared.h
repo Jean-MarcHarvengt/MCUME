@@ -67,8 +67,6 @@ static __inline__ char *my_strdup(const char*s)
     return x;
 }
 
-#define fast_memcmp memcmp
-
 
 /*
  * Please note: Many things are configurable with command line parameters,

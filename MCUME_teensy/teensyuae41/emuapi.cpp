@@ -679,20 +679,22 @@ int emu_setKeymap(int index) {
     tft.drawText(0,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
     tft.drawText(0,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
     tft.drawText(0,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    delay(500);
+    tft.drawText(0,96+16,"mouse mode                              ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
+    delay(200);
   }
   else if (keyMap == 0) {
     keyMap = 1;     
     keys = key_map2;            
     tft.drawText(0, 0+16, "F1 IF2 IF3 IF4 IF5 IF6 IF7 IF8 IF9 IF10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
     tft.drawText(0,16+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawText(0,24+16, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(0,24+16, "PRNIDELIDELI r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
     tft.drawText(0,40+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
     tft.drawText(0,48+16, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
     tft.drawText(0,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
     tft.drawText(0,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
     tft.drawText(0,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    delay(500);     
+    tft.drawText(0,96+16,"joystick mode                           ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
+    delay(200);     
   }
 
 }

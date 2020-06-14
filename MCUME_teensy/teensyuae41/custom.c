@@ -29,7 +29,7 @@
 #include "autoconf.h"
 
 #define OS_WITHOUT_MEMORY_MANAGEMENT
-#define LORES_HACK
+//#define LORES_HACK
 //#define SMART_UPDATE 1
 
 #define SPRITE_COLLISIONS
@@ -45,7 +45,7 @@
  * @@@ Probably won't compile in this version.
  */
 
-/* #define EMULATE_AGA */
+//#define EMULATE_AGA 
 
 #ifndef EMULATE_AGA
 #define AGA_CHIPSET 0

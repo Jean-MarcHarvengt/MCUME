@@ -77,11 +77,6 @@ extern void machdep_init (void);
 
 extern char romfile[], prtname[], sername[];
 
-#define MAX_COLOR_MODES 5
-
-extern int fast_memcmp(const void *foo, const void *bar, int len);
-extern int memcmpy(void *foo, const void *bar, int len);
-
 /*
  * You can specify numbers from 0 to 5 here. It is possible that higher
  * numbers will make the CPU emulation slightly faster, but if the setting
@@ -89,12 +84,6 @@ extern int memcmpy(void *foo, const void *bar, int len);
  * Best to leave this as it is.
  */
 #define CPU_EMU_SIZE 0
-
-/* #define NEED_TO_DEBUG_BADLY */
-
-#if !defined(USER_PROGRAMS_BEHAVE)
-#define USER_PROGRAMS_BEHAVE 0
-#endif
 
 /* Some memsets which know that they can safely overwrite some more memory
  * at both ends and use that knowledge to align the pointers. */
@@ -164,6 +153,15 @@ static __inline__ void fuzzy_memset_le32_1 (void *p, uae_u32 c, int offset, int 
      default: printf("Hit the programmer.\n"); break;
     }
 }
+
+static __inline__ int memcmpy(void *foo, const void *bar, int len)
+{
+    int differs = memcmp(foo, bar, len);
+    memcpy(foo, bar, len);
+    return differs;
+}
+
+#define fast_memcmp memcmp
 
 /*
  * Frame rate hack. Currently only implemented for Pentium (P6?) CPUs.
