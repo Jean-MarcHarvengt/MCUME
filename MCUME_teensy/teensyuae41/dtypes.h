@@ -31,7 +31,7 @@ typedef ULONG uaecptr;
 
 
 #define SOUND_PRESENT 1
-#define M68K_SPEED 4
+#define M68K_SPEED 8
 //#define HAS_BOGOMEM 1
 //#define HAS_MEMDISK  1
 #define HAS_EXPANMEM 1

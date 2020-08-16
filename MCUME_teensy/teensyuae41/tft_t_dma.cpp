@@ -3,6 +3,9 @@
 */
 
 #include "TFT_T_DMA.h"
+
+#ifndef HAS_T4_VGA
+
 #include "font8x8.h"
 
 
@@ -1231,8 +1234,7 @@ void TFT_T_DMA::drawSprite(int16_t x, int16_t y, const uint16_t *bitmap, uint16_
     l++;
   } 
 }
-
-
+#endif
 
 
 

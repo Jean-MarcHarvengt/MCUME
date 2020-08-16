@@ -6,7 +6,14 @@
   * Copyright 1995-1997 Bernd Schmidt
   */
 
+#include "platform_config.h"  
+#ifdef HAS_T4_VGA
+typedef unsigned char xcolnr;
+#else
 typedef unsigned short xcolnr;
+#endif
+
+
 
 typedef int (*allocfunc_type)(int, int, int, xcolnr *);
 
@@ -55,6 +62,8 @@ struct vidbuf_description
 			* value than maxline here). */
     int can_double; /* Set if the high part of each entry in xcolors contains the same value
 		     * as the low part, so that two pixels can be drawn at once. */
+    int width;
+    int height;
 };
 
 extern struct vidbuf_description gfxvidinfo;

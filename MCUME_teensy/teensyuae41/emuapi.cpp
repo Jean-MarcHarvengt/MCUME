@@ -5,8 +5,20 @@ extern "C" {
   #include "iopins.h"
 }
 
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+const vga_pixel deflogo[] = {
+  0,0
+};
+static const vga_pixel * logo = deflogo;
+#else
 #include "tft_t_dma.h"
-#include "logo.h"
+const uint16_t deflogo[] = {
+  0,0
+};
+static const uint16_t * logo = deflogo;
+#endif
+
 #include "bmpjoy.h"
 #include "bmpvbar.h"
 #ifdef OLD_LAYOUT    
@@ -93,7 +105,7 @@ static File file;
 #define MENU_FILE_YOFFSET   (2*TEXT_HEIGHT)
 #define MENU_FILE_W         (MAX_FILENAME_SIZE*TEXT_WIDTH)
 #define MENU_FILE_H         (MAX_MENULINES*TEXT_HEIGHT)
-#define MENU_FILE_BGCOLOR   RGBVAL16(0x00,0x00,0x20)
+#define MENU_FILE_BGCOLOR   RGBVAL16(0x00,0x00,0x40)
 #define MENU_JOYS_YOFFSET   (12*TEXT_HEIGHT)
 #define MENU_VBAR_XOFFSET   (0*TEXT_WIDTH)
 #define MENU_VBAR_YOFFSET   (MENU_FILE_YOFFSET)
@@ -115,10 +127,6 @@ static bool menuRedraw=true;
 
 static int16_t calMinX=-1,calMinY=-1,calMaxX=-1,calMaxY=-1;
 static bool i2cKeyboardPresent = false;
-//const uint16_t deflogo[] = {
-//  0x0000,0x0000
-//};
-//static const uint16_t * logo = deflogo;
 static unsigned short * keys;
 static int keyMap;
 
@@ -592,7 +600,7 @@ bool virtualkeyboardIsActive(void) {
 void toggleVirtualkeyboard(bool keepOn) {
        
     if (keepOn) {      
-        tft.drawSpriteNoDma(0,0,(uint16_t*)logo);
+        tft.drawSpriteNoDma(0,0,logo);
         //prev_zt = 0;
         vkbKeepOn = true;
         vkbActive = true;
@@ -609,7 +617,7 @@ void toggleVirtualkeyboard(bool keepOn) {
         }
         else {         
             tft.stopDMA();                  
-            tft.drawSpriteNoDma(0,0,(uint16_t*)logo);           
+            tft.drawSpriteNoDma(0,0,logo);           
             //prev_zt = 0;
             vkbActive = true;
             exitVkbd = false;
@@ -654,7 +662,7 @@ void handleVirtualkeyboard() {
      
     if (vkeyRefresh) {
         vkeyRefresh = false;
-        tft.drawSpriteNoDma(0,0,(uint16_t*)logo, rx, ry, rw, rh);
+        tft.drawSpriteNoDma(0,0,logo, rx, ry, rw, rh);
     }  
          
     if ( (exitVkbd) && (vkbActive) ) {      
@@ -668,35 +676,35 @@ void handleVirtualkeyboard() {
 }
 
 int emu_setKeymap(int index) {
+  int xoff = 16;
   if (keyMap == 1) {  
     keyMap = 0;     
     keys = key_map1;
-    tft.drawText(0, 0+16, " 1 I 2 I 3 I 4 I 5 I 6 I 7 I 8 I 9 I 10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
-    tft.drawText(0,16+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawText(0,24+16, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
-    tft.drawText(0,40+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    tft.drawText(0,48+16, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
-    tft.drawText(0,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawText(0,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
-    tft.drawText(0,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    tft.drawText(0,96+16,"mouse mode                              ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
+    tft.drawText(xoff, 0+16, " 1 I 2 I 3 I 4 I 5 I 6 I 7 I 8 I 9 I 10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(xoff,16+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(xoff,24+16, " q I w I e I r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(xoff,40+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(xoff,48+16, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(xoff,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(xoff,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(xoff,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(xoff,96+16, "mouse mode                              ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     delay(200);
   }
   else if (keyMap == 0) {
     keyMap = 1;     
     keys = key_map2;            
-    tft.drawText(0, 0+16, "F1 IF2 IF3 IF4 IF5 IF6 IF7 IF8 IF9 IF10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
-    tft.drawText(0,16+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawText(0,24+16, "PRNIDELIDELI r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
-    tft.drawText(0,40+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    tft.drawText(0,48+16, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
-    tft.drawText(0,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawText(0,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
-    tft.drawText(0,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
-    tft.drawText(0,96+16,"joystick mode                           ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
+    tft.drawText(xoff, 0+16, "F1 IF2 IF3 IF4 IF5 IF6 IF7 IF8 IF9 IF10I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(xoff,16+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(xoff,24+16, "PRNIDELIDELI r I t I y I u I i I o I p I", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(xoff,40+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(xoff,48+16, " a I s I d I f I g I h I j I k I l IRTNI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawText(xoff,64+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawText(xoff,72+16, " z I x I c I v I b I n I m I , IDELISPCI", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), true);
+    tft.drawText(xoff,88+16, "--- --- --- --- --- --- --- --- --- --- ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x80), false);
+    tft.drawText(xoff,96+16, "joystick mode                           ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     delay(200);     
   }
-
 }
 
 
@@ -768,10 +776,12 @@ void backgroundMenu(void) {
     menuRedraw=true;  
     tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
     tft.drawTextNoDma(0,0, TITLE, RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);  
-    tft.drawSpriteNoDma(MENU_VBAR_XOFFSET,MENU_VBAR_YOFFSET,(uint16_t*)bmpvbar);
+#ifndef HAS_T4_VGA
+    tft.drawSpriteNoDma(MENU_VBAR_XOFFSET,MENU_VBAR_YOFFSET,bmpvbar);
+#endif    
 #ifdef OLD_LAYOUT    
-    tft.drawSpriteNoDma(MENU_TFT_XOFFSET,MENU_TFT_YOFFSET,(uint16_t*)bmptft);
-    tft.drawSpriteNoDma(MENU_VGA_XOFFSET,MENU_VGA_YOFFSET,(uint16_t*)bmpvga);
+    tft.drawSpriteNoDma(MENU_TFT_XOFFSET,MENU_TFT_YOFFSET,bmptft);
+    tft.drawSpriteNoDma(MENU_VGA_XOFFSET,MENU_VGA_YOFFSET,bmpvga);
 #endif      
 }
 
@@ -881,7 +891,7 @@ int handleMenu(uint16_t bClick)
             strcpy(selection,filename);            
           }
           else {
-            tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, 0xFFFF, 0x0000, true);      
+            tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, RGBVAL16(0xff,0xff,0xff), MENU_FILE_BGCOLOR, true);      
           }
         }
         i++; 
@@ -889,8 +899,10 @@ int handleMenu(uint16_t bClick)
       fileIndex++;    
     }
 
-    tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);  
-    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0xff,0x00,0x00), false);
+#ifndef HAS_T4_VGA
+    tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);
+#endif      
+    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
     menuRedraw=false;     
   }
 
@@ -1459,5 +1471,3 @@ void emu_init(void)
   keys = key_map1;
   keyMap = 0;
 }
-
-

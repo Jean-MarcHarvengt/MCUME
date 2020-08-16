@@ -64,6 +64,28 @@ void AUDxDAT(int nr, uae_u16 v)
 #endif
 }
 
+void AUDxLCH(int nr, uae_u16 v) { audio_channel[nr].lc = (audio_channel[nr].lc & 0xffff) | ((uae_u32)v << 16); }
+void AUDxLCL(int nr, uae_u16 v) { audio_channel[nr].lc = (audio_channel[nr].lc & ~0xffff) | (v & 0xFFFE); }
+void AUDxPER(int nr, uae_u16 v)
+{
+    if (v <= 0) {
+#if 0 /* v == 0 is rather common, and harmless, and the value isn't signed anyway */
+  static int warned = 0;
+  if (!warned)
+      write_log ("Broken program accessing the sound hardware\n"), warned++;
+#endif
+  v = 65535;
+    }
+    if (v < maxhpos/2 && currprefs.produce_sound < 3)
+  v = maxhpos/2;
+
+    audio_channel[nr].per = v;
+}
+
+void AUDxVOL(int nr, uae_u16 v) { audio_channel[nr].vol = v & 64 ? 63 : v & 63; }
+void AUDxLEN(int nr, uae_u16 v) { audio_channel[nr].len = v; }
+
+
 /* Templates! I want templates! */
 void sample16_handler(void)
 {

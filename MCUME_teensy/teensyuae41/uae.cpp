@@ -1,7 +1,11 @@
 #include <string.h>
 
 #include "emuapi.h"
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+#else
 #include "tft_t_dma.h"
+#endif
 #include "iopins.h" 
 
 extern "C" {
@@ -79,8 +83,11 @@ char romfile[MAX_FILENAME] = "./kick13.rom";
 char prtname[MAX_FILENAME] = "lpr ";
 char sername[MAX_FILENAME] = "";
 char warning_buffer[256];
-static char slinebuf[800];
-
+#ifdef HAS_T4_VGA
+static char slinebuf[WIN_W];
+#else
+static char slinebuf[WIN_W*2];
+#endif
 
 #define MOUSE_STEP 3
 static int prev_hk = 0;
@@ -214,7 +221,11 @@ void write_log (const char *buf) { /*fprintf (stderr, buf); */ }
 void flush_line(int y)
 {
     if(y >= 0 && y < WIN_H) {
+#ifdef HAS_T4_VGA
+      emu_DrawLine8((unsigned char *)slinebuf, WIN_W , 1, y);
+#else
       emu_DrawLine16((unsigned short *)slinebuf, WIN_W , 1, y);
+#endif      
     }  
 }
 
@@ -285,13 +296,20 @@ static int hddfound=0;
 void uae_Init(void)
 {
   emu_printf("Init");
+#ifdef HAS_T4_VGA
+  gfxvidinfo.rowbytes   = WIN_W;
+  gfxvidinfo.pixbytes   = 1;
+#else
   gfxvidinfo.rowbytes   = WIN_W*2;
   gfxvidinfo.pixbytes   = 2;
+#endif  
   gfxvidinfo.maxlinetoscr = WIN_W;
   gfxvidinfo.maxline = WIN_H;
   gfxvidinfo.linemem = slinebuf;
   gfxvidinfo.maxblocklines  = 0;
-  
+  gfxvidinfo.width = WIN_W;
+  gfxvidinfo.height = WIN_H;
+    
   buttonstate[0] = buttonstate[1] = buttonstate[2] = 0;
   lastmx = lastmy = 0;
   newmousecounters = 0;
@@ -407,35 +425,5 @@ void uae_Start(char * floppy1, char * floppy2)
 }
 
 void uae_Step(void) {
-  /*
-  JoyState = 0;
-  if (k & MASK_JOY2_DOWN)  JoyState|=0x02;
-  if (k & MASK_JOY2_UP)    JoyState|=0x01;
-  if (k & MASK_JOY2_LEFT)  JoyState|=0x04;
-  if (k & MASK_JOY2_RIGHT) JoyState|=0x08;
-  if (k & MASK_JOY2_BTN) JoyState|=0x10; 
-  if (k & MASK_KEY_USER2) JoyState|=0x20;  
-*/
-/*
-  if (hk != 0) {
-    emu_printh(hk);
-    KeyMap[Keys[hk-1].Pos] &=~ Keys[hk-1].Mask;   
-  }
-  else  {
-    memset(KeyMap,0xFF,16);
-  }
-*/
-
-  //emu_DrawVsync();    
+  // not reached!  
 }
-
-
-
-
-
-
-
-
-
-
-

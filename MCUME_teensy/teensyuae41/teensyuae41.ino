@@ -2,7 +2,6 @@
 #include "emuapi.h"  
 
 #include "keyboard_osd.h"
-#include "tft_t_dma.h"
 
 //extern "C" {
 #include "uae.h"
@@ -35,7 +34,13 @@ uVGA uvga;
 uint8_t * VGA_frame_buffer;
 #endif
 
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+TFT_T_DMA tft;
+#else
+#include "tft_t_dma.h"
 TFT_T_DMA tft = TFT_T_DMA(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO, TFT_TOUCH_CS, TFT_TOUCH_INT);
+#endif
 
 bool vgaMode = false;
 
@@ -71,7 +76,11 @@ void emu_DrawVsync(void)
   skip += 1;
   skip &= VID_FRAME_SKIP;
   if (!vgaMode) {
+#ifdef HAS_T4_VGA
+    tft.waitSync();
+#else
     while (vbl==vb) {};
+#endif
   }
 #ifdef HAS_VGA
   else {
@@ -83,7 +92,11 @@ void emu_DrawVsync(void)
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
   if (!vgaMode) {
+#ifdef HAS_T4_VGA
+    tft.writeLine(width,1,line, VBuf, palette8);
+#else
     tft.writeLine(width,1,line, VBuf, palette16);
+#endif
   }
 #ifdef HAS_VGA
   else {
@@ -101,11 +114,26 @@ void emu_DrawLine(unsigned char * VBuf, int width, int height, int line)
 #endif  
 }  
 
+void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line) 
+{
+  if (!vgaMode) {
+    if (skip==0) {
+#ifdef HAS_T4_VGA
+      tft.writeLine(width,height,line, VBuf);
+#endif      
+    }
+  }  
+#ifdef HAS_VGA 
+#endif    
+} 
+
 void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line) 
 {
   if (!vgaMode) {
     if (skip==0) {
+#ifndef HAS_T4_VGA
       tft.writeLine(width,height,line, VBuf);
+#endif      
     }
   }  
 #ifdef HAS_VGA 
@@ -116,7 +144,11 @@ void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride)
 {
   if (!vgaMode) {
     if (skip==0) {
+#ifdef HAS_T4_VGA
+      tft.writeScreen(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette8);
+#else
       tft.writeScreen(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette16);
+#endif
     }
   }
 #ifdef HAS_VGA
@@ -168,7 +200,12 @@ void * emu_LineBuffer(int line)
 // ****************************************************
 void setup() {
 
-  tft.begin(); 
+#ifdef HAS_T4_VGA
+  tft.begin(VGA_MODE_352x240);
+  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+#else
+  tft.begin();
+#endif  
   
   emu_init(); 
 
@@ -239,8 +276,15 @@ void loop(void)
 
 AudioPlaySystem mymixer;
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
+#ifdef HAS_T4_VGA
+AudioOutputI2S  i2s1;
+AudioConnection patchCord8(mymixer, 0, i2s1, 0);
+AudioConnection patchCord9(mymixer, 0, i2s1, 1);
+AudioControlSGTL5000     sgtl5000_1;
+#else
 AudioOutputMQS  mqs;
 AudioConnection patchCord9(mymixer, 0, mqs, 1);
+#endif
 #else
 AudioOutputAnalog dac1;
 AudioConnection   patchCord1(mymixer, dac1);
@@ -273,4 +317,3 @@ void emu_sndPlayBuzz(int size, int val) {
   //Serial.println(size); 
 }
 #endif
-

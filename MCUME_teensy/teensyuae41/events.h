@@ -22,7 +22,7 @@ struct ev
 
 enum { 
     ev_hsync, ev_copper, ev_cia,
-    ev_blitter, ev_diskblk, ev_diskindex,
+    ev_blitter, ev_diskblk, ev_diskindex, ev_disksync,
 #ifndef DONT_WANT_SOUND
     ev_aud0, ev_aud1, ev_aud2, ev_aud3,
     ev_sample,

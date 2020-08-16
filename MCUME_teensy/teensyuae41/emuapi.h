@@ -1,9 +1,8 @@
 #ifndef EMUAPI_H
 #define EMUAPI_H
 
-//#define INVX        1
-//#define INVY        1
-#define HAS_SND     1
+#include "platform_config.h"
+
 #define CUSTOM_SND  1
 #define HAS_I2CKBD  1
 //#define TIMER_REND  1
@@ -135,6 +134,7 @@ extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char 
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line);
+extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
 extern void * emu_LineBuffer(int line);
