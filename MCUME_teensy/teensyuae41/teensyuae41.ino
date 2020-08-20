@@ -202,7 +202,7 @@ void setup() {
 
 #ifdef HAS_T4_VGA
   tft.begin(VGA_MODE_352x240);
-  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+  //NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
 #else
   tft.begin();
 #endif  
@@ -227,6 +227,7 @@ void loop(void)
       toggleMenu(false);
       vgaMode = false;   
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
+      emu_start();
       emu_Init(floppy1,floppy2);      
       tft.startDMA(); 
       emu_Init2();      
@@ -238,6 +239,7 @@ void loop(void)
       vgaMode = true;
       VGA_frame_buffer = (uint8_t *)malloc((UVGA_YRES*(UVGA_XRES+UVGA_XRES_EXTRA))*sizeof(uint8_t));
       uvga.set_static_framebuffer(VGA_frame_buffer);      
+      emu_start();
       emu_Init(filename);       
       int retvga = uvga.begin(&modeline);
       Serial.println(retvga);

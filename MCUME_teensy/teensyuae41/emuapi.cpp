@@ -31,6 +31,12 @@ static const uint16_t * logo = deflogo;
 #include <Wire.h>
 #endif
 
+#ifdef HAS_USBKEY
+#include "USBHost_t36.h"  // Read this header first for key info
+USBHost myusb;
+KeyboardController keyboard1(myusb);
+#endif
+
 #ifdef USE_SDFS
 #include "uSDFS.h"
 static FATFS fatfs;
@@ -1392,6 +1398,17 @@ void emu_FileTempWrite(int addr, unsigned char val)
 #endif   
 }
 
+#ifdef HAS_USBKEY
+void OnPress(auto key)
+{
+  emu_KeyboardOnDown(key);
+}
+
+void OnRelease(int key)
+{
+  emu_KeyboardOnUp(key);  
+}
+#endif
 
 void emu_init(void)
 {
@@ -1441,7 +1458,11 @@ void emu_init(void)
   {
     toggleMenu(true);
   }
+}
 
+
+void emu_start(void)
+{
 #ifdef HAS_I2CKBD
   byte msg[7]={0,0,0,0,0,0,0};
   Wire.begin(); // join i2c bus SDA2/SCL2
@@ -1466,6 +1487,12 @@ void emu_init(void)
     i2cKeyboardPresent = true;
     Serial.println("i2C keyboard found");            
   }
+#endif
+
+#ifdef HAS_USBKEY
+  myusb.begin();
+  keyboard1.attachPress(OnPress);
+  keyboard1.attachRelease(OnRelease);
 #endif
 
   keys = key_map1;

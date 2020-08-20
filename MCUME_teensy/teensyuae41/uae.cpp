@@ -96,7 +96,179 @@ static int prev_key = 0;
 static int k = 0;
 static bool isMouse = true;
 
-const int keyconv[] = 
+#define INV_KEY -1
+
+const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
+{
+/* 0x00 */ INV_KEY,
+/* 0x01 */ INV_KEY,
+/* 0x02 */ INV_KEY,
+/* 0x03 */ INV_KEY,
+/* 0x04 */ INV_KEY,
+/* 0x05 */ INV_KEY,
+/* 0x06 */ INV_KEY,
+/* 0x07 */ INV_KEY,
+/* 0x08 */ INV_KEY,
+/* 0x09 */ AK_TAB,
+/* 0x0A */ AK_ENT,
+/* 0x0B */ INV_KEY,
+/* 0x0C */ INV_KEY,
+/* 0x0D */ INV_KEY,
+/* 0x0E */ INV_KEY,
+/* 0x0F */ INV_KEY,
+/* 0x10 */ INV_KEY,
+/* 0x11 */ INV_KEY,
+/* 0x12 */ INV_KEY,
+/* 0x13 */ INV_KEY,
+/* 0x14 */ INV_KEY,
+/* 0x15 */ INV_KEY,
+/* 0x16 */ INV_KEY,
+/* 0x17 */ INV_KEY,
+/* 0x18 */ INV_KEY,
+/* 0x19 */ INV_KEY,
+/* 0x1A */ INV_KEY,
+/* 0x1B */ AK_ESC,
+/* 0x1C */ INV_KEY,
+/* 0x1D */ INV_KEY,
+/* 0x1E */ INV_KEY,
+/* 0x1F */ INV_KEY,
+/* 0x20 */ AK_SPC,
+/* 0x21 */ INV_KEY,
+/* 0x22 */ INV_KEY,
+/* 0x23 */ INV_KEY,
+/* 0x24 */ INV_KEY,
+/* 0x25 */ INV_KEY,
+/* 0x26 */ INV_KEY,
+/* 0x27 */ INV_KEY,
+/* 0x28 */ INV_KEY,
+/* 0x29 */ INV_KEY,
+/* 0x2A */ AK_NPMUL,
+/* 0x2B */ INV_KEY,
+/* 0x2C */ AK_COMMA,
+/* 0x2D */ INV_KEY,
+/* 0x2E */ INV_KEY,
+/* 0x2F */ INV_KEY,
+/* 0x30 */ AK_0,
+/* 0x31 */ AK_1,
+/* 0x32 */ AK_2,
+/* 0x33 */ AK_3,
+/* 0x34 */ AK_4,
+/* 0x35 */ AK_5,
+/* 0x36 */ AK_6,
+/* 0x37 */ AK_7,
+/* 0x38 */ AK_8,
+/* 0x39 */ AK_9,
+/* 0x3A */ INV_KEY,
+/* 0x3B */ INV_KEY, // semi colon
+/* 0x3C */ INV_KEY,
+/* 0x3D */ INV_KEY,
+/* 0x3E */ INV_KEY,
+/* 0x3F */ INV_KEY,
+/* 0x40 */ INV_KEY,
+/* 0x41 */ INV_KEY,
+/* 0x42 */ INV_KEY,
+/* 0x43 */ INV_KEY,
+/* 0x44 */ INV_KEY,
+/* 0x45 */ INV_KEY,
+/* 0x46 */ INV_KEY,
+/* 0x47 */ INV_KEY,
+/* 0x48 */ INV_KEY,
+/* 0x49 */ INV_KEY,
+/* 0x4A */ INV_KEY,
+/* 0x4B */ INV_KEY,
+/* 0x4C */ INV_KEY,
+/* 0x4D */ INV_KEY,
+/* 0x4E */ INV_KEY,
+/* 0x4F */ INV_KEY,
+/* 0x50 */ INV_KEY,
+/* 0x51 */ INV_KEY,
+/* 0x52 */ INV_KEY,
+/* 0x53 */ INV_KEY,
+/* 0x54 */ INV_KEY,
+/* 0x55 */ INV_KEY,
+/* 0x56 */ INV_KEY,
+/* 0x57 */ INV_KEY,
+/* 0x58 */ INV_KEY,
+/* 0x59 */ INV_KEY,
+/* 0x5A */ INV_KEY,
+/* 0x5B */ INV_KEY,
+/* 0x5C */ INV_KEY,
+/* 0x5D */ INV_KEY,
+/* 0x5E */ INV_KEY,
+/* 0x5F */ INV_KEY,
+/* 0x60 */ INV_KEY,
+/* 0x61 */ AK_A,
+/* 0x62 */ AK_B,
+/* 0x63 */ AK_C,
+/* 0x64 */ AK_D,
+/* 0x65 */ AK_E,
+/* 0x66 */ AK_F,
+/* 0x67 */ AK_G,
+/* 0x68 */ AK_H,
+/* 0x69 */ AK_I,
+/* 0x6A */ AK_J,
+/* 0x6B */ AK_K,
+/* 0x6C */ AK_L,
+/* 0x6D */ AK_M,
+/* 0x6E */ AK_N,
+/* 0x6F */ AK_O,
+/* 0x70 */ AK_P,
+/* 0x71 */ AK_Q,
+/* 0x72 */ AK_R,
+/* 0x73 */ AK_S,
+/* 0x74 */ AK_T,
+/* 0x75 */ AK_U,
+/* 0x76 */ AK_V,
+/* 0x77 */ AK_W,
+/* 0x78 */ AK_X,
+/* 0x79 */ AK_Y,
+/* 0x7A */ AK_Z,
+/* 0x7B */ INV_KEY,
+/* 0x7C */ INV_KEY,
+/* 0x7D */ INV_KEY,
+/* 0x7E */ INV_KEY,
+/* 0x7F */ AK_BS
+};
+
+
+const int16_t keyboardSpecialConv[] = // Functions and other keys
+{
+/* 0xC0 */ INV_KEY,
+/* 0xC1 */ INV_KEY,
+/* 0xC2 */ AK_F1,
+/* 0xC3 */ AK_F2,
+/* 0xC4 */ AK_F3,
+/* 0xC5 */ AK_F4,
+/* 0xC6 */ AK_F5,
+/* 0xC7 */ AK_F6,
+/* 0xC8 */ AK_F7,
+/* 0xC9 */ AK_F8,
+/* 0xCA */ AK_F9,
+/* 0xCB */ AK_F10,
+/* 0xCC */ INV_KEY,
+/* 0xCD */ INV_KEY,
+/* 0xCE */ INV_KEY,
+/* 0xCF */ INV_KEY,
+/* 0xD0 */ INV_KEY,
+/* 0xD1 */ INV_KEY,
+/* 0xD2 */ INV_KEY,
+/* 0xD3 */ INV_KEY,
+/* 0xD4 */ AK_DEL,
+/* 0xD5 */ INV_KEY,
+/* 0xD6 */ INV_KEY,
+/* 0xD7 */ INV_KEY,
+/* 0xD8 */ INV_KEY,
+/* 0xD9 */ INV_KEY,
+/* 0xDA */ INV_KEY,
+/* 0xDB */ INV_KEY,
+/* 0xDC */ INV_KEY,
+/* 0xDD */ INV_KEY,
+/* 0xDE */ INV_KEY,
+/* 0xDF */ INV_KEY
+};
+
+
+const int i2ckeyConv[] = 
 {
   AK_1,AK_2,AK_3,AK_4,AK_5,AK_6,AK_7,AK_8,AK_9,AK_0,
   AK_Q,AK_W,AK_E,AK_R,AK_T,AK_Y,AK_U,AK_I,AK_O,AK_P,
@@ -105,6 +277,7 @@ const int keyconv[] =
   AK_F1,AK_F2,AK_F3,AK_F4,AK_F5,AK_F6,AK_F7,AK_F8,AK_F9,AK_F10,
   AK_NPMUL,AK_NPDEL,AK_DEL   
 };
+
 
 void uae_Input(int bClick) {
   hk = emu_ReadI2CKeyboard();
@@ -126,15 +299,16 @@ void uae_Input(int bClick) {
     prev_hk = hk;
     if ( (hk != 0) && (hk != prev_key) ) {
       prev_key = hk;
-      int iAmigaKeyCode = keyconv[hk-1];
+      int iAmigaKeyCode = i2ckeyConv[hk-1];
       record_key(iAmigaKeyCode << 1);
     }     
   }
   if ( (hk == 0) && (prev_key) ) {
-      int iAmigaKeyCode = keyconv[prev_key-1];
+      int iAmigaKeyCode = i2ckeyConv[prev_key-1];
       record_key((iAmigaKeyCode << 1) | 1);      
       prev_key = 0;
-  }           
+  }      
+
   if (isMouse)
   {
     if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
@@ -175,6 +349,44 @@ void handle_events(void)
 } 
 
 
+void emu_KeyboardOnDown(int key) {
+  /*
+  char buff[128] = {0};
+  char poof[64] = {0};
+  long lk = key;
+  ltoa( lk, poof, 2);
+  snprintf(buff, 127, "onPress>> sz(%u) %u 0x%x '%c' %s\n", sizeof(key), key, key, key, poof);
+  Serial.print(buff);
+  */ 
+  int iAmigaKeyCode = INV_KEY;
+  if ((key >=0xc0) && (key <=0xdf)) {
+    iAmigaKeyCode = keyboardSpecialConv[(key-0xc0) & 0x1f];    
+  }
+  else {
+    iAmigaKeyCode = keyboardAsciiConv[key & 0x7f];
+  }
+  if (iAmigaKeyCode != INV_KEY) {
+    record_key(iAmigaKeyCode << 1);
+  }
+}
+
+void emu_KeyboardOnUp(int key) {
+  /*
+  char buff[128] = {0};
+  snprintf(buff, 127, "onRelease>> sz(%u) %u 0x%x %c\n", sizeof(key), key, key, key);
+  Serial.print(buff); 
+  */ 
+  int iAmigaKeyCode = INV_KEY;
+  if ((key >=0xc0) && (key <=0xdf)) {
+    iAmigaKeyCode = keyboardSpecialConv[(key-0xc0) & 0x1f];    
+  }
+  else {
+    iAmigaKeyCode = keyboardAsciiConv[key & 0x7f];
+  }
+  if (iAmigaKeyCode != INV_KEY) {
+    record_key((iAmigaKeyCode << 1) | 1);
+  }
+}
 
 
 
@@ -238,7 +450,8 @@ void flush_screen(int ystart,int ystop)
   if (delta < 0) delta = (sndbufrdpt>>8) + (sndbufsize/2)-loc;
   sndinc=((sndbufsize/4)<<8)/delta;
       
-  emu_DrawVsync();    
+  emu_DrawVsync();
+  //yield();    
 }
 
 }

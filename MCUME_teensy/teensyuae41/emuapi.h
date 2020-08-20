@@ -4,7 +4,6 @@
 #include "platform_config.h"
 
 #define CUSTOM_SND  1
-#define HAS_I2CKBD  1
 //#define TIMER_REND  1
 
 #define EXTRA_HEAP  0x10
@@ -108,6 +107,7 @@ const unsigned short i2ckeys[] = {
 extern "C" {
 #endif
 extern void emu_init(void);
+extern void emu_start(void);
 extern void emu_printf(char * text);
 extern void emu_printi(int val);
 extern void emu_printh(int val);
@@ -147,6 +147,9 @@ extern int emu_GetPad(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
+extern void emu_KeyboardOnUp(int key);
+extern void emu_KeyboardOnDown(int key);
+
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);
 extern void emu_sndInit();
@@ -160,8 +163,3 @@ extern int emu_setKeymap(int index);
 #endif
 
 #endif
-
-
-
-
-
