@@ -74,33 +74,33 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4.0+PSRAM | Teensy4.1+PSRAM | ESP32 | ESP32-Wrover |
-| --- | --- |--- | --- | --- | --- |--- |
-| Zx81        | X | X | X | X | X | X |
-| Zx spectrum | X | X | X | X | X | X |
-| Atari 800   | X | X | X | X | X | X |
-| C64         | X | X | X | X | X | X |
-| Atari 520ST | - | full speed! | X | X | - | slow |
-| 8086 XT PC  | - | full speed! | X | X | - | slow |
-| MSX1/2      | - | full speed! | X | X | - | - |
-| Amiga       | - | - | exp only! | full speed! | - | - |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0+PSRAM | Teensy4.1+PSRAM | Teensy4.1+PSRAM+VGA | ESP32 | ESP32-Wrover |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Zx81        | X | X | X | X | X | X | X |
+| Zx spectrum | X | X | X | X | X | X | X |
+| Atari 800   | X | X | X | X | X | X | X |
+| C64         | X | X | X | X | X | X | X |
+| Atari 520ST | - | full speed! | X | X | - | - | slow |
+| 8086 XT PC  | - | full speed! | X | X | X | - | slow |
+| MSX1/2      | - | full speed! | X | X | X | - | - |
+| Amiga       | - | - | exp only! | full speed! | 640x480 | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
 
 Game console systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | ESP32 | ESP32-Wrover |
-| --- | --- |--- | --- | --- | --- |
-| Atari 2600                   | X | X | X | X | X |
-| Odyssey/Videopac             | X | X | X | X | X |
-| Colecovision                 | X | X | X | X | X |
-| Atari 5200                   | X | X | X | X | X |
-| Nintendo NES                 | X | big roms! | X | X | X |
-| Vectrex                      | - | full speed! | X | - | slow |
-| PC Engine                    | - | - | X | - | - |
-| Gameboy/GBColor              | - | - | X | - | - |
-| Sega Master System/Game Gear | - | - | X | - | - |
-| Sega Genesis/Megadrive       | - | - | X | - | - |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | Teensy4.1+PSRAM+VGA | ESP32 | ESP32-Wrover |
+| --- | --- | --- | --- | --- | --- | --- |
+| Atari 2600                   | X | X | X | X | X | X |
+| Odyssey/Videopac             | X | X | X | X | X | X |
+| Colecovision                 | X | X | X | X | X | X |
+| Atari 5200                   | X | X | X | X | X | X |
+| Nintendo NES                 | X | big roms! | X | X | X | X |
+| Vectrex                      | - | full speed! | X | X | - | slow |
+| PC Engine                    | - | - | X | X | - | - |
+| Gameboy/GBColor              | - | - | X | X | - | - |
+| Sega Master System/Game Gear | - | - | X | X | - | - |
+| Sega Genesis/Megadrive       | - | - | X | X | - | - |
 
 # Minimal requirements:
 - Teensy3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
@@ -151,7 +151,8 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Compilation/flashing (Teensy)
 - open the respective ino file with Arduino SDK
-- select DISPLAY MODULE in tft_t_dma_config.h (ST7789 or ILI9341)!!!!
+- select DISPLAY MODULE in platform_config.h (ST7789 or ILI9341)!!!!
+- select VGA or not in platform_config.h (T4.1 using vgat4 lib, T3.6 using uvga lib)
 - double check iopins.h for pins configuration!!!!
 - compile and install from there.
 
