@@ -1,14 +1,13 @@
 #ifndef EMUAPI_H
 #define EMUAPI_H
 
-#define INVX        1
-//#define INVY        1
-//#define HAS_SND     1
+#include "platform_config.h"
+
 //#define CUSTOM_SND  1
-#define HAS_I2CKBD  1
 //#define TIMER_REND  1
 
 #define EXTRA_HEAP  0x10
+
 
 // Title:     <                        >
 #define TITLE "    Vectrex Emulator"
@@ -57,7 +56,7 @@ const unsigned short keysw[]=
   //TAREA_NEW_ROW,18,18,18,18,18,18,18,18,18,18, 
   TAREA_END}; 
 
-const unsigned short keys[]={
+const unsigned short key_map1[]={
 
 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
 109,110,111,112,106,107,108,17,18,19,
@@ -96,8 +95,11 @@ const unsigned short i2ckeys[] = {
 #define MASK_KEY_USER4  0x2000
 
 
-
+extern "C" {
 extern void emu_init(void);
+extern void emu_start(void);
+extern void emu_resetSD(void);
+
 extern void emu_printf(char * text);
 extern void emu_printi(int val);
 extern void * emu_Malloc(int size);
@@ -118,6 +120,7 @@ extern void emu_FileTempWrite(int addr, unsigned char val);
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);
+extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line);
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
@@ -131,6 +134,9 @@ extern int emu_GetPad(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
+extern void emu_KeyboardOnUp(int keymodifer, int key);
+extern void emu_KeyboardOnDown(int keymodifer, int key);
+
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);
 extern void emu_sndInit();
@@ -139,9 +145,10 @@ extern int emu_us(void);
 
 extern int emu_setKeymap(int index);
 
+extern void emu_FileTempInit(void); 
+extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
+extern void emu_FileTempWrite(int addr, unsigned char val); 
+extern void emu_printh(int val);
+}
 
 #endif
-
-
-
-

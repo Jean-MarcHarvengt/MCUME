@@ -35,6 +35,7 @@
 
 #include "patches.h"
 #include "emuapi.h"
+#include "platform_config.h"
 
 
 #define DIRECTORY ROMSDIR + "/\0"
@@ -191,13 +192,17 @@ uint16_t addr,size;
 
   Serial.println("loading");
 	//printf("%s,%d,%d:", filename, device, secondaryAddress);
+#ifdef EXTERNAL_SD  
   tft.stopDMA();
   //emu_resetSD();
   tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
+#endif  
 	if (emu_FileOpen(filename) == 0) {
 		//Serial.println("not found");
 		cpu.pc = 0xf530; //Jump to $F530
+#ifdef EXTERNAL_SD  
     tft.startDMA(); 
+#endif  
 		return;
 	}
 
@@ -214,8 +219,9 @@ uint16_t addr,size;
 	cpu.y = 0x49; //Offset for "LOADING"
 	cpu.pc = 0xF12B; //Print and return
 	emu_printf("loaded");
+#ifdef EXTERNAL_SD  
   tft.startDMA(); 
-
+#endif
 	return;
 }
 

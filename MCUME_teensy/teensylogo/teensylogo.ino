@@ -2,31 +2,39 @@ extern "C" {
   #include "iopins.h"  
   #include "emuapi.h"  
 }
-#include "tft_t_dma.h"
+
 #include "keyboard_osd.h"
 #include <math.h>
 #include "mcume.h"
 
 
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+TFT_T_DMA tft;
+#else
+#include "tft_t_dma.h"
 TFT_T_DMA tft = TFT_T_DMA(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO, TFT_TOUCH_CS, TFT_TOUCH_INT);
+#endif
+
 static int xOffLogo=0;
 static int swipeAngle=0;
 
 void setup() {
   //emu_sndInit();
+#ifdef HAS_T4_VGA
+  tft.begin(VGA_MODE_320x240);
+//  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+#else
   tft.begin();
-  //emu_sndPlaySound(0, 255, 4000);
-  emu_init();
-  //delay(5000);
-  //toggleMenu(false);
-  //tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
-  //tft.startDMA();  
+#endif 
+  emu_init();  
 }
 
 static uint8_t col=0x00;
 
 void loop(void) 
 {
+  
   uint16_t bClick = emu_DebounceLocalKeys();
   if (menuActive()) {
     int action = handleMenu(bClick);
@@ -62,10 +70,9 @@ void loop(void)
 #endif    
     if ( (!virtualkeyboardIsActive()) ) {
       delay(20);
-      //emu_printf("step");
       xOffLogo = 16*sin((2*3.14*swipeAngle)/256)+30;
-      swipeAngle = (swipeAngle + 4)&0xff;
-      tft.drawSprite(xOffLogo,10,(uint16_t*)logo);
+      swipeAngle = (swipeAngle + 4)&0xff;   
+      tft.drawSprite(xOffLogo,10,(uint16_t*)logo);   
       if (bClick & MASK_JOY2_BTN) {  
         tft.stopDMA();
         emu_init();    
@@ -75,6 +82,12 @@ void loop(void)
   }  
 }
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
 #ifdef HAS_SND
 
 #include <Audio.h>
@@ -82,8 +95,15 @@ void loop(void)
 
 AudioPlaySystem mymixer;
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
+#ifdef HAS_T4_VGA
+AudioOutputI2S  i2s1;
+AudioConnection patchCord8(mymixer, 0, i2s1, 0);
+AudioConnection patchCord9(mymixer, 0, i2s1, 1);
+AudioControlSGTL5000     sgtl5000_1;
+#else
 AudioOutputMQS  mqs;
 AudioConnection patchCord9(mymixer, 0, mqs, 1);
+#endif
 #else
 AudioOutputAnalog dac1;
 AudioConnection   patchCord1(mymixer, dac1);
@@ -91,6 +111,10 @@ AudioConnection   patchCord1(mymixer, dac1);
 
 void emu_sndInit() {
   Serial.println("sound init");  
+#ifdef HAS_T4_VGA
+  sgtl5000_1.enable();
+  sgtl5000_1.volume(0.6);
+#endif  
   AudioMemory(16);
   mymixer.start();
 }

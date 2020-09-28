@@ -2,22 +2,31 @@
 #include <Arduino.h>
 
 #include "emuapi.h"
+
 extern "C" {
 #include "osint.h"
 #include "e8910.h"
 #include "vecx.h"
 }
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+#else
+#include "tft_t_dma.h"
+#endif
 
-static int mouse_x = 160;
-static int mouse_y = 100;
+
 static int prev_key = 0; 
 static int prev_j = 0; 
 static int prev_mouseb = 0;
-static bool isMouse = true;
-static int joynum = 1;
 static int hk = 0;
 static int prev_hk = 0;
 static int k = 0;
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 extern void vec_Input(int click) {
   hk = emu_ReadI2CKeyboard();
@@ -30,93 +39,34 @@ static void do_events(void)
     prev_hk == hk;
     if ( (hk != 0) && (hk != prev_key) ) {
       prev_key = hk;
-      //IkbdKeyPress ( hk );
-      if (hk == 68) {
-        if (isMouse) isMouse = false;
-        else isMouse = true;
-      }
-      //IkbdLoop(); 
-      //Serial.print("press ");
-      //Serial.println(hk);
     }     
   }
   if ( (hk == 0) && (prev_key) ) {
-      //IkbdKeyRelease ( prev_key | 0x80 );
-      //IkbdLoop(); 
-      //Serial.print("release ");
-      //Serial.println(hk);
       prev_key = 0;
   }           
 
-  if (!isMouse)
-  {
-    int j = 0;     
-    if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
-      j |= 0x08;
-    }
-    if (( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT)) {
-      j |= 0x04;
-    }
-    if (( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP)) {
-      j |= 0x01;
-    }
-    if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
-      j |= 0x02;
-    }  
-    if ( k & MASK_JOY2_BTN) {
-      j |= 0x80;
-    }
-    if (j != prev_j) {
-      //IkbdJoystickChange(joynum,j);
-      prev_j = j;
-    }
+
+  int j = 0;     
+  if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
+    j |= 0x08;
   }
-  else {
-    if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
-      if ( mouse_x < 320 ) {
-        mouse_x += 1;
-        //Serial.print("r");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();
-      } 
-    }
-    else if (( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT)) {
-      if ( mouse_x > 1 ) {
-        mouse_x -= 1;
-        //Serial.print("l");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
-      }
-    }
-    else if (( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP)) {
-      if ( mouse_y > 1 ) {
-        mouse_y -= 1;
-        //Serial.print("u");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
-      }
-    }
-    else if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
-      if ( mouse_y < 200 ) {
-        mouse_y += 1;
-        //Serial.print("d");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
-      }
-    }  
-    
-    int mouseb=0;
-    if ( ( k & MASK_JOY2_BTN) ){
-      mouseb=1;
-    }
-    if ( (mouseb != prev_mouseb) ){
-      //if (mouseb) IkbdMousePress(2);
-      //else IkbdMouseRelease(2);
-      //Serial.println("btoggle");
-      //IkbdLoop();
-      prev_mouseb = mouseb;  
-    }    
+  if (( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT)) {
+    j |= 0x04;
   }
+  if (( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP)) {
+    j |= 0x01;
+  }
+  if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
+    j |= 0x02;
+  }  
+  if ( k & MASK_JOY2_BTN) {
+    j |= 0x80;
+  }
+  if (j != prev_j) {
+    prev_j = j;
+  }
+
+
 }     
 
 
@@ -126,11 +76,13 @@ extern vector_t * vectors_set;
 
 //#define USE_BYTEFB 1
 
+#define BUFHEIGHT TFT_HEIGHT
+
 #ifdef USE_BYTEFB
-#define vbufsize 256*256
+#define vbufsize 256*BUFHEIGHT
 unsigned char * vbuf;
 #else
-#define vbufsize 32*256
+#define vbufsize 32*BUFHEIGHT
 unsigned char vbuf[vbufsize];
 static unsigned short line[256];
 #endif
@@ -258,7 +210,8 @@ void osint_render(void){
   memset((void*)&vbuf[0],0,vbufsize);
   //int minx=255,maxx=0,miny=255,maxy=0;
 
-  for(int v = 0; v < vector_draw_cnt; v++){
+  for(int v = 0; v < vector_draw_cnt; v++) {
+
     /*
     minx=min(vectors_draw[v].x0/128, minx);
     minx=min(vectors_draw[v].x1/128, minx);
@@ -269,20 +222,26 @@ void osint_render(void){
     maxy=max(vectors_draw[v].y0/128, maxy);
     maxy=max(vectors_draw[v].y1/128, maxy);
     printf("%d %d %d %d\n",minx,maxx,miny,maxy);  
-*/
+    */
     unsigned char c = vectors_draw[v].color * 256 / VECTREX_COLORS;
+
+#ifdef HAS_T41
+    int x0=(vectors_draw[v].x0*7)/1024, x1=(vectors_draw[v].x1*7)/1024, y0=((vectors_draw[v].y0/128-32)*900)/1024, y1=((vectors_draw[v].y1/128-32)*900)/1024;
+    sline(  x0,y0,x1,y1, c);
+#else
     sline(  vectors_draw[v].x0,
         vectors_draw[v].y0,
         vectors_draw[v].x1,
         vectors_draw[v].y1, c);
+#endif    
   }
 
 #ifdef USE_BYTEFB
-  emu_DrawScreen(&vbuf[0], 256, 240, 256);
+  emu_DrawScreen(&vbuf[0], 256, BUFHEIGHT, 256);
 #else
   int ymul = 0;
-  int yinc = (256*256)/240;
-  for(int y = 0; y < 240; y++){
+  int yinc = (256*256)/BUFHEIGHT;
+  for(int y = 0; y < BUFHEIGHT; y++){
     int pix=32;
     unsigned char * vbufpt=&vbuf[32*(ymul>>8)];
     for(int x = 0; x < 32; x++){
@@ -304,7 +263,7 @@ void osint_render(void){
       if (b&0x1) line[pix++]=0xffff; 
       else line[pix++]=0x0000; 
     } 
-      emu_DrawLine16(&line[0], 256, 240, y);
+      emu_DrawLine16(&line[0], 256, BUFHEIGHT, y);
       ymul += yinc;   
   }
 #endif
@@ -342,17 +301,23 @@ void vec_Step(void)
 }
 
 
+#ifdef HAS_T41
+EXTMEM static unsigned char MemPool[8*1024*1024];
+#endif
+
 void vec_Init(void)
 {
   for(int i = 0; i < PALETTE_SIZE; i++){
     emu_SetPaletteEntry(i,i,i,i);
   }
 
+#ifdef HAS_T41
+  vectors_set = (vector_t*)MemPool;
+#else
   vectors_set = (vector_t*)emu_Malloc(2 * VECTOR_CNT*sizeof(vector_t));
-  if (!vectors_set)emu_printf("VSET malloc failed"); 
+#endif
 
-  //vector_hash = (long*)emu_Malloc(VECTOR_HASH*sizeof(long)); 
-  //if (!vector_hash)emu_printf("VHASH malloc failed"); 
+  if (!vectors_set)emu_printf("VSET malloc failed"); 
 
 #ifdef USE_BYTEFB
   vbuf = (unsigned char*) malloc(vbufsize);
@@ -378,9 +343,3 @@ void vec_Start(char * filename)
   }  
   emu_printf("init done");
 }
-
-
-
-
-
-

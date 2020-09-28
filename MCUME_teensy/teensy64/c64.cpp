@@ -1,7 +1,9 @@
 
 extern "C" {
 #include "emuapi.h"
+#include "platform_config.h"
 }
+
 #include "Teensy64.h"
 #include <string.h>
 
@@ -251,7 +253,9 @@ void c64_Init(void)
   resetCia2();
   resetVic();
   cpu_reset();
+#ifdef HAS_SND  
   emu_sndInit();
+#endif  
 }
 
 
@@ -305,6 +309,12 @@ void c64_Input(int bClick) {
       toggle = false; 
     }
   }
+}
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
 }
 
 #ifdef HAS_SND      

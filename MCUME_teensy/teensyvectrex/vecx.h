@@ -1,6 +1,8 @@
 #ifndef __VECX_H
 #define __VECX_H
 
+#include "platform_config.h"
+
 enum {
 	VECTREX_MHZ		= 1500000, /* speed of the vectrex being emulated */
 	VECTREX_COLORS  = 128,     /* number of possible colors ... grayscale */
@@ -11,7 +13,7 @@ enum {
 
 
 enum {
-	VECTREX_PDECAY	= 30, //30,      /* phosphor decay rate */
+	VECTREX_PDECAY	= 30,      /* phosphor decay rate */
 
 	/* number of 6809 cycles before a frame redraw */
 
@@ -28,11 +30,14 @@ enum {
 };
 
 typedef struct vector_type {
-	unsigned char x0, y0; /* start coordinate */
-	unsigned char x1, y1; /* end coordinate */
-	//long x0, y0; /* start coordinate */
-	//long x1, y1; /* end coordinate */
 
+#ifdef HAS_T41
+  long x0, y0; /* start coordinate */
+  long x1, y1; /* end coordinate */
+#else
+  unsigned char x0, y0; /* start coordinate */
+  unsigned char x1, y1; /* end coordinate */
+#endif
 	/* color [0, VECTREX_COLORS - 1], if color = VECTREX_COLORS, then this is
 	 * an invalid entry and must be ignored.
 	 */

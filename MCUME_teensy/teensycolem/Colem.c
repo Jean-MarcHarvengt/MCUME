@@ -110,6 +110,12 @@ struct
 /***************************************
 * Exported procedures
 ***************************************/
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
 void coc_Init(void)
 {
   int J;
@@ -894,5 +900,3 @@ void RefreshLine3(register byte Y)
 
   RefreshBorder(Y);
 }
-
-

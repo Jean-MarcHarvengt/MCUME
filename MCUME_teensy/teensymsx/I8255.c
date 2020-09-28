@@ -6,7 +6,7 @@
 /** port interface (PPI) chip from Intel. See I8255.h for   **/
 /** declarations.                                           **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 2001-2003                 **/
+/** Copyright (C) Marat Fayzullin 2001-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/

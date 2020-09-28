@@ -455,6 +455,13 @@ static void Initialise(void)
   cont2.analog_v = POT_CENTRE;
 }
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
+
 void at5_Init(void)
 {
    int i;
@@ -593,9 +600,3 @@ void at5_Start(char * cartname)
   
   emu_printf("init done");   
 }
-
-
-
-
-
-

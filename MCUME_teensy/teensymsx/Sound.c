@@ -333,7 +333,7 @@ void MIDISound(int Channel,int Freq,int Volume)
     /* SND_TRIANGLE is twice quieter than SND_MELODIC */
     if(CH[Channel].Type==SND_TRIANGLE) Volume=(Volume+1)/2;
     /* Compute MIDI note parameters */
-    MIDIVolume = Volume=(Volume+1)/2;;
+    MIDIVolume = (127*Volume+128)/255;
     MIDINote   = Freqs[Freq/3].Note;
     MIDIWheel  = Freqs[Freq/3].Wheel;
 
@@ -411,19 +411,13 @@ void MIDIMessage(byte D0,byte D1,byte D2)
 /*************************************************************/
 void NoteOn(byte Channel,byte Note,byte Level)
 {
-  Note&=0x7F;
-  Level&=0x7F;
+  Note  = Note>0x7F? 0x7F:Note;
+  Level = Level>0x7F? 0x7F:Level;
 
   if((CH[Channel].Note!=Note)||(CH[Channel].Level!=Level))
   {
-    if(CH[Channel].Note==Note)
-      MIDIMessage(0xA0+SHIFT(Channel),Note,Level);
-    else
-    {
-      if(CH[Channel].Note>=0) NoteOff(Channel);
-      MIDIMessage(0x90+SHIFT(Channel),Note,Level);
-    }
-
+    if((CH[Channel].Note>=0)&&(CH[Channel].Note!=Note)) NoteOff(Channel);
+    MIDIMessage(0x90+SHIFT(Channel),Note,Level);
     CH[Channel].Note=Note;
     CH[Channel].Level=Level;
   }

@@ -5,7 +5,7 @@
 /** This file contains implementation for the main table of **/
 /** Z80 commands. It is included from Z80.c.                **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-1998                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/
@@ -206,7 +206,7 @@ case POP_DE:   M_POP(DE);break;
 case POP_HL:   M_POP(HL);break;
 case POP_AF:   M_POP(AF);break;
 
-case DJNZ: if(--R->BC.B.h) { M_JR; } else R->PC.W++;break;
+case DJNZ: if(--R->BC.B.h) { R->ICount-=5;M_JR; } else R->PC.W++;break;
 case JP:   M_JP;break;
 case JR:   M_JR;break;
 case CALL: M_CALL;break;
@@ -214,18 +214,25 @@ case RET:  M_RET;break;
 case SCF:  S(C_FLAG);R(N_FLAG|H_FLAG);break;
 case CPL:  R->AF.B.h=~R->AF.B.h;S(N_FLAG|H_FLAG);break;
 case NOP:  break;
-case OUTA: OutZ80(RdZ80(R->PC.W++),R->AF.B.h);break;
-case INA:  R->AF.B.h=InZ80(RdZ80(R->PC.W++));break;
-case HALT: R->PC.W--;R->IFF|=0x80;R->ICount=0;break;
+case OUTA: I=RdZ80(R->PC.W++);OutZ80(I,R->AF.B.h);break;
+case INA:  I=RdZ80(R->PC.W++);R->AF.B.h=InZ80(I);break;
+
+case HALT:
+  R->PC.W--;
+  R->IFF|=IFF_HALT;
+  R->IBackup=0;
+  R->ICount=0;
+  break;
 
 case DI:
-  R->IFF&=0xFE;
+  if(R->IFF&IFF_EI) R->ICount+=R->IBackup-1;
+  R->IFF&=~(IFF_1|IFF_2|IFF_EI);
   break;
+
 case EI:
-  R->IFF|=0x01;
-  if(R->IRequest!=INT_NONE)
+  if(!(R->IFF&(IFF_1|IFF_EI)))
   {
-    R->IFF|=0x20;
+    R->IFF|=IFF_2|IFF_EI;
     R->IBackup=R->ICount;
     R->ICount=1;
   }

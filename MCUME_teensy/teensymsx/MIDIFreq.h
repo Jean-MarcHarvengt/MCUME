@@ -1,3 +1,17 @@
+/** EMULib Emulation Library *********************************/
+/**                                                         **/
+/**                       MIDIFreq.h                        **/
+/**                                                         **/
+/** This file contains a table to convert sound frequencies **/
+/** into MIDI octave/note numbers. It is included from the  **/
+/** Sound.c and SndWin.c files.                             **/
+/**                                                         **/
+/** Copyright (C) Marat Fayzullin 1996-2005                 **/
+/**     You are not allowed to distribute this software     **/
+/**     commercially. Please, notify me, if you make any    **/
+/**     changes to this file.                               **/
+/*************************************************************/
+
 { -36, 8063 },{ -12, 8063 },{  -3, 8298 },{   3, 8358 },
 {   8, 8201 },{  12, 8063 },{  15, 8054 },{  17, 8238 },
 {  19, 8311 },{  21, 8298 },{  23, 8217 },{  25, 8080 },

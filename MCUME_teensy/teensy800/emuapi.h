@@ -1,11 +1,9 @@
 #ifndef EMUAPI_H
 #define EMUAPI_H
 
-#define INVX        1
-//#define INVY        1
-#define HAS_SND     1
+#include "platform_config.h"
+
 #define CUSTOM_SND  1
-#define HAS_I2CKBD  1
 //#define TIMER_REND  1
 #define EXTRA_HEAP  0x10
 
@@ -18,7 +16,7 @@
 #define emu_Input(x) {}
 
 #define PALETTE_SIZE         256
-#define VID_FRAME_SKIP       0x3
+#define VID_FRAME_SKIP       0x0
 #define TFT_VBUFFER_YCROP    0
 #define SINGLELINE_RENDERING 1
 
@@ -60,7 +58,7 @@ const unsigned short keysw[] = {
   TAREA_END};
 
    
-const unsigned short keys[] = {
+const unsigned short key_map1[] = {
   0x1C+1,0x1F+1,0x1F  ,0x1A+1,0x18+1,0x1D+1,0x1B+1,0x33+1,0x35+1,0x30+1,0x32+1,0x36+1,0x37+1,0,0,
   0x2C+1,0x2F+1,0x2F  ,0x2A+1,0x28+1,0x2D+1,0x2B+1,0x0B+1,0x0D+1,0x08+1,0x0A+1,0x0E,0x0F+1,0x0C+1,
   0,     0x3F+1,0x3F  ,0x3A+1,0x38+1,0x3D+1,0x39+1,0x01+1,0x05+1,0x00+1,0x02+1,0x06+1,0x07+1,0,
@@ -97,6 +95,9 @@ const unsigned short i2ckeys[] = {
 
 
 extern void emu_init(void);
+extern void emu_start(void);
+extern void emu_resetSD(void);
+
 extern void emu_printf(char * text);
 extern void emu_printi(int val);
 extern void * emu_Malloc(int size);
@@ -117,6 +118,7 @@ extern void emu_FileTempWrite(int addr, unsigned char val);
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);
+extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line);
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
@@ -130,6 +132,9 @@ extern int emu_GetPad(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
+extern void emu_KeyboardOnUp(int keymodifer, int key);
+extern void emu_KeyboardOnDown(int keymodifer, int key);
+
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);
 extern void emu_sndInit();
@@ -138,8 +143,10 @@ extern int emu_us(void);
 
 extern int emu_setKeymap(int index);
 
+extern void emu_FileTempInit(void); 
+extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
+extern void emu_FileTempWrite(int addr, unsigned char val); 
+extern void emu_printh(int val);
+
+
 #endif
-
-
-
-

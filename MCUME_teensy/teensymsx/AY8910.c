@@ -6,7 +6,7 @@
 /** produced by General Instruments, Yamaha, etc. See       **/
 /** AY8910.h for declarations.                              **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1996-2003                 **/
+/** Copyright (C) Marat Fayzullin 1996-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/
@@ -148,7 +148,8 @@ void Write8910(register AY8910 *D,register byte R,register byte V)
       /* Compute channel number */
       R-=8;
       /* Compute and assign new volume */
-      D->Volume[R+3]=D->Volume[R]=255*(V&0x0F)/15;
+      D->Volume[R+3]=D->Volume[R]=
+        V&0x10? (V&0x04? 0:255):255*(V&0x0F)/15;
       /* Start/stop envelope */
       D->Phase[R]=V&0x10? 1:0;
       /* Compute changed channels mask */
@@ -160,8 +161,8 @@ void Write8910(register AY8910 *D,register byte R,register byte V)
       /* Write value */
       D->R[R]=V;
       /* Compute frequency */
-      J=((int)D->R[12]<<8)+D->R[11];
-      D->EPeriod=1000*J/AY8910_BASE/16;
+      J=((int)D->R[12]<<8)+D->R[11]+1;
+      D->EPeriod=1000*(J<<4)/AY8910_BASE;
       D->ECount=0;
       /* No channels changed */
       return;
@@ -198,10 +199,12 @@ void Loop8910(register AY8910 *D,int mS)
   /* Count milliseconds */
   D->ECount+=mS;
   if(D->ECount<D->EPeriod) return;
-  D->ECount-=D->EPeriod;
 
   /* By how much do we change volume? */
-  Step=mS>=D->EPeriod? mS/D->EPeriod:1;
+  Step=(D->ECount<<8)/D->EPeriod;
+
+  /* Count the remaining milliseconds */
+  D->ECount%=D->EPeriod;
 
   for(J=0;J<3;J++)
     if(D->Phase[J]&&(D->R[J+8]&0x10))

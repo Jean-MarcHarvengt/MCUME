@@ -25,7 +25,7 @@ void vce_w(int address, int data)
 //                      temp = (temp >> 8) | (temp << 8);
                         temp = (((uint16)temp1) << 8) + (uint16)temp2;
 #else
-                        temp = (((uint16)temp2) << 8) + (uint16)temp1;
+                        temp = (((uint16)temp2) << 8) + (uint16)temp1;                      
 #endif
                         pixel[(vce.addr >> 8) & 1][(vce.addr & 0xFF)] = pixel_lut[temp];
                         temp = (temp >> 1) & 0xFF;
@@ -41,7 +41,7 @@ void vce_w(int address, int data)
 #endif
                         for(n = 0; n < 0x10; n += 1)
                             pixel[0][(n << 4)] = pixel_lut[temp];
-                        temp = (temp >> 1) & 0xFF;
+                        temp = (temp >> 1) & 0xFF;                                                
                     }
                 }
             }
@@ -77,4 +77,3 @@ int vce_r(int address)
 
     return (0xFF);
 }
-

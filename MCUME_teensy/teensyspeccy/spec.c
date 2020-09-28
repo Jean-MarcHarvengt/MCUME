@@ -196,6 +196,13 @@ int endsWith(const char * s, const char * suffix)
    return (retval);  
 }
 
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
 void spec_Start(char * filename) {
   memset(Z80_RAM, 0, 0xC000);
   if ( (endsWith(filename, "SNA")) || (endsWith(filename, "sna")) ) {
@@ -211,6 +218,8 @@ void spec_Start(char * filename) {
   emu_sndInit(); 
 #endif  
 }
+
+
 
 static AY8910 ay;
 

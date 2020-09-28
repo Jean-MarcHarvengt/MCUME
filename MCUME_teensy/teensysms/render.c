@@ -37,6 +37,8 @@ static int vp_vend;
 static int vp_hstart;
 static int vp_hend;
 
+extern void emu_DrawLine(unsigned short *src, int width , int height, int line); 
+extern void emu_printf(char * text);
 
 /* Macros to access memory 32-bits at a time (from MAME's drawgfx.c) */
 
@@ -506,8 +508,3 @@ void palette_sync(int index)
 
     sbitmap.pal.dirty[index] = sbitmap.pal.update = 1;
 }
-
-
-
-
-

@@ -38,12 +38,8 @@ void render_shutdown(void);
 int make_sprite_list(void);
 void update_bg_pattern_cache(void);
 void update_obj_pattern_cache(void);
-void render_line_8(int line);
-void render_line_16(int line);
-void render_bg_8(int line);
-void render_bg_16(int line);
-void render_obj_8(int line);
-void render_obj_16(int line);
+void render_line_generic(int line);
+void render_bg(int line);
+void render_obj(int line);
 
 #endif /* _RENDER_H_ */
-

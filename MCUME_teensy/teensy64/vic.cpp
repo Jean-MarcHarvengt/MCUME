@@ -69,7 +69,11 @@
 #define BORDER_LEFT           0
 #define BORDER_RIGHT          0
 
+#ifdef HAS_T4_VGA
+typedef uint8_t tpixel;
+#else
 typedef uint16_t tpixel;
+#endif
 
 #define MAXCYCLESSPRITES0_2       3
 #define MAXCYCLESSPRITES3_7       5
@@ -1270,7 +1274,8 @@ void mode7 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc ); //Funktionspointer
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
-static uint16_t linebuffer[SCREEN_WIDTH];
+
+static tpixel linebuffer[SCREEN_WIDTH];
 
 void vic_do(void) {
 
@@ -1304,7 +1309,7 @@ void vic_do(void) {
     cpu.vic.denLatch = 0;
     //if (cpu.vic.rasterLine == LINECNT)
     //delay(50);
-    //emu_DrawVsync();  
+    emu_DrawVsync();  
 
   } else  cpu.vic.rasterLine++;
 
@@ -1602,7 +1607,13 @@ g-Zugriff
 
   }
 
-    emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+#ifdef HAS_T4_VGA
+  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+#else
+  emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+#endif
+
+
 
 //Rechter Rand nach CSEL, im Textbereich
 cpu_clock(5);

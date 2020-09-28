@@ -3,6 +3,9 @@
 */
 
 #include "TFT_T_DMA.h"
+
+#ifndef HAS_T4_VGA
+
 #include "font8x8.h"
 
 
@@ -443,7 +446,7 @@ void TFT_T_DMA::startDMA(void) {
   digitalWrite(_cs, HIGH);
   SPI.begin();
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
- #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #ifdef TFT_DEBUG          
   PRREG(LPSPI4_CCR);
@@ -1231,7 +1234,7 @@ void TFT_T_DMA::drawSprite(int16_t x, int16_t y, const uint16_t *bitmap, uint16_
     l++;
   } 
 }
-
+#endif
 
 
 

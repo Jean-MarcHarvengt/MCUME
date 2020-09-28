@@ -748,15 +748,16 @@ static einline void via_sstep1 (void)
 }
 
 
-
+#ifdef HAS_T41
+static einline void alg_addline (long x0, long y0, long x1, long y1, unsigned char color)
+{
+#else
 static einline void alg_addline (long xx0, long yy0, long xx1, long yy1, unsigned char color)
 {
-	unsigned long key;
-	long index;
-
-	unsigned char x0=(xx0*7)/1024, x1=(xx1*7)/1024, y0=((yy0/128-32)*900)/1024, y1=((yy1/128-32)*900)/1024;
-//	long x0=xx0/128, x1=xx1/128, y0=yy0/128, y1=yy1/128;
-
+  unsigned char x0=(xx0*7)/1024, x1=(xx1*7)/1024, y0=((yy0/128-32)*900)/1024, y1=((yy1/128-32)*900)/1024;
+#endif
+  unsigned long key;
+  long index;
 
 	key = (unsigned long) x0;
 	key = key * 31 + (unsigned long) y0;

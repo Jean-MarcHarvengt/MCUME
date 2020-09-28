@@ -1,5 +1,6 @@
 #include "shared.h"
 
+
 /* Bit 0 : BG enable, Bit 1 : OBJ enable */
 int plane_enable = -1;
 
@@ -23,15 +24,19 @@ t_sprite sprite_list[0x40];
 uint8 used_sprite_list[0x40];
 uint8 used_sprite_index;
 
+
+extern void emu_DrawLine16(unsigned short *src, int width , int height, int line); 
+extern void emu_printf(char * text);
+
+
+
 /*--------------------------------------------------------------------------*/
 /* Init, reset, shutdown functions                                          */
 /*--------------------------------------------------------------------------*/
 
-
 int render_init(void)
 {
-    int i, j, x;
-    uint8 *ptr;
+    int i, j;
 
     /* Make VCE data to raw pixel look-up table */
     for(i = 0; i < 0x200; i += 1)
@@ -42,26 +47,19 @@ int render_init(void)
         pixel_lut[i] = (r << 13 | g << 8 | b << 2) & 0xE71C;
     }
 
-    // 16bits default
-    render_line = render_line_16;
-//    render_line = (bitmap.depth == 8) ? render_line_8 : render_line_16;
-
+    render_line = render_line_generic;
     return (1);
 }
 
 
 void render_reset(void)
 {
-    /* Hack for Mac port */
-    //render_line = (bitmap.depth == 8) ? render_line_8 : render_line_16;
-    render_line = render_line_16;
-
+    render_line = render_line_generic;
 }
 
 
 void render_shutdown(void)
 {
-    /* todo: free xlat pointer */
 }
 
 
@@ -234,46 +232,41 @@ void update_obj_pattern_cache(void)
 /* Render functions                                                         */
 /*--------------------------------------------------------------------------*/
 
-
-
 // 16 bits line rendering
-extern void emu_DrawLine16(unsigned short *src, int width , int height, int line); 
 static unsigned short linebuf[1024];
 
 #define MIN(a,b) (a<b?a:b)
-void render_line_16(int line)
+void render_line_generic(int line)
 {
-
     if((reg[0x05] & 0x80) && (plane_enable & 1))
     {
         update_bg_pattern_cache();
-        render_bg_16(line);
+        render_bg(line);
     }
     else
     {
         int i;
         uint16 *ptr = (uint16 *)&linebuf[XOFFSET]; //&bitmap.data[(line * bitmap.pitch) + (XOFFSET * bitmap.granularity)];
-        for(i = 0; i < disp_width; i += 1) ptr[i] = pixel[0][0];            
+        for(i = 0; i < disp_width; i += 1) ptr[i] = pixel[0][0];                     
     }
 
     if((reg[0x05] & 0x40) && (plane_enable & 2))
     {
         update_obj_pattern_cache();
-        //if (line<100)
-        render_obj_16(line);
+        render_obj(line);
     }
-    //disp_width
+   
     emu_DrawLine16(&linebuf[XOFFSET], MIN(disp_width,256) , 240, line);
 
 }
 
 
 
-void render_bg_16(int line)
+void render_bg(int line)
 {
     uint16 *nt;
     uint8 *src, palette;
-    uint16 *dst;
+    uint16 *dst;   
     int column, name, attr, x, shift, v_line, nt_scroll;
     int xscroll = (reg[7] & 0x03FF);
     int end = disp_nt_width;
@@ -312,13 +305,13 @@ void render_bg_16(int line)
         /* Draw column */
         for(x = 0; x < 8; x += 1)
         {
-            dst[(column << 3) | (x)] = pixel[0][(src[x] | palette)];
+            dst[(column << 3) | (x)] = pixel[0][(src[x] | palette)];          
         }
     }
 }
 
 
-void render_obj_16(int line)
+void render_obj(int line)
 {
     t_sprite *p;
     int j, i, x, c;
@@ -326,7 +319,7 @@ void render_obj_16(int line)
     int v_line;
     uint8 *src;
     int nt_line;
-    uint16 *dst;
+    uint16 *dst;  
 
     for(j = (used_sprite_index - 1); j >= 0; j -= 1)
     {
@@ -343,12 +336,12 @@ void render_obj_16(int line)
             v_line &= 0x0F;
             //src = &obj_pattern_cache[(name << 8) | ((v_line & 0x0f) << 4)];
             src = &obj_pattern_cache[(name << 8) | ( (p->flags & FLAG_YFLIP?v_line ^ 0x0F:v_line) << 4)];
-            dst = (uint16 *)&linebuf[((XOFFSET+p->xpos) & 0x1ff)]; //&bitmap.data[(line * bitmap.pitch) + (((XOFFSET+p->xpos) & 0x1ff) * (bitmap.granularity))];
+            dst = (uint16 *)&linebuf[((XOFFSET+p->xpos) & 0x1ff)]; //&bitmap.data[(line * bitmap.pitch) + (((XOFFSET+p->xpos) & 0x1ff) * (bitmap.granularity))]; 
             for(x = 0; x < 0x10; x += 1)
             {
                 c = src[x];
                 //if ((unsigned int)&dst[x] < (unsigned int)&linebuf[400])
-                if(c) dst[x] = pixel[1][((c) | p->palette)];
+               if(c) dst[x] = pixel[1][((c) | p->palette)];
             }
 
             if(p->flags & FLAG_CGX)
@@ -362,7 +355,7 @@ void render_obj_16(int line)
                 {
                     c = src[x];
                     //if ((unsigned int)&dst[x] < (unsigned int)&linebuf[400])
-                    if(c) dst[x] = pixel[1][((c) | p->palette)];
+                   if(c) dst[x] = pixel[1][((c) | p->palette)];        
                 }
             }             
           
@@ -370,4 +363,3 @@ void render_obj_16(int line)
        
     }
 }
-

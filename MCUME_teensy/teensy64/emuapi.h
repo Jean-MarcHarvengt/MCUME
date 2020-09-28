@@ -1,17 +1,15 @@
 #ifndef EMUAPI_H
 #define EMUAPI_H
 
-#define INVX        1
-//#define INVY        1
-#define HAS_SND     1
+#include "platform_config.h"
+
 #define CUSTOM_SND  1
-#define HAS_I2CKBD  1
 //#define TIMER_REND  1
 
 #define EXTRA_HEAP  0x10
 
 // Title:     <                        >
-#define TITLE "    NES Emulator "
+#define TITLE "    C64 Emulator "
 #define ROMSDIR "c64"
 
 #define emu_Init(ROM) {c64_Start(ROM); c64_Init(); }
@@ -51,7 +49,7 @@ const unsigned short keysw[] = {
   TAREA_NEW_ROW,40,40,
   TAREA_END};
    
-const unsigned short keys[] = {
+const unsigned short key_map1[] = {
   2,3};  
    
 #ifdef HAS_I2CKBD
@@ -80,6 +78,7 @@ const unsigned short i2ckeys[] = {
 
 
 extern void emu_init(void);
+extern void emu_start(void);
 extern void emu_resetSD(void);
 
 extern void emu_printf(char * text);
@@ -102,6 +101,7 @@ extern void emu_FileTempWrite(int addr, unsigned char val);
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);
+extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line);
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
@@ -115,6 +115,9 @@ extern int emu_GetPad(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
+extern void emu_KeyboardOnUp(int keymodifer, int key);
+extern void emu_KeyboardOnDown(int keymodifer, int key);
+
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);
 extern void emu_sndInit();
@@ -123,9 +126,10 @@ extern int emu_us(void);
 
 extern int emu_setKeymap(int index);
 
+extern void emu_FileTempInit(void); 
+extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
+extern void emu_FileTempWrite(int addr, unsigned char val); 
+extern void emu_printh(int val);
+
 
 #endif
-
-
-
-

@@ -7,7 +7,7 @@
 /** LoopZ80(), and PatchZ80() functions to accomodate the   **/
 /** emulated machine's architecture.                        **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-1998                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/   
 /**     changes to this file.                               **/
@@ -16,7 +16,7 @@
 
 #include "Z80.h"
 #include "Tables.h"
-
+#include <stdio.h>
 
 /** INLINE ***************************************************/
 /** Different compilers inline C functions differently.     **/
@@ -32,8 +32,8 @@
 /** up. It has to stay inlined to be fast.                  **/
 /*************************************************************/
 #ifdef COLEM
-extern byte *RAM;
-INLINE byte RdZ80(word A) { return(RAM[A]); }
+extern byte *Page[];
+INLINE byte RdZ80(word A) { return(Page[A>>15][A&0x7FFF]); }
 #endif
 #ifdef MG
 extern byte *Page[];
@@ -90,7 +90,7 @@ INLINE byte RdZ80(word A)
   R->AF.B.l=Rg&0x01;Rg>>=1;R->AF.B.l|=PZSTable[Rg]
 
 #define M_BIT(Bit,Rg)  \
-  R->AF.B.l=(R->AF.B.l&~(N_FLAG|Z_FLAG))|H_FLAG|(Rg&(1<<Bit)? 0:Z_FLAG)
+  R->AF.B.l=(R->AF.B.l&C_FLAG)|H_FLAG|PZSTable[Rg&(1<<Bit)]
 
 #define M_SET(Bit,Rg) Rg|=1<<Bit
 #define M_RES(Bit,Rg) Rg&=~(1<<Bit)
@@ -157,7 +157,10 @@ INLINE byte RdZ80(word A)
 #define M_AND(Rg) R->AF.B.h&=Rg;R->AF.B.l=H_FLAG|PZSTable[R->AF.B.h]
 #define M_OR(Rg)  R->AF.B.h|=Rg;R->AF.B.l=PZSTable[R->AF.B.h]
 #define M_XOR(Rg) R->AF.B.h^=Rg;R->AF.B.l=PZSTable[R->AF.B.h]
-#define M_IN(Rg)  Rg=InZ80(R->BC.B.l);R->AF.B.l=PZSTable[Rg]|(R->AF.B.l&C_FLAG)
+
+#define M_IN(Rg)        \
+  Rg=InZ80(R->BC.B.l);  \
+  R->AF.B.l=PZSTable[Rg]|(R->AF.B.l&C_FLAG)
 
 #define M_INC(Rg)       \
   Rg++;                 \
@@ -409,8 +412,6 @@ static void CodesDD(register Z80 *R)
       R->PC.W--;break;
     case PFX_CB:
       CodesDDCB(R);break;
-    case HALT:
-      R->PC.W--;R->IFF|=0x80;R->ICount=0;break;
     default:
       if(R->TrapBadOps)
         printf
@@ -438,8 +439,6 @@ static void CodesFD(register Z80 *R)
       R->PC.W--;break;
     case PFX_CB:
       CodesFDCB(R);break;
-    case HALT:
-      R->PC.W--;R->IFF|=0x80;R->ICount=0;break;
     default:
         printf
         (
@@ -457,13 +456,22 @@ static void CodesFD(register Z80 *R)
 /*************************************************************/
 void ResetZ80(Z80 *R)
 {
-  R->PC.W=0x0000;R->SP.W=0xF000;
-  R->AF.W=R->BC.W=R->DE.W=R->HL.W=0x0000;
-  R->AF1.W=R->BC1.W=R->DE1.W=R->HL1.W=0x0000;
-  R->IX.W=R->IY.W=0x0000;
-  R->I=0x00;R->IFF=0x00;
-  R->ICount=R->IPeriod;
-  R->IRequest=INT_NONE;
+  R->PC.W     = 0x0000;
+  R->SP.W     = 0xF000;
+  R->AF.W     = 0x0000;
+  R->BC.W     = 0x0000;
+  R->DE.W     = 0x0000;
+  R->HL.W     = 0x0000;
+  R->AF1.W    = 0x0000;
+  R->BC1.W    = 0x0000;
+  R->DE1.W    = 0x0000;
+  R->HL1.W    = 0x0000;
+  R->IX.W     = 0x0000;
+  R->IY.W     = 0x0000;
+  R->I        = 0x00;
+  R->IFF      = 0x00;
+  R->ICount   = R->IPeriod;
+  R->IRequest = INT_NONE;
 }
 
 /** ExecZ80() ************************************************/
@@ -495,27 +503,62 @@ word ExecZ80(Z80 *R)
 /*************************************************************/
 void IntZ80(Z80 *R,word Vector)
 {
-  if((R->IFF&0x01)||(Vector==INT_NMI))
+  if((R->IFF&IFF_1)||(Vector==INT_NMI))
   {
-    /* Experimental V Shouldn't disable all interrupts? */
-    R->IFF=(R->IFF&0x9E)|((R->IFF&0x01)<<6);
-    if(R->IFF&0x80) { R->PC.W++;R->IFF&=0x7F; }
+    /* If HALTed, take CPU off HALT instruction */
+    if(R->IFF&IFF_HALT) { R->PC.W++;R->IFF&=~IFF_HALT; }
+
+    /* Save PC on stack */
     M_PUSH(PC);
 
     /* Automatically reset IRequest if needed */
     if(R->IAutoReset&&(Vector==R->IRequest)) R->IRequest=INT_NONE;
 
-    if(Vector==INT_NMI) R->PC.W=INT_NMI;
-    else
-      if(R->IFF&0x04)
-      { 
-        Vector=(Vector&0xFF)|((word)(R->I)<<8);
-        R->PC.B.l=RdZ80(Vector++);
-        R->PC.B.h=RdZ80(Vector);
-      }
-      else
-        if(R->IFF&0x02) R->PC.W=INT_IRQ;
-        else R->PC.W=Vector;
+    /* If it is NMI... */
+    if(Vector==INT_NMI)
+    {
+      /* Copy IFF1 to IFF2 */
+      if(R->IFF&IFF_1) R->IFF|=IFF_2; else R->IFF&=~IFF_2;
+      /* Clear IFF1 */
+      R->IFF&=~(IFF_1|IFF_EI);
+      /* Jump to hardwired NMI vector */
+      R->PC.W=0x0066;
+      /* Done */
+      return;
+    }
+
+    /* Further interrupts off */
+    R->IFF&=~(IFF_1|IFF_2|IFF_EI);
+
+    /* If in IM2 mode... */
+    if(R->IFF&IFF_IM2)
+    {
+      /* Make up the vector address */
+      Vector=(Vector&0xFF)|((word)(R->I)<<8);
+      /* Read the vector */
+      R->PC.B.l=RdZ80(Vector++);
+      R->PC.B.h=RdZ80(Vector);
+      /* Done */
+      return;
+    }
+
+    /* If in IM1 mode, just jump to hardwired IRQ vector */
+    if(R->IFF&IFF_IM1) { R->PC.W=0x0038;return; }
+
+    /* If in IM0 mode... */
+
+    /* Jump to a vector */
+    switch(Vector)
+    {
+      case INT_RST00: R->PC.W=0x0000;break;
+      case INT_RST08: R->PC.W=0x0008;break;
+      case INT_RST10: R->PC.W=0x0010;break;
+      case INT_RST18: R->PC.W=0x0018;break;
+      case INT_RST20: R->PC.W=0x0020;break;
+      case INT_RST28: R->PC.W=0x0028;break;
+      case INT_RST30: R->PC.W=0x0030;break;
+      case INT_RST38: R->PC.W=0x0038;break;
+    }
   }
 }
 
@@ -524,24 +567,21 @@ void IntZ80(Z80 *R,word Vector)
 /** returns INT_QUIT. It will return the PC at which        **/
 /** emulation stopped, and current register values in R.    **/
 /*************************************************************/
-static byte I;
-static pair J;
-
 word RunZ80(Z80 *R)
 {
-//  register byte I;
-//  register pair J;
+  register byte I;
+  register pair J;
   int ras=0;
  
   for(;;)
   {
-//#ifdef DEBUG
-//    /* Turn tracing on when reached trap address */
-//    if(R->PC.W==R->Trap) R->Trace=1;
-//    /* Call single-step debugger, exit if requested */
-//    if(R->Trace)
-//      if(!DebugZ80(R)) return(R->PC.W);
-//#endif
+#ifdef DEBUG
+    /* Turn tracing on when reached trap address */
+    if(R->PC.W==R->Trap) R->Trace=1;
+    /* Call single-step debugger, exit if requested */
+    if(R->Trace)
+      if(!DebugZ80(R)) return(R->PC.W);
+#endif
 
     I=RdZ80(R->PC.W++);
     R->ICount-=Cycles[I];
@@ -559,17 +599,25 @@ word RunZ80(Z80 *R)
     {
       /* If we have come after EI, get address from IRequest */
       /* Otherwise, get it from the loop handler             */
-      if(R->IFF&0x20)
+      if(R->IFF&IFF_EI)
       {
-        J.W=R->IRequest;         /* Get pending interrupt    */
-        R->ICount+=R->IBackup-1; /* Restore the ICount       */
-        R->IFF&=0xDF;            /* Done with AfterEI state  */
+        R->IFF=(R->IFF&~IFF_EI)|IFF_1; /* Done with AfterEI state */
+        R->ICount+=R->IBackup-1;       /* Restore the ICount      */
+
+        /* Call periodic handler or set pending IRQ */
+        if(R->ICount>0) J.W=R->IRequest;
+        else
+        {
+          J.W=LoopZ80(R, &ras);        /* Call periodic handler    */
+          R->ICount+=R->IPeriod; /* Reset the cycle counter  */
+          if(J.W==INT_NONE) J.W=R->IRequest;  /* Pending IRQ */
+        }
       }
       else
       {
         J.W=LoopZ80(R, &ras);          /* Call periodic handler    */
-        R->ICount=R->IPeriod;    /* Reset the cycle counter  */
-        if(J.W==INT_NONE) I=R->IRequest; /* Pending int-rupt */
+        R->ICount+=R->IPeriod;   /* Reset the cycle counter  */
+        if(J.W==INT_NONE) J.W=R->IRequest;    /* Pending IRQ */
       }
 
       if(J.W==INT_QUIT) return(R->PC.W); /* Exit if INT_QUIT */

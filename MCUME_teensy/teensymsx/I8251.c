@@ -6,7 +6,7 @@
 /** chip and the 8253 timer chip implementing a generic     **/
 /** RS232 interface.                                        **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 2003                      **/
+/** Copyright (C) Marat Fayzullin 2004-2005                 **/
 /**               Maarten ter Huurne 2000                   **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/

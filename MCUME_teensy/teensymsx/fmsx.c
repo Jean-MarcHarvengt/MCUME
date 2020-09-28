@@ -2,7 +2,6 @@
 
 #include "emuapi.h"
 #include "tft_t_dma.h"
-//#include "psram_t.h"
 #include "iopins.h" 
 
 
@@ -278,33 +277,18 @@ static unsigned char linebuffer[WIDTH];
 
 char *Disks[2][MAXDISKS+1];     /* Disk names for each drive */
 
+extern void * loc_Malloc(int size);
 
 
 
-
-/*
-PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
-
-extern "C" uint8 read_rom(int address) {
-  //emu_printh(address);
-  return (psram.psread(address)); 
+void emu_KeyboardOnDown(int keymodifer, int key) {
 }
 
-extern "C" void  write_rom(int address, uint8 val)  {
-  psram.pswrite(address,val); 
-
+void emu_KeyboardOnUp(int keymodifer, int key) {
 }
-*/
-
 
 void msx_Init(void)
 {
-  emu_printf("Allocating MEM");
-  //psram.begin();
-  //mem_init(); 
-
-
-
   /* Clear everything */
 //  CartCount=TypeCount=JoyCount=0;
 //  DiskCount[0]=DiskCount[1]=0;
@@ -2632,7 +2616,7 @@ byte *LoadROM(const char *Name,int Size,byte *Buf)
 
   if (Size<=0) return (0);
 
-  P=Buf? Buf:emu_Malloc(Size);
+  P=Buf? Buf:loc_Malloc(Size);
   emu_LoadFile(Name, P, Size);
 
   /* Add a new chunk to free */
@@ -2662,7 +2646,7 @@ byte *LoadROM(const char *Name,int Size,byte *Buf)
   }
 
   /* Allocate memory */
-  P=Buf? Buf:emu_Malloc(Size);
+  P=Buf? Buf:loc_Malloc(Size);
   if(!P)
   {
     fclose(F);
@@ -2772,7 +2756,7 @@ int LoadCart(const char *Name,int Slot)
   ROMMask[Slot]=!ROM64&&(Size>4)? C3-1:0x00;
 
   /* Allocate space for the ROM */
-  ROMData[Slot]=emu_Malloc(C3*0x2000);
+  ROMData[Slot]=loc_Malloc(C3*0x2000);
   if(!ROMData[Slot]) { emu_printf("failed");return(0); }
   Chunks[CCount++]=ROMData[Slot];
 
@@ -3353,5 +3337,3 @@ int GuessROM(const byte *Buf,int Size)
   /* Return the most likely mapper type */
   return(I);
 }
-
-

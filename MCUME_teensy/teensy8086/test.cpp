@@ -4,7 +4,13 @@
 #include "emu.h"
 #include "ps2.h"
 
+#ifdef HAS_T41 
+EXTMEM static unsigned char MemPool[8*1024*1024];
+#else
 static uint8_t LOMEM[NATIVE_RAM];
+#endif
+
+
 uint8_t * RAM;
 uint8_t * LORAM;
 
@@ -333,14 +339,15 @@ void installPalette(void) {
 
 extern uint8_t vidmode, portram[0x400];
 
-#define XRES 320
-#define YRES 200
+#define XRES_MAX 640
+#define XRES_HI  640
+#define XRES_LO  320
+#define YRES     200
 
 #include "font.h"
 
 
-static unsigned short line[XRES];
-
+static unsigned short line[XRES_MAX];
 
 void drawscreentext80(void) {
   uint16_t row, col, y, x, xpos;
@@ -360,23 +367,23 @@ void drawscreentext80(void) {
       fg = attrib & 0x0F;
       //if (y == 0) {printf("0x%02X",cc);}
       fontdata = ROM_READ(font, ((uint32_t)cc << 3) + (y&0x7));
-      for (x=0; x<4; x++) 
+      for (x=0; x<8; x++) 
+      //for (x=0; x<4; x++) 
       {
         if (fontdata & 1) {
           line[xpos++] = palettecga[fg];
         } else {
           line[xpos++] = palettecga[bg];
         }
-        fontdata >>= 2;
+        fontdata >>= 1;
+        //fontdata >>= 2;
       }
     } 
-
-    emu_DrawLine16(&line[0], XRES, YRES, y);       
+    emu_DrawLine16(&line[0], XRES_HI, YRES, y);       
   }
 }
 
 void drawscreenlorescga(void) {
-  //uint16_t row;
   uint16_t y, x, xpos;
   uint8_t intensity, usepal;
   uint16_t color;
@@ -385,10 +392,8 @@ void drawscreenlorescga(void) {
 
   for (y=0; y<(25*8); y++) 
   {
-    //row = y>>3;
-    //uint8_t * vrampt=&VRAM[160*row];
     xpos = 0;
-    for (x=0; x<XRES; x++) 
+    for (x=0; x<XRES_LO; x++) 
     {
       int ychar = y;// >> 1;
       int xchar = x;// >> 1;
@@ -403,8 +408,7 @@ void drawscreenlorescga(void) {
       if (color == (usepal + intensity)) color = 0; 
       line[xpos++] = palettecga[color];     
     } 
-
-    emu_DrawLine16(&line[0], XRES, YRES, y);       
+    emu_DrawLine16(&line[0], XRES_LO, YRES, y);       
   }
 }
 
@@ -415,7 +419,7 @@ void drawscreenhirescga(void) {
   for (y=0; y<(25*8); y++) 
   {
     xpos = 0;
-    for (x=0; x<XRES; x++) 
+    for (x=0; x<XRES_HI; x++) 
     {
       int ychar = y >> 1;
       int xchar = x;
@@ -423,8 +427,7 @@ void drawscreenhirescga(void) {
       color = ((curchar >> (7-(x&7))) & 1) ? 15 : 0;
       line[xpos++] = palettecga[color];     
     } 
-
-    emu_DrawLine16(&line[0], XRES, YRES, y);       
+    emu_DrawLine16(&line[0], XRES_HI, YRES, y);       
   }
 }
 
@@ -457,9 +460,10 @@ static uint8_t nbkeys=0;
 static uint8_t kcnt=0;
 static int toggle=1;
 
-//static char * seq="DIR\r";
-//static char * seq="CAT.EXE\r";
-static char * seq="PRINCE.BAT\r";
+static char * seq;
+static char * seq1="PRINCE.BAT\r";
+static char * seq2="CAT.EXE\r";
+static char * seq3="DIR\r";
 
 static int mouse_x = 160;
 static int mouse_y = 100;
@@ -480,7 +484,6 @@ static void keyevent(int keysym, int isdown)
     if (!isdown) portram[0x60] |= 0x80;
     portram[0x64] |= 2;
     doirq(1);
-    //vTaskDelay(50 / portTICK_PERIOD_MS);
   }
 }
 
@@ -490,7 +493,13 @@ extern void apc_Input(int bClick) {
 
   if (nbkeys == 0) {
     if (bClick & MASK_JOY2_BTN) {
-        nbkeys = strlen(seq);   
+        nbkeys = strlen(seq1);
+        seq=seq1;   
+        kcnt=0;
+    }  
+    if (bClick & MASK_KEY_USER1) {
+        nbkeys = strlen(seq2);
+        seq=seq2;  
         kcnt=0;
     }  
   }
@@ -554,35 +563,23 @@ static void do_events(void)
   }
   else {
     if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
-      if ( mouse_x < XRES ) {
+      if ( mouse_x < XRES_HI ) {
         mouse_x += 1;
-        //Serial.print("r");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();
       } 
     }
     else if (( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT)) {
       if ( mouse_x > 1 ) {
-        mouse_x -= 1;
-        //Serial.print("l");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
+        mouse_x -= 1;       
       }
     }
     else if (( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP)) {
       if ( mouse_y > 1 ) {
-        mouse_y -= 1;
-        //Serial.print("u");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
+        mouse_y -= 1;     
       }
     }
     else if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
       if ( mouse_y < YRES ) {
-        mouse_y += 1;
-        //Serial.print("d");
-        //IkbdMouseMotion ( mouse_x, mouse_y );
-        //IkbdLoop();        
+        mouse_y += 1;      
       }
     }  
     
@@ -591,14 +588,16 @@ static void do_events(void)
       mouseb=1;
     }
     if ( (mouseb != prev_mouseb) ){
-      //if (mouseb) IkbdMousePress(2);
-      //else IkbdMouseRelease(2);
-      //Serial.println("btoggle");
-      //IkbdLoop();
       prev_mouseb = mouseb;  
     }    
   }
 }     
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 void apc_Step(void)
 {
@@ -612,12 +611,18 @@ void apc_Step(void)
 
 void apc_Init(void)
 {
+#ifdef HAS_T41 
+  LORAM = MemPool;
+  RAM = MemPool + NATIVE_RAM;
+#else
   RAM = (uint8_t*) malloc(RAM_SIZE);
-  if (!RAM) emu_printf("SPI RAM malloc failed"); 
+  if (!RAM) emu_printf("RAM malloc failed"); 
   LORAM = &LOMEM[0];
   //LORAM = (uint8_t*)malloc(NATIVE_RAM);
   //if (!LORAM) emu_printf("LORAM malloc failed"); 
 
+#endif
+  
   installPalette();
   init8253();
   reset86();
@@ -630,9 +635,3 @@ void apc_Start(char * filename)
   initDisk(filename);
   emu_printf("init done");
 }
-
-
-
-
-
-

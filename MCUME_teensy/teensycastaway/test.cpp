@@ -192,7 +192,7 @@ static void do_events(void)
   
   
   if (hk != prev_hk) {
-    prev_hk == hk;
+    prev_hk = hk;
     if ( (hk != 0) && (hk != prev_key) ) {
       prev_key = hk;
       IkbdKeyPress ( hk );

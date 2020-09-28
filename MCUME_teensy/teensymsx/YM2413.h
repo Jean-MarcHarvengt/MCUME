@@ -6,7 +6,7 @@
 /** produced by Yamaha (also see OPL2, OPL3, OPL4 chips).   **/
 /** See YM2413.h for the code.                              **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1996-2003                 **/
+/** Copyright (C) Marat Fayzullin 1996-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/

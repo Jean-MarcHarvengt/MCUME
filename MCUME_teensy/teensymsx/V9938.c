@@ -5,7 +5,7 @@
 /** This file contains implementation for the V9938 special **/
 /** graphical operations.                                   **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-2003                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/

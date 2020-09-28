@@ -10,7 +10,7 @@
 //#define ROTATE_SCREEN  1
 #define EXTERNAL_SD    1
 
-#define HAS_PSRAM      1
+//#define HAS_PSRAM      1
 
 //#define USE_SDFAT      1
 //#define SD_FAT_TYPE    1

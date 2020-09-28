@@ -5,7 +5,7 @@
 /** This file contains implementation for the ED table of   **/
 /** Z80 commands. It is included from Z80.c.                **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-1998                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/
@@ -92,24 +92,24 @@ case RLD:
 
 case LD_A_I:
   R->AF.B.h=R->I;
-  R->AF.B.l=(R->AF.B.l&C_FLAG)|(R->IFF&1? P_FLAG:0)|ZSTable[R->AF.B.h];
+  R->AF.B.l=(R->AF.B.l&C_FLAG)|(R->IFF&IFF_2? P_FLAG:0)|ZSTable[R->AF.B.h];
   break;
 
 case LD_A_R:
   R->R++;
   R->AF.B.h=(byte)(R->R-R->ICount);
-  R->AF.B.l=(R->AF.B.l&C_FLAG)|(R->IFF&1? P_FLAG:0)|ZSTable[R->AF.B.h];
+  R->AF.B.l=(R->AF.B.l&C_FLAG)|(R->IFF&IFF_2? P_FLAG:0)|ZSTable[R->AF.B.h];
   break;
 
 case LD_I_A:   R->I=R->AF.B.h;break;
 case LD_R_A:   break;
 
-case IM_0:     R->IFF&=0xF9;break;
-case IM_1:     R->IFF=(R->IFF&0xF9)|2;break;
-case IM_2:     R->IFF=(R->IFF&0xF9)|4;break;
+case IM_0:     R->IFF&=~(IFF_IM1|IFF_IM2);break;
+case IM_1:     R->IFF=(R->IFF&~IFF_IM2)|IFF_IM1;break;
+case IM_2:     R->IFF=(R->IFF&~IFF_IM1)|IFF_IM2;break;
 
 case RETI:     M_RET;break;
-case RETN:     if(R->IFF&0x40) R->IFF|=0x01; else R->IFF&=0xFE;
+case RETN:     if(R->IFF&IFF_2) R->IFF|=IFF_1; else R->IFF&=~IFF_1;
                M_RET;break;
 
 case NEG:      I=R->AF.B.h;R->AF.B.h=0;M_SUB(I);break;
@@ -166,37 +166,59 @@ case INDR:
   break;
 
 case OUTI:
-  OutZ80(R->BC.B.l,RdZ80(R->HL.W++));
+  I=RdZ80(R->HL.W++);
+  OutZ80(R->BC.B.l,I);
   R->BC.B.h--;
-  R->AF.B.l=N_FLAG|(R->BC.B.h? 0:Z_FLAG);
+  R->AF.B.l=N_FLAG|(R->BC.B.h? 0:Z_FLAG)|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
   break;
 
 case OTIR:
   do
   {
-    OutZ80(R->BC.B.l,RdZ80(R->HL.W++));
-    R->BC.B.h--;R->ICount-=21;
+    I=RdZ80(R->HL.W++);
+    OutZ80(R->BC.B.l,I);
+    R->BC.B.h--;
+    R->ICount-=21;
   }
   while(R->BC.B.h&&(R->ICount>0));
-  if(R->BC.B.h) { R->AF.B.l=N_FLAG;R->PC.W-=2; }
-  else { R->AF.B.l=Z_FLAG|N_FLAG;R->ICount+=5; }
+  if(R->BC.B.h)
+  {
+    R->AF.B.l=N_FLAG|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
+    R->PC.W-=2;
+  }
+  else
+  {
+    R->AF.B.l=Z_FLAG|N_FLAG|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
+    R->ICount+=5;
+  }
   break;
 
 case OUTD:
-  OutZ80(R->BC.B.l,RdZ80(R->HL.W--));
+  I=RdZ80(R->HL.W--);
+  OutZ80(R->BC.B.l,I);
   R->BC.B.h--;
-  R->AF.B.l=N_FLAG|(R->BC.B.h? 0:Z_FLAG);
+  R->AF.B.l=N_FLAG|(R->BC.B.h? 0:Z_FLAG)|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
   break;
 
 case OTDR:
   do
   {
-    OutZ80(R->BC.B.l,RdZ80(R->HL.W--));
-    R->BC.B.h--;R->ICount-=21;
+    I=RdZ80(R->HL.W--);
+    OutZ80(R->BC.B.l,I);
+    R->BC.B.h--;
+    R->ICount-=21;
   }
   while(R->BC.B.h&&(R->ICount>0));
-  if(R->BC.B.h) { R->AF.B.l=N_FLAG;R->PC.W-=2; }
-  else { R->AF.B.l=Z_FLAG|N_FLAG;R->ICount+=5; }
+  if(R->BC.B.h)
+  {
+    R->AF.B.l=N_FLAG|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
+    R->PC.W-=2;
+  }
+  else
+  {
+    R->AF.B.l=Z_FLAG|N_FLAG|(R->HL.B.l+I>255? (C_FLAG|H_FLAG):0);
+    R->ICount+=5;
+  }
   break;
 
 case LDI:

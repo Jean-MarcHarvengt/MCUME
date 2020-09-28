@@ -5,8 +5,17 @@ extern "C" {
   #include "iopins.h"
 }
 
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+const uint16_t deflogo[] = {
+  0,0
+};
+static const uint16_t * logo = deflogo;
+#else
 #include "tft_t_dma.h"
 #include "logo.h"
+#endif
+
 #include "bmpjoy.h"
 #include "bmpvbar.h"
 #ifdef OLD_LAYOUT    
@@ -18,6 +27,13 @@ extern "C" {
 #ifdef HAS_I2CKBD
 #include <Wire.h>
 #endif
+
+#ifdef HAS_USBKEY
+#include "USBHost_t36.h"  // Read this header first for key info
+USBHost myusb;
+KeyboardController keyboard1(myusb);
+#endif
+static uint8_t usbnavpad=0;
 
 #ifdef USE_SDFS
 #include "uSDFS.h"
@@ -84,7 +100,7 @@ static File file;
 #define MKEY_TFT            23
 #define MKEY_VGA            24
 
-#define MAX_FILES           32
+#define MAX_FILES           64
 #define MAX_FILENAME_SIZE   24
 #define MAX_MENULINES       (MKEY_L9)
 #define TEXT_HEIGHT         16
@@ -93,7 +109,7 @@ static File file;
 #define MENU_FILE_YOFFSET   (2*TEXT_HEIGHT)
 #define MENU_FILE_W         (MAX_FILENAME_SIZE*TEXT_WIDTH)
 #define MENU_FILE_H         (MAX_MENULINES*TEXT_HEIGHT)
-#define MENU_FILE_BGCOLOR   RGBVAL16(0x00,0x00,0x20)
+#define MENU_FILE_BGCOLOR   RGBVAL16(0x00,0x00,0x40)
 #define MENU_JOYS_YOFFSET   (12*TEXT_HEIGHT)
 #define MENU_VBAR_XOFFSET   (0*TEXT_WIDTH)
 #define MENU_VBAR_YOFFSET   (MENU_FILE_YOFFSET)
@@ -113,13 +129,10 @@ static char selection[MAX_FILENAME_SIZE+1]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
-static int16_t calMinX=-1,calMinY=-1,calMaxX=-1,calMaxY=-1;
+static int calMinX=-1,calMinY=-1,calMaxX=-1,calMaxY=-1;
 static bool i2cKeyboardPresent = false;
-//const uint16_t deflogo[] = {
-//  0x0000,0x0000
-//};
-//static const uint16_t * logo = deflogo;
-
+static unsigned short * keys;
+static int keyMap;
 
 const unsigned short menutouchareas[] = {
   TAREA_XY,MENU_FILE_XOFFSET,MENU_FILE_YOFFSET,
@@ -245,7 +258,7 @@ void emu_printf(int val)
 
 void emu_printi(int val)
 {
-  Serial.println(val);
+  Serial.println(val,HEX);
 }
 
 void emu_printh(int val)
@@ -272,13 +285,29 @@ void * emu_Malloc(int size)
     }
   }
   else {
-    emu_printf("could allocate ");
+    emu_printf("could allocate dynamic ");
     emu_printf(size);    
   }
   
   return retval;
 }
 
+void * emu_MallocI(int size)
+{
+  void * retval =  NULL; 
+
+  if ( (malbufpt+size) < sizeof(malbuf) ) {
+    retval = (void *)&malbuf[malbufpt];
+    malbufpt += size;
+    emu_printf("could allocate static ");
+    emu_printf(size);          
+  }
+  else {
+    emu_printf("failure to allocate");
+  }
+
+  return retval;
+}
 void emu_Free(void * pt)
 {
   free(pt);
@@ -400,6 +429,12 @@ int emu_ReadKeys(void)
     retval = ((j2 << 8) | j1);
   }
 
+  if (usbnavpad & MASK_JOY2_UP) retval |= MASK_JOY2_UP;
+  if (usbnavpad & MASK_JOY2_DOWN) retval |= MASK_JOY2_DOWN;
+  if (usbnavpad & MASK_JOY2_LEFT) retval |= MASK_JOY2_LEFT;
+  if (usbnavpad & MASK_JOY2_RIGHT) retval |= MASK_JOY2_RIGHT;
+  if (usbnavpad & MASK_JOY2_BTN) retval |= MASK_JOY2_BTN;
+
 #ifdef PIN_KEY_USER1 
   if ( digitalRead(PIN_KEY_USER1) == LOW ) retval |= MASK_KEY_USER1;
 #endif
@@ -454,6 +489,7 @@ int emu_ReadKeys(void)
     } 
 #endif 
   }
+  
   return (retval);
 }
 
@@ -479,9 +515,9 @@ int emu_ReadI2CKeyboard(void) {
       if (b != 0xff) hitindex=i; 
       msg[i++] = b;        
     }
-   
+    
     if (hitindex >=0 ) {
-      /* 
+      /*
       Serial.println(msg[0], BIN);
       Serial.println(msg[1], BIN);
       Serial.println(msg[2], BIN);
@@ -491,7 +527,7 @@ int emu_ReadI2CKeyboard(void) {
       Serial.println(msg[6], BIN);
       */
       unsigned short match = (~msg[hitindex])&0x00FF | (hitindex<<8);
-      Serial.println(match,HEX);  
+      //Serial.println(match,HEX);  
       for (i=0; i<sizeof(i2ckeys); i++) {
         if (match == i2ckeys[i]) {
           //Serial.println((int)keys[i]);      
@@ -574,7 +610,7 @@ bool virtualkeyboardIsActive(void) {
 void toggleVirtualkeyboard(bool keepOn) {
        
     if (keepOn) {      
-        tft.drawSpriteNoDma(0,0,(uint16_t*)logo);
+        tft.drawSpriteNoDma(0,0,logo);
         //prev_zt = 0;
         vkbKeepOn = true;
         vkbActive = true;
@@ -591,7 +627,7 @@ void toggleVirtualkeyboard(bool keepOn) {
         }
         else {         
             tft.stopDMA();                  
-            tft.drawSpriteNoDma(0,0,(uint16_t*)logo);           
+            tft.drawSpriteNoDma(0,0,logo);           
             //prev_zt = 0;
             vkbActive = true;
             exitVkbd = false;
@@ -636,7 +672,7 @@ void handleVirtualkeyboard() {
      
     if (vkeyRefresh) {
         vkeyRefresh = false;
-        tft.drawSpriteNoDma(0,0,(uint16_t*)logo, rx, ry, rw, rh);
+        tft.drawSpriteNoDma(0,0,logo, rx, ry, rw, rh);
     }  
          
     if ( (exitVkbd) && (vkbActive) ) {      
@@ -650,10 +686,6 @@ void handleVirtualkeyboard() {
 }
 
 int emu_setKeymap(int index) {
-  if (index) {   
-  }
-  else {
-  }
 }
 
 
@@ -725,10 +757,12 @@ void backgroundMenu(void) {
     menuRedraw=true;  
     tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
     tft.drawTextNoDma(0,0, TITLE, RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);  
-    tft.drawSpriteNoDma(MENU_VBAR_XOFFSET,MENU_VBAR_YOFFSET,(uint16_t*)bmpvbar);
+#ifndef HAS_T4_VGA
+    tft.drawSpriteNoDma(MENU_VBAR_XOFFSET,MENU_VBAR_YOFFSET,bmpvbar);
+#endif    
 #ifdef OLD_LAYOUT    
-    tft.drawSpriteNoDma(MENU_TFT_XOFFSET,MENU_TFT_YOFFSET,(uint16_t*)bmptft);
-    tft.drawSpriteNoDma(MENU_VGA_XOFFSET,MENU_VGA_YOFFSET,(uint16_t*)bmpvga);
+    tft.drawSpriteNoDma(MENU_TFT_XOFFSET,MENU_TFT_YOFFSET,bmptft);
+    tft.drawSpriteNoDma(MENU_VGA_XOFFSET,MENU_VGA_YOFFSET,bmpvga);
 #endif      
 }
 
@@ -838,7 +872,7 @@ int handleMenu(uint16_t bClick)
             strcpy(selection,filename);            
           }
           else {
-            tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, 0xFFFF, 0x0000, true);      
+            tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, RGBVAL16(0xff,0xff,0xff), MENU_FILE_BGCOLOR, true);      
           }
         }
         i++; 
@@ -846,8 +880,10 @@ int handleMenu(uint16_t bClick)
       fileIndex++;    
     }
 
-    tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);  
-    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0xff,0x00,0x00), false);
+#ifndef HAS_T4_VGA
+    tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);
+#endif      
+    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
     menuRedraw=false;     
   }
 
@@ -1337,10 +1373,137 @@ void emu_FileTempWrite(int addr, unsigned char val)
 #endif   
 }
 
+#ifdef HAS_USBKEY
+void OnPress(auto key)
+{
+  uint8_t keymodifier = keyboard1.getModifiers();
+
+  if(keymodifier == 0x40){
+    // ALTGR Key modifier FR Keyboard
+    switch (key) {
+#ifdef LAYOUT_FRENCH
+      case 233 : key = '~' ; break;
+      case  34 : key = '#' ; break;
+      case  39 : key = '{' ; break;
+      case  40 : key = '[' ; break;
+      case  45 : key = '|' ; break;
+      case 232 : key = '`' ; break;
+      case  95 : key = 92  ; break;
+      case 231 : key = '^' ; break;
+      case 224 : key = '@' ; break;
+      case  41 : key = ']' ; break;
+      case  61 : key = '}' ; break;
+#endif  
+#ifdef LAYOUT_FRENCH_BELGIAN
+      case  38 : key = '|' ; break; //1
+      case 233 : key = '@' ; break; //2
+      case  34 : key = '#' ; break; //3
+      case 167 : key = '^' ; break; //6
+      case 231 : key = '{' ; break; //9
+      case 224 : key = '}' ; break; //0
+      case  36 : key = ']' ; break; //$
+      case  61 : key = '~' ; break; //=
+#endif  
+    }
+  }  
+
+  if (menuActive())
+  {
+    switch (key)  
+    {
+      case 217:
+        usbnavpad |= MASK_JOY2_DOWN;
+        break;
+      case 218:
+        usbnavpad |= MASK_JOY2_UP;
+        break;
+      case 216:
+        usbnavpad |= MASK_JOY2_LEFT;
+        break;
+      case 215:
+        usbnavpad |= MASK_JOY2_RIGHT;
+        break;
+      case 10:
+        usbnavpad |= MASK_JOY2_BTN;
+        break;
+    }     
+  }
+  else
+  {
+    emu_KeyboardOnDown(keymodifier, key);
+  }
+}
+
+void OnRelease(int key)
+{
+  uint8_t keymodifier = keyboard1.getModifiers();
+
+  if(keymodifier == 0x40){
+    // ALTGR Key modifier FR Keyboard
+    switch (key) {
+#ifdef LAYOUT_FRENCH
+      case 233 : key = '~' ; break;
+      case  34 : key = '#' ; break;
+      case  39 : key = '{' ; break;
+      case  40 : key = '[' ; break;
+      case  45 : key = '|' ; break;
+      case 232 : key = '`' ; break;
+      case  95 : key = 92  ; break;
+      case 231 : key = '^' ; break;
+      case 224 : key = '@' ; break;
+      case  41 : key = ']' ; break;
+      case  61 : key = '}' ; break;
+#endif  
+#ifdef LAYOUT_FRENCH_BELGIAN
+      case  38 : key = '|' ; break; //1
+      case 233 : key = '@' ; break; //2
+      case  34 : key = '#' ; break; //3
+      case 167 : key = '^' ; break; //6
+      case 231 : key = '{' ; break; //9
+      case 224 : key = '}' ; break; //0
+      case  36 : key = ']' ; break; //$
+      case  61 : key = '~' ; break; //=
+#endif  
+    }
+  }
+
+  if (menuActive())
+  {
+    switch (key)  
+    {
+      case 217:
+        usbnavpad &= ~MASK_JOY2_DOWN;
+        break;
+      case 218:
+        usbnavpad &= ~MASK_JOY2_UP;
+        break;
+      case 216:
+        usbnavpad &= ~MASK_JOY2_LEFT;
+        break;
+      case 215:
+        usbnavpad &= ~MASK_JOY2_RIGHT;
+        break;
+      case 10:
+        usbnavpad &= ~MASK_JOY2_BTN;
+        break;
+    }     
+  }
+  else
+  {
+    emu_KeyboardOnUp(keymodifier, key);  
+  }
+}
+#endif
 
 void emu_init(void)
 {
   Serial.begin(115200);
+
+#ifdef HAS_USBKEY
+  myusb.begin();
+  keyboard1.attachPress(OnPress);
+  keyboard1.attachRelease(OnRelease);
+#endif
 
 #ifdef USE_SDFS
   strcpy(romspath,SDFSDEV);
@@ -1386,7 +1549,11 @@ void emu_init(void)
   {
     toggleMenu(true);
   }
+}
 
+
+void emu_start(void)
+{
 #ifdef HAS_I2CKBD
   byte msg[7]={0,0,0,0,0,0,0};
   Wire.begin(); // join i2c bus SDA2/SCL2
@@ -1412,5 +1579,9 @@ void emu_init(void)
     Serial.println("i2C keyboard found");            
   }
 #endif
-}
 
+  usbnavpad = 0;
+  
+  keys = key_map1;
+  keyMap = 0;
+}

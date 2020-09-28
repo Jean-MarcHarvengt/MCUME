@@ -5,11 +5,12 @@
 /** This file contains implementation for the PatchZ80()    **/
 /** function necessary for emulating MSX disk and tape IO.  **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-2003                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/
 /*************************************************************/
+
 #include "MSX.h"
 #include "Boot.h"
 #include <stdio.h>
@@ -351,6 +352,7 @@ case 0x00E1:
 
     rewind(CasStream);
   }
+
   if(Verbose&0x04) puts("FAILED");
 #endif
   return;
@@ -373,6 +375,7 @@ case 0x00E4:
 
   return;
 }
+
 case 0x00E7:
 /** TAPIOF: *****************************************************
 ****************************************************************/

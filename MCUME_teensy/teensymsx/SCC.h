@@ -5,7 +5,7 @@
 /** This file contains definitions and declarations for     **/
 /** routines in SCC.c.                                      **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1996-2003                 **/
+/** Copyright (C) Marat Fayzullin 1996-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/

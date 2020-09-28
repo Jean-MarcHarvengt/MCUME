@@ -50,12 +50,17 @@
 #define USBHOST (!PS2KEYBOARD)
 
 
-#include "tft_t_dma.h"
-extern TFT_T_DMA tft;	
-
 extern "C" {
   #include "emuapi.h"
 }
+
+#ifdef HAS_T4_VGA
+#include "vga_t_dma.h"
+#else
+#include "tft_t_dma.h"
+#endif
+extern TFT_T_DMA tft;  
+
 
 void initMachine();
 void resetMachine() __attribute__ ((noreturn));

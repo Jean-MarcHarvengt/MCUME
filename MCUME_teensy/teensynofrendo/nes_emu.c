@@ -248,7 +248,11 @@ char *osd_getromdata() {
     return (char*)romdata;
 }
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
 
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 void nes_Init(void)
 {
@@ -282,5 +286,3 @@ void nes_Start(char * filename)
 		}  
 	}
 }
-
-

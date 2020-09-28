@@ -37,4 +37,3 @@ void make_name_lut(void);
 void parse_satb(int line);
 
 #endif /* _RENDER_H_ */
-

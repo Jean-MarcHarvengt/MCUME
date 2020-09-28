@@ -41,6 +41,12 @@ static char * lorom=0;  //[MAX_ROM_SIZE];
 /****************************************************************************
 * Exported procedures
 ****************************************************************************/
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
 void odd_Init(void)
 {
 	if (bios == 0) bios = (char *)emu_Malloc(MAXC);
@@ -200,9 +206,3 @@ void odd_Step(void)
 	emu_DrawScreen((unsigned char *)getGBuf()+BORDERW/2, BMPW-BORDERW, BMPH, BMPW);
   emu_DrawVsync();
 }
-
-
-
-
-
-

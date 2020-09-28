@@ -200,6 +200,7 @@ void do_interrupt()
 
 void bitbufBlit(unsigned char * buf)
 {
+emu_DrawVsync();  
   memset( XBuf, 1, WIDTH*8 ); 
   buf = buf + (ZX_VID_MARGIN*(ZX_VID_FULLWIDTH/8));
   int y,x,i;
@@ -472,6 +473,13 @@ static void initmem()
 }
 
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
+
 void z81_Init(void) 
 {
 #if HAS_SND
@@ -516,8 +524,7 @@ void z81_Step(void)
 {
   ExecZ80();
   sighandler(0);
-  //if (strlen(tapename)) handleKeyBuf();  
-  emu_DrawVsync(); 
+  //if (strlen(tapename)) handleKeyBuf();   
   updateKeyboard();
   Loop8910(&ay,20);     
 }
@@ -558,4 +565,3 @@ void z81_Start(char * filename)
     ramsize = 56;
   }
 }
-

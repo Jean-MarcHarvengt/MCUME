@@ -240,7 +240,6 @@ Serial.printf("D") ; Serial.flush();
 
 #include "emuapi.h"
 
-
 PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
 {
 }
@@ -386,4 +385,3 @@ uint16_t PSRAM_T::psread_w(uint32_t addr)
   psram_read_n(curPage,&(pages[top].page[0]),PAGE_SIZE);   
   return (pages[top].page[offs+1]<<8) + pages[top].page[offs];
 }
-

@@ -2,13 +2,35 @@
 
 #include "emuapi.h"
 #include "tft_t_dma.h"
-#include "psram_t.h"
 #include "iopins.h" 
 
 extern "C" {
 #include "shared.h"
 #include "system.h"
 }
+
+#ifdef HAS_T41 
+
+EXTMEM static unsigned char MemPool[8*1024*1024];
+
+extern "C" uint8 read_rom(int address) {
+  return (MemPool[address]); 
+}
+
+extern "C" uint8 readb_swap_rom(int address) {
+  return (MemPool[address^1]); 
+}
+
+extern "C" uint16 readw_swap_rom(int address) {
+  return ((MemPool[address+1]<<8) + MemPool[address]);  
+}
+extern "C" void  write_rom(int address, uint8 val)  {
+  MemPool[address]=val;
+}
+
+#else
+
+#include "psram_t.h"
 
 PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
 
@@ -26,6 +48,8 @@ extern "C" uint16 readw_swap_rom(int address) {
 extern "C" void  write_rom(int address, uint8 val)  {
   psram.pswrite(address,val); 
 }
+
+#endif
 
 static uint8 romversion;
 extern "C" uint8 rom_version(void) {
@@ -47,11 +71,18 @@ static deinterleave_block(int offset, int srcoffset)
     }
 }
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 void gen_Init(void)
 {
   emu_printf("Allocating MEM");
+#ifndef HAS_T41   
   psram.begin();
+#endif  
   mem_init();    
   emu_printf("Allocating MEM done");
 }
@@ -167,7 +198,3 @@ audio_play_sample(stream, 0, len);
 #endif  
 #endif  
 } 
-
-
-
-

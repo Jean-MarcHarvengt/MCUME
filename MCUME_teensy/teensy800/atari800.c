@@ -267,6 +267,11 @@ void at8_Init(void)
   Initialise();
 }
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 void at8_Step(void)
 {
@@ -371,9 +376,3 @@ void at8_Start(char * cartname)
     
   emu_printf("init done");   
 }
-
-
-
-
-
-

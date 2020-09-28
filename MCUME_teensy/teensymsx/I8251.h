@@ -5,7 +5,7 @@
 /** This file contains definitions and declarations for     **/
 /** routines in I8251.c.                                    **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 2003                      **/
+/** Copyright (C) Marat Fayzullin 2004-2005                 **/
 /**               Maarten ter Huurne 2000                   **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/

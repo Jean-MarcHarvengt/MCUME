@@ -5,7 +5,7 @@
 /** This file contains declarations relevant to emulation   **/
 /** of Z80 CPU.                                             **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1994-1998                 **/
+/** Copyright (C) Marat Fayzullin 1994-2005                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/   
 /**     changes to this file.                               **/
@@ -19,8 +19,16 @@
 /* #define MSB_FIRST */        /* Compile for hi-endian CPU  */
 
                                /* LoopZ80() may return:      */
-#define INT_IRQ     0x0038     /* Standard RST 38h interrupt */
-#define INT_NMI     0x0066     /* Non-maskable interrupt     */
+#define INT_RST00   0x00C7     /* RST 00h                    */
+#define INT_RST08   0x00CF     /* RST 08h                    */
+#define INT_RST10   0x00D7     /* RST 10h                    */
+#define INT_RST18   0x00DF     /* RST 18h                    */
+#define INT_RST20   0x00E7     /* RST 20h                    */
+#define INT_RST28   0x00EF     /* RST 28h                    */
+#define INT_RST30   0x00F7     /* RST 30h                    */
+#define INT_RST38   0x00FF     /* RST 38h                    */
+#define INT_IRQ     INT_RST38  /* Default IRQ opcode is FFh  */
+#define INT_NMI     0xFFFD     /* Non-maskable interrupt     */
 #define INT_NONE    0xFFFF     /* No interrupt required      */
 #define INT_QUIT    0xFFFE     /* Exit the emulation         */
 
@@ -33,11 +41,25 @@
 #define N_FLAG      0x02       /* 1: Subtraction occured     */
 #define C_FLAG      0x01       /* 1: Carry/Borrow occured    */
 
+                               /* Bits in IFF flip-flops:    */
+#define IFF_1       0x01       /* IFF1 flip-flop             */
+#define IFF_IM1     0x02       /* 1: IM1 mode                */
+#define IFF_IM2     0x04       /* 1: IM2 mode                */
+#define IFF_2       0x08       /* IFF2 flip-flop             */
+#define IFF_EI      0x20       /* 1: EI pending              */
+#define IFF_HALT    0x80       /* 1: CPU HALTed              */
+
 /** Simple Datatypes *****************************************/
 /** NOTICE: sizeof(byte)=1 and sizeof(word)=2               **/
 /*************************************************************/
+#ifndef BYTE_TYPE_DEFINED
+#define BYTE_TYPE_DEFINED
 typedef unsigned char byte;
+#endif
+#ifndef WORD_TYPE_DEFINED
+#define WORD_TYPE_DEFINED
 typedef unsigned short word;
+#endif
 typedef signed char offset;
 
 /** Structured Datatypes *************************************/
@@ -107,7 +129,7 @@ byte RdZ80(register word Addr);
 /** InZ80()/OutZ80() *****************************************/
 /** Z80 emulation calls these functions to read/write from  **/
 /** I/O ports. There can be 65536 I/O ports, but only first **/
-/** 256 are usually used                                    **/
+/** 256 are usually used.                                   **/
 /************************************ TO BE WRITTEN BY USER **/
 void OutZ80(register word Port,register byte Value);
 byte InZ80(register word Port);
@@ -127,7 +149,9 @@ void PatchZ80(register Z80 *R);
 /** the CPU, and given the Z80 registers. Emulation exits   **/
 /** if DebugZ80() returns 0.                                **/
 /*************************************************************/
+#ifdef DEBUG
 byte DebugZ80(register Z80 *R);
+#endif
 
 /** LoopZ80() ************************************************/
 /** Z80 emulation calls this function periodically to check **/

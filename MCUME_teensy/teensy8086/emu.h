@@ -4,13 +4,15 @@
 
 //  #define RAM_SIZE 0xF8000 // 512k //655360UL
 //  #define NATIVE_RAM (0X28000) //  128k+32768 //231424UL
-  #define RAM_SIZE 0x78000 // 512k //655360UL
-  #define NATIVE_RAM (0X28000) //  128k+32768 //231424UL
-  #define NATIVE_START 0UL
+
+
+#define RAM_SIZE 0x78000 // 512k //655360UL
+#define NATIVE_RAM (0X28000) //  128k+32768 //231424UL
+#define NATIVE_START 0UL
 
 
 
-  #define ROM_READ(a,b) a[b]
+#define ROM_READ(a,b) a[b]
 
 
 //#define INCLUDE_ROM_BASIC
@@ -152,4 +154,3 @@ union _bytewordregs_{
   uint16_t wordregs[8];
   uint8_t byteregs[8];
 } ;
-

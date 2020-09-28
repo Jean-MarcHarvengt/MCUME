@@ -7,12 +7,41 @@
 
 
 #include "shared.h"
+#include "platform_config.h"
+
+#ifdef HAS_T4_VGA 
+#include "vga_t_dma.h"
+#endif
+extern void emu_DrawLine16(unsigned short *src, int width , int height, int line); 
+extern void emu_printf(char * text);
+
 
 #ifdef ALIGN_LONG
 
 /* Or change the names if you depend on these from elsewhere.. */
 #undef READ_LONG
 #undef WRITE_LONG
+
+
+
+       if(reg[12] & 8)
+        {
+            int j;
+            for(j = 0; j < 3; j += 1)
+            {
+                color = &vdp_palette[j][data];
+                set_color((j << 6), color);
+            }
+        }
+        else
+        {
+            color = &vdp_palette[1][data];
+            set_color(0x00, color);
+            set_color(0x40, color);
+            set_color(0x80, color);
+        }
+  
+
 
 static __inline__ uint32 READ_LONG(void *address)
 {
@@ -155,6 +184,9 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 
 /* Pixel creation macros, input is four bits each */
 
+/* 3:3:2 RGB */
+#define MAKE_PIXEL_8(r,g,b)  ((r) <<  5 | (g) << 2 | ((b) >> 1))
+
 /* 5:6:5 RGB */
 #define MAKE_PIXEL_16(r,g,b) ((r) << 12 | (g) << 7 | (b) << 1)
 
@@ -229,6 +261,7 @@ int render_init(void)
         pixel_16_lut[2][i] = MAKE_PIXEL_16(r|8,g|8,b|8);
     }
 
+
     /* Set up color update function */
     color_update = color_update_16;
 
@@ -283,6 +316,7 @@ void render_reset(void)
     memset(ntb_buf, 0, sizeof(ntb_buf));
     memset(obj_buf, 0, sizeof(obj_buf));
 
+    //memset(&pixel_8, 0, sizeof(pixel_8));
     memset(&pixel_16, 0, sizeof(pixel_16));
 }
 
@@ -363,12 +397,8 @@ void render_line(int line)
 
 
     int width = (reg[12] & 1) ? 320 : 256;
-    
-
-
     remap_16(lb+0x20, line_buf, pixel_16, width);
     emu_DrawLine16(line_buf, width ,256, line); 
-    //remap_16(lb+0x20, emu_LineBuffer(line), pixel_16, width);
 }
 /*--------------------------------------------------------------------------*/
 /* Window rendering                                                         */
@@ -770,18 +800,6 @@ void window_clip(int line)
 /*--------------------------------------------------------------------------*/
 /* Remap functions                                                          */
 /*--------------------------------------------------------------------------*/
-
-/*
-void remap_8(uint8 *src, uint8 *dst, uint8 *table, int length)
-{
-    int count;
-    for(count = 0; count < length; count += 1)
-    {
-        *dst++ = table[*src++];
-    }
-}
-*/
-
 void remap_16(uint8 *src, uint16 *dst, uint16 *table, int length)
 {
     int count;
@@ -807,6 +825,7 @@ void merge(uint8 *srca, uint8 *srcb, uint8 *dst, uint8 *table, int width)
         dst[i] = c;
     }
 }
+
 
 void color_update_16(int index, uint16 data)
 {
@@ -1044,4 +1063,3 @@ void render_obj_im2(int line, uint8 *buf, uint8 *table)
         }
     }
 }
-

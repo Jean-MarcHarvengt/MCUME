@@ -35,13 +35,26 @@
 #define I2C_SDA_IO     18
 
 // Analog joystick (primary) for JOY2 and 5 extra buttons
+#ifdef HAS_T4_VGA
+#define PIN_JOY2_A1X    A3
+#define PIN_JOY2_A2Y    A2
+#define PIN_JOY2_BTN    14
+#define PIN_KEY_USER1   22
+#define PIN_KEY_USER2   23
+
+// Second joystick
+#define PIN_JOY1_BTN     34
+#define PIN_JOY1_1       38 // UP
+#define PIN_JOY1_2       36 // DOWN
+#define PIN_JOY1_3       35 // RIGHT
+#define PIN_JOY1_4       37 // LEFT
+
+#else
 #define PIN_JOY2_A1X    A1
 #define PIN_JOY2_A2Y    A2
 #define PIN_JOY2_BTN    17
 #define PIN_KEY_USER1   3 //34
 #define PIN_KEY_USER2   4 //35
-//#define PIN_KEY_USER3   33
-//#define PIN_KEY_USER4   39
 
 // Second joystick
 #define PIN_JOY1_BTN     2
@@ -49,6 +62,7 @@
 #define PIN_JOY1_2       7  // DOWN
 #define PIN_JOY1_3       6  // RIGHT
 #define PIN_JOY1_4       5  // LEFT
+#endif
 
 #else 
 // OLD LAYOUT!!!!
@@ -87,7 +101,3 @@
 #endif
 
 #endif
-
-
-
-

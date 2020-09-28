@@ -2,7 +2,6 @@
 
 #include "emuapi.h"
 #include "tft_t_dma.h"
-#include "psram_t.h"
 #include "iopins.h" 
 
 extern "C" {
@@ -10,33 +9,46 @@ extern "C" {
 }
 
 static int rom_offset = 0;
-  
-PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
 
+#ifdef HAS_T41 
+EXTMEM static unsigned char MemPool[8*1024*1024];
+
+extern "C" uint8 read_rom(int address) {
+  return (MemPool[address+rom_offset]); 
+}
+
+extern "C" void  write_rom(int address, uint8 val)  {
+  MemPool[address]=val;
+}
+
+#else
+
+#include "psram_t.h"
+
+PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
 
 extern "C" uint8 read_rom(int address) {
   return (psram.psread(address+rom_offset));
 }
 
-//extern "C" uint8 readb_swap_rom(int address) {
-//  return(psram.psread(address^1));
-//}
-
-//extern "C" uint16 readw_swap_rom(int address) {
-//  return psram.psread_w(address);  
-//}
-
 extern "C" void  write_rom(int address, uint8 val)  {
   psram.pswrite(address,val); 
 }
+#endif
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 
-
-
-void gen_Init(void)
+void sms_Init(void)
 {
   emu_printf("Allocating MEM");
+#ifndef HAS_T41     
   psram.begin();
+#endif  
   mem_init();    
   emu_printf("Allocating MEM done");
 }
@@ -46,14 +58,15 @@ static int hk = 0;
 static int k = 0;
 
 
-void gen_Input(int click) {
+void sms_Input(int click) {
+
   hk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys();   
 }
 
 
 
-void gen_Start(char * filename)
+void sms_Start(char * filename)
 {
   emu_printf("load and init");  
 
@@ -94,25 +107,22 @@ void gen_Start(char * filename)
       cart.type = TYPE_GG; 
     }
   }
-  
 
 
- 
-
-#ifdef SOUND_PRESENT
 #ifdef HAS_SND
+#ifdef SOUND_PRESENT
   system_init(22050);  
   emu_sndInit();
+#else
+  system_init(0);
 #endif  
 #else
   system_init(0);
 #endif
-
-
   emu_printf("init done");
 }
 
-void gen_Step(void) 
+void sms_Step(void) 
 {
   input.pad[0]=0;
 
@@ -153,7 +163,3 @@ void SND_Process(void *stream, int len) {
 #endif  
 #endif  
 } 
-
-
-
-
