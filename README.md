@@ -112,7 +112,7 @@ Game console systems supported and status on various MCU platforms<br>
 # Optional requirements:
 - I2C custom keyboard (for computers emulators)
 - Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0)
-- VGA output (Teensy 3.6 only)
+- VGA output (Teensy 3.6 and Teensy 4.1 only)
 - 2 extra buttons (USER3 and USER4) mostly for NES emu
 
 # Wiring
