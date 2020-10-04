@@ -153,8 +153,8 @@ void ast_Init(void)
   (void) memcpy (membase, &tos[0], 8);
 
   extern unsigned char *disc[2];
-  disc [ 0 ] = (uint8*) disk0[0];
-  disc [ 1 ] = (uint8*) disk1[0];
+  disc [ 0 ] = (uint8*) &disk0[0];
+  disc [ 1 ] = (uint8*) &disk1[0];
   
 }
 static int mouse_x = XRES/2;

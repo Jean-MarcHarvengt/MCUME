@@ -8,6 +8,7 @@
 //#define INVX           1
 //#define INVY           1
 #define HAS_USBKEY     1
+//#define HAS_I2CKBD       1
 
 //#define ILI9341        1
 //#define ST7789         1

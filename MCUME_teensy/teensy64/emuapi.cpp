@@ -1074,7 +1074,6 @@ int handleCallibration(uint16_t bClick) {
 
 
 
-
 int emu_FileOpen(char * filename)
 {
   int retval = 0;
