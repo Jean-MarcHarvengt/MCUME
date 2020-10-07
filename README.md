@@ -74,7 +74,7 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4.0+PSRAM | Teensy4.1+PSRAM | Teensy4.1+PSRAM+VGA | ESP32 | ESP32-Wrover |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Zx81        | X | X | X | X | X | X | X |
 | Zx spectrum | X | X | X | X | X | X | X |
@@ -89,7 +89,7 @@ Please compile for smallest code on the Teensy4.0 else you will run out of memor
 
 Game console systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4+PSRAM | Teensy4.1+PSRAM+VGA | ESP32 | ESP32-Wrover |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
 | --- | --- | --- | --- | --- | --- | --- |
 | Atari 2600                   | X | X | X | X | X | X |
 | Odyssey/Videopac             | X | X | X | X | X | X |
