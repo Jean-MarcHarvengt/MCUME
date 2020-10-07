@@ -1,6 +1,3 @@
-
-
-
 #include "iopins.h"  
 #include "emuapi.h"  
 #include "keyboard_osd.h"
@@ -19,12 +16,19 @@ TFT_T_DMA tft = TFT_T_DMA(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO,
 static IntervalTimer myTimer;
 static unsigned char  palette8[PALETTE_SIZE];
 static unsigned short  palette16[PALETTE_SIZE];
+volatile boolean vbl=true;
 static int skip=0;
 
 static unsigned long long mscount=0;
 volatile unsigned int systime;
+int joystick=0;
 
-static void vblCount() { 
+static void vblCount() {
+  if (vbl) {
+    vbl = false;
+  } else {
+    vbl = true;
+  }   
   mscount += 20;
   systime += 20;
 }
@@ -91,6 +95,17 @@ int emu_FrameSkip(void)
   return skip;
 }
 
+void emu_DrawVsync(void)
+{
+  volatile boolean vb=vbl;
+  skip += 1;
+  skip &= VID_FRAME_SKIP;
+#ifdef HAS_T4_VGA
+  tft.waitSync();
+#else
+  while (vbl==vb) {};
+#endif
+}
 
 // ****************************************************
 // the setup() method runs once, when the sketch starts
@@ -133,12 +148,25 @@ void loop(void)
     delay(20);
   } 
   else { 
-    D_DoomLoop();  
+    int k=emu_ReadKeys();
+    joystick = 0;
+    if ( (k & MASK_JOY1_DOWN) || (k & MASK_JOY2_DOWN) )  joystick|=0x02;
+    if ( (k & MASK_JOY1_UP) || (k & MASK_JOY2_UP) )   joystick|=0x01;
+    if ( (k & MASK_JOY1_LEFT) || (k & MASK_JOY2_LEFT) )  joystick|=0x04;
+    if ( (k & MASK_JOY1_RIGHT) || (k & MASK_JOY2_RIGHT) )  joystick|=0x08;
+    if ( (k & MASK_JOY1_BTN) || (k & MASK_JOY2_BTN) ) joystick|=0x10; 
+    if ( (k & MASK_KEY_USER1) ) joystick|=0x20;
+    D_DoomLoop();
+    emu_DrawVsync(); 
   } 
 }
 
 
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
 
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
 
 
 

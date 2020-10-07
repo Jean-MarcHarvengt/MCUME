@@ -59,7 +59,7 @@
 #define MIN_RAM     8  /* MiB */
 
 
-extern unsigned char MemPool[6*1024*1024];
+extern unsigned char MemPool[8*1024*1024];
 typedef struct atexit_listentry_s atexit_listentry_t;
 
 struct atexit_listentry_s

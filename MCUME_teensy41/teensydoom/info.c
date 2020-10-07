@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+#include "arduinoproto.h"
+
 // Data.
 #include "sounds.h"
 #include "m_fixed.h"
@@ -29,7 +32,8 @@
 
 #include "p_mobj.h"
 
-char *sprnames[] = {
+
+PROGMEM char *sprnames[] = {
     "TROO","SHTG","PUNG","PISG","PISF","SHTF","SHT2","CHGG","CHGF","MISG",
     "MISF","SAWG","PLSG","PLSF","BFGG","BFGF","BLUD","PUFF","BAL1","BAL2",
     "PLSS","PLSE","MISL","BFS1","BFE1","BFE2","TFOG","IFOG","PLAY","POSS",
@@ -124,7 +128,7 @@ void A_SpawnFly();
 void A_BrainExplode();
 
 
-state_t	states[NUMSTATES] = {
+PROGMEM state_t	states[NUMSTATES] = {
     {SPR_TROO,0,-1,{NULL},S_NULL,0,0},	// S_NULL
     {SPR_SHTG,4,0,{A_Light0},S_NULL,0,0},	// S_LIGHTDONE
     {SPR_PUNG,0,1,{A_WeaponReady},S_PUNCH,0,0},	// S_PUNCH
@@ -1095,7 +1099,7 @@ state_t	states[NUMSTATES] = {
 };
 
 
-mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
+PROGMEM mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 
     {		// MT_PLAYER
 	-1,		// doomednum

@@ -9,7 +9,7 @@
 #define EXTRA_HEAP  0x10
 
 // Title:     <                        >
-#define TITLE "      DATA directory    "
+#define TITLE "  Doom data directory   "
 #define ROMSDIR "/data"
 
 

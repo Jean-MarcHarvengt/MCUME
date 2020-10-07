@@ -103,13 +103,6 @@ typedef struct
 
 static uint16_t rgb565_palette[256];
 
-// Last touch state
-
-
-// Last button state
-
-static bool last_button_state;
-
 // run state
 
 static bool run;
@@ -132,27 +125,79 @@ void I_ShutdownGraphics (void)
 
 void I_StartFrame (void)
 {
-
 }
+
+static int oldjoystick=0;
+extern int joystick;
 
 void I_GetEvent (void)
 {
-	event_t event;
-	bool button_state;
+  event_t event;
+  event.data2 = -1;
+  event.data3 = -1;
+  if ( (!(oldjoystick & 0x04)) && (joystick & 0x04) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_LEFTARROW;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x04)) && (oldjoystick & 0x04) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_LEFTARROW;
+    D_PostEvent (&event);       
+  } 
+  if ( (!(oldjoystick & 0x08)) && (joystick & 0x08) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_RIGHTARROW;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x08)) && (oldjoystick & 0x08) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_RIGHTARROW;
+    D_PostEvent (&event);       
+  } 
+  if ( (!(oldjoystick & 0x01)) && (joystick & 0x01) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_UPARROW;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x01)) && (oldjoystick & 0x01) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_UPARROW;
+    D_PostEvent (&event);       
+  } 
+  if ( (!(oldjoystick & 0x02)) && (joystick & 0x02) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_DOWNARROW;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x02)) && (oldjoystick & 0x02) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_DOWNARROW;
+    D_PostEvent (&event);       
+  }
 
-//	button_state = button_read ();
+  if ( (!(oldjoystick & 0x10)) && (joystick & 0x10) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_FIRE;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x10)) && (oldjoystick & 0x10) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_FIRE;
+    D_PostEvent (&event);       
+  } 
+  if ( (!(oldjoystick & 0x20)) && (joystick & 0x20) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_ENTER;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x20)) && (oldjoystick & 0x20) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_ENTER;
+    D_PostEvent (&event);       
+  } 
 
-	if (last_button_state != button_state)
-	{
-		last_button_state = button_state;
-
-		event.type = last_button_state ? ev_keydown : ev_keyup;
-		event.data1 = KEY_FIRE;
-		event.data2 = -1;
-		event.data3 = -1;
-
-		D_PostEvent (&event);
-	}
+  oldjoystick = joystick;
 }
 
 void I_StartTic (void)

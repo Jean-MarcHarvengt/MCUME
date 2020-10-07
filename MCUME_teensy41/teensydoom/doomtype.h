@@ -69,14 +69,14 @@
 typedef bool boolean;
 
 #else
-
+#ifndef BOOLDEFINED
 typedef enum 
 {
     false	= 0,
     true	= 1,
 	undef	= 0xFFFFFFFF
 } boolean;
-
+#endif
 #endif
 
 typedef uint8_t byte;
