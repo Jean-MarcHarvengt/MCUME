@@ -4,6 +4,9 @@
 </p>
 
 # News
+October 2020: DOOM ported to the Teensy4.1 (for VGA and LCD displays)<br>
+No sound yet but with USB keyboard support.<br>
+
 June 2020: Update of UAE (Amiga emulator) on Teensy4.1<br>
 Now with HDD support, better sound and 68020 emulation.<br>
 All for better compatibility...<br>
@@ -74,18 +77,21 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Zx81        | X | X | X | X | X | X | X |
-| Zx spectrum | X | X | X | X | X | X | X |
-| Atari 800   | X | X | X | X | X | X | X |
-| C64         | X | X | X | X | X | X | X |
-| Atari 520ST | - | full speed! | X | X | - | - | slow |
-| 8086 XT PC  | - | full speed! | X | X | X | - | slow |
-| MSX1/2      | - | full speed! | X | X | X | - | - |
-| Amiga       | - | - | exp only! | full speed! | 640x480 | - | - |
+| Zx81        | X | X | X | X | X | X |
+| Zx spectrum | X | X | X | X | X | X |
+| Atari 800   | X | X | X | X | X | X |
+| C64         | X | X | X | X | X | X |
+| Atari 520ST | - | full speed! | X | X | - | slow |
+| 8086 XT PC  | - | full speed! | X | X | - | slow |
+| MSX1/2      | - | full speed! | X | X | - | - |
+| Amiga       | - | - | exp only! | 640x480 | - | - |
+| Doom        | - | - | - | x | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
+For Teensy 4.1 with PSRAM try compiling for faster code (unless it complains at compilation).<br> 
+Doom for example only works if compiled for faster code!
 
 Game console systems supported and status on various MCU platforms<br>
 
@@ -145,7 +151,8 @@ Game console systems supported and status on various MCU platforms<br>
   - "sms"  => for Sega Master System/Game Gear, put your ".sms"/"gg" files here  
   - "gen"  => for Sega Genesis/Megadrive, put your ".smd"/"bin" files here 
   - "msx"  => for MSX roms, put your ".rom"/".msx2" files here. MSX system roms in msx/roms 
-  - "amiga"  => for Amiga floppies, put your ".adf" and ".hdf" files here. 
+  - "amiga"  => for Amiga floppies, put your ".adf" and ".hdf" files here.
+  - "data"  => for Doom, put your WAD files there (doom1,doom2,plutonia or tnt)
   
 -- insert the card into the SD slot
 
@@ -250,6 +257,7 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu), Bernd Schmidt (UAE) and  Mike Chambers for his 8086 Arduino project!
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu), Bernd Schmidt (UAE) and  Mike Chambers for his 8086 Arduino project!<br>
+Doom is based on the ST32 port of chocolate doom so thanks for initial porting effort.<br>
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
