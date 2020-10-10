@@ -78,7 +78,7 @@ Now ported to much more MCUs! <br>
 Computer systems supported and status on various MCU platforms<br>
 
 | System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- |
 | Zx81        | X | X | X | X | X | X |
 | Zx spectrum | X | X | X | X | X | X |
 | Atari 800   | X | X | X | X | X | X |
