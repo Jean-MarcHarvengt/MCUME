@@ -90,12 +90,13 @@ angle_t			clipangle;
 // maps the visible view angles to screen X coordinates,
 // flattening the arc to a flat projection plane.
 // There will be many angles mapped to the same X. 
-int			viewangletox[FINEANGLES/2];
+int * viewangletox = NULL;
 
 // The xtoviewangleangle[] table maps a screen pixel
 // to the lowest viewangle that maps back to x ranges
 // from clipangle to -clipangle.
-angle_t			xtoviewangle[SCREENWIDTH+1];
+angle_t * xtoviewangle = NULL;
+
 
 lighttable_t*		scalelight[LIGHTLEVELS][MAXLIGHTSCALE];
 lighttable_t*		scalelightfixed[MAXLIGHTSCALE];
@@ -504,6 +505,8 @@ fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
 //
 void R_InitTables (void)
 {
+
+  
     // UNUSED: now getting from tables.c
 #if 0
     int		i;
@@ -544,6 +547,9 @@ void R_InitTextureMapping (void)
     int			t;
     fixed_t		focallength;
     
+    if (xtoviewangle == NULL) xtoviewangle = emu_Malloc(sizeof(angle_t)*(SCREENWIDTH+1));
+    if (viewangletox == NULL) viewangletox = emu_Malloc(sizeof(int)*(FINEANGLES/2));
+  
     // Use tangent table to generate viewangletox:
     //  viewangletox will give the next greatest x
     //  after the view angle.

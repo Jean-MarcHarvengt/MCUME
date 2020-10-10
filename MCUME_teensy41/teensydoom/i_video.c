@@ -196,7 +196,26 @@ void I_GetEvent (void)
     event.data1 = KEY_ENTER;
     D_PostEvent (&event);       
   } 
-
+  if ( (!(oldjoystick & 0x40)) && (joystick & 0x40) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_USE;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x40)) && (oldjoystick & 0x40) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_USE;
+    D_PostEvent (&event);       
+  } 
+  if ( (!(oldjoystick & 0x80)) && (joystick & 0x80) ) {
+    event.type = ev_keydown;
+    event.data1 = KEY_TAB;
+    D_PostEvent (&event);     
+  }
+  else if ( (!(joystick & 0x80)) && (oldjoystick & 0x80) ) {
+    event.type = ev_keyup;
+    event.data1 = KEY_TAB;
+    D_PostEvent (&event);       
+  } 
   oldjoystick = joystick;
 }
 

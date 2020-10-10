@@ -22,6 +22,7 @@ static int skip=0;
 static unsigned long long mscount=0;
 volatile unsigned int systime;
 int joystick=0;
+static int usbjoystick=0;
 
 static void vblCount() {
   if (vbl) {
@@ -137,18 +138,21 @@ void loop(void)
     if (action == ACTION_RUNTFT) {
       toggleMenu(false);
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-      tft.startDMA(); 
+      tft.startDMA();
       char filepath[80];
       strcpy(filepath, ROMSDIR);
       strcat(filepath, "/");
       strcat(filepath, wad);
       D_DoomMain(filepath);  
       Serial.println("init end");      
+      usbjoystick=0;
+      emu_start();
     }           
     delay(20);
   } 
   else { 
-    int k=emu_ReadKeys();
+    int k = usbjoystick;
+    if (k==0) k = emu_ReadKeys();
     joystick = 0;
     if ( (k & MASK_JOY1_DOWN) || (k & MASK_JOY2_DOWN) )  joystick|=0x02;
     if ( (k & MASK_JOY1_UP) || (k & MASK_JOY2_UP) )   joystick|=0x01;
@@ -156,6 +160,8 @@ void loop(void)
     if ( (k & MASK_JOY1_RIGHT) || (k & MASK_JOY2_RIGHT) )  joystick|=0x08;
     if ( (k & MASK_JOY1_BTN) || (k & MASK_JOY2_BTN) ) joystick|=0x10; 
     if ( (k & MASK_KEY_USER1) ) joystick|=0x20;
+    if ( (k & MASK_KEY_USER2) ) joystick|=0x40;
+    if ( (k & MASK_KEY_USER3) ) joystick|=0x80;
     D_DoomLoop();
     emu_DrawVsync(); 
   } 
@@ -163,9 +169,25 @@ void loop(void)
 
 
 void emu_KeyboardOnDown(int keymodifer, int key) {
+  if (key == 218) usbjoystick|=MASK_JOY1_UP;         // UP
+  else if (key == 217) usbjoystick|=MASK_JOY1_DOWN;  // DOWN
+  else if (key == 216) usbjoystick|=MASK_JOY1_LEFT;  // LEFT
+  else if (key == 215) usbjoystick|=MASK_JOY1_RIGHT; // RIGHT
+  else if (key == 102) usbjoystick|=MASK_JOY1_BTN;   // FIRE
+  else if (key == 10) usbjoystick|=MASK_KEY_USER1;   // RETURN  
+  else if (key == 32) usbjoystick|=MASK_KEY_USER2;  // USE  
+  else if (key == 9) usbjoystick|=MASK_KEY_USER3;    // TAB  
 }
 
 void emu_KeyboardOnUp(int keymodifer, int key) {
+  if (key == 218) usbjoystick&=~MASK_JOY1_UP;         // UP
+  else if (key == 217) usbjoystick&=~MASK_JOY1_DOWN;  // DOWN
+  else if (key == 216) usbjoystick&=~MASK_JOY1_LEFT;  // LEFT
+  else if (key == 215) usbjoystick&=~MASK_JOY1_RIGHT; // RIGHT
+  else if (key == 102) usbjoystick&=~MASK_JOY1_BTN;   // FIRE
+  else if (key == 10) usbjoystick&=~MASK_KEY_USER1;   // RETURN
+  else if (key == 32) usbjoystick&=~MASK_KEY_USER2;   // USE    
+  else if (key == 9) usbjoystick&=~MASK_KEY_USER3;    // TAB  
 }
 
 

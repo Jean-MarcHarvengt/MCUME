@@ -3,7 +3,7 @@
 
 #include "platform_config.h"
 
-#define CUSTOM_SND  1
+//#define CUSTOM_SND  1
 //#define TIMER_REND  1
 
 #define EXTRA_HEAP  0x10

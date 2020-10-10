@@ -1153,15 +1153,14 @@ FRESULT f_read (FIL* fp, void* buff, unsigned int  btr, unsigned int * br)
     int nr = fds[i].f.read(buff, btr);
     //emu_printf("fread");
     //emu_printi(btr);  
-    emu_printi(nr);    
+    //emu_printi(nr);    
     *br = nr;
     if (nr <= 0) 
       return(FR_DISK_ERR);
     else
       return(FR_OK);
   }
-  //else {
-  //}
+
 
   unsigned char buffer[256];
   
@@ -1185,8 +1184,8 @@ FRESULT f_read (FIL* fp, void* buff, unsigned int  btr, unsigned int * br)
       }
     }    
     *br = byteread;
-     emu_printi(byteread);         
-     if (byteread <= 0) 
+    //emu_printi(byteread);         
+    if (byteread <= 0) 
       return(FR_DISK_ERR);
     else
       return(FR_OK);
