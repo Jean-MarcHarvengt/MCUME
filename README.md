@@ -5,8 +5,12 @@
 
 # News
 October 2020: DOOM ported to the Teensy4.1 (for VGA and LCD displays)<br>
-No sound yet but with USB keyboard support.<br>
-
+No sound yet but with USB keyboard support (see VGA prototype PCB below).<br>
+<br>
+<p align="center">
+<img src="/images/T41VGA.jpg" width="640" />  
+<br>
+  
 June 2020: Update of UAE (Amiga emulator) on Teensy4.1<br>
 Now with HDD support, better sound and 68020 emulation.<br>
 All for better compatibility...<br>
