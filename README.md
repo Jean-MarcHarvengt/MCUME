@@ -86,7 +86,7 @@ Computer systems supported and status on various MCU platforms<br>
 | Atari 520ST | - | full speed! | X | X | - | slow |
 | 8086 XT PC  | - | full speed! | X | X | - | slow |
 | MSX1/2      | - | full speed! | X | X | - | - |
-| Amiga       | - | - | exp only! | 640x480 | - | - |
+| Amiga       | - | - | exp only! | X (640x480!) | - | - |
 | Doom        | - | - | - | x | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
