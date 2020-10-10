@@ -6,6 +6,7 @@
 # News
 October 2020: DOOM ported to the Teensy4.1 (for VGA and LCD displays)<br>
 No sound yet but with USB keyboard support (see VGA prototype PCB below).<br>
+https://www.youtube.com/watch?v=adYwnctiKsg
 <br>
 <p align="center">
 <img src="/images/T41VGA.jpg" width="640" />  
