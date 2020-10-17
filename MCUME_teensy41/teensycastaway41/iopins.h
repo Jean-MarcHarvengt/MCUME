@@ -44,9 +44,9 @@
 
 // Second joystick
 #define PIN_JOY1_BTN     34
-#define PIN_JOY1_1       38 // UP
+#define PIN_JOY1_1       35 // UP
 #define PIN_JOY1_2       36 // DOWN
-#define PIN_JOY1_3       35 // RIGHT
+#define PIN_JOY1_3       38 // RIGHT
 #define PIN_JOY1_4       37 // LEFT
 
 #else
