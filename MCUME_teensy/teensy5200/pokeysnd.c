@@ -362,7 +362,7 @@ void POKEYSND_SetMzQuality(int quality)	/* specially for win32, perhaps not need
 	mz_quality = quality;
 }
 
-void POKEYSND_Process(void *sndbuffer, int sndn)
+void SND_Process(void *sndbuffer, int sndn)
 {
 	POKEYSND_Process_ptr(sndbuffer, sndn);
 #if defined(PBI_XLD) || defined (VOICEBOX)

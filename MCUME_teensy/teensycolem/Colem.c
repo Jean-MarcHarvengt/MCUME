@@ -201,7 +201,7 @@ int coc_Start(char * Cartridge)
   snd_Reset();
 #endif  
 #ifdef SOUND_PRESENT
-  snd_Open(22050, 2, 4096/*16384*/,(void*)snd_Mixer);
+  snd_Open(44100/*22050*/, 2, 4096/*16384*/,(void*)snd_Mixer);
 #endif
 
   /* Initialize VDP registers */

@@ -57,7 +57,11 @@ struct uae_prefs currprefs = {
 /* gfx_width */ WIN_W,
 /* gfx_height */ WIN_H,
 #ifdef HAS_T4_VGA
+#ifdef HIRES
 /* gfx_lores */ 0,
+#else
+/* gfx_lores */ 1,
+#endif
 #else
 /* gfx_lores */ 1,
 #endif

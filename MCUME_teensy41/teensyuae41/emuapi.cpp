@@ -7,10 +7,10 @@ extern "C" {
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
-const vga_pixel deflogo[] = {
+const int16_t deflogo[] = {
   0,0
 };
-static const vga_pixel * logo = deflogo;
+static const int16_t * logo = deflogo;
 #else
 #include "tft_t_dma.h"
 const uint16_t deflogo[] = {

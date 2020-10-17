@@ -68,9 +68,7 @@ static Channel chan[6] = {
 volatile bool playing = false;
 
 
-
-
-PROGMEM static void snd_Reset(void)
+static void snd_Reset(void)
 {
 #ifndef CUSTOM_SND 
   chan[0].vol = 0;
@@ -95,17 +93,17 @@ void SND_Process(void *sndbuffer, int sndn);
 }
 #endif
 
-PROGMEM static void snd_Mixer(short *  stream, int len )
+
+FASTRUN void AudioPlaySystem::snd_Mixer(short *  stream, int len )
 {
   if (playing) 
   {
-#ifdef CUSTOM_SND 
+#ifdef CUSTOM_SND
     SND_Process((void*)stream, len);
 #else
     int i;
-    long s;  
-    len = len >> 1; 
-     
+    long s;     
+    len = len >> 1;   
     short v0=chan[0].vol;
     short v1=chan[1].vol;
     short v2=chan[2].vol;
@@ -133,57 +131,59 @@ PROGMEM static void snd_Mixer(short *  stream, int len )
   }
 }
   
-PROGMEM void AudioPlaySystem::begin(void)
+void AudioPlaySystem::begin(void)
 {
-  //emu_printf("AudioPlaySystem constructor");
-	this->reset();
-	setSampleParameters(CLOCKFREQ, SAMPLERATE);
+  this->reset();
 }
 
-PROGMEM void AudioPlaySystem::start(void)
+void AudioPlaySystem::start(void)
 {
-  //emu_printf("allocating sound buf");
+#ifndef HAS_T4_VGA
+  AudioMemory(16);
+#endif  
   playing = true;  
 }
 
-PROGMEM void AudioPlaySystem::setSampleParameters(float clockfreq, float samplerate) {
+void AudioPlaySystem::setSampleParameters(float clockfreq, float samplerate) {
 }
 
-PROGMEM void AudioPlaySystem::reset(void)
+void AudioPlaySystem::reset(void)
 {
-	snd_Reset();
+  snd_Reset();
 }
 
-PROGMEM void AudioPlaySystem::stop(void)
+void AudioPlaySystem::stop(void)
 {
-	//__disable_irq();
-	playing = false;	
-	//__enable_irq();
+  //__disable_irq();
+  playing = false;  
+  //__enable_irq();
 }
 
-PROGMEM bool AudioPlaySystem::isPlaying(void) 
+bool AudioPlaySystem::isPlaying(void) 
 { 
   return playing; 
 }
 
-PROGMEM void AudioPlaySystem::update(void) {
-	audio_block_t *block;
+#ifndef HAS_T4_VGA
+void AudioPlaySystem::update(void) {
+  audio_block_t *block;
 
-	// only update if we're playing
-	if (!playing) return;
+  // only update if we're playing
+  if (!playing) return;
 
-	// allocate the audio blocks to transmit
-	block = allocate();
-	if (block == NULL) return;
+  // allocate the audio blocks to transmit
+  block = allocate();
+  if (block == NULL) return;
 
   snd_Mixer((short*)block->data,AUDIO_BLOCK_SAMPLES);
   //memset( (void*)block->data, 0, AUDIO_BLOCK_SAMPLES*2);
 
-	transmit(block);
-	release(block);
+  transmit(block);
+  release(block);
 }
+#endif
 
-PROGMEM void AudioPlaySystem::sound(int C, int F, int V) {
+void AudioPlaySystem::sound(int C, int F, int V) {
 #ifndef CUSTOM_SND 
   if (C < 6) {
     chan[C].vol = V;
@@ -192,7 +192,6 @@ PROGMEM void AudioPlaySystem::sound(int C, int F, int V) {
 #endif  
 }
 
-PROGMEM void AudioPlaySystem::step(void) {
+void AudioPlaySystem::step(void) {
 }
 #endif
-

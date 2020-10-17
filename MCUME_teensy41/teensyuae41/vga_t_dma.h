@@ -15,9 +15,13 @@
 
 
 
-
-#define TFT_WIDTH      640 //320 
-#define TFT_REALWIDTH  640 //320
+#ifdef HIRES
+#define TFT_WIDTH      640
+#define TFT_REALWIDTH  640
+#else
+#define TFT_WIDTH      320 
+#define TFT_REALWIDTH  320
+#endif
 
 #define TFT_HEIGHT     240
 #define TFT_REALHEIGHT 240
@@ -44,8 +48,8 @@ class TFT_T_DMA: public VGA_T4
     void fillScreenNoDma(vga_pixel color) { clear(color); }
     void drawTextNoDma(int16_t x, int16_t y, const char * text, vga_pixel fgcolor, vga_pixel bgcolor, bool doublesize) { drawText(x,y,text,fgcolor,bgcolor,doublesize); }
     void drawRectNoDma(int16_t x, int16_t y, int16_t w, int16_t h, vga_pixel color) { drawRect(x, y, w, h, color); }
-    void drawSpriteNoDma(int16_t x, int16_t y, const vga_pixel *bitmap) { drawSprite(x, y, bitmap); }
-    void drawSpriteNoDma(int16_t x, int16_t y, const vga_pixel *bitmap, uint16_t croparx, uint16_t cropary, uint16_t croparw, uint16_t croparh) { drawSprite(x, y, bitmap, croparx, cropary, croparw, croparh); }
+    void drawSpriteNoDma(int16_t x, int16_t y, const int16_t *bitmap) { drawSprite(x, y, bitmap); }
+    void drawSpriteNoDma(int16_t x, int16_t y, const int16_t *bitmap, uint16_t croparx, uint16_t cropary, uint16_t croparw, uint16_t croparh) { drawSprite(x, y, bitmap, croparx, cropary, croparw, croparh); }
 };
 
 

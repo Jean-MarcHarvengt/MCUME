@@ -275,31 +275,33 @@ void loop(void)
   }  
 }
 
-
 #ifdef HAS_SND
 
-#include <Audio.h>
 #include "AudioPlaySystem.h"
 
 AudioPlaySystem mymixer;
+#ifndef HAS_T4_VGA
+#include <Audio.h>
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-#ifdef HAS_T4_VGA
+//AudioOutputMQS  mqs;
+//AudioConnection patchCord9(mymixer, 0, mqs, 1);
 AudioOutputI2S  i2s1;
 AudioConnection patchCord8(mymixer, 0, i2s1, 0);
 AudioConnection patchCord9(mymixer, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;
 #else
-AudioOutputMQS  mqs;
-AudioConnection patchCord9(mymixer, 0, mqs, 1);
-#endif
-#else
 AudioOutputAnalog dac1;
 AudioConnection   patchCord1(mymixer, dac1);
+#endif
 #endif
 
 void emu_sndInit() {
   Serial.println("sound init");  
-  AudioMemory(16);
+#ifdef HAS_T4_VGA
+  tft.begin_audio(256, mymixer.snd_Mixer);  
+ // sgtl5000_1.enable();
+ // sgtl5000_1.volume(0.6);
+#endif  
   mymixer.start();
 }
 
