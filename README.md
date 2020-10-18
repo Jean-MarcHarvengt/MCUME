@@ -5,7 +5,7 @@
 
 # News
 Mid October 2020: Most emulators are now supporing VGA with sound on the Teensy4.1<br>
-Experimental I2S sound driver has been added to the VGA_t4 library.<br><br>
+Experimental I2S sound driver has been added to the VGA_t4 library with minimal DMA disturbances.<br><br>
 If you are experimenting issues (e.g. image flashing out, crash after few minutes):
 - try compiling for smallest code iso faster
 - activate/Deactivate USE_VIDEO_PLL option in vga_t4.cpp
