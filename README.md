@@ -10,7 +10,7 @@ If you are experimenting issues (e.g. image flashing out, crash after few minute
 - try compiling for smallest code iso faster
 - activate/Deactivate USE_VIDEO_PLL option in vga_t4.cpp
 <br>
-e.g.:<br>
+e.g.:
 - ST emu: compile for "smallest code" and USE_VIDEO_PLL
 - Amiga emu: compile for "smallest code" and don't use USE_VIDEO_PLL (to avoid video artefact, sound distorsion still has to be fixed)
 - Doom: compile for "faster" and USE_VIDEO_PLL
