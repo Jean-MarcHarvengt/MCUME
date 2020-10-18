@@ -4,6 +4,19 @@
 </p>
 
 # News
+Mid October 2020: Most emulators are now supporing VGA with sound on the Teensy4.1<br>
+Experimental I2S sound driver has been added to the VGA_t4 library.<br>
+If you are experimenting issues (e.g. image flashing out, crash after few minutes):
+- try compiling for smallest code iso faster
+- activate/Deactivate USE_VIDEO_PLL option in vga_t4.cpp
+e.g. <br>
+ST emu: compile for "smallest code" and USE_VIDEO_PLL
+Amiga emu: compile for "smallest code" and don't use USE_VIDEO_PLL (to avoid video artefact, sound distorsion still has to be fixed)
+Doom: compile for "faster" nd USE_VIDEO_PLL
+
+Atari ST emu has now better sound support!<br>
+<br>
+
 October 2020: DOOM ported to the Teensy4.1 (for VGA and LCD displays)<br>
 No sound yet but with USB keyboard support (see VGA prototype PCB below).<br>
 https://www.youtube.com/watch?v=adYwnctiKsg
