@@ -1,13 +1,13 @@
 #ifndef DCASTAWAY_SOUND_H
 #define DCASTAWAY_SOUND_H
 
-#include "dcastaway.h"
 #ifndef NO_SOUND
-
 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+
+//#include "config.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -17,11 +17,11 @@
 #define FALSE 0
 #endif
 
-#define MUSIC_VOLUME 64
+#define MUSIC_VOLUME 80
 #ifdef DINGOO
 #define SOUND_FREQ 16000
 #else
-#define SOUND_FREQ 22050 //22050 //11025 //22050
+#define SOUND_FREQ 22050
 #endif
 
 #define SOUND_BUFFER_SIZE 1024
@@ -37,7 +37,7 @@ enum
   FREQ_44Khz
 };
 
-#define MIXBUFFER_SIZE    1024 //8192
+#define MIXBUFFER_SIZE    8192
 #define SCREEN_START_CYCLE  96          /* Cycle first normal pixel appears on */
 #define SCANLINES_PER_FRAME 313         /* Number of scan lines per frame */
 #define CYCLES_PER_LINE     512         /* Cycles per horiztonal line scan */
@@ -97,11 +97,10 @@ static __inline__ int Misc_LimitInt(int Value, int MinRange, int MaxRange)
 #define Memory_Clear(A,B) (memset(A,0,B))
 
 
-#define Audio_Lock()
-#define Audio_Unlock()
-
 void Sound_UpdateFromCallBack16(short *pBuffer, int len);
 
+#define Audio_Lock()
+#define Audio_Unlock()
 void Sound_Update_VBL(void);
 void Sound_UpdateFromAudioCallBack(void);
 void Sound_Init(void);
