@@ -351,7 +351,7 @@ void uae_Input(int bClick) {
 
     buttonstate[0] = 0;
     buttonstate[2] = 0;
-    if (k & MASK_JOY2_BTN) buttonstate[0] = 1;             
+    if ( (k & MASK_JOY1_BTN)|| ( k & MASK_JOY2_BTN))  buttonstate[0] = 1;             
     if (k & MASK_KEY_USER1) buttonstate[2] = 1;             
   }
 }
@@ -420,11 +420,11 @@ void read_joystick(int nr, unsigned int *dir, int *button)
 
   if (!isMouse)
   {
-    if (k & MASK_JOY2_DOWN)  bot=1;
-    if (k & MASK_JOY2_UP)    top=1;
-    if (k & MASK_JOY2_LEFT)  left=1;
-    if (k & MASK_JOY2_RIGHT) right=1;
-    if (k & MASK_JOY2_BTN) *button |=0xFF;
+    if ((k & MASK_JOY2_DOWN) || ( k & MASK_JOY1_DOWN))  bot=1;
+    if ((k & MASK_JOY2_UP) || ( k & MASK_JOY1_UP))   top=1;
+    if ((k & MASK_JOY2_LEFT) || ( k & MASK_JOY1_LEFT))  left=1;
+    if ((k & MASK_JOY2_RIGHT) || ( k & MASK_JOY1_RIGHT)) right=1;
+    if ((k & MASK_JOY2_BTN) || ( k & MASK_JOY1_BTN)) *button |=0xFF;
 
     if (left) top = !top;
     if (right) bot = !bot;

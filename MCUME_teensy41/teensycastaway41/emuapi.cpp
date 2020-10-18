@@ -389,35 +389,17 @@ int emu_ReadKeys(void)
   uint16_t j2 = 0;
   
   // Second joystick
-#if INVY
-#ifdef PIN_JOY1_1
-  if ( digitalRead(PIN_JOY1_1) == LOW ) j2 |= MASK_JOY2_DOWN;
-#endif
-#ifdef PIN_JOY1_2
-  if ( digitalRead(PIN_JOY1_2) == LOW ) j2 |= MASK_JOY2_UP;
-#endif
-#else
 #ifdef PIN_JOY1_1
   if ( digitalRead(PIN_JOY1_1) == LOW ) j2 |= MASK_JOY2_UP;
 #endif
 #ifdef PIN_JOY1_2
   if ( digitalRead(PIN_JOY1_2) == LOW ) j2 |= MASK_JOY2_DOWN;
 #endif
-#endif
-#if INVX
-#ifdef PIN_JOY1_3
-  if ( digitalRead(PIN_JOY1_3) == LOW ) j2 |= MASK_JOY2_LEFT;
-#endif
-#ifdef PIN_JOY1_4
-  if ( digitalRead(PIN_JOY1_4) == LOW ) j2 |= MASK_JOY2_RIGHT;
-#endif
-#else
 #ifdef PIN_JOY1_3
   if ( digitalRead(PIN_JOY1_3) == LOW ) j2 |= MASK_JOY2_RIGHT;
 #endif
 #ifdef PIN_JOY1_4
   if ( digitalRead(PIN_JOY1_4) == LOW ) j2 |= MASK_JOY2_LEFT;
-#endif
 #endif
 #ifdef PIN_JOY1_BTN
   if ( digitalRead(PIN_JOY1_BTN) == LOW ) j2 |= MASK_JOY2_BTN;
@@ -820,7 +802,7 @@ int handleMenu(uint16_t bClick)
   int rx=0,ry=0,rw=0,rh=0;
   char c = 0; //captureTouchZone(menutouchareas, menutouchactions, &rx,&ry,&rw,&rh);
  
-  if ( (bClick & MASK_JOY2_BTN) || (c == MKEY_TFT) ) {     
+  if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_JOY1_BTN) || (c == MKEY_TFT) ) {     
       emu_printf(newpath);
 #ifdef USE_SDFS
       FILINFO entry;
@@ -851,7 +833,7 @@ int handleMenu(uint16_t bClick)
      //tft.drawRectNoDma( rx,ry,rw,rh, KEYBOARD_HIT_COLOR );
     }
   }
-  else if (bClick & MASK_JOY2_UP) {
+  else if ( (bClick & MASK_JOY2_UP) || (bClick & MASK_JOY1_UP) ) {
     if (curFile!=0) {
       menuRedraw=true;
       curFile--;
@@ -866,7 +848,7 @@ int handleMenu(uint16_t bClick)
       curFile--;
     }
   }  
-  else if (bClick & MASK_JOY2_DOWN)  {
+  else if ( (bClick & MASK_JOY2_DOWN) || (bClick & MASK_JOY1_DOWN) )  {
     if ((curFile<(nbFiles-1)) && (nbFiles)) {
       curFile++;
       menuRedraw=true;
