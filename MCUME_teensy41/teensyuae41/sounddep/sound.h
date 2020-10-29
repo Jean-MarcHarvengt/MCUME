@@ -7,26 +7,24 @@
   */
 
 
-#define sndbufsize 8192
+#define sndbufsize 4096 //1024 //8192 //2048 //2048
 
 extern int sound_fd;
 extern uae_u16 sndbuffer[];
-extern uae_u16 *sndbufpt;
+extern uae_u32 sndbufpt;
 
 
 static __inline__ void check_sound_buffers (void)
 {
-    if (sndbufpt - sndbuffer >= sndbufsize) {
+    if (sndbufpt >= sndbufsize) {
 	   //write (sound_fd, sndbuffer, sndbufsize);
-	   sndbufpt = sndbuffer;
+	   sndbufpt = 0;
     }
 }
 
 
-#define PUT_SOUND_BYTE(b) do { *(uae_u8 *)sndbufpt = b; sndbufpt = (uae_u16 *)(((uae_u8 *)sndbufpt) + 1); } while (0)
-#define PUT_SOUND_WORD(b) do { *(uae_u16 *)sndbufpt = b; sndbufpt = (uae_u16 *)(((uae_u8 *)sndbufpt) + 2); } while (0)
+#define PUT_SOUND_WORD(b) do { sndbuffer[sndbufpt] = b; sndbufpt +=1; } while (0)
 #define SOUND16_BASE_VAL 0
-#define SOUND8_BASE_VAL 128
 
 #define DEFAULT_SOUND_MAXB 8192
 #define DEFAULT_SOUND_MINB 8192

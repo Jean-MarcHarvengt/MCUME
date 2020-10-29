@@ -300,7 +300,9 @@ void uae_Input(int bClick) {
   if (bClick & MASK_KEY_USER2) {
     if (isMouse) isMouse = false;
     else isMouse = true;
+#ifndef HAS_T4_VGA   
     emu_setKeymap(0);
+#endif    
   }   
 
   // Diskswap in joystick mode
@@ -405,13 +407,6 @@ void emu_KeyboardOnUp(int keymodifer, int key) {
 
 extern "C" {
 
-uae_u16 sndbuffer[sndbufsize];
-uae_u16 * sndbufpt;
-static uae_u32 *sndbuffer32=(uae_u32 *)sndbuffer;
-static uae_u32 sndbufrdpt=sndbufsize/4;
-static uae_u32 sndinc=0x100; // default read increment
-#define sndbufrdmask ((sndbufsize/2-1)<<8)+0xff
-
 void read_joystick(int nr, unsigned int *dir, int *button)
 {
   int left = 0, right = 0, top = 0, bot = 0;
@@ -456,14 +451,124 @@ void flush_line(int y)
 
 void flush_block(int ystart,int ystop){}
 
+
+uae_u16 sndbuffer[sndbufsize];
+uae_u32 sndbufpt;
+static uae_u32 psndbufpt=0;
+
+static uae_u32 *sndbuffer32=(uae_u32 *)sndbuffer;
+static uae_u32 sndbufrdpt=(sndbufsize/2)<<8;
+static uae_u32 psndbufrdpt=(sndbufsize/2)<<8;
+static uae_u32 sndbufrdcnt=0;
+
+static uae_u32 sndinc=0x100; // default read increment
+#define sndbufrdmask ((sndbufsize/2-1)<<8)+0xff
+
+
+#define AVG_COUNT 16
+static int avgcounter = AVG_COUNT;
+static uae_u32 avgr=0;
+static uae_u32 avgw=0;
+static uae_u32 inc = (0x378<<8)/(0x2E0); //(wdelta<<8)/(0x2E0);
+
+// distance between read and write buffer
+static long incdelta=0;
+static long pdelta=0x1000;
+static bool pdown=true; 
+
+
 void flush_screen(int ystart,int ystop)
-{
-  uae_u32 loc = (sndbufpt-sndbuffer)/2;
-  int delta = (sndbufrdpt>>8)-loc;
-  if (delta < 0) delta = (sndbufrdpt>>8) + (sndbufsize/2)-loc;
-  sndinc=((sndbufsize/4)<<8)/delta;
-      
+{    
   emu_DrawVsync();
+
+  // #sample written per frame
+  int wdelta = 0;
+  uae_u32  wdpt = sndbufpt;
+  if (wdpt > psndbufpt) { 
+    wdelta = wdpt-psndbufpt;
+  }
+  else if (wdpt < psndbufpt) { 
+    wdelta = wdpt + sndbufsize - psndbufpt;
+  }
+  psndbufpt = wdpt;
+ 
+  // #sample read per frame
+  int rdelta = sndbufrdcnt;
+  sndbufrdcnt = 0;
+  /*
+  int rdelta = 0;
+  uae_u32  rdpt = sndbufrdpt>>8;
+  if (rdpt > psndbufrdpt) { 
+    rdelta = rdpt-psndbufrdpt;
+  }
+  else if (rdpt < psndbufrdpt) { 
+    rdelta = rdpt + sndbufsize/2 - psndbufrdpt;
+  }
+  psndbufrdpt = rdpt;
+  */
+  
+  inc = (wdelta<<8)/(0x2E0);
+ 
+  // Compute average R/W over AVG_COUNT frame
+  avgcounter--;
+  avgw += wdelta;
+  avgr += rdelta;
+  if (avgcounter == 0) {
+    wdelta = avgw/AVG_COUNT;
+    rdelta = avgr/AVG_COUNT;
+    avgw = 0;
+    avgr = 0;
+    avgcounter = AVG_COUNT;
+
+    //emu_printi(wdelta);
+    //emu_printi(rdelta);
+    //inc = (wdelta<<8)/(rdelta); 
+     
+    uae_u32 xwrpt = sndbufpt;
+    uae_u32 xrdpt = (sndbufrdpt>>8)*2;
+    uae_u32 delta = 0;
+    if (xrdpt > xwrpt) { 
+      delta = xrdpt-xwrpt;
+    }
+    else if (xrdpt < xwrpt) { 
+      delta = xrdpt + sndbufsize - xwrpt;
+    }
+
+    // we try to be keep read and write buffer at half distance of each other
+    bool down;
+    if (delta < pdelta)  {
+      down = true;
+      if (delta < (sndbufsize/2-0x100)) {
+        if ( (down) && (pdown) )
+          incdelta += 2; 
+        else
+          incdelta = 1;  
+      }
+    }
+    else if (delta > pdelta) {
+      down = false;
+      if (delta > (sndbufsize/2+0x100)) { 
+        if ( (!down) && (!pdown) )
+          incdelta -= 2; 
+        else
+          incdelta = -1;  
+      }
+    }
+    // Hard reset sound buffer?
+    if ( (delta < sndbufsize/4) || (delta > (sndbufsize-sndbufsize/4)) ) {
+      memset(sndbuffer,sizeof(sndbuffer),0);
+      sndbufpt = 0;
+      sndbufrdpt=(sndbufsize/2)<<8;
+      psndbufrdpt=(sndbufsize/2)<<8;
+      delta = sndbufsize/2;
+    }
+    pdelta = delta;
+    pdown = down; 
+    //emu_printi(delta);     
+  }
+
+  sndinc=inc+incdelta;
+
   yield();    
 }
 
@@ -494,6 +599,7 @@ void SND_Process(void *stream, int len) {
       uae_u32 s = sndbuffer32[sndbufrdpt>>8];  
       *data++ = (s >> 16);
       *data++ = (s & 0xffff);
+      sndbufrdcnt += 2;
       sndbufrdpt += sndinc;
       sndbufrdpt &= sndbufrdmask;
     }    
@@ -504,14 +610,12 @@ int init_sound (void)
 {
   currprefs.sound_maxbsiz = sndbufsize;
   sample_evtime = (long)maxhpos * maxvpos * 50 / currprefs.sound_freq;
-  init_sound_table16 ();
+  init_sound_table16();
   eventtab[ev_sample].handler = sample16_handler;
-  int i;
-  for (i=0;i<sndbufsize;i++) {
-    sndbuffer[i] = 0;
-  }
-  sndbufpt = sndbuffer;
-  sndbufrdpt=(sndbufsize/4)<<8;
+  memset(sndbuffer,sizeof(sndbuffer),0);
+  sndbufpt = 0;
+  sndbufrdpt=(sndbufsize/2)<<8;
+  psndbufrdpt=(sndbufsize/2)<<8;
   sound_available = 1;  
   return 1;
 }

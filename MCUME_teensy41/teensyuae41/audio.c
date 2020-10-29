@@ -36,16 +36,6 @@ void init_sound_table16(void)
 #endif
 }
 
-void init_sound_table8 (void)
-{
-#ifdef HAS_TABLE
-    int i,j;
-    
-    for (i = 0; i < 256; i++)
-	for (j = 0; j < 64; j++)
-	    sound_table[i][j] = (j * (uae_s8)i) / 256;
-#endif
-}
 
 void AUDxDAT(int nr, uae_u16 v) 
 {
@@ -122,32 +112,7 @@ void sample16_handler(void)
 #endif
 }
 
-void sample8_handler(void)
-{
-#ifndef DONT_WANT_SOUND
-    int nr, adk;
-    uae_u32 data = SOUND8_BASE_VAL;
-    
-    eventtab[ev_sample].evtime = cycles + sample_evtime;
-    eventtab[ev_sample].oldcycles = cycles;
-    
-    adk = adkcon;
-    
-#ifdef HAS_TABLE
-   if (!(adk & 0x11))
-	data += sound_table[audio_channel[0].current_sample][audio_channel[0].vol];
-    if (!(adk & 0x22))
-	data += sound_table[audio_channel[1].current_sample][audio_channel[1].vol];
-    if (!(adk & 0x44))
-	data += sound_table[audio_channel[2].current_sample][audio_channel[2].vol];
-    if (!(adk & 0x88))
-	data += sound_table[audio_channel[3].current_sample][audio_channel[3].vol];
-#endif
 
-    PUT_SOUND_BYTE (data);
-    check_sound_buffers ();
-#endif
-}
 
 #ifdef HAS_ULAW
 static uae_u8 int2ulaw(int ch)
