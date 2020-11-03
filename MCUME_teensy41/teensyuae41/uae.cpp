@@ -293,9 +293,12 @@ const int i2ckeyConv[] =
 
 
 void uae_Input(int bClick) {
+  buttonstate[0] = 0;
+  buttonstate[2] = 0;
+  
   hk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys(); 
-  
+   
   // Toggle keymap + mouse/joystick
   if (bClick & MASK_KEY_USER2) {
     if (isMouse) isMouse = false;
@@ -304,6 +307,29 @@ void uae_Input(int bClick) {
     emu_setKeymap(0);
 #endif    
   }   
+
+  // force joystick mode if mouse detected
+  if (emu_MouseDetected() ) isMouse = false;
+  int buts,dx,dy;
+  int mouseEvent = emu_GetMouse(&dx,&dy,&buts);
+  if (mouseEvent){
+    lastmx += dx;
+    if ( lastmx > 640 ) {
+      lastmx = 639;
+    } 
+    else if ( lastmx < 0 ) {
+      lastmx = 0;     
+    }
+    lastmy += dy;
+    if ( lastmy > 480 ) {
+      lastmy = 399;
+    } 
+    else if ( lastmy < 0 ) {
+      lastmy = 0;      
+    }
+    if (buts & 0x1) buttonstate[0] = 1; 
+    if (buts & 0x2) buttonstate[2] = 1; 
+  }
 
   // Diskswap in joystick mode
   if (bClick & MASK_KEY_USER1) {
@@ -351,8 +377,6 @@ void uae_Input(int bClick) {
       }
     } 
 
-    buttonstate[0] = 0;
-    buttonstate[2] = 0;
     if ( (k & MASK_JOY1_BTN)|| ( k & MASK_JOY2_BTN))  buttonstate[0] = 1;             
     if (k & MASK_KEY_USER1) buttonstate[2] = 1;             
   }
