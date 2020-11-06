@@ -9,6 +9,9 @@ November 2020: move to latest VGA_t4 library for stable HIRES support<br>
 - Amiga sound improved (freq drifting less audible)
 - Atari ST now support 640x200 and 640x400 (B/W) modes with double buffering!!!
 - Amiga now support 640x240 mode for cleaner workbench!!!
+https://www.youtube.com/watch?v=vex335vHc68
+https://www.youtube.com/watch?v=LKdcduVwwGQ
+
 
 Mid October 2020: Most emulators are now supporing VGA with sound on the Teensy4.1<br>
 Experimental I2S sound driver has been added to the VGA_t4 library with minimal DMA disturbances.<br><br>
