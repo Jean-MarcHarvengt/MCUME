@@ -4,16 +4,21 @@
 </p>
 
 # News
+November 2020: move to latest VGA_t4 library for stable HIRES support<br>
+- support USB mouse added to Amiga/Atari ST emulation
+- Amiga sound improved (freq drifting less audible)
+- Atari ST now support 640x200 and 640x400 (B/W) modes with double buffering!!!
+- Amiga now support 640x240 mode for cleaner workbench!!!
+
 Mid October 2020: Most emulators are now supporing VGA with sound on the Teensy4.1<br>
 Experimental I2S sound driver has been added to the VGA_t4 library with minimal DMA disturbances.<br><br>
 If you are experimenting issues (e.g. image flashing out, crash after few minutes):
 - try compiling for smallest code iso faster
-- activate/Deactivate USE_VIDEO_PLL option in vga_t4.cpp
 <br>
 e.g.:<br>
-- ST emu: compile for "smallest code" and USE_VIDEO_PLL<br>
-- Amiga emu: compile for "smallest code" and don't use USE_VIDEO_PLL (to avoid video artefact, sound distorsion still has to be fixed)<br>
-- Doom: compile for "faster" and USE_VIDEO_PLL<br>
+- ST emu: compile for "smallest code"<br>
+- Amiga emu: compile for "smallest code"<br>
+- Doom: compile for "faster"<br>
 
 Atari ST emu has now better sound support!<br>
 <br>
@@ -102,10 +107,10 @@ Computer systems supported and status on various MCU platforms<br>
 | Zx spectrum | X | X | X | X | X | X |
 | Atari 800   | X | X | X | X | X | X |
 | C64         | X | X | X | X | X | X |
-| Atari 520ST | - | full speed! | X | X | - | slow |
+| Atari 520ST | - | full speed! | X | X (640x400!) | - | slow |
 | 8086 XT PC  | - | full speed! | X | X | - | slow |
 | MSX1/2      | - | full speed! | X | X | - | - |
-| Amiga       | - | - | exp only! | X (640x480!) | - | - |
+| Amiga       | - | - | exp only! | X (640x240!) | - | - |
 | Doom        | - | - | - | x | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
@@ -228,6 +233,7 @@ Game console systems supported and status on various MCU platforms<br>
 - Castaway (AtariST):
   - floppy support
   - I2C custom keyboard support!
+  - USB mouse and keyboard support (T4.1)
   - with sound
   - full speed on Teensy4.0 only!!
 - 8086 (XT PC):
@@ -260,8 +266,10 @@ Game console systems supported and status on various MCU platforms<br>
   - Full speed with sound
   - up to 2MB chip RAM + 4MB expand fast RAM roms
   - HDF (Hard Disk) and adf support
+  - USB mouse and keyboard support (T4.1)
   - Improved compatibility (still no AGA support!)
-  
+- Doom:
+  - Full speed without sound
   
 # Running
 - ESP32 only: Select the emulator from the app selector screen and press FIRE (wait a bit that the SD get mounted)
