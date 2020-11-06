@@ -310,6 +310,7 @@ void uae_Input(int bClick) {
 
   // force joystick mode if mouse detected
   if (emu_MouseDetected() ) isMouse = false;
+  
   int buts,dx,dy;
   int mouseEvent = emu_GetMouse(&dx,&dy,&buts);
   if (mouseEvent){

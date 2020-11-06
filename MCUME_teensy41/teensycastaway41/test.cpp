@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "emuapi.h"
-//#include "tft_t_dma.h"
 
 #include "dcastaway.h"
 #include "st.h"
@@ -9,6 +8,9 @@
 #include "m68k_intrf.h"
 #include "iopins.h"
 
+#ifdef HAS_T4_VGA 
+#include "vga_t_dma.h"
+#endif
 
 #ifndef NO_SOUND  
 #include "sound.h"
@@ -42,21 +44,37 @@ extern unsigned char fdc_motor;
 
 #define XRES 320
 #define YRES 200
- 
+
+#ifdef HAS_T4_VGA 
+#define DOUBLE_BUFFERING 1
+
+#ifdef DOUBLE_BUFFERING
+#ifdef HIRES
+static vga_pixel line[XRES*2];
+#else
+static vga_pixel line[XRES];
+#endif
+#else
+#ifdef HIRES
+static unsigned short line[XRES*2];
+#else
 static unsigned short line[XRES];
+#endif
+#endif
+#else
+static unsigned short line[XRES];
+#endif
 
 #define PALMULT8(x)  ((x)<<5)
 #define RGBVAL16(r,g,b)  ( (((r>>3)&0x1f)<<11) | (((g>>2)&0x3f)<<5) | (((b>>3)&0x1f)<<0) )
 
-
-void Redraw16 ( int row, int vid_adr ) {
-
+#ifndef DOUBLE_BUFFERING
+void Redraw16 ( int row, int vid_adr ) 
+{
   static unsigned short palmap [ 16 ];
-  //Source address
   register unsigned short *line_i;
   line_i = (unsigned short *)(&membase[vid_adr]);
   register unsigned short *line_o= &line[0];
-  //Build paletter
   if (vid_flag) {
     unsigned char i, r, g, b;
     for (i = 0; i < 16; i++) {
@@ -79,16 +97,20 @@ void Redraw16 ( int row, int vid_adr ) {
       *line_o++ = palmap [ ind ]; 
     }
   }
+#ifdef HIRES
+  emu_DrawLine16(&line[0], XRES, YRES, row*2);  
+  emu_DrawLine16(&line[0], XRES, YRES, row*2+1);  
+#else
   emu_DrawLine16(&line[0], XRES, YRES, row);
+#endif  
 }
 
-void Redraw16_med ( int row, int vid_adr ) {
+void Redraw16_med ( int row, int vid_adr )
+{
   static unsigned short palmap [ 4 ];
-  //Source address
   register unsigned short *line_i;
   line_i = (unsigned short *)(&membase[vid_adr]);
   register unsigned short *line_o= &line[0];
-  //Build paletter
   if (vid_flag) {
     unsigned char i, r, g, b;
     for (i = 0; i < 4; i++) {
@@ -97,7 +119,6 @@ void Redraw16_med ( int row, int vid_adr ) {
       r = PALMULT8 ( ((vid_col[i] >> 8) & 0x7) );
       palmap [ i ] = RGBVAL16(r,g,b); 
     }
-    //palmap [ 0 ] = RGBVAL16(0xff,0xff,0xff); 
     vid_flag=0;
   }
   register int col;
@@ -107,12 +128,62 @@ void Redraw16_med ( int row, int vid_adr ) {
     for (bit=15;bit>=0;bit--) {
       int ind = (pl0 >> bit) & 0x1;
       ind += ((pl1 >> bit) & 0x1)<<1;
+#ifdef HIRES
+      *line_o++ = palmap [ ind ]; 
+#else
       if (bit & 0x01)
         *line_o++ = palmap [ ind ]; 
+#endif
     }
   }
+#ifdef HIRES
+  emu_DrawLine16(&line[0], XRES*2, YRES, row*2);  
+  emu_DrawLine16(&line[0], XRES*2, YRES, row*2+1);  
+#else
   emu_DrawLine16(&line[0], XRES, YRES, row);
+#endif  
 }
+
+void Redraw16_hi ( int row, int vid_adr ) 
+{
+  static unsigned short palmap [ 2 ];
+  register unsigned short *line_i;
+  line_i = (unsigned short *)(&membase[vid_adr]);
+  register unsigned short *line_o= &line[0];
+  if (vid_flag) {
+    palmap [ 0 ] = RGBVAL16(0xff,0xff,0xff); 
+    palmap [ 1 ] = RGBVAL16(0x00,0x00,0x00); 
+    vid_flag=0;
+  }
+  register int col;
+  register int bit;
+  for (col=0; col<40; col++) {
+    register unsigned short pl0=*line_i++;
+    for (bit=15;bit>=0;bit--) {
+      int ind = (pl0 >> bit) & 0x1;
+#ifdef HIRES
+      *line_o++ = palmap [ ind ]; 
+#endif
+    }
+  }
+#ifdef HIRES
+  emu_DrawLine16(&line[0], XRES*2, YRES, row*2);  
+#endif 
+  line_o= &line[0];   
+  for (col=0; col<40; col++) {
+    register unsigned short pl0=*line_i++;
+    for (bit=15;bit>=0;bit--) {
+      int ind = (pl0 >> bit) & 0x1;
+#ifdef HIRES
+      *line_o++ = palmap [ ind ]; 
+#endif
+    }
+  }
+#ifdef HIRES
+  emu_DrawLine16(&line[0], XRES*2, YRES, row*2+1);  
+#endif    
+}
+#endif
 
 
 static uint8 disk0[256];
@@ -140,6 +211,9 @@ void ast_Init(void)
 
 static int mouse_x = XRES/2;
 static int mouse_y = 100;
+static int prev_mouse_x = XRES/2;
+static int prev_mouse_y = 100;
+
 static int prev_key = 0; 
 static int prev_j = 0; 
 static int prev_mouseb = 0;
@@ -354,42 +428,62 @@ static void do_events(void)
 {
   int bClick = k & ~prev_k;
   prev_k = k;
-
+  int mouseb=0;
+  
   // Toggle mouse/joystick
   if (bClick & MASK_KEY_USER1) {
     if (isMouse) isMouse = false;
     else isMouse = true;
-  
   }
   // Toggle keymap
   if (bClick & MASK_KEY_USER2) {
+#ifndef HAS_T4_VGA     
     emu_setKeymap(0);
+#endif    
   }
-  
+
+  // force joystick mode if mouse detected
+  if (emu_MouseDetected() ) isMouse = false;
   
   if (hk != prev_hk) {
     prev_hk = hk;
     if ( (hk != 0) && (hk != prev_key) ) {
       prev_key = hk;
       IkbdKeyPress ( hk );
-      //if (hk == 68) {
-      //  if (isMouse) isMouse = false;
-      //  else isMouse = true;
-      //}
-      //IkbdLoop(); 
-      //Serial.print("press ");
-      //Serial.println(hk);
     }     
   }
   if ( (hk == 0) && (prev_key) ) {
       IkbdKeyRelease ( prev_key | 0x80 );
-      //IkbdLoop(); 
-      //Serial.print("release ");
-      //Serial.println(hk);
       prev_key = 0;
-  }           
+  }
 
-
+  int buts,dx,dy;
+  int mouseEvent = emu_GetMouse(&dx,&dy,&buts);
+  if (mouseEvent){
+    mouse_x += dx;
+#ifdef HIRES
+    if (vid_shiftmode==COL2) {
+      if ( mouse_x >= XRES*2 ) {
+        mouse_x = XRES*2-1;
+      }      
+    }
+    else  
+#endif    
+    if ( mouse_x >= XRES ) {
+      mouse_x = XRES-1;
+    } 
+    else if ( mouse_x < 0 ) {
+      mouse_x = 0;     
+    }
+    mouse_y += dy;
+    if ( mouse_y >= YRES ) {
+      mouse_y = YRES-1;
+    } 
+    else if ( mouse_y < 0 ) {
+      mouse_y = 0;      
+    }
+    if (buts & 0x1) mouseb=1;; 
+  }
 
 
   if (!isMouse)
@@ -417,51 +511,201 @@ static void do_events(void)
   }
   else {
     if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {
-      if ( mouse_x < XRES ) {
-        mouse_x += 1;
-        //Serial.print("r");
-        IkbdMouseMotion ( mouse_x, mouse_y );
-        IkbdLoop();
+      mouse_x += 1;
+#ifdef HIRES
+      if (vid_shiftmode==COL2) {
+        if ( mouse_x >= XRES*2 ) {
+          mouse_x = XRES*2-1;
+        }      
+      }
+      else  
+#endif    
+      if ( mouse_x >= XRES ) {
+        mouse_x = XRES-1;
       } 
     }
     else if (( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT)) {
-      if ( mouse_x > 1 ) {
-        mouse_x -= 1;
-        //Serial.print("l");
-        IkbdMouseMotion ( mouse_x, mouse_y );
-        IkbdLoop();        
+      mouse_x -= 1;       
+      if ( mouse_x < 0 ) {
+        mouse_x = 0;       
       }
     }
     else if (( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP)) {
-      if ( mouse_y > 1 ) {
-        mouse_y -= 1;
-        //Serial.print("u");
-        IkbdMouseMotion ( mouse_x, mouse_y );
-        IkbdLoop();        
+      mouse_y -= 1;       
+      if ( mouse_y < 0 ) {
+        mouse_y = 0;
       }
     }
     else if (( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN)) {
-      if ( mouse_y < YRES ) {
-        mouse_y += 1;
-        //Serial.print("d");
-        IkbdMouseMotion ( mouse_x, mouse_y );
-        IkbdLoop();        
-      }
+      mouse_y += 1;       
+      if ( mouse_y >= YRES ) {
+         mouse_y = YRES-1;
+     }
     }  
     
-    int mouseb=0;
     if (( k & MASK_JOY1_BTN) || ( k & MASK_JOY2_BTN)) {
       mouseb=1;
-    }
-    if ( (mouseb != prev_mouseb) ){
-      if (mouseb) IkbdMousePress(2);
-      else IkbdMouseRelease(2);
-      //Serial.println("btoggle");
-      IkbdLoop();
-      prev_mouseb = mouseb;  
-    }    
+    }  
   }
+
+  if ( (prev_mouse_x != mouse_x) | (prev_mouse_y != mouse_y) ) {
+      IkbdMouseMotion ( mouse_x, mouse_y );
+      IkbdLoop(); 
+      prev_mouse_x = mouse_x;
+      prev_mouse_y = mouse_y;
+  }
+  if ( (mouseb != prev_mouseb) ){
+    if (mouseb) IkbdMousePress(2);
+    else IkbdMouseRelease(2);
+    IkbdLoop();
+    prev_mouseb = mouseb;  
+  }    
 }     
+
+#ifdef DOUBLE_BUFFERING
+static unsigned short lines[200*80];
+#ifdef HAS_T4_VGA   
+static unsigned char palettes[200*16];
+#else
+static unsigned short palettes[200*16];
+#endif
+static unsigned char modes[200];
+
+static void renderScreen(void) {
+  register int col;
+  register int bit;  
+  int row;
+  for (row=0; row<200; row++) {
+    int mode= modes[row];
+    unsigned short * line_i = &lines[80*row];
+#ifdef HAS_T4_VGA 
+    vga_pixel * palmap = &palettes[row*16];
+    register vga_pixel *line_o= (unsigned char *)&line[0];    
+#else
+    unsigned short * palmap = &palettes[row*16];
+    register unsigned short *line_o= &line[0];    
+#endif    
+    if (mode==MONO) {
+#ifdef HIRES
+      for (col=0; col<40; col++) {
+        register unsigned short pl0=*line_i++;
+        for (bit=15;bit>=0;bit--) {
+          int ind = (pl0 >> bit) & 0x1;
+          *line_o++ = palmap [ ind ]; 
+        }
+      }
+      emu_DrawLine8((vga_pixel*)&line[0], XRES*2, YRES, row*2); 
+      line_o= (vga_pixel *)&line[0];   
+      for (col=0; col<40; col++) {
+        register unsigned short pl0=*line_i++;
+        for (bit=15;bit>=0;bit--) {
+          int ind = (pl0 >> bit) & 0x1;
+          *line_o++ = palmap [ ind ]; 
+        }
+      }
+      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES, row*2+1); 
+#endif
+    }
+    else if (mode==COL2) {        
+      for (col=0; col<40; col++) {
+        register unsigned short pl0=*line_i++,pl1=*line_i++;
+        for (bit=15;bit>=0;bit--) {
+          int ind = (pl0 >> bit) & 0x1;
+          ind += ((pl1 >> bit) & 0x1)<<1;
+#ifdef HIRES
+          *line_o++ = palmap [ ind ]; 
+#else
+          if (bit & 0x01)
+            *line_o++ = palmap [ ind ]; 
+#endif
+        }
+      }
+#ifdef HAS_T4_VGA 
+#ifdef HIRES
+      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES, row*2); 
+      emu_CopyLine(XRES*2, YRES, row*2, row*2+1);       
+#else
+      emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row);     
+#endif     
+#else
+      emu_DrawLine16(&line[0], XRES, YRES, row);
+#endif 
+    }
+    else { 
+      for (col=0; col<20; col++) {
+        register unsigned short pl0=*line_i++,pl1=*line_i++,pl2=*line_i++,pl3=*line_i++;
+        for (bit=15;bit>=0;bit--) {
+          int ind = (pl0 >> bit) & 0x1;
+          ind += ((pl1 >> bit) & 0x1)<<1;
+          ind += ((pl2 >> bit) & 0x1)<<2;
+          ind += ((pl3 >> bit) & 0x1)<<3;
+          *line_o++ = palmap [ ind ]; 
+        }
+      }
+#ifdef HAS_T4_VGA 
+#ifdef HIRES
+      emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row*2);
+      emu_CopyLine(XRES*2, YRES, row*2, row*2+1);       
+#else
+      emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row);     
+#endif     
+#else
+      emu_DrawLine16(&line[0], XRES, YRES, row);
+#endif 
+    }
+  }
+}
+
+
+static copyLine(int row, int vid_adr, int mode) 
+{
+#ifdef HAS_T4_VGA 
+  vga_pixel * palmap=&palettes[row*16];
+#else
+  unsigned short * palmap=&palettes[row*16];
+#endif  
+  unsigned char i, r, g, b;   
+  modes[row] = mode;
+  if (vid_flag) {
+    vid_flag=0;
+  } 
+  if (mode==MONO) { 
+ #ifdef HAS_T4_VGA 
+    palmap [ 0 ] = VGA_RGB(0xff,0xff,0xff); 
+    palmap [ 1 ] = VGA_RGB(0x00,0x00,0x00);      
+ #else
+    palmap [ 0 ] = RGBVAL16(0xff,0xff,0xff); 
+    palmap [ 1 ] = RGBVAL16(0x00,0x00,0x00);      
+ #endif    
+  }
+  else if (mode==COL2) { 
+    for (i = 0; i < 4; i++) {
+      b = PALMULT8 ( (vid_col[i] & 0x7) );
+      g = PALMULT8 ( ((vid_col[i] >> 4) & 0x7) );
+      r = PALMULT8 ( ((vid_col[i] >> 8) & 0x7) );
+ #ifdef HAS_T4_VGA 
+     palmap [ i ] = VGA_RGB(r,g,b); 
+ #else
+     palmap [ i ] = RGBVAL16(r,g,b); 
+ #endif
+    }     
+  }
+  else {    
+    for (i = 0; i < 16; i++) {
+      b = PALMULT8 ( (vid_col[i] & 0x7) );
+      g = PALMULT8 ( ((vid_col[i] >> 4) & 0x7) );
+      r = PALMULT8 ( ((vid_col[i] >> 8) & 0x7) );
+ #ifdef HAS_T4_VGA 
+     palmap [ i ] = VGA_RGB(r,g,b); 
+ #else
+     palmap [ i ] = RGBVAL16(r,g,b); 
+ #endif
+    }
+  }
+  memcpy(&lines[row*80], &membase[vid_adr], 160);
+}
+#endif
+
 
 void ast_Step(void)
 {
@@ -592,15 +836,21 @@ void ast_Step(void)
 
 
         if (emu_FrameSkip() == 0 ) {
-          //Update video address
+          //Update video address and draw screen line
           vid_adr=(vid_baseh<<16)+(vid_basem<<8)+(hbl-64)*160;
-        
-          //Draw screen line
-          if (vid_shiftmode==COL2) {
-            Redraw16_med ( hbl - 64, vid_adr );
+#ifdef DOUBLE_BUFFERING
+          copyLine(hbl - 64, vid_adr,vid_shiftmode); 
+#else          
+          
+          if (vid_shiftmode==MONO) {
+            Redraw16_hi( hbl - 64, vid_adr );
+          }  
+          else if (vid_shiftmode==COL2) {
+            Redraw16_med( hbl - 64, vid_adr );
           } else {
-            Redraw16 ( hbl - 64, vid_adr );
-          }          
+            Redraw16( hbl - 64, vid_adr );
+          }  
+#endif         
         }
 
         //Timer-A event count mode
@@ -629,8 +879,19 @@ void ast_Step(void)
       //Vertical blank?
       else if (hbl>=313)
       {
-        //delay(15);
+#ifdef DOUBLE_BUFFERING        
+        if (vid_shiftmode==MONO) {
+          emu_DrawWaitLine(325);
+        }  
+        else if (vid_shiftmode==COL2) {
+          emu_DrawWaitLine(360);
+        } else {
+          emu_DrawWaitLine(360);
+        }
+        renderScreen();        
+#else
         emu_DrawVsync();
+#endif        
         do_events();
 #ifndef NO_SOUND  
         Sound_Update_VBL();
@@ -726,8 +987,10 @@ int disk_Seek(int seek) {
 }
  
 
-void ast_Start(char * filename)
+void ast_Start(char * filename, int mode)
 {
+  if (mode) display_mode = MONO;
+  
   emu_printf("init started");
   strncpy (disk[0].name, filename, sizeof(disk[0].name));
   initialize_memmap();
@@ -744,6 +1007,7 @@ void ast_Start(char * filename)
   Sound_Init(); 
 #endif  
 #endif   
+
   HWReset(); /* CPU Reset */
 
   emu_printf("init done");

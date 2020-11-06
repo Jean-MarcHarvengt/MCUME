@@ -86,6 +86,24 @@ void emu_DrawVsync(void)
 #endif  
 }
 
+void emu_DrawWaitLine(int line)
+{
+  volatile boolean vb=vbl;
+  skip += 1;
+  skip &= VID_FRAME_SKIP;
+  if (!vgaMode) {
+#ifdef HAS_T4_VGA
+    tft.waitLine(line);
+#else
+    while (vbl==vb) {};
+#endif    
+  }
+#ifdef HAS_VGA
+  else {
+    while (vbl==vb) {};
+  }
+#endif  
+}
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
   if (!vgaMode) {
@@ -174,6 +192,13 @@ void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride)
 #endif  
 }
 
+void emu_CopyLine(int width, int height, int ysrc, int ydst)
+{
+#ifdef HAS_T4_VGA
+  tft.copyLine(width,height,ysrc,ydst);
+#endif  
+}
+
 int emu_FrameSkip(void)
 {
   return skip;
@@ -199,11 +224,15 @@ void * emu_LineBuffer(int line)
 void setup() {
   
 #ifdef HAS_T4_VGA
+#ifdef HIRES
+  tft.begin(VGA_MODE_640x480);
+#else
   tft.begin(VGA_MODE_320x240);
-//  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+#endif
 #else
   tft.begin();
-#endif  
+#endif
+
   emu_init(); 
 
   myTimer.begin(vblCount, 20000);  //to run every 20ms  
@@ -212,6 +241,7 @@ void setup() {
 // ****************************************************
 // the loop() method runs continuously
 // ****************************************************
+
 void loop(void) 
 {
   if (menuActive()) {
@@ -222,30 +252,17 @@ void loop(void)
       toggleMenu(false);
       vgaMode = false;
       emu_start();        
-      emu_Init(filename);
-      //digitalWrite(TFT_CS, 1);
-      //digitalWrite(SD_CS, 1);       
+      emu_Init(filename,0);     
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA();      
     }    
-    else if (action == ACTION_RUNVGA)  {   
-#ifdef HAS_VGA
+    else if (action == ACTION_RUNVGA)  {
       toggleMenu(false);
-      vgaMode = true;
-      VGA_frame_buffer = (uint8_t *)malloc((UVGA_YRES*(UVGA_XRES+UVGA_XRES_EXTRA))*sizeof(uint8_t));
-      uvga.set_static_framebuffer(VGA_frame_buffer);      
-      emu_start();
-      emu_Init(filename);       
-      int retvga = uvga.begin(&modeline);
-      Serial.println(retvga);
-      Serial.print("VGA init: ");  
-      Serial.println(retvga);              
-      uvga.clear(0x00);
+      vgaMode = false;
+      emu_start();        
+      emu_Init(filename,1);     
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-      // In VGA mode, we show the keyboard on TFT
-      toggleVirtualkeyboard(true); // keepOn
-      Serial.println("Starting");
-#endif                      
+      tft.startDMA();                    
     }         
     delay(20);
   }

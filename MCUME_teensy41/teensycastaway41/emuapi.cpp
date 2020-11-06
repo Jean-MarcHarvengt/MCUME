@@ -31,8 +31,13 @@ static const uint16_t * logo = deflogo;
 #ifdef HAS_USBKEY
 #include "USBHost_t36.h"  // Read this header first for key info
 USBHost myusb;
+//USBHub hub1(myusb);
 KeyboardController keyboard1(myusb);
+USBHIDParser hid1(myusb);
+MouseController mouse1(myusb);
 #endif
+static bool mouseDetected = false;
+static bool keyboardDetected = false;
 static uint8_t usbnavpad=0;
 
 #ifdef USE_SDFS
@@ -934,6 +939,151 @@ char * menuSelection(void)
   return (selection);  
 }
   
+int emu_GetMouse(int *x, int *y, int *buts) {
+#ifdef HAS_USBKEY
+  if (mouse1.available()) {
+    *buts = mouse1.getButtons();
+    *x = mouse1.getMouseX();
+    *y = mouse1.getMouseY();
+    mouse1.mouseDataClear();
+    mouseDetected = true;
+    return 1;
+  }   
+#endif
+  return 0;
+}
+
+#ifdef HAS_USBKEY
+void OnPress(auto key)
+{
+  keyboardDetected = true;
+  uint8_t keymodifier = keyboard1.getModifiers();
+
+  if(keymodifier == 0x40){
+    // ALTGR Key modifier FR Keyboard
+    switch (key) {
+#ifdef LAYOUT_FRENCH
+      case 233 : key = '~' ; break;
+      case  34 : key = '#' ; break;
+      case  39 : key = '{' ; break;
+      case  40 : key = '[' ; break;
+      case  45 : key = '|' ; break;
+      case 232 : key = '`' ; break;
+      case  95 : key = 92  ; break;
+      case 231 : key = '^' ; break;
+      case 224 : key = '@' ; break;
+      case  41 : key = ']' ; break;
+      case  61 : key = '}' ; break;
+#endif  
+#ifdef LAYOUT_FRENCH_BELGIAN
+      case  38 : key = '|' ; break; //1
+      case 233 : key = '@' ; break; //2
+      case  34 : key = '#' ; break; //3
+      case 167 : key = '^' ; break; //6
+      case 231 : key = '{' ; break; //9
+      case 224 : key = '}' ; break; //0
+      case  36 : key = ']' ; break; //$
+      case  61 : key = '~' ; break; //=
+#endif  
+    }
+  }  
+
+  if (menuActive())
+  {
+    switch (key)  
+    {
+      case 217:
+        usbnavpad |= MASK_JOY2_DOWN;
+        break;
+      case 218:
+        usbnavpad |= MASK_JOY2_UP;
+        break;
+      case 216:
+        usbnavpad |= MASK_JOY2_LEFT;
+        break;
+      case 215:
+        usbnavpad |= MASK_JOY2_RIGHT;
+        break;
+      case 10:
+        usbnavpad |= MASK_JOY2_BTN;
+        break;
+    }     
+  }
+  else
+  {
+    emu_KeyboardOnDown(keymodifier, key);
+  }
+}
+
+void OnRelease(int key)
+{
+  keyboardDetected = true;
+  uint8_t keymodifier = keyboard1.getModifiers();
+
+  if(keymodifier == 0x40){
+    // ALTGR Key modifier FR Keyboard
+    switch (key) {
+#ifdef LAYOUT_FRENCH
+      case 233 : key = '~' ; break;
+      case  34 : key = '#' ; break;
+      case  39 : key = '{' ; break;
+      case  40 : key = '[' ; break;
+      case  45 : key = '|' ; break;
+      case 232 : key = '`' ; break;
+      case  95 : key = 92  ; break;
+      case 231 : key = '^' ; break;
+      case 224 : key = '@' ; break;
+      case  41 : key = ']' ; break;
+      case  61 : key = '}' ; break;
+#endif  
+#ifdef LAYOUT_FRENCH_BELGIAN
+      case  38 : key = '|' ; break; //1
+      case 233 : key = '@' ; break; //2
+      case  34 : key = '#' ; break; //3
+      case 167 : key = '^' ; break; //6
+      case 231 : key = '{' ; break; //9
+      case 224 : key = '}' ; break; //0
+      case  36 : key = ']' ; break; //$
+      case  61 : key = '~' ; break; //=
+#endif  
+    }
+  }
+
+  if (menuActive())
+  {
+    switch (key)  
+    {
+      case 217:
+        usbnavpad &= ~MASK_JOY2_DOWN;
+        break;
+      case 218:
+        usbnavpad &= ~MASK_JOY2_UP;
+        break;
+      case 216:
+        usbnavpad &= ~MASK_JOY2_LEFT;
+        break;
+      case 215:
+        usbnavpad &= ~MASK_JOY2_RIGHT;
+        break;
+      case 10:
+        usbnavpad &= ~MASK_JOY2_BTN;
+        break;
+    }     
+  }
+  else
+  {
+    emu_KeyboardOnUp(keymodifier, key);  
+  }
+}
+#endif
+
+int emu_MouseDetected(void) {
+  return (mouseDetected?1:0);
+}
+
+int emu_KeyboardDetected(void) {
+  return (keyboardDetected?1:0); 
+}
 
 
 
@@ -1396,128 +1546,6 @@ void emu_FileTempWrite(int addr, unsigned char val)
   tempfile.write(&v, 1);
 #endif   
 }
-
-#ifdef HAS_USBKEY
-void OnPress(auto key)
-{
-  uint8_t keymodifier = keyboard1.getModifiers();
-
-  if(keymodifier == 0x40){
-    // ALTGR Key modifier FR Keyboard
-    switch (key) {
-#ifdef LAYOUT_FRENCH
-      case 233 : key = '~' ; break;
-      case  34 : key = '#' ; break;
-      case  39 : key = '{' ; break;
-      case  40 : key = '[' ; break;
-      case  45 : key = '|' ; break;
-      case 232 : key = '`' ; break;
-      case  95 : key = 92  ; break;
-      case 231 : key = '^' ; break;
-      case 224 : key = '@' ; break;
-      case  41 : key = ']' ; break;
-      case  61 : key = '}' ; break;
-#endif  
-#ifdef LAYOUT_FRENCH_BELGIAN
-      case  38 : key = '|' ; break; //1
-      case 233 : key = '@' ; break; //2
-      case  34 : key = '#' ; break; //3
-      case 167 : key = '^' ; break; //6
-      case 231 : key = '{' ; break; //9
-      case 224 : key = '}' ; break; //0
-      case  36 : key = ']' ; break; //$
-      case  61 : key = '~' ; break; //=
-#endif  
-    }
-  }  
-
-  if (menuActive())
-  {
-    switch (key)  
-    {
-      case 217:
-        usbnavpad |= MASK_JOY2_DOWN;
-        break;
-      case 218:
-        usbnavpad |= MASK_JOY2_UP;
-        break;
-      case 216:
-        usbnavpad |= MASK_JOY2_LEFT;
-        break;
-      case 215:
-        usbnavpad |= MASK_JOY2_RIGHT;
-        break;
-      case 10:
-        usbnavpad |= MASK_JOY2_BTN;
-        break;
-    }     
-  }
-  else
-  {
-    emu_KeyboardOnDown(keymodifier, key);
-  }
-}
-
-void OnRelease(int key)
-{
-  uint8_t keymodifier = keyboard1.getModifiers();
-
-  if(keymodifier == 0x40){
-    // ALTGR Key modifier FR Keyboard
-    switch (key) {
-#ifdef LAYOUT_FRENCH
-      case 233 : key = '~' ; break;
-      case  34 : key = '#' ; break;
-      case  39 : key = '{' ; break;
-      case  40 : key = '[' ; break;
-      case  45 : key = '|' ; break;
-      case 232 : key = '`' ; break;
-      case  95 : key = 92  ; break;
-      case 231 : key = '^' ; break;
-      case 224 : key = '@' ; break;
-      case  41 : key = ']' ; break;
-      case  61 : key = '}' ; break;
-#endif  
-#ifdef LAYOUT_FRENCH_BELGIAN
-      case  38 : key = '|' ; break; //1
-      case 233 : key = '@' ; break; //2
-      case  34 : key = '#' ; break; //3
-      case 167 : key = '^' ; break; //6
-      case 231 : key = '{' ; break; //9
-      case 224 : key = '}' ; break; //0
-      case  36 : key = ']' ; break; //$
-      case  61 : key = '~' ; break; //=
-#endif  
-    }
-  }
-
-  if (menuActive())
-  {
-    switch (key)  
-    {
-      case 217:
-        usbnavpad &= ~MASK_JOY2_DOWN;
-        break;
-      case 218:
-        usbnavpad &= ~MASK_JOY2_UP;
-        break;
-      case 216:
-        usbnavpad &= ~MASK_JOY2_LEFT;
-        break;
-      case 215:
-        usbnavpad &= ~MASK_JOY2_RIGHT;
-        break;
-      case 10:
-        usbnavpad &= ~MASK_JOY2_BTN;
-        break;
-    }     
-  }
-  else
-  {
-    emu_KeyboardOnUp(keymodifier, key);  
-  }
-}
-#endif
 
 void emu_init(void)
 {

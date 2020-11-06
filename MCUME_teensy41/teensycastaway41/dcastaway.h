@@ -50,7 +50,7 @@ typedef unsigned long   uint32;
  */
 #define MEMBASE 0x00000000L
 #ifndef MEMSIZE
-#define MEMSIZE 0x00100000L /* default memsize 1 Mb */
+#define MEMSIZE 0x00400000L /* default memsize 4 Mb */
 //#define MEMSIZE 0x00080000L /* default memsize 512 Kb */
 #endif
 #define CARBASE 0x00fa0000L

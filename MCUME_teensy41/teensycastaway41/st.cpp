@@ -616,4 +616,3 @@ PROGMEM uint32 DoIORL(uint32 address)
 {
 	return (((uint32)DoIORW(address))<<16)+DoIORW(address+2);
 }
-

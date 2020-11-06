@@ -16,12 +16,16 @@
 
 
 
+#ifdef HIRES
+#define TFT_WIDTH      640
+#define TFT_REALWIDTH  640
+#else
 #define TFT_WIDTH      320 
 #define TFT_REALWIDTH  320
+#endif
 
 #define TFT_HEIGHT     240
 #define TFT_REALHEIGHT 240
-
 
 
 #ifdef __cplusplus

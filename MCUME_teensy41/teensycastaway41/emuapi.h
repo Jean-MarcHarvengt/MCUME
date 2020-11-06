@@ -6,13 +6,13 @@
 #define CUSTOM_SND  1
 //#define TIMER_REND  1
 
-#define EXTRA_HEAP  0x10
+#define EXTRA_HEAP  0x10000
 
 // Title:     <                        >
 #define TITLE "   AtariST Emulator     "
 #define ROMSDIR "/st"
 
-#define emu_Init(ROM) {ast_Init(); ast_Start(ROM);}
+#define emu_Init(ROM,MODE) {ast_Init(); ast_Start(ROM,MODE);}
 #define emu_Step(x) {ast_Step();}
 #define emu_Input(x) {ast_Input(x);}
 
@@ -134,7 +134,9 @@ extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stri
 extern void emu_DrawLine(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line);
 extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line);
+extern void emu_CopyLine(int width, int height, int ysrc, int ydst);
 extern void emu_DrawVsync(void);
+extern void emu_DrawWaitLine(int line);
 extern int emu_FrameSkip(void);
 extern void * emu_LineBuffer(int line);
 
@@ -143,6 +145,9 @@ extern int emu_SwapJoysticks(int statusOnly);
 extern unsigned short emu_DebounceLocalKeys(void);
 extern int emu_ReadKeys(void);
 extern int emu_GetPad(void);
+extern int emu_GetMouse(int *x, int *y, int *buts);
+extern int emu_MouseDetected(void);
+extern int emu_KeyboardDetected(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
