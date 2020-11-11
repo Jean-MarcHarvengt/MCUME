@@ -34,7 +34,7 @@ static const uint16_t * logo = deflogo;
 #ifdef HAS_USBKEY
 #include "USBHost_t36.h"  // Read this header first for key info
 USBHost myusb;
-//USBHub hub1(myusb);
+USBHub hub1(myusb);
 KeyboardController keyboard1(myusb);
 USBHIDParser hid1(myusb);
 MouseController mouse1(myusb);
@@ -134,6 +134,7 @@ static int nbFiles=0;
 static int curFile=0;
 static int topFile=0;
 static char selection[MAX_FILENAME_SIZE+1]="";
+static char shown_selection[MAX_FILENAME_SIZE+1]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
@@ -424,6 +425,8 @@ int emu_ReadKeys(void)
   if (usbnavpad & MASK_JOY2_LEFT) retval |= MASK_JOY2_LEFT;
   if (usbnavpad & MASK_JOY2_RIGHT) retval |= MASK_JOY2_RIGHT;
   if (usbnavpad & MASK_JOY2_BTN) retval |= MASK_JOY2_BTN;
+  if (usbnavpad & MASK_KEY_USER1) retval |= MASK_KEY_USER1;
+  if (usbnavpad & MASK_KEY_USER2) retval |= MASK_KEY_USER2;
 
 #ifdef PIN_KEY_USER1 
   if ( digitalRead(PIN_KEY_USER1) == LOW ) retval |= MASK_KEY_USER1;
@@ -812,14 +815,20 @@ int handleMenu(uint16_t bClick)
         nbFiles = readNbFiles();             
       }
       else {
-        action = ACTION_RUNTFT;               
+        action = ACTION_RUN1;               
       }
       menuRedraw=true;
   }
   else if ( (bClick & MASK_KEY_USER1) || (c == MKEY_VGA) ) {
       menuRedraw=true;
-      action = ACTION_RUNVGA;    
+      strcpy(shown_selection,selection);
+      action = ACTION_RUN2;    
   }
+  else if ( (bClick & MASK_KEY_USER2) || (c == MKEY_JOY) ) {
+      menuRedraw=true;  
+      action = ACTION_RUN3;    
+      //emu_SwapJoysticks(0);
+  }  
   else if ( (c >= MKEY_L1) && (c <= MKEY_L9) ) {
     if ( (topFile+(int)c-1) <= (nbFiles-1)  )
     {
@@ -858,11 +867,7 @@ int handleMenu(uint16_t bClick)
       curFile++;
       menuRedraw=true;
     }
-  }
-  else if ( (bClick & MASK_KEY_USER2) || (c == MKEY_JOY) ) {
-    emu_SwapJoysticks(0);
-    menuRedraw=true;  
-  }   
+  } 
     
   if (menuRedraw && nbFiles) {
     int fileIndex = 0;
@@ -902,7 +907,10 @@ int handleMenu(uint16_t bClick)
 #ifndef HAS_T4_VGA
     tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);
 #endif      
-    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+//    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, "FLOPPY2:", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawRectNoDma(120,MENU_JOYS_YOFFSET+8, MENU_FILE_W, 8, RGBVAL16(0x00,0x00,0x00));
+    tft.drawTextNoDma(120,MENU_JOYS_YOFFSET+8, shown_selection, RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     menuRedraw=false;     
   }
 
@@ -1000,6 +1008,12 @@ void OnPress(auto key)
       case 10:
         usbnavpad |= MASK_JOY2_BTN;
         break;
+      case 32:
+        usbnavpad |= MASK_KEY_USER1;
+        break;
+      case 9:
+        usbnavpad |= MASK_KEY_USER2;
+        break;
     }     
   }
   else
@@ -1060,6 +1074,12 @@ void OnRelease(int key)
         break;
       case 10:
         usbnavpad &= ~MASK_JOY2_BTN;
+        break;
+      case 32:
+        usbnavpad &= ~MASK_KEY_USER1;
+        break;
+      case 9:
+        usbnavpad &= ~MASK_KEY_USER2;
         break;
     }     
   }

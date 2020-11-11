@@ -16,7 +16,7 @@
 #include "sound.h"
 #endif
 
-#include "tossw12.h"
+#include "tossw14.h"
 
 int8 *membase;
 int8 *rombase;
@@ -216,7 +216,8 @@ static int prev_mouse_y = 100;
 
 static int prev_key = 0; 
 static int prev_j = 0; 
-static int prev_mouseb = 0;
+static int prev_mouseb1 = 0;
+static int prev_mouseb2 = 0;
 static bool isMouse = true;
 static int joynum = 1;
 static int hk = 0;
@@ -267,16 +268,16 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x23 */ INV_KEY,
 /* 0x24 */ INV_KEY,
 /* 0x25 */ INV_KEY,
-/* 0x26 */ INV_KEY,
-/* 0x27 */ INV_KEY,
-/* 0x28 */ INV_KEY,
-/* 0x29 */ INV_KEY,
-/* 0x2A */ INV_KEY,  // mult
+/* 0x26 */ 43,       // ampercent (backslash)
+/* 0x27 */ 40,       // single quote
+/* 0x28 */ 26,       // bracket left
+/* 0x29 */ 27,       // bracket right
+/* 0x2A */ INV_KEY,  // mult *
 /* 0x2B */ INV_KEY,
-/* 0x2C */ INV_KEY,  // comma
-/* 0x2D */ INV_KEY,
-/* 0x2E */ INV_KEY,
-/* 0x2F */ INV_KEY,
+/* 0x2C */ 51,       // comma ,
+/* 0x2D */ 12,       // minus -
+/* 0x2E */ 52,       // period .
+/* 0x2F */ 53,       // slash /
 /* 0x30 */ 0x0B,     // 0
 /* 0x31 */ 0x02,
 /* 0x32 */ 0x03,
@@ -287,10 +288,10 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x37 */ 0x08,
 /* 0x38 */ 0x09,
 /* 0x39 */ 0x0A,     // 9
-/* 0x3A */ INV_KEY,
-/* 0x3B */ INV_KEY,  // semi colon
+/* 0x3A */ INV_KEY,  // colon :
+/* 0x3B */ 39,       // semi colon ;
 /* 0x3C */ INV_KEY,
-/* 0x3D */ INV_KEY,
+/* 0x3D */ 13,       // equal =
 /* 0x3E */ INV_KEY,
 /* 0x3F */ INV_KEY,
 /* 0x40 */ INV_KEY,
@@ -326,7 +327,7 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x5E */ INV_KEY,
 /* 0x5F */ INV_KEY,
 /* 0x60 */ INV_KEY,
-/* 0x61 */ 0x1E,    //0x10,    // A
+/* 0x61 */ 0x1E,    // A
 /* 0x62 */ 0x30,    // B
 /* 0x63 */ 0x2E,    // C
 /* 0x64 */ 0x20,    // D
@@ -338,20 +339,20 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x6A */ 0x24,    // J
 /* 0x6B */ 0x25,    // K
 /* 0x6C */ 0x26,    // L
-/* 0x6D */ 0x32, //0x27,    // M
+/* 0x6D */ 0x32,    // M
 /* 0x6E */ 0x31,    // N
 /* 0x6F */ 0x18,    // O
 /* 0x70 */ 0x19,    // P
-/* 0x71 */ 0x10, //0x1E,    // Q
+/* 0x71 */ 0x10,    // Q
 /* 0x72 */ 0x13,    // R
 /* 0x73 */ 0x1F,    // S
 /* 0x74 */ 0x14,    // T
 /* 0x75 */ 0x16,    // U
 /* 0x76 */ 0x2F,    // V
-/* 0x77 */ 0x11, //0x2C,    // W
+/* 0x77 */ 0x11,    // W
 /* 0x78 */ 0x2D,    // X
-/* 0x79 */ 0x2C, //0x15,    // Y
-/* 0x7A */ 0x15, //0x2C, //0x11,    // Z
+/* 0x79 */ 0x15,    // Y
+/* 0x7A */ 0x2C,    // Z
 /* 0x7B */ INV_KEY,
 /* 0x7C */ INV_KEY,
 /* 0x7D */ INV_KEY,
@@ -396,7 +397,10 @@ const int16_t keyboardSpecialConv[] = // Functions and other keys
 /* 0xDF */ INV_KEY
 };
 
+
+
 void emu_KeyboardOnDown(int keymodifer, int key) {
+  //emu_printi(key);
   int keyCode = INV_KEY;
   if ((key >=0xc0) && (key <=0xdf)) {
     keyCode = keyboardSpecialConv[(key-0xc0) & 0x1f];    
@@ -404,6 +408,8 @@ void emu_KeyboardOnDown(int keymodifer, int key) {
   else {
     keyCode = keyboardAsciiConv[key & 0x7f];
   }  
+  //emu_printi(keyCode);
+
   IkbdKeyPress ( keyCode );
 }
 
@@ -414,8 +420,8 @@ void emu_KeyboardOnUp(int keymodifer, int key) {
   }
   else {
     keyCode = keyboardAsciiConv[key & 0x7f];
-  }    
-  IkbdKeyRelease ( keyCode | 0x80 );
+  }     
+  IkbdKeyRelease ( keyCode );
 }
 
 
@@ -428,19 +434,18 @@ static void do_events(void)
 {
   int bClick = k & ~prev_k;
   prev_k = k;
-  int mouseb=0;
+  int  mouseb1 = prev_mouseb1;
+  int  mouseb2 = prev_mouseb2;  
   
-  // Toggle mouse/joystick
-  if (bClick & MASK_KEY_USER1) {
+  // Toggle keymap + mouse/joystick
+  if (bClick & MASK_KEY_USER2) {
     if (isMouse) isMouse = false;
     else isMouse = true;
-  }
-  // Toggle keymap
-  if (bClick & MASK_KEY_USER2) {
 #ifndef HAS_T4_VGA     
     emu_setKeymap(0);
-#endif    
+#endif  
   }
+  
 
   // force joystick mode if mouse detected
   if (emu_MouseDetected() ) isMouse = false;
@@ -482,9 +487,20 @@ static void do_events(void)
     else if ( mouse_y < 0 ) {
       mouse_y = 0;      
     }
-    if (buts & 0x1) mouseb=1;; 
+    
+    if (buts & 0x1) {
+      mouseb1 |=1; 
+    }
+    else {
+      mouseb1 &=~1;       
+    }
+    if (buts & 0x2) {
+      mouseb2 |=1;
+    }
+    else {
+      mouseb2 &=~1;     
+    }
   }
-
 
   if (!isMouse)
   {
@@ -544,8 +560,17 @@ static void do_events(void)
     }  
     
     if (( k & MASK_JOY1_BTN) || ( k & MASK_JOY2_BTN)) {
-      mouseb=1;
-    }  
+      mouseb1 |= 1;
+    }
+    else  {
+      mouseb1 &=~1;  
+    }
+    if (( k & MASK_KEY_USER1)) {
+      mouseb2 |= 1;
+    }
+    else  {
+      mouseb2 &=~1;  
+    }    
   }
 
   if ( (prev_mouse_x != mouse_x) | (prev_mouse_y != mouse_y) ) {
@@ -554,11 +579,31 @@ static void do_events(void)
       prev_mouse_x = mouse_x;
       prev_mouse_y = mouse_y;
   }
-  if ( (mouseb != prev_mouseb) ){
-    if (mouseb) IkbdMousePress(2);
-    else IkbdMouseRelease(2);
+
+
+  if ( (mouseb1 != prev_mouseb1) ){
+    if (mouseb1) {
+      IkbdMousePress(2);
+      //emu_printf("b1p");
+    }
+    else {
+      IkbdMouseRelease(2);
+      //emu_printf("b1r");
+    }
     IkbdLoop();
-    prev_mouseb = mouseb;  
+    prev_mouseb1 = mouseb1;  
+  }    
+  if ( (mouseb2 != prev_mouseb2) ){
+    if (mouseb2) {
+      IkbdMousePress(1);
+      //emu_printf("b2p");
+    }
+    else {
+      IkbdMouseRelease(1);
+      //emu_printf("b2r");
+    }
+    IkbdLoop();
+    prev_mouseb2 = mouseb2;  
   }    
 }     
 
@@ -881,12 +926,12 @@ void ast_Step(void)
       {
 #ifdef DOUBLE_BUFFERING        
         if (vid_shiftmode==MONO) {
-          emu_DrawWaitLine(325);
+          emu_DrawWaitLine(400);
         }  
         else if (vid_shiftmode==COL2) {
-          emu_DrawWaitLine(360);
+          emu_DrawWaitLine(400);
         } else {
-          emu_DrawWaitLine(360);
+          emu_DrawWaitLine(400);
         }
         renderScreen();        
 #else
@@ -969,34 +1014,40 @@ int disk_Size(char * filename) {
   return emu_FileSize(filename);
 }
 
-int disk_Open(char * filename) {
-  //emu_printf("disk reset pt");     
-  return emu_FileOpen(filename);
+int disk_Open(char * filename, int disk) {
+  //emu_printf("disk open"); 
+  //emu_printi(disk);    
+  return emu_FileOpenBis(filename, disk+1);
 }
 
-int disk_Read(char * buf, int size) {
+int disk_Read(char * buf, int size, int disk) {
   //emu_printf("disk read");
-  //emu_printi(size);   
-  return emu_FileRead(buf, size);
+  //emu_printi(size);
+  //emu_printi(disk);      
+  return emu_FileReadBis(buf, size, disk);
 }
 
-int disk_Seek(int seek) {
+int disk_Seek(int seek, int disk) {
   //emu_printf("disk seek");
-  //emu_printi(seek);   
-  return emu_FileSeek(seek);
+  //emu_printi(seek);
+  //emu_printi(disk);      
+  return emu_FileSeekBis(seek, disk);
 }
  
 
-void ast_Start(char * filename, int mode)
+void ast_Start(char * floppy1, char * floppy2, int mode)
 {
   if (mode) display_mode = MONO;
   
   emu_printf("init started");
-  strncpy (disk[0].name, filename, sizeof(disk[0].name));
+  strncpy (disk[0].name, floppy1, sizeof(disk[0].name));
+  strncpy (disk[1].name, floppy2, sizeof(disk[1].name));
+
   initialize_memmap();
   FDCInit(0);
+  FDCInit(1);
   //FDCeject(0);
-  FDCeject(1);
+  //FDCeject(1);
   IkbdReset(); 
   IOInit();   
 #ifdef HAS_SND

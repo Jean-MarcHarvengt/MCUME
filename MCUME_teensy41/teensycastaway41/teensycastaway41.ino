@@ -244,23 +244,27 @@ void setup() {
 
 void loop(void) 
 {
+  static char floppy2[64]="";  
   if (menuActive()) {
     uint16_t bClick = emu_DebounceLocalKeys();
     int action = handleMenu(bClick);
-    char * filename = menuSelection();   
-    if (action == ACTION_RUNTFT) {
+    char * floppy1 = menuSelection();   
+    if (action == ACTION_RUN1) {
       toggleMenu(false);
       vgaMode = false;
       emu_start();        
-      emu_Init(filename,0);     
+      emu_Init(floppy1,floppy2,0);     
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA();      
     }    
-    else if (action == ACTION_RUNVGA)  {
+    else if (action == ACTION_RUN2)  {
+      strcpy(floppy2,menuSelection());                        
+    }         
+    else if (action == ACTION_RUN3)  {
       toggleMenu(false);
       vgaMode = false;
       emu_start();        
-      emu_Init(filename,1);     
+      emu_Init(floppy1,floppy2,1);     
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA();                    
     }         

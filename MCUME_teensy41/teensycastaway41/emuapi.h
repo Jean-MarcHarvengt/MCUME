@@ -12,7 +12,7 @@
 #define TITLE "   AtariST Emulator     "
 #define ROMSDIR "/st"
 
-#define emu_Init(ROM,MODE) {ast_Init(); ast_Start(ROM,MODE);}
+#define emu_Init(FLOPPY1, FLOPPY2, MODE) {ast_Init(); ast_Start(FLOPPY1, FLOPPY2, MODE);}
 #define emu_Step(x) {ast_Step();}
 #define emu_Input(x) {ast_Input(x);}
 
@@ -28,8 +28,9 @@
 #define ACTION_NONE          0
 #define ACTION_MAXKBDVAL     16
 #define ACTION_EXITKBD       128
-#define ACTION_RUNTFT        129
-#define ACTION_RUNVGA        130
+#define ACTION_RUN1          129
+#define ACTION_RUN2          130
+#define ACTION_RUN3          131
 
 #ifdef KEYMAP_PRESENT
 
@@ -117,6 +118,10 @@ extern void emu_printi(int val);
 extern void * emu_Malloc(int size);
 extern void emu_Free(void * pt);
 
+extern int emu_FileOpenBis(char * filename, int handler);
+extern int emu_FileReadBis(char * buf, int size, int handler);
+extern int emu_FileSeekBis(int seek, int handler);
+
 extern int emu_FileOpen(char * filename);
 extern int emu_FileRead(char * buf, int size);
 extern unsigned char emu_FileGetc(void);
@@ -153,6 +158,7 @@ extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
 extern void emu_KeyboardOnUp(int keymodifer, int key);
 extern void emu_KeyboardOnDown(int keymodifer, int key);
+extern void emu_MidiOnDataReceived(unsigned char data);
 
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);

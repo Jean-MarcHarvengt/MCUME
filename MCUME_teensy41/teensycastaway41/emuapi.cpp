@@ -31,10 +31,11 @@ static const uint16_t * logo = deflogo;
 #ifdef HAS_USBKEY
 #include "USBHost_t36.h"  // Read this header first for key info
 USBHost myusb;
-//USBHub hub1(myusb);
+USBHub hub1(myusb);
 KeyboardController keyboard1(myusb);
 USBHIDParser hid1(myusb);
 MouseController mouse1(myusb);
+MIDIDevice midi1(myusb);
 #endif
 static bool mouseDetected = false;
 static bool keyboardDetected = false;
@@ -131,6 +132,7 @@ static int nbFiles=0;
 static int curFile=0;
 static int topFile=0;
 static char selection[MAX_FILENAME_SIZE+1]="";
+static char shown_selection[MAX_FILENAME_SIZE+1]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
@@ -421,6 +423,8 @@ int emu_ReadKeys(void)
   if (usbnavpad & MASK_JOY2_LEFT) retval |= MASK_JOY2_LEFT;
   if (usbnavpad & MASK_JOY2_RIGHT) retval |= MASK_JOY2_RIGHT;
   if (usbnavpad & MASK_JOY2_BTN) retval |= MASK_JOY2_BTN;
+  if (usbnavpad & MASK_KEY_USER1) retval |= MASK_KEY_USER1;
+  if (usbnavpad & MASK_KEY_USER2) retval |= MASK_KEY_USER2;
 
 #ifdef PIN_KEY_USER1 
   if ( digitalRead(PIN_KEY_USER1) == LOW ) retval |= MASK_KEY_USER1;
@@ -822,14 +826,20 @@ int handleMenu(uint16_t bClick)
         nbFiles = readNbFiles();             
       }
       else {
-        action = ACTION_RUNTFT;               
+        action = ACTION_RUN1;               
       }
       menuRedraw=true;
   }
   else if ( (bClick & MASK_KEY_USER1) || (c == MKEY_VGA) ) {
-      menuRedraw=true;
-      action = ACTION_RUNVGA;    
+    menuRedraw=true;
+    strcpy(shown_selection,selection);
+    action = ACTION_RUN2;    
   }
+  else if ( (bClick & MASK_KEY_USER2) || (c == MKEY_JOY) ) {
+    menuRedraw=true;  
+    action = ACTION_RUN3;    
+    //emu_SwapJoysticks(0);
+  }     
   else if ( (c >= MKEY_L1) && (c <= MKEY_L9) ) {
     if ( (topFile+(int)c-1) <= (nbFiles-1)  )
     {
@@ -869,10 +879,6 @@ int handleMenu(uint16_t bClick)
       menuRedraw=true;
     }
   }
-  else if ( (bClick & MASK_KEY_USER2) || (c == MKEY_JOY) ) {
-    emu_SwapJoysticks(0);
-    menuRedraw=true;  
-  }   
     
   if (menuRedraw && nbFiles) {
     int fileIndex = 0;
@@ -912,7 +918,10 @@ int handleMenu(uint16_t bClick)
 #ifndef HAS_T4_VGA
     tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);
 #endif      
-    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+//    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, "FLOPPY2:", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+    tft.drawRectNoDma(120,MENU_JOYS_YOFFSET+8, MENU_FILE_W, 8, RGBVAL16(0x00,0x00,0x00));
+    tft.drawTextNoDma(120,MENU_JOYS_YOFFSET+8, shown_selection, RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     menuRedraw=false;     
   }
 
@@ -1007,12 +1016,18 @@ void OnPress(auto key)
       case 10:
         usbnavpad |= MASK_JOY2_BTN;
         break;
+      case 32:
+        usbnavpad |= MASK_KEY_USER1;
+        break;
+      case 9:
+        usbnavpad |= MASK_KEY_USER2;
+        break;
     }     
   }
   else
   {
     emu_KeyboardOnDown(keymodifier, key);
-  }
+  } 
 }
 
 void OnRelease(int key)
@@ -1068,6 +1083,12 @@ void OnRelease(int key)
       case 10:
         usbnavpad &= ~MASK_JOY2_BTN;
         break;
+      case 32:
+        usbnavpad &= ~MASK_KEY_USER1;
+        break;
+      case 9:
+        usbnavpad &= ~MASK_KEY_USER2;
+        break;
     }     
   }
   else
@@ -1085,7 +1106,122 @@ int emu_KeyboardDetected(void) {
   return (keyboardDetected?1:0); 
 }
 
+#ifdef HAS_USBKEY
+static unsigned char midiBuffer[16];
+static int midiDataCnt=0;
+static int midiLastCmd=0;
+static int midiCmdNbParam=0;
+#endif
 
+void emu_MidiOnDataReceived(unsigned char value) {
+#ifdef HAS_USBKEY
+//10000000 = 128 = note off
+//10010000 = 144 = note on
+//10100000 = 160 = aftertouch
+//10110000 = 176 = continuous controller
+//11000000 = 192 = patch change
+//11010000 = 208 = channel pressure
+//11100000 = 224 = pitch bend
+//11110000 = 240 = non-musical commands
+  if (value >= 128) {
+    midiDataCnt = 0;
+    midiLastCmd = value;
+    switch (value & 0xF0) {
+      case 128:
+        midiCmdNbParam = 2;
+        Serial.print("note off: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 144:
+        midiCmdNbParam = 2;
+        Serial.print("note on: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 160:
+        midiCmdNbParam = 2;
+        Serial.print("aftertouch: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 176:
+        midiCmdNbParam = 2;
+        Serial.print("continuous controller: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 192:
+        midiCmdNbParam = 1;
+        Serial.print("patch change: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 208:
+        midiCmdNbParam = 1;
+        Serial.print("channel pressure: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 224:
+        midiCmdNbParam = 2;
+        Serial.print("pitch bend: ");      
+        Serial.println(value&0xf);            
+        break;
+      case 240:
+        Serial.print("non-musical commands: ");      
+        Serial.println(value&0xf);            
+        break;
+      default:
+        Serial.print("??: ");      
+        Serial.println(value&0xf);            
+        break;      
+    }          
+  }
+  else {
+    if (midiDataCnt<16) midiBuffer[midiDataCnt++] = value ;
+    Serial.print("DATA ");      
+    Serial.println(value);
+    if (midiDataCnt == midiCmdNbParam) {
+      switch (midiLastCmd & 0xF0) {
+        case 128:
+          midiCmdNbParam = 2;
+          midi1.sendNoteOff(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
+          break;
+        case 144:
+          midiCmdNbParam = 2;
+          midi1.sendNoteOn(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
+          break;
+        case 160:
+          midiCmdNbParam = 2;
+          midi1.sendAfterTouchPoly(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
+          //Serial.print("aftertouch: ");                
+          break;
+        case 176:
+          midiCmdNbParam = 2;
+          //Serial.print("continuous controller: ");      
+          midi1.sendControlChange(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);           
+          break;
+        case 192:
+          midiCmdNbParam = 1;
+          //Serial.print("patch change: ");      
+          midi1.sendProgramChange(midiBuffer[0], midiLastCmd&0xf);           
+          break;
+        case 208:
+          midiCmdNbParam = 1;
+          //Serial.print("channel pressure: ");
+          midi1.sendProgramChange(midiBuffer[0], midiLastCmd&0xf);                 
+          break;
+        case 224:
+          midiCmdNbParam = 2;
+          //Serial.print("pitch bend: ");
+          midi1.sendProgramChange(midiBuffer[1]<<7+midiBuffer[0], midiLastCmd&0xf);                  
+          break;
+        case 240:
+          Serial.print("non-musical commands: ");                 
+          break;
+        default:
+          Serial.print("??: ");               
+          break;      
+      }         
+    }
+  }
+#endif  
+}
 
 static void callibrationInit(void) 
 {
@@ -1248,6 +1384,88 @@ int handleCallibration(uint16_t bClick) {
 
 
 
+static File filehandlers[3];
+
+
+int emu_FileOpenBis(char * filename, int handler)
+{
+  int retval = 0;
+
+  char filepath[80];
+  strcpy(filepath, romspath);
+  strcat(filepath, "/");
+  strcat(filepath, filename);
+  emu_printf("FileOpen...");
+  emu_printf(filepath);
+#ifdef USE_SDFS
+  if( !(f_open(&file, filepath, FA_READ)) ) {
+#else    
+  if ((filehandlers[handler] = SD.open(filepath, O_READ))) {
+#endif
+    retval = handler;  
+  }
+  else {
+    emu_printf("FileOpen failed");
+  }
+  return (retval);
+}
+
+int emu_FileReadBis(char * buf, int size, int handler)
+{
+  unsigned char buffer[256];
+  
+  int remaining = size;
+  int byteread = 0;
+  int retval=0; 
+  if (size < 256) {
+#ifdef USE_SDFS
+    if( !(f_read (&file, buffer, size, &retval)) )
+#else
+    retval = filehandlers[handler].read(buffer, size);
+#endif
+   if (retval>0) {
+      memcpy(buf,buffer,retval);
+      byteread += retval;   
+   }   
+  }
+  else {
+    while (remaining>0) {
+#ifdef USE_SDFS
+      if( !(f_read (&file, buffer, 256, &retval)) )
+      //f_read (&file, buffer, 256, &retval);
+#else
+      retval = filehandlers[handler].read(buffer, 256);
+#endif
+      if (retval>0) {
+        //emu_printi(retval);
+        memcpy(buf,buffer,retval);
+        buf += retval;
+        byteread += retval;     
+        remaining -= retval;
+      }
+      else {
+        break;
+      }
+    }    
+  }
+
+  return byteread; 
+}
+
+
+int emu_FileSeekBis(int seek, int handler) 
+{
+#ifdef USE_SDFS
+  f_lseek(&file, seek);
+#else
+  filehandlers[handler].seek(seek);
+#endif
+  return (seek);
+}
+
+
+
+
 
 int emu_FileOpen(char * filename)
 {
@@ -1314,6 +1532,26 @@ int emu_FileRead(char * buf, int size)
   return byteread; 
 }
 
+
+int emu_FileSeek(int seek) 
+{
+#ifdef USE_SDFS
+  f_lseek(&file, seek);
+#else
+  file.seek(seek);
+#endif
+  return (seek);
+}
+
+int emu_FileTell(void) 
+{
+#ifdef USE_SDFS
+  return (f_tell(&file));
+#else
+  return (50);
+#endif
+}
+
 unsigned char emu_FileGetc(void) {
   unsigned char c;
 #ifdef USE_SDFS
@@ -1362,25 +1600,6 @@ int emu_FileSize(char * filename)
 #endif
  
   return(filesize);    
-}
-
-int emu_FileSeek(int seek) 
-{
-#ifdef USE_SDFS
-  f_lseek(&file, seek);
-#else
-  file.seek(seek);
-#endif
-  return (seek);
-}
-
-int emu_FileTell(void) 
-{
-#ifdef USE_SDFS
-  return (f_tell(&file));
-#else
-  return (50);
-#endif
 }
 
 

@@ -31,6 +31,7 @@ static char     sccsid[] = "$Id: st.c,v 1.14 2002/10/10 19:41:27 jhoenig Exp $";
 #ifndef NO_SOUND
 #include "sound.h"
 #endif
+#include "emuapi.h"
 
 
 #ifdef DEBUG
@@ -375,18 +376,21 @@ PROGMEM void DoIOWB(uint32 address, uint8 value)
 
 	switch(address) {
     case ACIA1_SR&0x7fff:
+        //Serial.println(value);    
 	waitstate+=8;
         acia1_cr = value;
         break;
     case ACIA1_DR&0x7fff:
+        //Serial.println(value);    
 	waitstate+=8;
         IkbdRecv (value);
         break;
-    case ACIA2_SR&0x7fff:
+    case ACIA2_SR&0x7fff: 
 	waitstate+=8;
         acia2_cr = value;
         break;
     case ACIA2_DR&0x7fff:
+        emu_MidiOnDataReceived(value);
 	waitstate+=8;
         break;
 	}

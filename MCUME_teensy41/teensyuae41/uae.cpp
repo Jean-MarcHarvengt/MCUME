@@ -293,8 +293,8 @@ const int i2ckeyConv[] =
 
 
 void uae_Input(int bClick) {
-  buttonstate[0] = 0;
-  buttonstate[2] = 0;
+//  buttonstate[0] = 0;
+//  buttonstate[2] = 0;
   
   hk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys(); 
@@ -328,8 +328,18 @@ void uae_Input(int bClick) {
     else if ( lastmy < 0 ) {
       lastmy = 0;      
     }
-    if (buts & 0x1) buttonstate[0] = 1; 
-    if (buts & 0x2) buttonstate[2] = 1; 
+    if (buts & 0x1) {
+      buttonstate[0] |=1; 
+    }
+    else {
+      buttonstate[0] &=~1;       
+    }
+    if (buts & 0x2) {
+      buttonstate[2] |=1;
+    }
+    else {
+      buttonstate[2] &=~1;     
+    }
   }
 
   // Diskswap in joystick mode
@@ -377,9 +387,18 @@ void uae_Input(int bClick) {
         newmousecounters = 1;        
       }
     } 
-
-    if ( (k & MASK_JOY1_BTN)|| ( k & MASK_JOY2_BTN))  buttonstate[0] = 1;             
-    if (k & MASK_KEY_USER1) buttonstate[2] = 1;             
+    if (( k & MASK_JOY1_BTN) || ( k & MASK_JOY2_BTN)) {
+      buttonstate[0] |= 1;
+    }
+    else  {
+      buttonstate[0] &=~1;  
+    }
+    if (( k & MASK_KEY_USER1)) {
+      buttonstate[2] |= 1;
+    }
+    else  {
+      buttonstate[2] &=~1;  
+    }             
   }
 }
 

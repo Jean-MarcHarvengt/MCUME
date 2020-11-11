@@ -25,9 +25,6 @@ static char     sccsid[] = "$Id: fdc.c,v 1.2 2002/06/08 23:31:58 jhoenig Exp $";
 #include "diskapi.h"
 
 
-//#define MEMDISC 1
-#define DISK 1
-
 #define DISKNULL \
 	"\0\0\0\0\0\0\0\0\0\0" \
 	"\0\0\0\0\0\0\0\0\0\0" \
@@ -93,28 +90,12 @@ PROGMEM int discread(unsigned long address,int a,int len,int discn)
 {
 	int i;
 
-#ifdef MEMDISC            
-	uint8 val1,val2,*dbuf;
-	uint8 *buf = (uint8 *)(membase + address);
-	dbuf=buf;
-	for (i=0;i<len;i++) *buf++=disc[discn][discpos[discn]+i];
-#ifdef BYTES_SWAP
-	for (i=0; i<len; i+=2) {
-		val1 = dbuf[i];
-		val2 = dbuf[i+1];
-		dbuf[i] = val2;
-		dbuf[i+1] =val1;
-	}
-#endif
-
-#else
-
 	LOG("disc read: ",len);
 	uint8 buf[256];
 	int totlen = len; 
 	while (totlen>=256) {
 		//fread(buf,1,256,disk[discn].file);
-    disk_Read(buf,256);
+    disk_Read(buf,256, disk[discn].file);
 		
 		LOG("b read: ",buf[0]);
 		totlen -= 256;		
@@ -125,14 +106,13 @@ PROGMEM int discread(unsigned long address,int a,int len,int discn)
 	}
 	if (totlen) {
 		//fread(buf,1,totlen,disk[discn].file);
-		disk_Read(buf,totlen);
+		disk_Read(buf,totlen, disk[discn].file);
 		LOG("b: ",buf[0]);
 		for (i=0; i<totlen; i++) {
 			SetMemBBB(address, buf[i]);
 			address++;
 		}
 	}
-#endif
     
 	discpos[discn]=discpos[discn]+i;
 	readdsk |= ( discn + 1 );
@@ -143,11 +123,7 @@ PROGMEM int discwrite(unsigned char *buf,int a,int len,int discn)
 {
 	int i;
 	uint8 val1,val2,*dbuf;
-	dbuf=buf;
-#ifdef MEMDISC            
-	//for (i=0;i<len;i++) disc[discn][discpos[discn]+i]=*buf++;
-#else
-#endif    
+	dbuf=buf;   
 #ifdef BYTES_SWAP
 	for (i=0; i<len; i+=2) {
 		val1 = disc[discn][discpos[discn]+i];
@@ -166,10 +142,7 @@ int discseek(int discn,int pos,int a)
 		return -1;
 	}
 	discpos[discn]=pos;
-#ifdef MEMDISC
-#else
-	if (disk[discn].file) disk_Seek(pos); //fseek(disk[discn].file,pos,SEEK_SET);
-#endif    
+	if (disk[discn].file) disk_Seek(pos, disk[discn].file); //fseek(disk[discn].file,pos,SEEK_SET);   
 	return 0;
 }
 
@@ -181,11 +154,7 @@ PROGMEM int FDCInit(int i)
 {
     unsigned char  *buf;
     emu_printf("FDCInit");     
-#ifdef MEMDISC 
-    memset((void *)&disc[i][0],0,MAX_DISC_SIZE);
-#else
     memset((void *)&disc[i][0],0,256);
-#endif
     int             len,len2,calcsides,calcsectors,calctracks,badbootsector;
 	discpos[i]=0;
 
@@ -197,21 +166,17 @@ PROGMEM int FDCInit(int i)
 		//disk[i].disksize = len;
 		//fseek(disk[i].file,0,SEEK_SET);
 		len = disk_Size(disk[i].name);
-    disk[i].file = disk_Open(disk[i].name);  
+    disk[i].file = disk_Open(disk[i].name, i);  
     buf=&disc[i][0];
     disk[i].disksize = len;    
-#ifdef MEMDISC      
-    //fread(buf,1,len,disk[i].file);
-		//fclose(disk[i].file);
-#else    
+   
 		if (disk[i].file) {
 	    //fread(buf,1,256,disk[i].file);
 			//fseek(disk[i].file,0,SEEK_SET);
-      disk_Read(buf, 256);
-      disk_Seek(0);
+      disk_Read(buf, 256, disk[i].file);
+      disk_Seek(0,disk[i].file);
     }	
-#endif        
-		
+       
         disk[i].head = 0;
         disk[i].sides = (int) *(buf + 26);
         disk[i].sectors = (int) *(buf + 24);
@@ -263,10 +228,7 @@ PROGMEM void FDCchange(int i){
 
 PROGMEM void FDCeject(int num){
 	int i;
-    
-#ifdef MEMDISC        
-	for (i=0;i<1050*1024;i++) disc[num][i]=0;
-#endif    
+       
 	disk[num].file = NULL;
 	sprintf(disk[num].name,"disk%01d",num);
 	disk[num].sides = SIDES;
@@ -322,7 +284,6 @@ PROGMEM void            FDCCommand(void)
     }
     fdc_status = 0;             /* clear fdc status */
     
-#if DISK
         
     if (fdc_command < 0x80) {   /* TYPE-I fdc commands */
         if (drives >= 0) {      /* drive selected */
@@ -522,7 +483,7 @@ PROGMEM void            FDCCommand(void)
             fdc_status |= 0x10; /* no drive selected */
         }
     }
-#endif    
+   
     if (motor) {
         fdc_status |= 0x80;     /* motor on flag */
 		fdc_motor=1;

@@ -228,7 +228,7 @@ void loop(void)
     uint16_t bClick = emu_DebounceLocalKeys();
     int action = handleMenu(bClick);
     char * floppy1 = menuSelection();
-    if (action == ACTION_RUNTFT) {
+    if (action == ACTION_RUN1) {
       toggleMenu(false);
       vgaMode = false;   
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
@@ -237,25 +237,8 @@ void loop(void)
       tft.startDMA(); 
       emu_Init2();      
     }    
-    else if (action == ACTION_RUNVGA)  {
-      strcpy(floppy2,menuSelection());   
-#ifdef HAS_VGA
-      toggleMenu(false);
-      vgaMode = true;
-      VGA_frame_buffer = (uint8_t *)malloc((UVGA_YRES*(UVGA_XRES+UVGA_XRES_EXTRA))*sizeof(uint8_t));
-      uvga.set_static_framebuffer(VGA_frame_buffer);      
-      emu_start();
-      emu_Init(filename);       
-      int retvga = uvga.begin(&modeline);
-      Serial.println(retvga);
-      Serial.print("VGA init: ");  
-      Serial.println(retvga);              
-      uvga.clear(0x00);
-      tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-      // In VGA mode, we show the keyboard on TFT
-      toggleVirtualkeyboard(true); // keepOn
-      Serial.println("Starting");
-#endif                      
+    else if (action == ACTION_RUN2)  {
+      strcpy(floppy2,menuSelection());                        
     }         
     delay(20);
   }

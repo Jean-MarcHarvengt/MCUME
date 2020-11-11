@@ -39,4 +39,3 @@ typedef ULONG uaecptr;
 #define HAS_FILESYS 1  
 
 #endif /* _DTYPES_H_ */
-

@@ -29,8 +29,9 @@
 #define ACTION_NONE          0
 #define ACTION_MAXKBDVAL     16
 #define ACTION_EXITKBD       128
-#define ACTION_RUNTFT        129
-#define ACTION_RUNVGA        130
+#define ACTION_RUN1          129
+#define ACTION_RUN2          130
+#define ACTION_RUN3          131
 
 
 #ifdef KEYMAP_PRESENT
