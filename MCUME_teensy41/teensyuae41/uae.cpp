@@ -486,9 +486,9 @@ void flush_line(int y)
 {
     if(y >= 0 && y < WIN_H) {
 #ifdef HAS_T4_VGA
-      emu_DrawLine8((unsigned char *)slinebuf, WIN_W , 1, y);
+      emu_DrawLine8((unsigned char *)slinebuf, WIN_W , WIN_H, y);
 #else
-      emu_DrawLine16((unsigned short *)slinebuf, WIN_W , 1, y);
+      emu_DrawLine16((unsigned short *)slinebuf, WIN_W , WIN_H, y);
 #endif      
     }  
 }
@@ -524,7 +524,8 @@ static bool pdown=true;
 void flush_screen(int ystart,int ystop)
 {    
   emu_DrawVsync();
-
+  emu_tweakVideo(1,0,0);
+  
   // #sample written per frame
   int wdelta = 0;
   uae_u32  wdpt = sndbufpt;

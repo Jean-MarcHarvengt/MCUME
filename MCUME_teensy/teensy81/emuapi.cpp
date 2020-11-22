@@ -34,6 +34,7 @@ static const unsigned short * keysw = keyswzx80;
 #ifdef HAS_USBKEY
 #include "USBHost_t36.h"  // Read this header first for key info
 USBHost myusb;
+USBHub hub1(myusb);
 KeyboardController keyboard1(myusb);
 #endif
 static uint8_t usbnavpad=0;

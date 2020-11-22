@@ -94,7 +94,7 @@ void emu_DrawLine(unsigned char * VBuf, int width, int height, int line)
 {
   if (!vgaMode) {
 #ifdef HAS_T4_VGA
-    tft.writeLine(width,1,line, VBuf, palette8);
+    tft.writeLine(width,height,line, VBuf, palette8);
 #else
     tft.writeLine(width,1,line, VBuf, palette16);
 #endif

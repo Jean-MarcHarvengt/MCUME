@@ -139,6 +139,7 @@ extern void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line)
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
 extern void * emu_LineBuffer(int line);
+extern void emu_tweakVideo(int shiftdelta, int numdelta, int denomdelta);
 
 extern void emu_InitJoysticks(void);
 extern int emu_SwapJoysticks(int statusOnly);
