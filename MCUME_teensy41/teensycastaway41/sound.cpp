@@ -584,7 +584,6 @@ static void Audio_CallBack(void *userdata, uint8 *stream, int len)
   int i;
 
   uint16 *pBuffer;
-  //len/=2;
 
 
   /* If there are only some samples missing to have a complete buffer,
@@ -602,8 +601,7 @@ static void Audio_CallBack(void *userdata, uint8 *stream, int len)
 
   for(i = 0; i < len; i++)
   {
-  *pBuffer++ = ((int)
-    ((char)MixBuffer[(CompleteSndBufIdx + i) % MIXBUFFER_SIZE]))*256;
+    *pBuffer++ = ((int)((char)MixBuffer[(CompleteSndBufIdx + i) % MIXBUFFER_SIZE]))*256;
   }
 
   /* We should now have generated a complete frame of samples.

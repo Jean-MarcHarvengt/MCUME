@@ -218,6 +218,13 @@ void * emu_LineBuffer(int line)
 #endif  
 }
 
+void emu_tweakVideo(int shiftdelta, int numdelta, int denomdelta) {
+#ifdef HAS_T4_VGA
+  tft.tweak_video(shiftdelta, numdelta, denomdelta);
+#endif  
+}
+
+
 // ****************************************************
 // the setup() method runs once, when the sketch starts
 // ****************************************************

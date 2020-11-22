@@ -98,8 +98,8 @@ void Redraw16 ( int row, int vid_adr )
     }
   }
 #ifdef HIRES
-  emu_DrawLine16(&line[0], XRES, YRES, row*2);  
-  emu_DrawLine16(&line[0], XRES, YRES, row*2+1);  
+  emu_DrawLine16(&line[0], XRES, YRES*2, row*2);  
+  emu_DrawLine16(&line[0], XRES, YRES*2, row*2+1);  
 #else
   emu_DrawLine16(&line[0], XRES, YRES, row);
 #endif  
@@ -137,8 +137,8 @@ void Redraw16_med ( int row, int vid_adr )
     }
   }
 #ifdef HIRES
-  emu_DrawLine16(&line[0], XRES*2, YRES, row*2);  
-  emu_DrawLine16(&line[0], XRES*2, YRES, row*2+1);  
+  emu_DrawLine16(&line[0], XRES*2, YRES*2, row*2);  
+  emu_DrawLine16(&line[0], XRES*2, YRES*2, row*2+1);  
 #else
   emu_DrawLine16(&line[0], XRES, YRES, row);
 #endif  
@@ -167,7 +167,7 @@ void Redraw16_hi ( int row, int vid_adr )
     }
   }
 #ifdef HIRES
-  emu_DrawLine16(&line[0], XRES*2, YRES, row*2);  
+  emu_DrawLine16(&line[0], XRES*2, YRES*2, row*2);  
 #endif 
   line_o= &line[0];   
   for (col=0; col<40; col++) {
@@ -180,7 +180,7 @@ void Redraw16_hi ( int row, int vid_adr )
     }
   }
 #ifdef HIRES
-  emu_DrawLine16(&line[0], XRES*2, YRES, row*2+1);  
+  emu_DrawLine16(&line[0], XRES*2, YRES*2, row*2+1);  
 #endif    
 }
 #endif
@@ -639,7 +639,7 @@ static void renderScreen(void) {
           *line_o++ = palmap [ ind ]; 
         }
       }
-      emu_DrawLine8((vga_pixel*)&line[0], XRES*2, YRES, row*2); 
+      emu_DrawLine8((vga_pixel*)&line[0], XRES*2, YRES*2, row*2); 
       line_o= (vga_pixel *)&line[0];   
       for (col=0; col<40; col++) {
         register unsigned short pl0=*line_i++;
@@ -648,7 +648,7 @@ static void renderScreen(void) {
           *line_o++ = palmap [ ind ]; 
         }
       }
-      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES, row*2+1); 
+      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES*2, row*2+1); 
 #endif
     }
     else if (mode==COL2) {        
@@ -667,8 +667,8 @@ static void renderScreen(void) {
       }
 #ifdef HAS_T4_VGA 
 #ifdef HIRES
-      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES, row*2); 
-      emu_CopyLine(XRES*2, YRES, row*2, row*2+1);       
+      emu_DrawLine8((unsigned char*)&line[0], XRES*2, YRES*2, row*2); 
+      emu_CopyLine(XRES*2, YRES*2, row*2, row*2+1);       
 #else
       emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row);     
 #endif     
@@ -676,7 +676,7 @@ static void renderScreen(void) {
       emu_DrawLine16(&line[0], XRES, YRES, row);
 #endif 
     }
-    else { 
+    else { // COL4
       for (col=0; col<20; col++) {
         register unsigned short pl0=*line_i++,pl1=*line_i++,pl2=*line_i++,pl3=*line_i++;
         for (bit=15;bit>=0;bit--) {
@@ -689,8 +689,8 @@ static void renderScreen(void) {
       }
 #ifdef HAS_T4_VGA 
 #ifdef HIRES
-      emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row*2);
-      emu_CopyLine(XRES*2, YRES, row*2, row*2+1);       
+      emu_DrawLine8((unsigned char*)&line[0], XRES, YRES*2, row*2);
+      emu_CopyLine(XRES*2, YRES*2, row*2, row*2+1);       
 #else
       emu_DrawLine8((unsigned char*)&line[0], XRES, YRES, row);     
 #endif     
@@ -926,12 +926,15 @@ void ast_Step(void)
       {
 #ifdef DOUBLE_BUFFERING        
         if (vid_shiftmode==MONO) {
-          emu_DrawWaitLine(400);
+          emu_DrawWaitLine(440);
+          emu_tweakVideo(1,0,0);
         }  
         else if (vid_shiftmode==COL2) {
-          emu_DrawWaitLine(400);
+          emu_DrawWaitLine(440);
+          emu_tweakVideo(1,0,0);          
         } else {
-          emu_DrawWaitLine(400);
+          emu_DrawWaitLine(440);
+          emu_tweakVideo(0,0,0);          
         }
         renderScreen();        
 #else

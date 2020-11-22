@@ -1108,13 +1108,15 @@ int emu_KeyboardDetected(void) {
 
 #ifdef HAS_USBKEY
 static unsigned char midiBuffer[16];
+static unsigned char midiLastCmd=0;
 static int midiDataCnt=0;
-static int midiLastCmd=0;
 static int midiCmdNbParam=0;
 #endif
 
 void emu_MidiOnDataReceived(unsigned char value) {
+
 #ifdef HAS_USBKEY
+//Serial.println(value, HEX);    
 //10000000 = 128 = note off
 //10010000 = 144 = note on
 //10100000 = 160 = aftertouch
@@ -1127,44 +1129,95 @@ void emu_MidiOnDataReceived(unsigned char value) {
     midiDataCnt = 0;
     midiLastCmd = value;
     switch (value & 0xF0) {
-      case 128:
+      case 128: // 0x80
         midiCmdNbParam = 2;
-        Serial.print("note off: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("note off: ");      
+        //Serial.println(value&0xf);            
         break;
-      case 144:
+      case 144: //0x90
         midiCmdNbParam = 2;
-        Serial.print("note on: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("note on: ");      
+        //Serial.println(value&0xf);            
         break;
-      case 160:
+      case 160: //0xA0
         midiCmdNbParam = 2;
-        Serial.print("aftertouch: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("aftertouch: "); // rare     
+        //Serial.println(value&0xf);            
         break;
-      case 176:
+      case 176: //0xB0
         midiCmdNbParam = 2;
-        Serial.print("continuous controller: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("continuous controller: ");      
+        //Serial.println(value&0xf);            
         break;
-      case 192:
+      case 192: //0xC0
         midiCmdNbParam = 1;
-        Serial.print("patch change: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("patch change: "); //some      
+        //Serial.println(value&0xf);            
         break;
-      case 208:
+      case 208: //0xD0
         midiCmdNbParam = 1;
         Serial.print("channel pressure: ");      
         Serial.println(value&0xf);            
         break;
-      case 224:
+      case 224: //0xE0
         midiCmdNbParam = 2;
-        Serial.print("pitch bend: ");      
-        Serial.println(value&0xf);            
+        //Serial.print("pitch bend: ");      
+        //Serial.println(value&0xf);            
         break;
-      case 240:
-        Serial.print("non-musical commands: ");      
-        Serial.println(value&0xf);            
+      case 240: //0xF0
+        // non-musical commands     
+        switch (value) {
+          case 0xF0:
+            //Serial.println("NI: System Exclusive"); 
+            break;
+          case 0xF1:
+            //Serial.println("NI: System Common - MIDI Time Code Quarter Frame"); 
+            break;
+          case 0xF2:
+             midiCmdNbParam = 2;
+             break;
+          case 0xF3:
+            //Serial.println("NI: System Common - Song Select"); 
+            break;
+          case 0xF6:
+            //Serial.println("NI: System Common - Tune Request"); 
+            break;
+          case 0xF8:
+            //Serial.println("System Real Time - Timing Clock");
+            midi1.sendRealTime(value, 0); 
+            break;
+          case 0xFA:
+            //Serial.println("System Real Time - Start"); 
+            midi1.sendRealTime(value, 0); 
+            break;
+          case 0xFB:
+            //Serial.println("System Real Time - Continue"); 
+            midi1.sendRealTime(value, 0); 
+            break;
+          case 0xFC:
+            //Serial.println("System Real Time - Stop");
+            midi1.sendRealTime(value, 0); 
+            break;
+          case 0xFE:
+            //Serial.println("System Real Time - Active Sensing"); 
+            midi1.sendRealTime(value, 0); 
+            break;
+          case 0xFF:
+            //Serial.println("System Real Time - System Reset"); 
+            midi1.sendRealTime(value, 0); 
+            break;
+        }
+        //SystemExclusive       = 0xF0, // System Exclusive
+        //TimeCodeQuarterFrame  = 0xF1, // System Common - MIDI Time Code Quarter Frame
+        //SongPosition          = 0xF2, // System Common - Song Position Pointer
+        //SongSelect            = 0xF3, // System Common - Song Select
+        //TuneRequest           = 0xF6, // System Common - Tune Request
+        //Clock                 = 0xF8, // System Real Time - Timing Clock
+        //Start                 = 0xFA, // System Real Time - Start
+        //Continue              = 0xFB, // System Real Time - Continue
+        //Stop                  = 0xFC, // System Real Time - Stop
+        //ActiveSensing         = 0xFE, // System Real Time - Active Sensing
+        //SystemReset           = 0xFF, // System Real Time - System Reset                   
         break;
       default:
         Serial.print("??: ");      
@@ -1174,45 +1227,49 @@ void emu_MidiOnDataReceived(unsigned char value) {
   }
   else {
     if (midiDataCnt<16) midiBuffer[midiDataCnt++] = value ;
-    Serial.print("DATA ");      
-    Serial.println(value);
-    if (midiDataCnt == midiCmdNbParam) {
+    if ( (midiLastCmd & 0xF0) == 240) {
+      if (midiLastCmd == 0xF2) {
+        if (midiDataCnt == midiCmdNbParam) {
+          //Serial.println("System Common - Song Position Pointer"); 
+          midi1.sendSongPosition(((int)midiBuffer[1]<<7)+(int)midiBuffer[0], 0);          
+        }
+      }
+      else {
+        Serial.println(value);
+      }
+    }
+    else if (midiDataCnt == midiCmdNbParam) {
+      unsigned char chan = (midiLastCmd&0xf)+1;
+      //Serial.print("ch ");    
+      //Serial.println(chan);    
       switch (midiLastCmd & 0xF0) {
-        case 128:
-          midiCmdNbParam = 2;
-          midi1.sendNoteOff(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
+        case 128: //0x80
+          //Serial.print("note off: ");      
+          midi1.sendNoteOff(midiBuffer[0], midiBuffer[1], chan);
           break;
-        case 144:
-          midiCmdNbParam = 2;
-          midi1.sendNoteOn(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
+        case 144: //0x90
+          //Serial.print("note on: ");      
+          midi1.sendNoteOn(midiBuffer[0], midiBuffer[1], chan);
           break;
-        case 160:
-          midiCmdNbParam = 2;
-          midi1.sendAfterTouchPoly(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);
-          //Serial.print("aftertouch: ");                
+        case 160: //0xA0
+          //Serial.print("aftertouch: ");      
+          midi1.sendPolyPressure(midiBuffer[0], midiBuffer[1], chan);
           break;
-        case 176:
-          midiCmdNbParam = 2;
+        case 176: //0xB0
           //Serial.print("continuous controller: ");      
-          midi1.sendControlChange(midiBuffer[0], midiBuffer[1], midiLastCmd&0xf);           
+          midi1.sendControlChange(midiBuffer[0], midiBuffer[1], chan);           
           break;
-        case 192:
-          midiCmdNbParam = 1;
+        case 192: //0xC0
           //Serial.print("patch change: ");      
-          midi1.sendProgramChange(midiBuffer[0], midiLastCmd&0xf);           
+          midi1.sendProgramChange(midiBuffer[0], chan);           
           break;
-        case 208:
-          midiCmdNbParam = 1;
-          //Serial.print("channel pressure: ");
-          midi1.sendProgramChange(midiBuffer[0], midiLastCmd&0xf);                 
+        case 208: //0xD0
+          //Serial.print("channel pressure: ");      
+          midi1.sendAfterTouch(midiBuffer[0], chan);                 
           break;
-        case 224:
-          midiCmdNbParam = 2;
-          //Serial.print("pitch bend: ");
-          midi1.sendProgramChange(midiBuffer[1]<<7+midiBuffer[0], midiLastCmd&0xf);                  
-          break;
-        case 240:
-          Serial.print("non-musical commands: ");                 
+        case 224: //0xE0
+          //Serial.print("pitch bend: ");          
+          midi1.sendPitchBend((((int)midiBuffer[1]<<7)+(int)midiBuffer[0])-8192, chan);                  
           break;
         default:
           Serial.print("??: ");               

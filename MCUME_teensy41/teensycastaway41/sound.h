@@ -24,7 +24,7 @@
 #define SOUND_FREQ 22050
 #endif
 
-#define SOUND_BUFFER_SIZE 1024
+#define SOUND_BUFFER_SIZE 512 //1024
 
 void Sound_Reset(void);
 void Sound_ClearMixBuffer(void);
