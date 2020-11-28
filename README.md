@@ -4,6 +4,11 @@
 </p>
 
 # News
+November 2020 UPDATE: Atari ST emulation now supporting MIDI output!<br>
+https://www.youtube.com/watch?v=H-TlCDBwdak<br>
+https://www.youtube.com/watch?v=fzoTYUpEOKs
+
+
 November 2020: move to latest VGA_t4 library for stable HIRES support<br>
 - USB mouse added to Amiga/Atari ST emulation
 - Amiga sound improved (freq drifting less audible)
