@@ -7,9 +7,9 @@
 April 2021: Add initial support for raspberry PICO<br>
 - adapted pico scanline library for  VGA 8 bits mode (RRRGGGBB), sorry adapted code is embedded...
 - SD support from https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico (fixed IRQ to 1)
-- rudimetary PWM IRQ based audio based on https://gregchadwick.co.uk/blog/playing-with-the-pico-pt3/
+- rudimentary PWM IRQ based audio (https://gregchadwick.co.uk/blog/playing-with-the-pico-pt3/)
 
-Far from perfect, lot of bugs, and unfortunately C64 emulator had no sound!
+Far from perfect, lot of bugs, and unfortunately C64 emulator had no sound!<br>
 
 
 November 2020 UPDATE: Atari ST emulation now supporting MIDI output!<br>
