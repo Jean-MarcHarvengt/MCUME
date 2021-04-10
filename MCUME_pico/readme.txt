@@ -1,4 +1,4 @@
-#only need cmake, copiler and pico-sdk (no extra, no playground)
+#only need cmake, ARM cross-compiler and pico-sdk (no extra, no playground)
 git clone -b master https://github.com/raspberrypi/pico-sdk.git
 cd pico-sdk/
 git submodule update --init
