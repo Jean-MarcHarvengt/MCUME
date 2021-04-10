@@ -9,8 +9,9 @@ April 2021: Add initial support for raspberry PICO<br>
 - SD support from https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico (fixed IRQ to 1)
 - rudimentary PWM IRQ based audio (https://gregchadwick.co.uk/blog/playing-with-the-pico-pt3/)
 
-Far from perfect, lot of bugs, and unfortunately C64 emulator had no sound!<br>
-
+Far from perfect, lot of bugs, and ... unfortunately C64 emulator had no sound!<br>
+All what you need is in MCUME_pico. Precompiled binaries in MCUME_pico/bin.<br>
+To recompile, look at MCUME_pico/readme.txt<br><br>
 
 November 2020 UPDATE: Atari ST emulation now supporting MIDI output!<br>
 https://www.youtube.com/watch?v=H-TlCDBwdak<br>
