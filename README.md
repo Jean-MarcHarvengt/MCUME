@@ -4,6 +4,14 @@
 </p>
 
 # News
+April 2021: Add initial support for raspberry PICO<br>
+- adapted pico scanline library for  VGA 8 bits mode (RRRGGGBB), sorry adapted code is embedded...
+- SD support from https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico (fixed IRQ to 1)
+- rudimetary PWM IRQ based audio based on https://gregchadwick.co.uk/blog/playing-with-the-pico-pt3/
+
+Far from perfect, lot of bugs, and unfortunately C64 emulator had no sound!
+
+
 November 2020 UPDATE: Atari ST emulation now supporting MIDI output!<br>
 https://www.youtube.com/watch?v=H-TlCDBwdak<br>
 https://www.youtube.com/watch?v=fzoTYUpEOKs
@@ -109,17 +117,17 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
-| --- | --- | --- | --- | --- | --- | --- |
-| Zx81        | X | X | X | X | X | X |
-| Zx spectrum | X | X | X | X | X | X |
-| Atari 800   | X | X | X | X | X | X |
-| C64         | X | X | X | X | X | X |
-| Atari 520ST | - | full speed! | X | X (640x400!) | - | slow |
-| 8086 XT PC  | - | full speed! | X | X | - | slow |
-| MSX1/2      | - | full speed! | X | X | - | - |
-| Amiga       | - | - | exp only! | X (640x240!) | - | - |
-| Doom        | - | - | - | x | - | - |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover | Pico |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Zx81        | X | X | X | X | X | X | X |
+| Zx spectrum | X | X | X | X | X | X | X |
+| Atari 800   | X | X | X | X | X | X | X |
+| C64         | X | X | X | X | X | X | X |
+| Atari 520ST | - | full speed! | X | X (640x400!) | - | slow | - |
+| 8086 XT PC  | - | full speed! | X | X | - | slow | - |
+| MSX1/2      | - | full speed! | X | X | - | - | - |
+| Amiga       | - | - | exp only! | X (640x240!) | - | - | - |
+| Doom        | - | - | - | x | - | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
 For Teensy 4.1 with PSRAM try compiling for faster code (unless it complains at compilation).<br> 
@@ -127,21 +135,21 @@ Doom for example only works if compiled for faster code!
 
 Game console systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover |
-| --- | --- | --- | --- | --- | --- | --- |
-| Atari 2600                   | X | X | X | X | X | X |
-| Odyssey/Videopac             | X | X | X | X | X | X |
-| Colecovision                 | X | X | X | X | X | X |
-| Atari 5200                   | X | X | X | X | X | X |
-| Nintendo NES                 | X | big roms! | X | X | X | X |
-| Vectrex                      | - | full speed! | X | X | - | slow |
-| PC Engine                    | - | - | X | X | - | - |
-| Gameboy/GBColor              | - | - | X | X | - | - |
-| Sega Master System/Game Gear | - | - | X | X | - | - |
-| Sega Genesis/Megadrive       | - | - | X | X | - | - |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover | Pico |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Atari 2600                   | X | X | X | X | X | X | X |
+| Odyssey/Videopac             | X | X | X | X | X | X | X |
+| Colecovision                 | X | X | X | X | X | X | X |
+| Atari 5200                   | X | X | X | X | X | X | X |
+| Nintendo NES                 | X | big roms! | X | X | X | X | - |
+| Vectrex                      | - | full speed! | X | X | - | slow | - |
+| PC Engine                    | - | - | X | X | - | - | - |
+| Gameboy/GBColor              | - | - | X | X | - | - | - |
+| Sega Master System/Game Gear | - | - | X | X | - | - | - |
+| Sega Genesis/Megadrive       | - | - | X | X | - | - | - |
 
 # Minimal requirements:
-- Teensy3.6/Teensy4.0 or ESP32 Node32S/Wrover SDK chip
+- Teensy3.6/Teensy4.0, ESP32 Node32S/Wrover SDK chip or Raspberry PICO
 - ILI9341 (Teensy/ESP32) or ST7789 (Teensy only) SPI display
 - SD card (Teensy uses built-in uSD, ESP32 uses external one connected over SPI, e.g. ILI9341 integrated one)
 - Analog joypad (Arduino or PSP like)
