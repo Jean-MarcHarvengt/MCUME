@@ -1,0 +1,1 @@
+// For compatibility with FreeRTOS+FAT API
