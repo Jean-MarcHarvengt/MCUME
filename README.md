@@ -13,7 +13,7 @@ Far from perfect, lot of bugs, and ... unfortunately C64 emulator has no sound f
 All what you need is in MCUME_pico. Precompiled binaries in MCUME_pico/bin.<br>
 To recompile, look at MCUME_pico/readme.txt<br>
 
-https://www.youtube.com/watch?v=MUpwlZXheb8
+https://www.youtube.com/watch?v=MUpwlZXheb8<br>
 https://www.youtube.com/watch?v=_WL_KGkxZ88
 <br><br>
 
