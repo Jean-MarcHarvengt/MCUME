@@ -11,7 +11,11 @@ April 2021: Add initial support for raspberry PICO<br>
 
 Far from perfect, lot of bugs, and ... unfortunately C64 emulator has no sound for performance reason!<br>
 All what you need is in MCUME_pico. Precompiled binaries in MCUME_pico/bin.<br>
-To recompile, look at MCUME_pico/readme.txt<br><br>
+To recompile, look at MCUME_pico/readme.txt<br>
+
+https://www.youtube.com/watch?v=MUpwlZXheb8
+https://www.youtube.com/watch?v=_WL_KGkxZ88
+<br><br>
 
 November 2020 UPDATE: Atari ST emulation now supporting MIDI output!<br>
 https://www.youtube.com/watch?v=H-TlCDBwdak<br>
