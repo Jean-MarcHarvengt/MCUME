@@ -211,7 +211,7 @@ int main(void) {
 
     vga.begin(VGA_MODE_320x240);
     //puts("Color bars ready, press SPACE to invert...");
-    vga.clear(VGA_RGB(0x00,0x00,0x00));
+    vga.clear(VGA_RGB(0xff,0x00,0x00));
     vga.get_frame_buffer_size(&fb_width, &fb_height); 
     // Initialize game engine
     // 2 tiles layers (TILES_MAX_LAYERS)
@@ -245,7 +245,8 @@ int main(void) {
     }
 
     vga.sprite_data(0, (vga_pixel *)mario, SPRITES_W*SPRITES_H);
-    while (true) {
+   
+    while (true) {     
         hscrL0 = hscrL0 + hscrincL0;
         if ( (hscrL0 & TILES_HMASK) == 0x0) {
         int updcolL0 = (hscrL0 >> TILES_HBITS) % TILES_COLS;
@@ -304,10 +305,7 @@ int main(void) {
         }
         vga.sprite(0, 100, 100, 0);
 
-
-        //scanvideo_wait_for_vblank();
         vga.run_gfxengine();
-
 
         int c = getchar_timeout_us(0);
         switch (c) {

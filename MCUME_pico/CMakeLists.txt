@@ -18,6 +18,7 @@ add_subdirectory(FatFs_SPI build)
 
 include_directories(vga_t4)
 
+
 set(PICO81_SOURCES 
 		pico81/Z80.c 
 		pico81/AY8910.c
@@ -190,10 +191,32 @@ set(PICONOFRENDO_SOURCES
 		piconofrendo/AudioPlaySystem.cpp
 	)
 
+set(PICOSND_SOURCES 
+#		picosnd/LibFC14/Dump.cpp
+#		picosnd/LibFC14/FC_Data.cpp
+#		picosnd/LibFC14/FC.cpp
+#		picosnd/LibFC14/fc14audiodecoder.cpp
+#		picosnd/LibFC14/LamePaulaMixer.cpp
+#		picosnd/LibFC14/LamePaulaVoice.cpp
+#		picosnd/LibFC14/Paula.cpp
+#		picosnd/StSnd/digidrum.cpp
+#		picosnd/StSnd/LzhLib.cpp
+#		picosnd/StSnd/Ym2149Ex.cpp
+#		picosnd/StSnd/Ymload.cpp
+#		picosnd/StSnd/YmMusic.cpp
+#		picosnd/StSnd/YmUserInterface.cpp
+		picosnd/sndplay.cpp
+		picosnd/sid.cpp
+		picosnd/reSID.cpp
+		picosnd/emuapi.cpp
+		picosnd/AudioPlaySystem.cpp
+		picosnd/picosnd.cpp
+	)
+
 set(VGA_T4_SOURCES 
 		vga_t4/VGA_t4.cpp
 		vga_t4/scanvideo.c
-		vga_t4/vga_modes.c
+#		vga_t4/vga_modes.c
 	)
 
 set(GFXENGINE_SOURCES 
@@ -203,6 +226,10 @@ set(GFXENGINE_SOURCES
 set(TESTIO_SOURCES 
 		testio/testio.cpp
 		testio/emuapi.cpp
+	)
+
+set(TESTVGA_SOURCES 
+		testvga/testvga.cpp
 	)
 
 add_executable(mcume
@@ -216,9 +243,15 @@ add_executable(mcume
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
 #		${PICONOFRENDO_SOURCES}
+#		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
+#		${TESTVGA_SOURCES}
 		${VGA_T4_SOURCES}
 	)
+
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
+
 
 target_link_libraries(mcume pico_multicore
 	    pico_stdlib

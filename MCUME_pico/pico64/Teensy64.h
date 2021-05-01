@@ -90,8 +90,8 @@ unsigned loadFile(const char *filename);
 #define REFRESHRATE       		(LINEFREQ / LINECNT) //Hz
 #define LINETIMER_DEFAULT_FREQ (1000000.0f/LINEFREQ)
 
-
-#define MCU_C64_RATIO   ((float)F_CPU / CLOCKSPEED) //MCU Cycles per C64 Cycle
+// Exact timing disabled!!! JMH
+//#define MCU_C64_RATIO   ((float)F_CPU / CLOCKSPEED) //MCU Cycles per C64 Cycle
 #define US_C64_CYCLE    (1000000.0f / CLOCKSPEED) // Duration (µs) of a C64 Cycle
 
 #define AUDIOSAMPLERATE     (LINEFREQ * 2)// (~32kHz)

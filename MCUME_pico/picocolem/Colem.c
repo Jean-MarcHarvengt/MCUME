@@ -227,9 +227,7 @@ int coc_Start(char * Cartridge)
 
 void coc_Step(void)
 {
-  //emu_printf("s");
   RunZ80(&ccpu);
-  RunZ80(&ccpu);  
 }
 
 void coc_Stop(void)

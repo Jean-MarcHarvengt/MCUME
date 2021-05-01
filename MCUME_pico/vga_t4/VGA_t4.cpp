@@ -17,22 +17,27 @@
 #include "VGA_font8x8.h"
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-//#include "pico/scanvideo.h"
-//#include "pico/scanvideo/composable_scanline.h"
 #include "scanvideo.h"
 #include "composable_scanline.h"
 #include "pico/sync.h"
+#include "hardware/irq.h"
 #include <string.h>
 
 #define R16(rgb) ((rgb>>8)&0xf8) 
 #define G16(rgb) ((rgb>>3)&0xfc) 
 #define B16(rgb) ((rgb<<3)&0xf8) 
 
+#define PIO_FB_OFFSET 4
 
 // 8 bits 320x240 frame buffer => 64K
 static vga_pixel * visible_framebuffer = NULL;
 static vga_pixel * framebuffer = NULL;
 static vga_pixel * fb0 = NULL;
+
+uint8_t * pio_fb = NULL;
+int pio_fbwidth=0;
+
+
 static vga_pixel * fb1 = NULL;
 
 static int  fb_width;
@@ -40,7 +45,7 @@ static int  fb_height;
 static int  fb_stride;
 static int  left_border;
 static int  top_border;
-static int  currentLine;
+
 
 static semaphore_t video_initted;
 static void core1_func();
@@ -54,39 +59,7 @@ PolyDef	PolySet;  // will contain a polygon data
 
 
 
-static void draw_fb_line(scanvideo_scanline_buffer_t *buffer) {
-    currentLine = scanvideo_scanline_number(buffer->scanline_id);
-    uint16_t *p = (uint16_t *) buffer->data;
- 
-    //if ( (currentLine > top_border)  && (currentLine < (fb_height+top_border)) ) 
-    {
-      currentLine -= top_border;
-      //if (left_border) {
-      //  *p++ = COMPOSABLE_COLOR_RUN;
-      //  *p++ = 0;
-      //  *p++ = left_border/2 - 3;
-      //}  
-      uint8_t *linebuffer = &visible_framebuffer[fb_stride*currentLine];
-      *p++ = COMPOSABLE_RAW_RUN;
-      *p++ = *linebuffer++; // first pixel (8bit to 16bits conv) 
-      *p++ = fb_width - 3;  // len - 3
-      for (uint bar = 0; bar < (fb_width-1); bar++) {
-          *p++ =  *linebuffer++; // other pixels (8bit to 16bits conv)        
-      }
-    }
-
-    // black pixel to end line
-    *p++ = COMPOSABLE_RAW_1P;
-    *p++ = 0;
-    // end of line with alignment padding
-    *p++ = COMPOSABLE_EOL_SKIP_ALIGN;
-    *p++ = 0;
-
-    buffer->data_used = ((uint32_t *) p) - buffer->data;
-    assert(buffer->data_used < buffer->data_max);
-
-    buffer->status = SCANLINE_OK;
-}
+static void core1_sio_irq();
 
 
 static void core1_func() {
@@ -95,12 +68,40 @@ static void core1_func() {
     scanvideo_timing_enable(true);
     sem_release(&video_initted);
 
+    multicore_fifo_clear_irq();
+    irq_set_exclusive_handler(SIO_IRQ_PROC1,core1_sio_irq);
+    //irq_set_priority (SIO_IRQ_PROC1, 129);    
+    irq_set_enabled(SIO_IRQ_PROC1,true);
+    
     while (true) {
-        scanvideo_scanline_buffer_t *scanline_buffer = scanvideo_begin_scanline_generation(true);
-        draw_fb_line(scanline_buffer);
-        scanvideo_end_scanline_generation(scanline_buffer);
+        tight_loop_contents();
     }
 }
+
+static void init_pio_framebuffer(uint8_t * fb) {
+  // Code for the PIO + buffer data initialized with random
+  //memset((void*)fb,0, fb_stride*fb_height*sizeof(vga_pixel));
+  uint8_t col = 0;
+  for( int i=0; i<fb_height; i++)
+  {
+    uint8_t * p8 = &fb[fb_stride*i];
+    uint16_t * p = (uint16_t *)p8;
+    *p++ = COMPOSABLE_RAW_RUN;
+    *p++ = fb_width;
+    for (uint y = 0; y < fb_width/2; y++) {
+        col = VGA_RGB(rand() % 255,rand() % 255,rand() % 255);
+        *p++ = (col << 8) + col;       
+    }
+    // black pixel to end line
+    //*p++ = COMPOSABLE_RAW_1P;
+    //*p++ = 0;
+    // end of line with alignment padding
+    *p++ = COMPOSABLE_EOL_SKIP_ALIGN;
+    *p++ = 0;
+    //pio_fbwidth = ((uint32_t *) p) - (uint32_t *)&fb[fb_stride*i];
+  }  
+}
+
 
 VGA_T4::VGA_T4()
 {
@@ -115,11 +116,11 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
 {
   switch(mode) {
     case VGA_MODE_320x240:
-      fb_width = 320; //200;
-      fb_height = 240; //200; //240 ;
+      fb_width = 320;
+      fb_height = 240;
       left_border = (320-fb_width)/2;
       top_border = (240-fb_height)/2;
-      fb_stride = fb_width;
+      fb_stride = fb_width+16;
       break;
     case VGA_MODE_320x480:
       break;   
@@ -140,11 +141,16 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
 
   /* initialize gfx buffer */
   if (fb0 == NULL) {
-    fb0 = (vga_pixel *)malloc(fb_stride*fb_height*sizeof(vga_pixel)); 
+    void *mallocpt = malloc(fb_stride*fb_height*sizeof(vga_pixel)+4);    
+    fb0 = (vga_pixel *)((void*)((intptr_t)mallocpt & ~3));
   }
-  memset((void*)fb0,0, fb_stride*fb_height*sizeof(vga_pixel));
-  visible_framebuffer = fb0;
-  framebuffer = fb0;
+
+
+  init_pio_framebuffer(fb0);
+  pio_fb = fb0;
+  pio_fbwidth = (320 + 2*6)/4;
+  visible_framebuffer = fb0+PIO_FB_OFFSET;
+  framebuffer = fb0+PIO_FB_OFFSET;
 
   // create a semaphore to be posted when video init is complete
   sem_init(&video_initted, 0, 1);
@@ -154,11 +160,6 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
 
   // wait for initialization of video to be complete
   sem_acquire_blocking(&video_initted);
-
-  // init buffer with random
-  uint8_t * buf = &framebuffer[0];
-  for( int i=0; i<(fb_width*fb_height); i++)
-      *buf++ = VGA_RGB(rand() % 255,rand() % 255,rand() % 255);
 
   return(VGA_OK);
 }
@@ -1382,14 +1383,16 @@ static const char * hex = "0123456789ABCDEF";
 void VGA_T4::begin_gfxengine(int nblayers, int nbtiles, int nbsprites)
 {
   // Try double buffering
+  
   if (fb1 == NULL) {
-    fb1 = (vga_pixel *)malloc(fb_stride*fb_height*sizeof(vga_pixel));
-    memset((void*)fb1,0, fb_stride*fb_height*sizeof(vga_pixel)); 
+    void *mallocpt = malloc(fb_stride*fb_height*sizeof(vga_pixel)+4);    
+    fb1 = (vga_pixel *)((void*)((intptr_t)mallocpt & ~3));    
   }
   if (fb1 != NULL) {
-  	memset((void*)fb1,0, fb_stride*fb_height*sizeof(vga_pixel));
-  	framebuffer = fb1;
+    init_pio_framebuffer(fb1);
+    framebuffer = fb1+PIO_FB_OFFSET;
   }
+  
 
   nb_layers = nblayers;
   nb_tiles = nbtiles;
@@ -1445,18 +1448,20 @@ void VGA_T4::begin_gfxengine(int nblayers, int nbtiles, int nbsprites)
 void VGA_T4::run_gfxengine()
 {
   waitSync();
-  
+
   if (fb1 != NULL) {
-  	if (visible_framebuffer == fb0) {
-  	  visible_framebuffer = fb1;
-  	  framebuffer = fb0;
+  	if (pio_fb == fb0) {
+      pio_fb = fb1;      
+  	  visible_framebuffer = fb1+PIO_FB_OFFSET;
+  	  framebuffer = fb0+PIO_FB_OFFSET;
   	}
   	else {
-  	  visible_framebuffer = fb0;
-  	  framebuffer = fb1;
+      pio_fb = fb0;      
+  	  visible_framebuffer = fb0+PIO_FB_OFFSET;
+  	  framebuffer = fb1+PIO_FB_OFFSET;
   	} 
   }
-  
+
   unsigned char * tilept;
 
   // Layer 0
@@ -1619,7 +1624,6 @@ static void (*fillsamples)(short * stream, int len) = nullptr;
 static uint32_t * i2s_tx_buffer;
 static short * i2s_tx_buffer16;
 
-
 static void SOFTWARE_isr() {
   if (fillfirsthalf) {
     fillsamples((short *)i2s_tx_buffer, sampleBufferSize);
@@ -1636,16 +1640,28 @@ static void AUDIO_isr() {
   s = s/2 + 32767; 
   pwm_set_gpio_level(AUDIO_PIN, s >> 8);
   cnt = cnt & (sampleBufferSize*2-1);
-  
+
   if (cnt == 0) {
     fillfirsthalf = false;
-    SOFTWARE_isr();
+    //irq_set_pending(RTC_IRQ+1);
+    multicore_fifo_push_blocking(0);
   } 
   else if (cnt == sampleBufferSize) {
     fillfirsthalf = true;
-    SOFTWARE_isr();
+    //irq_set_pending(RTC_IRQ+1);
+    multicore_fifo_push_blocking(0);
   }
 }
+
+static void core1_sio_irq() {
+  irq_clear(SIO_IRQ_PROC1);
+  while(multicore_fifo_rvalid()) {
+    uint16_t raw = multicore_fifo_pop_blocking();
+    SOFTWARE_isr();
+  } 
+  multicore_fifo_clear_irq();
+}
+
 
 void VGA_T4::begin_audio(int samplesize, void (*callback)(short * stream, int len))
 {
@@ -1669,11 +1685,18 @@ void VGA_T4::begin_audio(int samplesize, void (*callback)(short * stream, int le
   pwm_clear_irq(audio_pin_slice);
   pwm_set_irq_enabled(audio_pin_slice, true);
   irq_set_exclusive_handler(PWM_IRQ_WRAP, AUDIO_isr);
+  irq_set_priority (PWM_IRQ_WRAP, 128);
   irq_set_enabled(PWM_IRQ_WRAP, true);
+
+  //irq_set_exclusive_handler(RTC_IRQ+1,SOFTWARE_isr);
+  //irq_set_priority (RTC_IRQ+1, 120);
+  //irq_set_enabled(RTC_IRQ+1,true);
+
 
   // Setup PWM for audio output
   pwm_config config = pwm_get_default_config();
-  pwm_config_set_clkdiv(&config, 5.5f);
+//  pwm_config_set_clkdiv(&config, 5.5f);
+  pwm_config_set_clkdiv(&config, 40.0f);
   pwm_config_set_wrap(&config, 254);
   pwm_init(audio_pin_slice, &config, true);
 

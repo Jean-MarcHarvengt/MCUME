@@ -38,23 +38,21 @@ Copyright Frank Bösing, 2017
 
 #include "Teensy64.h"
 
+
 static inline unsigned get_ccount(void)
 {
-        unsigned r;
-//        asm volatile ("rsr %0, ccount" : "=r"(r));
-        return r;
+        //unsigned r;
+        //asm volatile ("rsr %0, ccount" : "=r"(r));
+        return 0;
 }
 
 void disableEventResponder(void);
 
 void enableCycleCounter(void);
-inline unsigned fbmillis(void)  __attribute__((always_inline));
 inline unsigned fbmicros(void)  __attribute__((always_inline));
-inline unsigned fbnanos(void) __attribute__((always_inline));
 
-unsigned fbmillis(void) { return (get_ccount() * (1000.0/F_CPU)); }
-unsigned fbmicros(void) { return (get_ccount() * (1000000.0/F_CPU)); }
-unsigned fbnanos(void) { return (get_ccount() * (1000000000.0 / F_CPU)); }
+//unsigned fbmicros(void) { return (get_ccount() * (1000000.0/F_CPU)); }
+unsigned fbmicros(void) { return (time_us_32()); }
 
 float setAudioSampleFreq(float freq);
 void setAudioOff(void);

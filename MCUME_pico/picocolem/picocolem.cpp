@@ -16,7 +16,7 @@ extern "C" {
 TFT_T_DMA tft;
 static int skip=0;
 
-int main(void) {
+int main(void) { 
     stdio_init_all();
     tft.begin(VGA_MODE_320x240);
     emu_init();

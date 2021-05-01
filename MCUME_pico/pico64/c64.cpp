@@ -40,10 +40,11 @@ static void oneRasterLine(void) {
 
     //Switch "ExactTiming" Mode off after a while:
     if (!cpu.exactTiming) break;
-    if (get_ccount() - cpu.exactTimingStartTime >= EXACTTIMINGDURATION * (F_CPU / 1000)) {
-    cpu_disableExactTiming();
-      break;
-    }
+    // no exact timing !!  JMH
+    //if (get_ccount() - cpu.exactTimingStartTime >= EXACTTIMINGDURATION * (F_CPU / 1000)) {
+    //  cpu_disableExactTiming();
+    //  break;
+    //}
   };
 
 }
@@ -257,6 +258,7 @@ void c64_Init(void)
   resetVic();
   cpu_reset();
 #ifdef HAS_SND  
+  playSID.begin();  
   emu_sndInit();
 #endif  
 }
