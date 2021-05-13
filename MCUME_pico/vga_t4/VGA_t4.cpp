@@ -1696,7 +1696,7 @@ void VGA_T4::begin_audio(int samplesize, void (*callback)(short * stream, int le
   // Setup PWM for audio output
   pwm_config config = pwm_get_default_config();
 //  pwm_config_set_clkdiv(&config, 5.5f);
-  pwm_config_set_clkdiv(&config, 40.0f);
+  pwm_config_set_clkdiv(&config, 50.0f);
   pwm_config_set_wrap(&config, 254);
   pwm_init(audio_pin_slice, &config, true);
 

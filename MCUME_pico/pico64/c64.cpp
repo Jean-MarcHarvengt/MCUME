@@ -17,6 +17,10 @@ AudioPlaySID playSID;
 
 using namespace std;
 
+#define OSKB_YPOS (240-16)
+static bool oskbActive=false;
+
+
 /* IRAM_ATTR */
 static void oneRasterLine(void) {
   static unsigned short lc = 1;
@@ -157,7 +161,8 @@ uint8_t cia1PORTA(void) {
   uint8_t v;
 
   v = ~cpu.cia1.R[0x02] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]);
-  int keys = emu_ReadKeys();
+  int keys = 0;
+  if (!oskbActive) keys = emu_ReadKeys();
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY2_BTN) v &= 0xEF;
     if (keys & MASK_JOY2_UP) v &= 0xFE;
@@ -197,7 +202,6 @@ uint8_t cia1PORTA(void) {
   }
  
   return v;
-
 }
 
 
@@ -206,8 +210,8 @@ uint8_t cia1PORTB(void) {
   uint8_t v;
 
   v = ~cpu.cia1.R[0x03] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]) ;
-
-  int keys = emu_ReadKeys();
+  int keys = 0;
+  if (!oskbActive) keys = emu_ReadKeys();
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY1_BTN) v &= 0xEF;
     if (keys & MASK_JOY1_UP) v &= 0xFE;
@@ -274,19 +278,87 @@ void c64_Start(char * filename)
 }
 
 
-static uint8_t nbkeys=0;
-static uint8_t kcnt=0;
-static bool toggle=true;
+static uint8_t nbkeys = 0;
+static uint8_t kcnt = 0;
+static bool toggle = true;
 
-static char * seq="LOAD\"\"\r                                            RUN\r";
+static char * textseq;
+static char * textload = "LOAD\"\"\r\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tRUN\r";
+static char textkey[1];
 
 static bool res=false;
+static bool firsttime=true;
+
+
+static unsigned char dummyline[320];
+
+static char * oskbtext1 = "1234567890 \"$,ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static char * oskbtext2 = "FFFFFFFF                              ";
+static int oskbXPos = 10;
+static int oskbYPos = 0;
+
+#define OSKB_TEXT VGA_RGB(0, 0, 170)
+#define OSKB_BG   VGA_RGB(255, 255, 255)
+#define OSKB_HL   VGA_RGB(255, 255, 0)
+
+void emu_DrawVsync(void)
+{
+    char sel[2]={0,0};
+    if (oskbActive) {
+      tft.drawText(0,OSKB_YPOS,oskbtext1,OSKB_TEXT,OSKB_BG,false);
+      tft.drawText(0,OSKB_YPOS+8,oskbtext2,OSKB_TEXT,OSKB_BG,false);
+      sel[0]=(oskbYPos==0)?oskbtext1[oskbXPos]:oskbtext2[oskbXPos];
+      tft.drawText(oskbXPos*8,OSKB_YPOS+8*oskbYPos,sel,OSKB_TEXT,OSKB_HL,false);
+    }
+    //skip += 1;
+    //skip &= VID_FRAME_SKIP;
+    tft.waitSync(); 
+}
+
+
+void * emu_LineBuffer(int line)
+{
+    if ( (line >= OSKB_YPOS) && (oskbActive) )
+      return &dummyline[0];
+
+    return (void*)tft.getLineBuffer(line);    
+}
+
 
 void c64_Input(int bClick) {
+  if (oskbActive) {
+    if (bClick & MASK_JOY2_BTN) {
+      textkey[0] = oskbtext1[oskbXPos];
+      if (oskbYPos==1) if (oskbXPos<8) textkey[0] = 0x85+oskbXPos;
+      textseq = textkey;
+      nbkeys = 1;   
+      kcnt = 0;
+    }
+    if (bClick & MASK_JOY2_RIGHT) if (oskbXPos != 0) oskbXPos--;
+    if (bClick & MASK_JOY2_LEFT) if (oskbXPos != 39)  oskbXPos++;
+    if (bClick & MASK_JOY2_UP) oskbYPos = 0;
+    if (bClick & MASK_JOY2_DOWN) oskbYPos = 1;
+  }
+
   if (nbkeys == 0) {
-    if (bClick) {
-      nbkeys = strlen(seq);   
-      kcnt=0;
+    if (bClick & MASK_KEY_USER1) {
+      if (!oskbActive) {
+        oskbActive = true;
+      }
+      else {
+        oskbActive = false; 
+      }       
+    } 
+    else if (bClick & MASK_KEY_USER2) {
+      if (firsttime) {
+        firsttime = false;
+        textseq = textload;
+        nbkeys = strlen(textseq);   
+        kcnt=0;
+      }
+      else {
+        cpu.swapJoysticks = !cpu.swapJoysticks;
+      }        
     } 
     else  
     {
@@ -302,8 +374,8 @@ void c64_Input(int bClick) {
     }
   }
   else {
-    char k = seq[kcnt];
-    if (k != ' ') setKey(ascii2scan[k],toggle);
+    char k = textseq[kcnt];
+    if (k != '\t') setKey(ascii2scan[k],toggle);
     if (!toggle) {
       kcnt++;
       nbkeys--;

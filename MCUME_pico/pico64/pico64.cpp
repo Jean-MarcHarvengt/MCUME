@@ -21,7 +21,18 @@ bool repeating_timer_callback(struct repeating_timer *t) {
     return true;
 }
 
+#include "hardware/clocks.h"
+#include "hardware/vreg.h"
+
 int main(void) {
+    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    set_sys_clock_khz(125000, true);    
+//    set_sys_clock_khz(150000, true);    
+//    set_sys_clock_khz(133000, true);    
+//    set_sys_clock_khz(200000, true);    
+//    set_sys_clock_khz(225000, true);    
+    set_sys_clock_khz(250000, true);    
+
     stdio_init_all();
 
     tft.begin(VGA_MODE_320x240);
@@ -65,12 +76,7 @@ void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int 
     }
 }
 
-void emu_DrawVsync(void)
-{
-    skip += 1;
-    skip &= VID_FRAME_SKIP;
-    tft.waitSync(); 
-}
+
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
@@ -106,10 +112,6 @@ int emu_FrameSkip(void)
     return skip;
 }
 
-void * emu_LineBuffer(int line)
-{
-    return (void*)tft.getLineBuffer(line);    
-}
 
 
 

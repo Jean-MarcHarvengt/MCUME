@@ -1271,7 +1271,7 @@ typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint1
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
 
-static tpixel linebuffer[SCREEN_WIDTH];
+//static tpixel linebuffer[SCREEN_WIDTH];
 
 void vic_do(void) {
 
@@ -1291,7 +1291,6 @@ void vic_do(void) {
   */
 
   if ( cpu.vic.rasterLine >= LINECNT ) {
-
     //reSID sound needs much time - too much to keep everything in sync and with stable refreshrate
     //but it is not called very often, so most of the time, we have more time than needed.
     //We can measure the time needed for a frame and calc a correction factor to speed things up.
@@ -1303,9 +1302,9 @@ void vic_do(void) {
     cpu.vic.rasterLine = 0;
     cpu.vic.vcbase = 0;
     cpu.vic.denLatch = 0;
-    //if (cpu.vic.rasterLine == LINECNT)
-    //delay(50);
-    emu_DrawVsync();  
+    //if (cpu.vic.rasterLine == LINECNT) {
+      emu_DrawVsync();
+    //}    
 
   } else  cpu.vic.rasterLine++;
 
@@ -1394,7 +1393,8 @@ void vic_do(void) {
 
   //max_x =  (!cpu.vic.CSEL) ? 40:38;
   //p = SCREENMEM + (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH;
-  p = &linebuffer[0]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+  //p = &linebuffer[0]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE));
   pe = p + SCREEN_WIDTH;
   //Left Screenborder: Cycle 10
   spl = &cpu.vic.spriteLine[24];
@@ -1559,7 +1559,8 @@ g-Zugriff
     uint16_t col = cpu.vic.colors[0];
     //p = &screen[r - FIRSTDISPLAYLINE][0];
     //p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH  + BORDER_LEFT;
-    p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+    //p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+    p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE));
 #if 0
     // Sprites im Rand
     uint16_t sprite;
@@ -1583,7 +1584,8 @@ g-Zugriff
     //Rand rechts:
     //p = &screen[r - FIRSTDISPLAYLINE][SCREEN_WIDTH - 9];
 	//p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH + SCREEN_WIDTH - 9 + BORDER_LEFT;
-	p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+	//p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
   pe = p + 9;
 
 #if 0
@@ -1603,7 +1605,7 @@ g-Zugriff
 
   }
 
-  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+//  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
 
 
 //Rechter Rand nach CSEL, im Textbereich
