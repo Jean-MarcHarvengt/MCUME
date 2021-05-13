@@ -4,6 +4,13 @@
 </p>
 
 # News
+May 2021: few improvements for raspberry pi PICO<br>
+- VGA driver stripped down for 8bits RRRGGGBB (red lines bug fixed)...
+- Improved PWM audio...
+- Add sound to C64 emulator but still running far too slow
+- Add SID player application (picosnd)
+<br>
+
 April 2021: Add initial support for raspberry PICO<br>
 - adapted pico scanline library for  VGA 8 bits mode (RRRGGGBB), sorry adapted code is embedded...
 - SD support from https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico (fixed IRQ to 1)
