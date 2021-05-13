@@ -4,6 +4,11 @@
 </p>
 
 # News
+May 13th 2021: C64 emulator improvement for PICO<br>
+- Overclocked to 250MHz for better speed
+- Add on screen keyboard for text input
+<br>
+
 May 2021: few improvements for raspberry pi PICO<br>
 - VGA driver stripped down for 8bits RRRGGGBB (red lines bug fixed)...
 - Improved PWM audio...
