@@ -48,7 +48,7 @@
 #define PICO_SCANVIDEO_SCANLINE_DMA_CHANNELS_MASK (1u << PICO_SCANVIDEO_SCANLINE_DMA_CHANNEL)
 
 
-extern uint8_t * pio_fb;
+extern uint32_t * pio_fb;
 extern int pio_fbwidth;
 
 
@@ -75,6 +75,28 @@ const scanvideo_timing_t vga_timing_640x480_60_default =
                 .enable_den = 0
         };
 
+const scanvideo_timing_t vga_timing_wide_480_50 =
+        {
+                .clock_freq = 24000000, //24000000,
+
+                .h_active = 800,
+                .v_active = 480,
+
+                .h_front_porch = 32, //12,
+                .h_pulse = 48,
+                .h_total = 960,
+                .h_sync_polarity = 0,
+
+                .v_front_porch = 1,
+                .v_pulse = 2,
+                .v_total = 500,
+                .v_sync_polarity = 0,
+
+                .enable_clock = 0,
+                .clock_polarity = 0,
+
+                .enable_den = 0
+        };
 
 const scanvideo_mode_t vga_mode_320x240_60 =
         {
@@ -87,6 +109,15 @@ const scanvideo_mode_t vga_mode_320x240_60 =
         };
 
 
+const scanvideo_mode_t vga_mode_tft_400x240_50 =
+        {
+                .default_timing = &vga_timing_wide_480_50,
+                .pio_program = &video_24mhz_composable,
+                .width = 400,
+                .height = 240,
+                .xscale = 2,
+                .yscale = 2,
+        };
 
 #define scanline_assert(x) (void)0
 
@@ -120,7 +151,6 @@ const scanvideo_pio_program_t video_24mhz_composable = {
         .configure_pio = video_24mhz_composable_configure_pio
 };
 
-#define PIO_WAIT_IRQ4 pio_encode_wait_irq(1, false, 4)
 static uint8_t video_htiming_load_offset;
 static uint8_t video_program_load_offset;
 
@@ -231,9 +261,9 @@ void __video_time_critical_func(prepare_for_active_scanline_irqs_enabled)() {
     full_scanline_buffer_t *fsb = &scanline_buffer;
     uint16_t scanline = shared_state.scanline.next_scanline_id & 0xffffu; 
     if (scanline < 240)
-        fsb->core.data = (uint32_t *)&pio_fb[(320+16)*scanline];
+        fsb->core.data = &pio_fb[(pio_fbwidth+1)*scanline];
     else 
-        fsb->core.data = (uint32_t *)&pio_fb[(320+16)*(0)];
+        fsb->core.data = &pio_fb[0];
     dma_channel_transfer_from_buffer_now(PICO_SCANVIDEO_SCANLINE_DMA_CHANNEL, fsb->core.data,
                                          (uint32_t) fsb->core.data_used);
     shared_state.scanline.in_vblank = false;
@@ -352,19 +382,9 @@ void setup_sm(int sm, uint offset) {
         sm_config_set_out_shift(&config, true, true, 32);
         const uint BASE = PICO_SCANVIDEO_SYNC_PIN_BASE; // hsync and vsync are +0 and +1, clock is +2
         uint pin_count;
-#if PICO_SCANVIDEO_ENABLE_DEN_PIN
-        pin_count = 3;
-        // 3 OUT pins and maybe 1 sideset pin following them
-#else
         // 2 OUT pins and 1 sideset pin following them
         pin_count = 2;
-#endif
         sm_config_set_out_pins(&config, BASE, pin_count);
-#if PICO_SCANVIDEO_ENABLE_DEN_PIN
-        // side set pin as well
-        sm_config_set_sideset_pins(&config, BASE + pin_count);
-        pin_count++;
-#endif
         pio_sm_set_consecutive_pindirs(video_pio, sm, BASE, pin_count, true);
     }
 
@@ -387,9 +407,6 @@ void scanvideo_set_scanline_repeat_fn(scanvideo_scanline_repeat_count_fn fn) {
     _scanline_repeat_count_fn = fn ? fn : default_scanvideo_scanline_repeat_count_fn;
 }
 
-bool scanvideo_setup(const scanvideo_mode_t *mode) {
-    return scanvideo_setup_with_timing(mode, mode->default_timing);
-}
 
 static pio_program_t copy_program(const pio_program_t *program, uint16_t *instructions,
                                        uint32_t max_instructions) {
@@ -400,8 +417,7 @@ static pio_program_t copy_program(const pio_program_t *program, uint16_t *instru
     return copy;
 }
 
-
-bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_timing_t *timing) {
+static bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_timing_t *timing) {
     __builtin_memset(&shared_state, 0, sizeof(shared_state));
 
     // init non zero members
@@ -409,9 +425,6 @@ bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_t
     video_mode = *mode;
     video_mode.default_timing = timing;
 
-    static_assert(BPP == 16, ""); // can't do 8 bit now because of pixel count
-    // this is no longer necessary
-    //assert(!(mode->width & 1));
     if (!video_mode.yscale_denominator) video_mode.yscale_denominator = 1;
     // todo is this still necessary?
     //invalid_params_if(SCANVIDEO_DPI, (timing->v_active % mode->yscale));
@@ -424,15 +437,6 @@ bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_t
     uint pin_mask = 3u << PICO_SCANVIDEO_SYNC_PIN_BASE;
     bi_decl_if_func_used(bi_2pins_with_names(PICO_SCANVIDEO_SYNC_PIN_BASE, "HSync",
                                                PICO_SCANVIDEO_SYNC_PIN_BASE + 1, "VSync"));
-
-#if PICO_SCANVIDEO_ENABLE_DEN_PIN
-    bi_decl_if_func_used(bi_1pin_with_name(PICO_SCANVIDEO_SYNC_PIN_BASE + 2, "Display Enable"));
-    pin_mask |= 4u << PICO_SCANVIDEO_SYNC_PIN_BASE;
-#endif
-#if PICO_SCANVIDEO_ENABLE_CLOCK_PIN
-    bi_decl_if_func_used(bi_1pin_with_name(PICO_SCANVIDEO_SYNC_PIN_BASE + 3, "Pixel Clock"));
-    pin_mask |= 8u << PICO_SCANVIDEO_SYNC_PIN_BASE;
-#endif
     static_assert(PICO_SCANVIDEO_PIXEL_RSHIFT + PICO_SCANVIDEO_PIXEL_RCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "red bits do not fit in color pins");
     static_assert(PICO_SCANVIDEO_PIXEL_GSHIFT + PICO_SCANVIDEO_PIXEL_GCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "green bits do not fit in color pins");
     static_assert(PICO_SCANVIDEO_PIXEL_BSHIFT + PICO_SCANVIDEO_PIXEL_BCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "blue bits do not fit in color pins");
@@ -455,15 +459,9 @@ bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_t
 #else
     uint sys_clk = clock_get_hz(clk_sys);
     video_clock_down_times_2 = sys_clk / timing->clock_freq;
-#if PICO_SCANVIDEO_ENABLE_CLOCK_PIN
-    if (video_clock_down_times_2 * timing->clock_freq != sys_clk) {
-        panic("System clock (%d) must be an integer multiple of 2 times the requested pixel clock (%d).", sys_clk, timing->clock_freq);
-    }
-#else
-    if (video_clock_down_times_2 * timing->clock_freq != sys_clk) {
-        panic("System clock (%d) must be an integer multiple of the requested pixel clock (%d).", sys_clk, timing->clock_freq);
-    }
-#endif
+    //if (video_clock_down_times_2 * timing->clock_freq != sys_clk) {
+    //    panic("System clock (%d) must be an integer multiple of the requested pixel clock (%d).", sys_clk, timing->clock_freq);
+    //}
 #endif
 
     valid_params_if(SCANVIDEO_DPI, mode->width * mode->xscale <= timing->h_active);
@@ -583,6 +581,11 @@ bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_t
     return true;
 }
 
+bool scanvideo_setup(const scanvideo_mode_t *mode) {
+    return scanvideo_setup_with_timing(mode, mode->default_timing);
+}
+
+
 bool video_24mhz_composable_adapt_for_mode(const scanvideo_pio_program_t *program, const scanvideo_mode_t *mode,
                                            scanvideo_scanline_buffer_t *missing_scanline_buffer,
                                            uint16_t *modifiable_instructions) {
@@ -602,22 +605,13 @@ bool video_24mhz_composable_adapt_for_mode(const scanvideo_pio_program_t *progra
 }
 
 
-
-void scanvideo_default_configure_pio(pio_hw_t *pio, uint sm, uint offset, pio_sm_config *config, bool overlay) {
-    pio_sm_set_consecutive_pindirs(pio, sm, PICO_SCANVIDEO_COLOR_PIN_BASE, PICO_SCANVIDEO_COLOR_PIN_COUNT, true);
-    sm_config_set_out_pins(config, PICO_SCANVIDEO_COLOR_PIN_BASE, PICO_SCANVIDEO_COLOR_PIN_COUNT);
-    sm_config_set_out_shift(config, true, true, 32); // autopull
-    sm_config_set_fifo_join(config, PIO_FIFO_JOIN_TX);
-    if (overlay) {
-        sm_config_set_out_special(config, 1, 1, PICO_SCANVIDEO_ALPHA_PIN);
-    } else {
-        sm_config_set_out_special(config, 1, 0, 0);
-    }
-}
-
 pio_sm_config video_24mhz_composable_configure_pio(pio_hw_t *pio, uint sm, uint offset) {
     pio_sm_config config = video_24mhz_composable_default_program_get_default_config(offset);
-    scanvideo_default_configure_pio(pio, sm, offset, &config, sm != PICO_SCANVIDEO_SCANLINE_SM);
+    pio_sm_set_consecutive_pindirs(pio, sm, PICO_SCANVIDEO_COLOR_PIN_BASE, PICO_SCANVIDEO_COLOR_PIN_COUNT, true);
+    sm_config_set_out_pins(&config, PICO_SCANVIDEO_COLOR_PIN_BASE, PICO_SCANVIDEO_COLOR_PIN_COUNT);
+    sm_config_set_out_shift(&config, true, true, 32); // autopull
+    sm_config_set_fifo_join(&config, PIO_FIFO_JOIN_TX);
+    sm_config_set_out_special(&config, 1, 0, 0);
     return config;
 }
 

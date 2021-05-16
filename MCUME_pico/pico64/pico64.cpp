@@ -35,7 +35,8 @@ int main(void) {
 
     stdio_init_all();
 
-    tft.begin(VGA_MODE_320x240);
+    tft.begin(VGA_MODE_400x240);
+//    tft.begin(VGA_MODE_320x240);
     emu_init();
     while (true) {
         if (menuActive()) {
@@ -76,7 +77,10 @@ void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int 
     }
 }
 
-
+void * emu_LineBuffer(int line)
+{
+    return (void*)tft.getLineBuffer(line);    
+}
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {

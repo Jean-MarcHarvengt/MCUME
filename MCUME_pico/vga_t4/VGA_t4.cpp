@@ -34,7 +34,7 @@ static vga_pixel * visible_framebuffer = NULL;
 static vga_pixel * framebuffer = NULL;
 static vga_pixel * fb0 = NULL;
 
-uint8_t * pio_fb = NULL;
+uint32_t * pio_fb = NULL;
 int pio_fbwidth=0;
 
 
@@ -46,13 +46,12 @@ static int  fb_stride;
 static int  left_border;
 static int  top_border;
 
+static scanvideo_mode_t vga_mode;
 
-static semaphore_t video_initted;
+static semaphore_t core1_initted;
 static void core1_func();
 
 PolyDef	PolySet;  // will contain a polygon data
-
-#define vga_mode vga_mode_320x240_60
 
 #define RGBVAL16(r,g,b)  ( (((b>>3)&0x1f)<<11) | (((g>>2)&0x3f)<<5) | (((r>>3)&0x1f)<<0) )
 #define PICO_SCANVIDEO_PIXEL_FROM_RGBVAL8(rgb) (((rgb&0x3)<<(PICO_SCANVIDEO_PIXEL_BSHIFT))|(((rgb&0x1C)>>2)<<(PICO_SCANVIDEO_PIXEL_GSHIFT))|(((rgb&0xE0)>>5)<<(PICO_SCANVIDEO_PIXEL_RSHIFT)))
@@ -63,15 +62,16 @@ static void core1_sio_irq();
 
 
 static void core1_func() {
-    // initialize video and interrupts on core 1
-    scanvideo_setup(&vga_mode);
-    scanvideo_timing_enable(true);
-    sem_release(&video_initted);
-
+  // initialize video
+  scanvideo_setup(&vga_mode);
+  scanvideo_timing_enable(true);
+  
     multicore_fifo_clear_irq();
     irq_set_exclusive_handler(SIO_IRQ_PROC1,core1_sio_irq);
     //irq_set_priority (SIO_IRQ_PROC1, 129);    
     irq_set_enabled(SIO_IRQ_PROC1,true);
+
+    sem_release(&core1_initted);
     
     while (true) {
         tight_loop_contents();
@@ -116,26 +116,23 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
 {
   switch(mode) {
     case VGA_MODE_320x240:
+      vga_mode = vga_mode_320x240_60;
       fb_width = 320;
-      fb_height = 240;
-      left_border = (320-fb_width)/2;
-      top_border = (240-fb_height)/2;
+      fb_height = 240;      
+      left_border = 0;
+      top_border = 0;
       fb_stride = fb_width+16;
       break;
-    case VGA_MODE_320x480:
-      break;   
-    case VGA_MODE_640x240:
-      break;
-    case VGA_MODE_640x480:
-      break;   
-    case VGA_MODE_512x240:
-      break;
-    case VGA_MODE_512x480:
-      break; 
     case VGA_MODE_352x240:
+      break;   
+    case VGA_MODE_400x240:
+      vga_mode = vga_mode_tft_400x240_50;
+      fb_width = 400;
+      fb_height = 240;
+      left_border = 0;
+      top_border = 0;
+      fb_stride = fb_width+16;
       break;
-    case VGA_MODE_352x480:
-      break;         
   }	
 
 
@@ -147,19 +144,19 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
 
 
   init_pio_framebuffer(fb0);
-  pio_fb = fb0;
-  pio_fbwidth = (320 + 2*6)/4;
+  pio_fb = (uint32_t*)fb0;
+  pio_fbwidth = (fb_width + 2*6)/4;
   visible_framebuffer = fb0+PIO_FB_OFFSET;
   framebuffer = fb0+PIO_FB_OFFSET;
 
-  // create a semaphore to be posted when video init is complete
-  sem_init(&video_initted, 0, 1);
 
-  // launch all the video on core 1, so it isn't affected by USB handling on core 0
+  // create a semaphore to be posted when audio init is complete
+  sem_init(&core1_initted, 0, 1);
+
   multicore_launch_core1(core1_func);
 
-  // wait for initialization of video to be complete
-  sem_acquire_blocking(&video_initted);
+  // wait for initialization of audio to be complete
+  sem_acquire_blocking(&core1_initted);
 
   return(VGA_OK);
 }
@@ -173,10 +170,11 @@ void VGA_T4::debug()
 }
 
 // retrieve size of the frame buffer
-void VGA_T4::get_frame_buffer_size(int *width, int *height)
+int VGA_T4::get_frame_buffer_size(int *width, int *height)
 {
-  *width = fb_width;
-  *height = fb_height;
+  if (width != nullptr) *width = fb_width;
+  if (height != nullptr) *height = fb_height;
+  return fb_stride;
 }
 
 void VGA_T4::waitSync()
@@ -1450,13 +1448,13 @@ void VGA_T4::run_gfxengine()
   waitSync();
 
   if (fb1 != NULL) {
-  	if (pio_fb == fb0) {
-      pio_fb = fb1;      
+  	if (pio_fb == (uint32_t*)fb0) {
+      pio_fb = (uint32_t*)fb1;      
   	  visible_framebuffer = fb1+PIO_FB_OFFSET;
   	  framebuffer = fb0+PIO_FB_OFFSET;
   	}
   	else {
-      pio_fb = fb0;      
+      pio_fb = (uint32_t*)fb0;      
   	  visible_framebuffer = fb0+PIO_FB_OFFSET;
   	  framebuffer = fb1+PIO_FB_OFFSET;
   	} 

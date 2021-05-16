@@ -8,12 +8,7 @@
 #define SCANVIDEO_scanvideo_H_
 
 #include "pico/types.h"
-
-#if !PICO_NO_HARDWARE
-
 #include "hardware/pio.h"
-
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,14 +20,6 @@ extern "C" {
  * Common Scan-out Video API
  */
 // == CONFIG ============
-
-#ifndef PICO_SCANVIDEO_ENABLE_CLOCK_PIN
-#define PICO_SCANVIDEO_ENABLE_CLOCK_PIN 0
-#endif
-
-#ifndef PICO_SCANVIDEO_ENABLE_DEN_PIN
-#define PICO_SCANVIDEO_ENABLE_DEN_PIN 0
-#endif
 
 #ifndef PICO_SCANVIDEO_COLOR_PIN_BASE
 #define PICO_SCANVIDEO_COLOR_PIN_BASE 2
@@ -46,15 +33,9 @@ extern "C" {
 #define PICO_SCANVIDEO_SYNC_PIN_BASE (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_COLOR_PIN_COUNT)
 #endif
 
-#ifndef PICO_SCANVIDEO_ENABLE_VIDEO_CLOCK_DOWN
-#define PICO_SCANVIDEO_ENABLE_VIDEO_CLOCK_DOWN 0
-#endif
-
 
 
 // ======================
-
-#define BPP 16
 
 // most likely 24000000
 extern const uint32_t video_clock_freq;
@@ -101,12 +82,7 @@ typedef struct scanvideo_mode {
 } scanvideo_mode_t;
 
 extern bool scanvideo_setup(const scanvideo_mode_t *mode);
-extern bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scanvideo_timing_t *timing);
 extern void scanvideo_timing_enable(bool enable);
-// these take effect after the next vsync
-extern void scanvideo_display_enable(bool enable);
-// doesn't exist yet!
-// extern void video_set_display_mode(const struct scanvideo_mode *mode);
 
 // --- scanline management ---
 
@@ -158,52 +134,23 @@ void scanvideo_set_scanline_repeat_fn(scanvideo_scanline_repeat_count_fn fn);
 
 extern const scanvideo_timing_t vga_timing_640x480_60_default;
 extern const scanvideo_mode_t vga_mode_320x240_60;
+extern const scanvideo_mode_t vga_mode_tft_400x240_50;
 
 
 // mode implementation
 
 struct scanvideo_pio_program {
-#if !PICO_NO_HARDWARE
     const pio_program_t *program;
     const uint8_t entry_point;
     // modifiable_instructions is of size program->length
     bool (*adapt_for_mode)(const scanvideo_pio_program_t *program, const scanvideo_mode_t *mode,
                            scanvideo_scanline_buffer_t *missing_scanline_buffer, uint16_t *modifiable_instructions);
     pio_sm_config (*configure_pio)(pio_hw_t *pio, uint sm, uint offset);
-#else
-    const char *id;
-#endif
 };
 
 extern const scanvideo_pio_program_t video_24mhz_composable;
 
-#if !PICO_NO_HARDWARE
-extern void scanvideo_default_configure_pio(pio_hw_t *pio, uint sm, uint offset, pio_sm_config *config, bool overlay);
-#endif
 
-
-// note this is not necessarily an absolute gpio pin mask, it is still shifted by PICO_SCANVIDEO_COLOR_PIN_BASE
-#define PICO_SCANVIDEO_ALPHA_MASK (1u << PICO_SCANVIDEO_ALPHA_PIN)
-
-#ifndef PICO_SCANVIDEO_PIXEL_FROM_RGB8
-#define PICO_SCANVIDEO_PIXEL_FROM_RGB8(r, g, b) ((((b)>>3u)<<PICO_SCANVIDEO_PIXEL_BSHIFT)|(((g)>>3u)<<PICO_SCANVIDEO_PIXEL_GSHIFT)|(((r)>>3u)<<PICO_SCANVIDEO_PIXEL_RSHIFT))
-#endif
-
-#ifndef PICO_SCANVIDEO_PIXEL_FROM_RGB5
-#define PICO_SCANVIDEO_PIXEL_FROM_RGB5(r, g, b) (((b)<<PICO_SCANVIDEO_PIXEL_BSHIFT)|((g)<<PICO_SCANVIDEO_PIXEL_GSHIFT)|((r)<<PICO_SCANVIDEO_PIXEL_RSHIFT))
-#endif
-
-#ifndef PICO_SCANVIDEO_R5_FROM_PIXEL
-#define PICO_SCANVIDEO_R5_FROM_PIXEL(p) (((p)>>PICO_SCANVIDEO_PIXEL_RSHIFT)&0x1f)
-#endif
-
-#ifndef PICO_SCANVIDEO_G5_FROM_PIXEL
-#define PICO_SCANVIDEO_G5_FROM_PIXEL(p) (((p)>>PICO_SCANVIDEO_PIXEL_GSHIFT)&0x1f)
-#endif
-
-#ifndef PICO_SCANVIDEO_B5_FROM_PIXEL
-#define PICO_SCANVIDEO_B5_FROM_PIXEL(p) (((p)>>PICO_SCANVIDEO_PIXEL_BSHIFT)&0x1f)
-#endif
 
 #ifdef __cplusplus
 }

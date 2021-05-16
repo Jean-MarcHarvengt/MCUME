@@ -32,13 +32,8 @@ typedef uint8_t vga_pixel;
 typedef enum vga_mode_t
 {
   VGA_MODE_320x240 = 0,
-  VGA_MODE_320x480 = 1,
-  VGA_MODE_352x240 = 2,
-  VGA_MODE_352x480 = 3,
-  VGA_MODE_512x240 = 4,
-  VGA_MODE_512x480 = 5,
-  VGA_MODE_640x240 = 6,
-  VGA_MODE_640x480 = 7
+  VGA_MODE_352x240 = 1,
+  VGA_MODE_400x240 = 2,
 } vga_mode_t;
 
 
@@ -170,7 +165,7 @@ public:
   void tweak_video(int shiftdelta, int numdelta, int denomdelta);
 
   // retrieve real size of the frame buffer
-  void get_frame_buffer_size(int *width, int *height);
+  int get_frame_buffer_size(int *width, int *height);
 
   // wait next Vsync
   void waitSync();

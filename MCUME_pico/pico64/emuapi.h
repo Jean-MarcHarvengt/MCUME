@@ -118,6 +118,7 @@ extern int emu_ReadAnalogJoyY(int min, int max);
 extern int emu_ReadI2CKeyboard(void);
 extern void emu_KeyboardOnUp(int keymodifer, int key);
 extern void emu_KeyboardOnDown(int keymodifer, int key);
+extern int emu_oskbActive(void);
 
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);

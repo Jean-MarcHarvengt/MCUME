@@ -39,12 +39,12 @@ Copyright Frank Bösing, 2017
 #include "Teensy64.h"
 
 
-static inline unsigned get_ccount(void)
-{
-        //unsigned r;
-        //asm volatile ("rsr %0, ccount" : "=r"(r));
-        return 0;
-}
+//static inline unsigned get_ccount(void)
+//{
+//        //unsigned r;
+//        //asm volatile ("rsr %0, ccount" : "=r"(r));
+//        return (time_us_32());
+//}
 
 void disableEventResponder(void);
 

@@ -27,14 +27,14 @@ static void oneRasterLine(void) {
 
   while (true) {
 
-    cpu.lineStartTime = get_ccount();
+    cpu.lineStartTime = fbmicros(); //get_ccount();
     cpu.lineCycles = cpu.lineCyclesAbs = 0;
 
     if (!cpu.exactTiming) {
-    vic_do();
-  } else {
-    vic_do_simple();
-  }
+      vic_do();
+    } else {
+      vic_do_simple();
+    }
 
     if (--lc == 0) {
       lc = LINEFREQ / 10; // 10Hz
@@ -44,11 +44,10 @@ static void oneRasterLine(void) {
 
     //Switch "ExactTiming" Mode off after a while:
     if (!cpu.exactTiming) break;
-    // no exact timing !!  JMH
-    //if (get_ccount() - cpu.exactTimingStartTime >= EXACTTIMINGDURATION * (F_CPU / 1000)) {
-    //  cpu_disableExactTiming();
-    //  break;
-    //}
+    if ( (fbmicros() - cpu.exactTimingStartTime)*1000 >= EXACTTIMINGDURATION ) {
+      cpu_disableExactTiming();
+      break;
+    }
   };
 
 }
@@ -289,11 +288,8 @@ static char textkey[1];
 static bool res=false;
 static bool firsttime=true;
 
-
-static unsigned char dummyline[320];
-
-static char * oskbtext1 = "1234567890 \"$,ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static char * oskbtext2 = "FFFFFFFF                              ";
+static char * oskbtext1 = "FFFFFFFF  RD\"$ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static char * oskbtext2 = "12345678  TL  ,.*     0123456789        ";
 static int oskbXPos = 10;
 static int oskbYPos = 0;
 
@@ -301,14 +297,20 @@ static int oskbYPos = 0;
 #define OSKB_BG   VGA_RGB(255, 255, 255)
 #define OSKB_HL   VGA_RGB(255, 255, 0)
 
+int emu_oskbActive(void) {
+  return (oskbActive?1:0);
+}
+
 void emu_DrawVsync(void)
 {
     char sel[2]={0,0};
     if (oskbActive) {
-      tft.drawText(0,OSKB_YPOS,oskbtext1,OSKB_TEXT,OSKB_BG,false);
-      tft.drawText(0,OSKB_YPOS+8,oskbtext2,OSKB_TEXT,OSKB_BG,false);
+      int fbwidth;
+      tft.get_frame_buffer_size(&fbwidth,NULL);       
+      tft.drawText((fbwidth-320)/2,OSKB_YPOS,oskbtext1,OSKB_TEXT,OSKB_BG,false);
+      tft.drawText((fbwidth-320)/2,OSKB_YPOS+8,oskbtext2,OSKB_TEXT,OSKB_BG,false);
       sel[0]=(oskbYPos==0)?oskbtext1[oskbXPos]:oskbtext2[oskbXPos];
-      tft.drawText(oskbXPos*8,OSKB_YPOS+8*oskbYPos,sel,OSKB_TEXT,OSKB_HL,false);
+      tft.drawText((fbwidth-320)/2+oskbXPos*8,OSKB_YPOS+8*oskbYPos,sel,OSKB_TEXT,OSKB_HL,false);
     }
     //skip += 1;
     //skip &= VID_FRAME_SKIP;
@@ -316,20 +318,13 @@ void emu_DrawVsync(void)
 }
 
 
-void * emu_LineBuffer(int line)
-{
-    if ( (line >= OSKB_YPOS) && (oskbActive) )
-      return &dummyline[0];
-
-    return (void*)tft.getLineBuffer(line);    
-}
-
-
 void c64_Input(int bClick) {
   if (oskbActive) {
-    if (bClick & MASK_JOY2_BTN) {
-      textkey[0] = oskbtext1[oskbXPos];
-      if (oskbYPos==1) if (oskbXPos<8) textkey[0] = 0x85+oskbXPos;
+    if (bClick & MASK_JOY2_BTN) {    
+      if (oskbXPos == 10) textkey[0] = 13;
+      else if (oskbXPos == 11) textkey[0] = 157;
+      else if (oskbXPos < 8) textkey[0] = 0x85+oskbXPos;
+      else textkey[0] = (oskbYPos == 0)?oskbtext1[oskbXPos]:oskbtext2[oskbXPos];
       textseq = textkey;
       nbkeys = 1;   
       kcnt = 0;

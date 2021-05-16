@@ -2677,11 +2677,11 @@ noOpcode:
 			cia_clockt(cpu.ticks);
 			c-= cpu.ticks;
 			cpu.lineCycles += cpu.ticks;
-
-			//if (cpu.exactTiming) {
-				//uint32_t t = cpu.lineCycles * MCU_C64_RATIO;
-				//while (ARM_DWT_CYCCNT - cpu.lineStartTime < t){;}
-			//}
+#define US_C64_CYCLE    (1000000.0f / CLOCKSPEED) // Duration (µs) of a C64 Cycle
+			if (cpu.exactTiming) {
+				uint32_t t = cpu.lineCycles * US_C64_CYCLE;
+				while (fbmicros() - cpu.lineStartTime < t){;}
+			}
 
 	};
 
@@ -2696,9 +2696,9 @@ void cpu_setExactTiming() {
 		vic_displaySimpleModeScreen();
 
 	}
-	//cpu.exactTiming = 1;
-	//cpu.exactTimingStartTime = ARM_DWT_CYCCNT;
-	cpu.exactTiming = 0;
+	cpu.exactTiming = 1;
+	cpu.exactTimingStartTime = fbmicros();
+	//cpu.exactTiming = 0;
 }
 
 //Disable "ExactTiming" Mode
