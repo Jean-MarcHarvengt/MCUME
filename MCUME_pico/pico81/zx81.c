@@ -494,7 +494,7 @@ void z81_Init(void)
     emu_SetPaletteEntry(Palette[J].R,Palette[J].G,Palette[J].B, J);
 
   emu_printf("Allocating RAM");
-  if (mem == 0) mem = emu_Malloc(MEMORYRAM_SIZE);
+  if (mem == 0) mem = emu_Malloc(MEMORYRAM_SIZE); //&memo[0];
   
   Reset8910(&ay,3500000,0);
   

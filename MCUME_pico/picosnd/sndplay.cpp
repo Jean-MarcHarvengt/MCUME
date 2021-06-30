@@ -48,7 +48,9 @@ static YMMUSIC *ymDecoder;
 
 void snd_Init(void)
 {
-  emu_sndInit();  
+#ifdef HAS_SND  
+  emu_sndInit();
+#endif  
   switch (mustype) {
     case C64Dmp:
       playSID.begin();

@@ -30,59 +30,37 @@
 #define ACTION_RUNTFT        129
 #define ACTION_RUNVGA        130
 
+
 #ifdef KEYMAP_PRESENT
-
-#define TAREA_W_DEF          32
-#define TAREA_H_DEF          32
-#define TAREA_END            255
-#define TAREA_NEW_ROW        254
-#define TAREA_NEW_COL        253
-#define TAREA_XY             252
-#define TAREA_WH             251
-
-#define KEYBOARD_X           120
-#define KEYBOARD_Y           6
-#define KEYBOARD_KEY_H       23
-#define KEYBOARD_KEY_W       28
-#define KEYBOARD_HIT_COLOR   RGBVAL16(0xff,0x00,0x00)
-
-const unsigned short keysw[] = {
-  TAREA_XY,KEYBOARD_X,KEYBOARD_Y,
-  TAREA_WH,KEYBOARD_KEY_W,KEYBOARD_KEY_H,
-  TAREA_NEW_ROW,28,28,28,
-  TAREA_NEW_COL,136,
-  TAREA_WH,KEYBOARD_KEY_W,KEYBOARD_KEY_H, 
-  TAREA_NEW_ROW,28,28,28,
-  TAREA_NEW_ROW,28,28,28,
-  TAREA_NEW_ROW,28,28,28,
-  TAREA_NEW_ROW,28,28,28,
-  TAREA_END};
-
-  // These may be set to 1. The core handles clearing them.
-  // [BREAK] 0  [ # ] 1  [ 0 ] 2  [ * ] 3
-  // [RESET] 4  [ 9 ] 5  [ 8 ] 6  [ 7 ] 7
-  // [PAUSE] 8  [ 6 ] 9  [ 5 ] 10 [ 4 ] 11
-  // [START] 12 [ 3 ] 13 [ 2 ] 14 [ 1 ] 15
-
+#ifdef PICOMPUTER
    
 const unsigned short key_map1[] = {
-  12+1,8+1,4+1,
-  0,
-  15+1,14+1,13+1,
-  11+1,10+1,9+1,
-  7+1,6+1,9+1,
-  3+1,2+1,1+1
+  15+1,14+1,13+1,11+1,10+1,9+1,7+1,6+1,5+1,2+1,0,
+  0,12+1,8+1,4+1,0+1,1+1,3+1,0,0,0,0,
+  0, 0,0,0,0,0,0,0,0,0,
+  0,0,0,0
   };  
 
-#ifdef HAS_I2CKBD
-const unsigned short i2ckeys[] = {
-     0X0080,0X0008,0X0180,0X0108,0X0280,0X0208,0X0380,0X0308,0X0480,0X0408,
-  0, 0X0040,0X0004,0X0140,0X0104,0X0240,0X0204,0X0340,0X0304,0X0440,0X0404,
-  0, 0X0020,0X0002,0X0120,0X0102,0X0220,0X0202,0X0320,0X0302,0X0420,0X0402,
-     0X0010,0X0001,0X0110,0X0101,0X0210,0X0201,0X0310,0X0301,0X0410,0X0401,
-  };
+// These may be set to 1. The core handles clearing them.
+// [BREAK] 0  [ # ] 1  [ 0 ] 2  [ * ] 3
+// [RESET] 4  [ 9 ] 5  [ 8 ] 6  [ 7 ] 7
+// [PAUSE] 8  [ 6 ] 9  [ 5 ] 10 [ 4 ] 11
+// [START] 12 [ 3 ] 13 [ 2 ] 14 [ 1 ] 15
+
+const unsigned short key_map2[] = {
+  0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,
+  0, 0,0,0,0,0,0,0,0,0,
+  0,0,0,0
+  };  
+
+const unsigned short matkeys[] = {
+  0x020,0x120,0x220,0x320,0x420,0x408,0x308,0x208,0x108,0x008,0x520, // row 1
+  0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
+  /*0x002*/ 0xfff,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
+  0x508,0x501,0x502,0x504 }; // cursor keys
+ 
 #endif
-   
 #endif
 
 

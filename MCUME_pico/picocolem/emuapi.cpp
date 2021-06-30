@@ -13,12 +13,12 @@ extern "C" {
   #include "iopins.h"
 }
 
-
+#ifdef USE_VGA
 #include "vga_t_dma.h"
-const uint16_t deflogo[] = {
-  0,0
-};
-static const uint16_t * logo = deflogo;
+#else
+#include "tft_t_dma.h"
+#endif
+
 
 #define MAX_FILES           64
 #define MAX_FILENAME_SIZE   24
@@ -49,8 +49,12 @@ static char selection[MAX_FILENAME_SIZE+1]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
-static bool i2cKeyboardPresent = false;
+#ifdef PICOMPUTER
 static unsigned short * keys;
+static unsigned char keymatrix[6];
+static int keymatrix_hitrow=-1;
+static bool key_fn=false;
+#endif
 static int keyMap;
    
 static int keypadval=0; 
@@ -134,16 +138,10 @@ void emu_Free(void * pt)
 
 
 
-
-
 int emu_ReadAnalogJoyX(int min, int max) 
 {
-#ifdef PIN_JOY2_A1X  
   adc_select_input(0);
   int val = adc_read();
-#else
-  int val = 0;
-#endif  
 #if INVX
   val = 4095 - val;
 #endif
@@ -156,12 +154,8 @@ int emu_ReadAnalogJoyX(int min, int max)
 
 int emu_ReadAnalogJoyY(int min, int max) 
 {
-#ifdef PIN_JOY2_A2Y  
   adc_select_input(1);  
   int val = adc_read();
-#else
-  int val = 0;
-#endif   
 #if INVY
   val = 4095 - val;
 #endif
@@ -178,7 +172,7 @@ int emu_ReadAnalogJoyY(int min, int max)
 static uint16_t readAnalogJoystick(void)
 {
   uint16_t joysval = 0;
-
+#ifdef PIN_JOY2_A1X
   int xReading = emu_ReadAnalogJoyX(0,256);
   if (xReading > 128) joysval |= MASK_JOY2_LEFT;
   else if (xReading < 128) joysval |= MASK_JOY2_RIGHT;
@@ -186,10 +180,11 @@ static uint16_t readAnalogJoystick(void)
   int yReading = emu_ReadAnalogJoyY(0,256);
   if (yReading < 128) joysval |= MASK_JOY2_UP;
   else if (yReading > 128) joysval |= MASK_JOY2_DOWN;
-  
+#endif  
 #ifdef PIN_JOY2_BTN
   joysval |= (gpio_get(PIN_JOY2_BTN) ? 0 : MASK_JOY2_BTN);
 #endif
+
   return (joysval);     
 }
 
@@ -276,6 +271,59 @@ int emu_ReadKeys(void)
   if ( !gpio_get(PIN_KEY_USER4) ) retval |= MASK_KEY_USER4;
 #endif
 
+#ifdef PICOMPUTER
+  keymatrix_hitrow = -1;
+  unsigned char row;
+  unsigned short cols[6]={1,2,3,4,5,14};
+  for (int i=0;i<6;i++){
+
+    gpio_put(cols[i], 0);
+    row=0;
+    
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(8) ? 0 : 0x02);
+    row |= (gpio_get(6) ? 0 : 0x04);
+    row |= (gpio_get(15) ? 0 : 0x08);
+    row |= (gpio_get(7) ? 0 : 0x10);
+    row |= (gpio_get(22) ? 0 : 0x20);
+    /*
+    if ( !gpio_get(9) ) row |= 0x01;
+    if ( !gpio_get(9) ) row |= 0x01;
+    if ( !gpio_get(9) ) row |= 0x01;
+    if ( !gpio_get(9) ) row |= 0x01;
+    if ( !gpio_get(8) ) row |= 0x02;
+    if ( !gpio_get(6) ) row |= 0x04;
+    if ( !gpio_get(15) ) row |= 0x08;  
+    if ( !gpio_get(7) ) row |= 0x10;
+    if ( !gpio_get(22) ) row |= 0x20;
+    */
+    keymatrix[i]=row;
+    if (row) keymatrix_hitrow=i;
+    gpio_put(cols[i], 1);
+  }
+
+  //6,9,15,8,7,22
+#if INVX
+  if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
+  if ( row & 0x1  ) retval |= MASK_JOY2_RIGHT;
+#else
+  if ( row & 0x1  ) retval |= MASK_JOY2_LEFT;
+  if ( row & 0x2  ) retval |= MASK_JOY2_RIGHT;
+#endif
+#if INVY
+  if ( row & 0x8  ) retval |= MASK_JOY2_DOWN;
+  if ( row & 0x4  ) retval |= MASK_JOY2_UP;  
+#else
+  if ( row & 0x4  ) retval |= MASK_JOY2_DOWN;
+  if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
+#endif
+  if ( row & 0x10 ) retval |= MASK_JOY2_BTN;
+  if ( row & 0x20 ) retval |= MASK_KEY_USER1;
+#endif
+
   //Serial.println(retval,HEX);
 
   if ( ((retval & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
@@ -297,7 +345,26 @@ unsigned short emu_DebounceLocalKeys(void)
 
 int emu_ReadI2CKeyboard(void) {
   int retval=0;
-
+#ifdef PICOMPUTER
+  if ( keymatrix[0] & 0x02 ) { 
+    key_fn = true;
+  }  
+  if (key_fn) {
+    keys = (unsigned short *)key_map2;    
+  }
+  else {
+    keys = (unsigned short *)key_map1;    
+  }
+  if (keymatrix_hitrow >=0 ) {
+    unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
+    for (int i=0; i<sizeof(matkeys); i++) {
+      if (match == matkeys[i]) {    
+        key_fn = false;  
+        return (keys[i]);
+      }
+    }
+  }
+#endif
   return(retval);
 }
 
@@ -358,8 +425,6 @@ void emu_InitJoysticks(void) {
     yRef += adc_read();
     sleep_ms(20);
   }
-#endif
-
 #if INVX
   xRef = 4095 -xRef/10;
 #else
@@ -369,7 +434,48 @@ void emu_InitJoysticks(void) {
   yRef = 4095 -yRef/10;
 #else
   yRef /= 10;
-#endif   
+#endif
+#endif
+
+#ifdef PICOMPUTER
+  gpio_init(1);
+  gpio_init(2);
+  gpio_init(3);
+  gpio_init(4);
+  gpio_init(5);
+  gpio_init(14);
+
+  gpio_init(6);
+  gpio_init(9);
+  gpio_init(15);
+  gpio_init(8);
+  gpio_init(7);
+  gpio_init(22);
+  gpio_set_dir(1, GPIO_OUT); 
+  gpio_set_dir(2, GPIO_OUT); 
+  gpio_set_dir(3, GPIO_OUT); 
+  gpio_set_dir(4, GPIO_OUT); 
+  gpio_set_dir(5, GPIO_OUT); 
+  gpio_set_dir(14, GPIO_OUT); 
+  gpio_put(1, 1);
+  gpio_put(2, 1);
+  gpio_put(3, 1);
+  gpio_put(4, 1);
+  gpio_put(5, 1);
+  gpio_put(14, 1);
+  gpio_set_pulls(6,true,false);
+  gpio_set_dir(6,GPIO_IN);  
+  gpio_set_pulls(9,true,false);
+  gpio_set_dir(9,GPIO_IN);  
+  gpio_set_pulls(15,true,false);
+  gpio_set_dir(15,GPIO_IN);  
+  gpio_set_pulls(8,true,false);
+  gpio_set_dir(8,GPIO_IN);  
+  gpio_set_pulls(7,true,false);
+  gpio_set_dir(7,GPIO_IN);  
+  gpio_set_pulls(22,true,false);
+  gpio_set_dir(22,GPIO_IN);  
+#endif
 }
 
 
@@ -796,9 +902,7 @@ void emu_init(void)
 
 void emu_start(void)
 {
-
   usbnavpad = 0;
-  
-  keys = (unsigned short *)key_map1;
+
   keyMap = 0;
 }

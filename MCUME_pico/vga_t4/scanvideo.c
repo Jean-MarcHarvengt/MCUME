@@ -27,7 +27,9 @@
 #include "hardware/structs/bus_ctrl.h"
 #include "pico/binary_info.h"
 
+#include "iopins.h"
 
+#ifdef USE_VGA
 
 // PICO_CONFIG: PICO_SCANVIDEO_ADJUST_BUS_PRIORITY, Enable/disable adjust bus priority, type=bool, default=0, group=video
 #ifndef PICO_SCANVIDEO_ADJUST_BUS_PRIORITY
@@ -649,6 +651,6 @@ void scanvideo_wait_for_vblank() {
     sem_acquire_blocking(&vblank_begin);
 }
 
-
+#endif
 
 #pragma GCC pop_options

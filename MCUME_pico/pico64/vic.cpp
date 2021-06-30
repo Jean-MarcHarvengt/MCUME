@@ -45,6 +45,7 @@
   - optimize more
 */
 
+
 #include "Teensy64.h"
 #include "vic.h"
 #include <string.h>
@@ -57,35 +58,26 @@
 #define PALETTE(r,g,b) (RGBVAL16(r,g,b))  //(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 #include "vic_palette.h"
 
+
+
+#define BORDER      	        (240-200)/2
+#define SCREEN_HEIGHT         (200+2*BORDER)
+#define SCREEN_WIDTH          320
+//#define LINE_MEM_WIDTH        320
+#define FIRSTDISPLAYLINE      (  51 - BORDER )
+#define LASTDISPLAYLINE       ( 250 + BORDER )
+#define BORDER_LEFT           (400-320)/2
+#define BORDER_RIGHT          0
+
+#ifdef USE_VGA
 typedef uint8_t tpixel;
+#else
+typedef uint16_t tpixel;
+#endif
 
-static tpixel * SCREENMEM=NULL;
-static int LINE_MEM_WIDTH=0;
-static int REAL_XRES=0;
-static int REAL_YRES=0;
-
-#define SCREEN_WIDTH          (320)
-
-/*
-static int BORDER=0;
-static int SCREEN_HEIGHT=0;
-static int FIRSTDISPLAYLINE=0;
-static int LASTDISPLAYLINE=0;
-static int BORDER_LEFT=0;
-static int BORDER_RIGHT=0;
-*/
-
-#define BORDER           ((REAL_YRES-200)/2)
-#define SCREEN_HEIGHT    (200+2*BORDER)
-#define FIRSTDISPLAYLINE (  51 - BORDER )
-#define LASTDISPLAYLINE  ( 250 + BORDER )
-#define BORDER_LEFT      ((REAL_XRES-320)/2)
-#define BORDER_RIGHT     ((REAL_XRES-320)/2)
-
-#define MAXCYCLESSPRITES0_2   3
-#define MAXCYCLESSPRITES3_7   5
-#define MAXCYCLESSPRITES      (MAXCYCLESSPRITES0_2 + MAXCYCLESSPRITES3_7)
-
+#define MAXCYCLESSPRITES0_2       3
+#define MAXCYCLESSPRITES3_7       5
+#define MAXCYCLESSPRITES    (MAXCYCLESSPRITES0_2 + MAXCYCLESSPRITES3_7)
 
 
 /*****************************************************************************************************/
@@ -1283,6 +1275,8 @@ typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint1
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
 
+//static tpixel linebuffer[SCREEN_WIDTH];
+
 void vic_do(void) {
 
   uint16_t vc;
@@ -1301,7 +1295,6 @@ void vic_do(void) {
   */
 
   if ( cpu.vic.rasterLine >= LINECNT ) {
-
     //reSID sound needs much time - too much to keep everything in sync and with stable refreshrate
     //but it is not called very often, so most of the time, we have more time than needed.
     //We can measure the time needed for a frame and calc a correction factor to speed things up.
@@ -1313,13 +1306,13 @@ void vic_do(void) {
     cpu.vic.rasterLine = 0;
     cpu.vic.vcbase = 0;
     cpu.vic.denLatch = 0;
-    emu_DrawVsync();
+    //if (cpu.vic.rasterLine == LINECNT) {
+      emu_DrawVsync();
+    //}    
 
   } else  cpu.vic.rasterLine++;
 
   int r = cpu.vic.rasterLine;
-
-//  if ( (r >= LASTDISPLAYLINE) && (emu_oskbActive()) ) return; 
 
   if (r == cpu.vic.intRasterLine )//Set Rasterline-Interrupt
     cpu.vic.R[0x19] |= 1 | ((cpu.vic.R[0x1a] & 1) << 7);
@@ -1403,61 +1396,18 @@ void vic_do(void) {
   }
 
   //max_x =  (!cpu.vic.CSEL) ? 40:38;
-  p = SCREENMEM + (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH;
-
-
-  uint16_t col;
-//#if !VGA
-if(REAL_XRES == SCREEN_WIDTH) {
+  //p = SCREENMEM + (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH;
+  //p = &linebuffer[0]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE));
   pe = p + SCREEN_WIDTH;
   //Left Screenborder: Cycle 10
   spl = &cpu.vic.spriteLine[24];
   cpu_clock(6);
-}
-else {
-  pe = p + SCREEN_WIDTH + BORDER_LEFT;
-  col = cpu.vic.colors[0];
-
-  //Left Screenborder: Cycle 10
-  for (int i = 0; i <2; i++) {
-  cpu_clock(1);
-  *p++ = col;*p++ = col;*p++ = col;*p++ = col;
-  *p++ = col;*p++ = col;*p++ = col;*p++ = col;
-  }
-
-  //Left Screenborder: Cycle 13
-#if 0  //mit Sprites
-  spl = &cpu.vic.spriteLine[0];
-  uint16_t sprite;
-  for (int i=0; i<3; i++) {
-    cpu_clock(1);
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-    SPRITEORFIXEDCOLOR();
-  }
-#else //ohne sprites
-  spl = &cpu.vic.spriteLine[24];
-  for (int i=0; i<3; i++) {
-    cpu_clock(1);
-    *p++ = col;*p++ = col;*p++ = col;*p++ = col;
-    *p++ = col;*p++ = col;*p++ = col;*p++ = col;
-  }
-#endif
-}
 
 
   if (cpu.vic.borderFlag) {
-//#if !VGA
-    if(REAL_XRES == SCREEN_WIDTH) {
-      cpu_clock(5);
-    }
-    if ( (!emu_oskbActive()) )
-      fastFillLineNoSprites(p, pe + BORDER_RIGHT, cpu.vic.colors[0]);
+	cpu_clock(5);
+    fastFillLineNoSprites(p, pe + BORDER_RIGHT, cpu.vic.colors[0]);
     goto noDisplayIncRC ;
   }
 
@@ -1612,7 +1562,9 @@ g-Zugriff
     cpu_clock(1);
     uint16_t col = cpu.vic.colors[0];
     //p = &screen[r - FIRSTDISPLAYLINE][0];
-	p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH  + BORDER_LEFT;
+    //p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH  + BORDER_LEFT;
+    //p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+    p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + BORDER_LEFT;
 #if 0
     // Sprites im Rand
     uint16_t sprite;
@@ -1635,8 +1587,10 @@ g-Zugriff
 
     //Rand rechts:
     //p = &screen[r - FIRSTDISPLAYLINE][SCREEN_WIDTH - 9];
-	p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH + SCREEN_WIDTH - 9 + BORDER_LEFT;
-	pe = p + 9;
+	//p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH + SCREEN_WIDTH - 9 + BORDER_LEFT;
+	//p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+  pe = p + 9;
 
 #if 0
     // Sprites im Rand
@@ -1646,32 +1600,20 @@ g-Zugriff
     }
 #else
     //keine Sprites im Rand
-    while (p < pe) {
-      *p++ = col;
-    }
+    //while (p < pe) {
+    //  *p++ = col;
+    //}
 #endif
 
+
+
   }
+
+//  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
 
 
 //Rechter Rand nach CSEL, im Textbereich
 cpu_clock(5);
-//#if VGA
-if(REAL_XRES != SCREEN_WIDTH) {
-  p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH + SCREEN_WIDTH + BORDER_LEFT;
-  pe += BORDER_RIGHT;
-#if 0
-    // Sprites im Rand
-    while (p < pe) {
-      SPRITEORFIXEDCOLOR();
-    }
-#else
-    //keine Sprites im Rand
-    while (p < pe) {
-      *p++ = col;
-    }
-#endif
-}
 
 
 noDisplayIncRC:
@@ -1953,7 +1895,7 @@ if ( cpu.vic.rasterLine >= LINECNT ) {
     cpu.vic.rasterLine = 0;
     cpu.vic.vcbase = 0;
     cpu.vic.denLatch = 0;
-    emu_DrawVsync();
+
   } else  {
 	  cpu.vic.rasterLine++;
 	  cpu_clock(1);
@@ -1961,8 +1903,6 @@ if ( cpu.vic.rasterLine >= LINECNT ) {
   }
 
   int r = cpu.vic.rasterLine;
-  
-//  if ( (r >= LASTDISPLAYLINE) && (emu_oskbActive()) ) return; 
 
   if (r == cpu.vic.intRasterLine )//Set Rasterline-Interrupt
     cpu.vic.R[0x19] |= 1 | ((cpu.vic.R[0x1a] & 1) << 7);
@@ -2028,6 +1968,16 @@ if ( cpu.vic.rasterLine >= LINECNT ) {
 
 }
 
+
+/*****************************************************************************************************/
+/*****************************************************************************************************/
+/*****************************************************************************************************/
+
+void installPalette(void) {
+ memcpy(cpu.vic.palette, (void*)palette, sizeof(cpu.vic.palette));
+}
+
+
 /*****************************************************************************************************/
 /*****************************************************************************************************/
 /*****************************************************************************************************/
@@ -2056,17 +2006,17 @@ void vic_write(uint32_t address, uint8_t value) {
 
   switch (address) {
     case 0x11 :
-	  cpu.vic.R[address] = value;
+    cpu.vic.R[address] = value;
       cpu.vic.intRasterLine = (cpu.vic.intRasterLine & 0xff) | ((((uint16_t) value) << 1) & 0x100);
       if (cpu.vic.rasterLine == 0x30 ) cpu.vic.denLatch |= value & 0x10;
 
       cpu.vic.badline = (cpu.vic.denLatch && (cpu.vic.rasterLine >= 0x30) && (cpu.vic.rasterLine <= 0xf7) && ( (cpu.vic.rasterLine & 0x07) == (value & 0x07)));
 
-	  if (cpu.vic.badline) {
-		cpu.vic.idle = 0;
-	  }
+    if (cpu.vic.badline) {
+    cpu.vic.idle = 0;
+    }
 
-	  vic_adrchange();
+    vic_adrchange();
 
       break;
     case 0x12 :
@@ -2163,40 +2113,7 @@ uint8_t vic_read(uint32_t address) {
 /*****************************************************************************************************/
 /*****************************************************************************************************/
 
-void installPalette(void) {
- memcpy(cpu.vic.palette, (void*)palette, sizeof(cpu.vic.palette));
-}
-
-
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-/*****************************************************************************************************/
-#define XOFFSET       4
-#define YOFFSET       16
-
-
 void resetVic(void) {
-  LINE_MEM_WIDTH = tft.get_frame_buffer_size(&REAL_XRES,&REAL_YRES);  
-  SCREENMEM=(tpixel*)emu_LineBuffer(0);
-  /*
-  if (REAL_XRES == SCREEN_WIDTH) {
-    BORDER           = (REAL_YRES-200)/2;
-    SCREEN_HEIGHT    = (200+2*BORDER);
-    FIRSTDISPLAYLINE = (  51 - BORDER );
-    LASTDISPLAYLINE  = ( 250 + BORDER );
-    BORDER_LEFT      = 0;
-    BORDER_RIGHT     = 0;
-  }  
-  else {
-    BORDER           = (REAL_YRES-200)/2;
-    SCREEN_HEIGHT    = (200+2*BORDER);
-    FIRSTDISPLAYLINE = (  51 - BORDER );
-    LASTDISPLAYLINE  = ( 250 + BORDER );
-    BORDER_LEFT      = (REAL_XRES-320)/2;
-    BORDER_RIGHT     = (REAL_XRES-320)/2;
-  }  
-  */
-
   enableCycleCounter();
 
   cpu.vic.intRasterLine = 0;
@@ -2204,6 +2121,8 @@ void resetVic(void) {
   cpu.vic.lineHasSprites = 0;
   memset(&cpu.RAM[0x400], 0, 1000);
   memset(&cpu.vic, 0, sizeof(cpu.vic));
+  
+
 
   installPalette();  
 

@@ -28,35 +28,29 @@
 #define ACTION_RUNVGA        130
 
 #ifdef KEYMAP_PRESENT
-
-#define TAREA_W_DEF          32
-#define TAREA_H_DEF          32
-#define TAREA_END            255
-#define TAREA_NEW_ROW        254
-#define TAREA_NEW_COL        253
-#define TAREA_XY             252
-#define TAREA_WH             251
-
-#define KEYBOARD_X           104
-#define KEYBOARD_Y           78
-#define KEYBOARD_KEY_H       30
-#define KEYBOARD_KEY_W       21
-#define KEYBOARD_HIT_COLOR   RGBVAL16(0xff,0x00,0x00)
-
-const unsigned short keysw[] = {
-  TAREA_XY,KEYBOARD_X,KEYBOARD_Y,
-  TAREA_WH,KEYBOARD_KEY_W,KEYBOARD_KEY_H,
-  TAREA_NEW_ROW,40,40,
-  TAREA_END};
+#ifdef PICOMPUTER
    
 const unsigned short key_map1[] = {
-  2,3};  
-   
-#ifdef HAS_I2CKBD
-const unsigned short i2ckeys[] = {
-  0X0080,0X0008};
-#endif  
-   
+  'Q','W','E','R','T','Y','U','I','O','P','0',
+  0,'A','S','D','F','G','H','J','K','L',0xD,
+  0,'Z','X','C','V','B','N','M',',',' ',
+  0,0,0,0
+  };  
+
+const unsigned short key_map2[] = {
+  '1','2','3','4','5','6','7','8','9','0',0,
+  0,0,0,0,0,0,0,0,0,0,0,
+  0, 0,0,0,0,0,0,0,0,0,
+  0,0,0,0
+  };  
+
+const unsigned short matkeys[] = {
+  0x020,0x120,0x220,0x320,0x420,0x408,0x308,0x208,0x108,0x008,0x520, // row 1
+  0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
+  /*0x002*/ 0xfff,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
+  0x508,0x501,0x502,0x504 }; // cursor keys
+ 
+#endif
 #endif
 
 

@@ -13,8 +13,12 @@ extern "C" {
   #include "iopins.h"
 }
 
-
+#ifdef USE_VGA
 #include "vga_t_dma.h"
+#else
+#include "tft_t_dma.h"
+#endif
+
 const uint16_t deflogo[] = {
   0,0
 };

@@ -6,19 +6,28 @@ extern "C" {
   #include "emuapi.h"  
 }
 #include "keyboard_osd.h"
-#include "vga_t_dma.h"
+
 extern "C" {
 #include "zx81.h"
 }
 #include <stdio.h>
 
-
+#ifdef USE_VGA
+#include "vga_t_dma.h"
+#else
+#include "tft_t_dma.h"
+#endif
 TFT_T_DMA tft;
+
 static int skip=0;
 
 int main(void) {
     stdio_init_all();
+#ifdef USE_VGA    
     tft.begin(VGA_MODE_320x240);
+#else
+    tft.begin();
+#endif  
     emu_init();
     while (true) {
         if (menuActive()) {
@@ -49,11 +58,13 @@ int main(void) {
 }
 
 static unsigned char  palette8[PALETTE_SIZE];
+static unsigned short palette16[PALETTE_SIZE];
 
 void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index)
 {
     if (index<PALETTE_SIZE) {
         palette8[index]  = RGBVAL8(r,g,b);
+        palette16[index]  = RGBVAL16(r,g,b);        
     }
 }
 
@@ -67,7 +78,11 @@ void emu_DrawVsync(void)
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
     if (skip == 0) {
-        tft.writeLine(width,height,line, VBuf, palette8);
+#ifdef USE_VGA                        
+         tft.writeLine(width,height,line, VBuf, palette8);
+#else
+         tft.writeLine(width,height,line, VBuf, palette16);
+#endif      
     }  
 }  
 
@@ -75,21 +90,27 @@ void emu_DrawLine(unsigned char * VBuf, int width, int height, int line)
 void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line) 
 {
     if (skip == 0) {
+#ifdef USE_VGA                        
       tft.writeLine(width,height,line, VBuf);
+#endif      
     }
 } 
 
 void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line) 
 {
     if (skip == 0) {
+#ifdef USE_VGA        
         tft.writeLine16(width,height,line, VBuf);
+#endif        
     }
 }  
 
 void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride) 
 {
     if (skip == 0) {
+#ifdef USE_VGA                
         tft.writeScreen(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette8);
+#endif
     }
 }
 

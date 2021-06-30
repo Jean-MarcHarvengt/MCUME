@@ -23,6 +23,11 @@
 #include "hardware/irq.h"
 #include <string.h>
 
+#include "platform_config.h"
+#include "iopins.h"
+
+#ifdef USE_VGA
+
 #define R16(rgb) ((rgb>>8)&0xf8) 
 #define G16(rgb) ((rgb>>3)&0xfc) 
 #define B16(rgb) ((rgb<<3)&0xf8) 
@@ -1611,8 +1616,6 @@ void VGA_T4::set_vscroll(int layer, int colbeg, int colend, int mask)
 #include "hardware/irq.h"
 #include "hardware/pwm.h"
 
-#define AUDIO_PIN 28
-
 static bool fillfirsthalf = true;
 static uint16_t cnt = 0;
 static uint16_t sampleBufferSize = 0;
@@ -1709,7 +1712,6 @@ void VGA_T4::end_audio()
   }  
 }
 
-
-
+#endif
  
 

@@ -31,6 +31,7 @@ int main(void) {
     stdio_init_all();
 
     printf("start\n");   
+//    vga.begin(VGA_MODE_400x240);
     vga.begin(VGA_MODE_320x240);
     //tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
 	vga.clear(LIGHT_BLUE);
@@ -50,7 +51,7 @@ int main(void) {
 	buf[0] = digits[r1];
 	buf[1] = digits[r2];
 	buf[2] = digits[r3];
-	vga.drawText(0,0,buf,BLUE,LIGHT_BLUE,false);
+	vga.drawText(4*8,0,buf,BLUE,LIGHT_BLUE,false);
 
 
     while (true) {

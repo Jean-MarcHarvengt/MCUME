@@ -32,50 +32,91 @@
 
 
 #ifdef KEYMAP_PRESENT
-
-#define TAREA_W_DEF          32
-#define TAREA_H_DEF          32
-#define TAREA_END            255
-#define TAREA_NEW_ROW        254
-#define TAREA_NEW_COL        253
-#define TAREA_XY             252
-#define TAREA_WH             251
-
-#define KEYBOARD_X           1
-#define KEYBOARD_Y           6
-#define KEYBOARD_KEY_H       23
-#define KEYBOARD_KEY_W       21
-#define KEYBOARD_HIT_COLOR   RGBVAL16(0xff,0x00,0x00)
-
-const unsigned short keysw[] = {
-  TAREA_XY,KEYBOARD_X,KEYBOARD_Y,
-  TAREA_WH,KEYBOARD_KEY_W,KEYBOARD_KEY_H,
-  TAREA_NEW_ROW,21,21,22,21,22,21,21,22,21,22,21,21,22,21,22,
-  TAREA_NEW_ROW,34,21,21,21,21,21,21,21,21,21,21,21,21,34,
-  TAREA_NEW_ROW,40,21,21,21,21,21,21,21,21,21,21,21,21,21,
-  TAREA_NEW_ROW,50,21,21,21,21,21,21,21,21,21,21,21,45,
-  TAREA_NEW_ROW,60,192,
-  TAREA_END};
-
-   
+#ifdef PICOMPUTER
 const unsigned short key_map1[] = {
-  0x1C+1,0x1F+1,0x1F  ,0x1A+1,0x18+1,0x1D+1,0x1B+1,0x33+1,0x35+1,0x30+1,0x32+1,0x36+1,0x37+1,0,0,
-  0x2C+1,0x2F+1,0x2F  ,0x2A+1,0x28+1,0x2D+1,0x2B+1,0x0B+1,0x0D+1,0x08+1,0x0A+1,0x0E,0x0F+1,0x0C+1,
-  0,     0x3F+1,0x3F  ,0x3A+1,0x38+1,0x3D+1,0x39+1,0x01+1,0x05+1,0x00+1,0x02+1,0x06+1,0x07+1,0,
-  0x3C+1,0x17+1,0x16+1,0x12+1,0x11+1,0x15+1,0x23+1,0x25+1,0x20+1,0x22+1,0x26+1,  0,0,
-  0,     0x21+1
+  //0x1F+1,0x1F  ,0x1A+1,0x18+1,0x1D+1,0x1B+1,0x33+1,0x35+1,0x30+1,0x32+1,0x34+1, // Digits
+  0x2F+1,0x2F  ,0x2A+1,0x28+1,0x2D+1,0x2B+1,0x0B+1,0x0D+1,0x08+1,0x0A+1,0x34+1, 
+  0x2C+1,0x3F+1,0x3F  ,0x3A+1,0x38+1,0x3D+1,0x39+1,0x01+1,0x05+1,0x00+1,0x0C+1, 
+  0,     0x17+1,0x16+1,0x12+1,0x10+1,0x15+1,0x23+1,0x25+1,0x20+1, 0x21+1,
+  0,0,0,0
   };  
 
-#ifdef HAS_I2CKBD
-const unsigned short i2ckeys[] = {
-  0, 0X0080,0X0008,0X0180,0X0108,0X0280,0X0208,0X0380,0X0308,0X0480,0X0408,0,0,0,0,
-  0, 0X0040,0X0004,0X0140,0X0104,0X0240,0X0204,0X0340,0X0304,0X0440,0X0404,0,0,0X0402,
-  0, 0X0020,0X0002,0X0120,0X0102,0X0220,0X0202,0X0320,0X0302,0X0420,0,0,0,0,
-  0X0010,0X0001,0X0110,0X0101,0X0210,0X0201,0X0310,0X0301,0X0410,0,0,0,0,
-  0, 0X0401};
+const unsigned short key_map2[] = {
+  0x1F+1,0x1F  ,0x1A+1,0x18+1,0x1D+1,0x1B+1,0x33+1,0x35+1,0x30+1,0x32+1,0x34+1, // Digits
+  0x2C+1,0x07+1,0x22+1,0x26+1,0x02+1,0x06+1,0x36+1,0x37+1,0x0F+1,0x0E + 1,0x06+1, // various 
+  //0x07+1=*, 0x22+1=.,0x26+1=/, 0x02+1=;, 0x06+1=+, 0x36+1=<, 0x37+1=>, 0x0F+1==, 0x0E+1=-, 0x06+1=+
+  0, 0,0,0,0,0,0,0,0,0,
+  0,0,0,0
+  };  
+
+const unsigned short matkeys[] = {
+  0x020,0x120,0x220,0x320,0x420,0x408,0x308,0x208,0x108,0x008,0x520, // row 1
+  0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
+  /*0x002*/ 0xfff,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
+  0x508,0x501,0x502,0x504 }; // cursor keys
+#endif 
 #endif
-   
-#endif
+
+/* Pokey code   
+KEY_A  = 63
+KEY_S  = 62
+KEY_G  = 61
+KEY_Cap  = 60
+KEY_D  = 58
+KEY_H  = 57
+KEY_F  = 56
+KEY_Great = 55
+KEY_Less = 54
+KEY_8  = 53
+KEY_BSp  = 52
+KEY_7  = 51
+KEY_0  = 50
+KEY_9  = 48
+KEY_Q  = 47
+KEY_W  = 46
+KEY_T  = 45
+KEY_Tab  = 44
+KEY_Y  = 43
+KEY_E  = 42
+KEY_R  = 40
+KEY_Inv  = 39
+KEY_Slash = 38
+KEY_M  = 37
+KEY_N  = 35
+KEY_Dot  = 34
+KEY_Spa  = 33
+KEY_Comma = 32
+KEY_1  = 31
+KEY_2  = 30
+KEY_5  = 29
+KEY_Esc  = 28
+KEY_6  = 27
+KEY_3  = 26
+KEY_4  = 24
+KEY_Z  = 23
+KEY_X  = 22
+KEY_B  = 21
+KEY_F4  = 20
+KEY_F3  = 19
+KEY_C  = 18
+KEY_Hlp  = 17
+KEY_V  = 16
+KEY_Equal = 15
+KEY_Minus = 14
+KEY_I  = 13
+KEY_Ret  = 12
+KEY_U  = 11
+KEY_P  = 10
+KEY_O  = 8
+KEY_Aster = 7
+KEY_plus = 6
+KEY_K  = 5
+KEY_F2  = 4
+KEY_F1  = 3
+KEY_Semi = 2
+KEY_J  = 1
+KEY_L  = 0
+*/
 
 #define MASK_JOY2_RIGHT 0x0001
 #define MASK_JOY2_LEFT  0x0002

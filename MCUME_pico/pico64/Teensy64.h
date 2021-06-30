@@ -56,8 +56,13 @@ extern "C" {
   #include "emuapi.h"
 }
 
+#ifdef USE_VGA
 #include "vga_t_dma.h"
-extern TFT_T_DMA tft;  
+#else
+#include "tft_t_dma.h"
+#endif
+extern TFT_T_DMA tft;
+
 
 inline unsigned long millis() {
     return (to_ms_since_boot(get_absolute_time ()));

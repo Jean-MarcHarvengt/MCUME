@@ -16,7 +16,9 @@ pico_sdk_init()
 
 add_subdirectory(FatFs_SPI build)
 
+include_directories(config)
 include_directories(vga_t4)
+include_directories(tft_t)
 
 
 set(PICO81_SOURCES 
@@ -216,7 +218,10 @@ set(PICOSND_SOURCES
 set(VGA_T4_SOURCES 
 		vga_t4/VGA_t4.cpp
 		vga_t4/scanvideo.c
-#		vga_t4/vga_modes.c
+	)
+
+set(TFT_T_SOURCES 
+		tft_t/tft_t_dma.cpp
 	)
 
 set(GFXENGINE_SOURCES 
@@ -232,13 +237,18 @@ set(TESTVGA_SOURCES
 		testvga/testvga.cpp
 	)
 
+set(TESTTFT_SOURCES 
+		testtft/testtft.cpp
+		testtft/emuapi.cpp
+	)
+
 add_executable(mcume
-		${GFXENGINE_SOURCES}
+#		${GFXENGINE_SOURCES}
 #		${PICO81_SOURCES}
+#		${PICOSPECCY_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
-#		${PICOSPECCY_SOURCES}
-#		${PICO64_SOURCES}
+		${PICO64_SOURCES}
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
@@ -246,7 +256,9 @@ add_executable(mcume
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
 #		${TESTVGA_SOURCES}
+#		${TESTTFT_SOURCES}
 		${VGA_T4_SOURCES}
+		${TFT_T_SOURCES}
 	)
 
 pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
@@ -272,6 +284,6 @@ target_compile_definitions(mcume PUBLIC DEBUG N_SD_CARDS=${N_SD_CARDS})
 
 
 #pico_enable_stdio_uart(mcume 0)
-#pico_enable_stdio_usb(mcume 1)
+pico_enable_stdio_usb(mcume 1)
 
 pico_add_extra_outputs(mcume)

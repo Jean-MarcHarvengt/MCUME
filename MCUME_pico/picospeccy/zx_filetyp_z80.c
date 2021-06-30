@@ -7,7 +7,7 @@
 // Web      : www.mikrocontroller-4u.de
 //--------------------------------------------------------------
 #include "zx_filetyp_z80.h"
-#include "emuapi.h"
+//#include "emuapi.h"
 
 //-------------------------------------------------------------
 extern uint8_t out_ram;

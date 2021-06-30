@@ -293,9 +293,9 @@ static char * oskbtext2 = "12345678  TL  ,.*     0123456789        ";
 static int oskbXPos = 10;
 static int oskbYPos = 0;
 
-#define OSKB_TEXT VGA_RGB(0, 0, 170)
-#define OSKB_BG   VGA_RGB(255, 255, 255)
-#define OSKB_HL   VGA_RGB(255, 255, 0)
+#define OSKB_TEXT RGBVAL16(0, 0, 170)
+#define OSKB_BG   RGBVAL16(255, 255, 255)
+#define OSKB_HL   RGBVAL16(255, 255, 0)
 
 int emu_oskbActive(void) {
   return (oskbActive?1:0);
@@ -314,7 +314,7 @@ void emu_DrawVsync(void)
     }
     //skip += 1;
     //skip &= VID_FRAME_SKIP;
-    tft.waitSync(); 
+    //tft.waitSync(); 
 }
 
 
@@ -336,7 +336,7 @@ void c64_Input(int bClick) {
   }
 
   if (nbkeys == 0) {
-    if (bClick & MASK_KEY_USER1) {
+    if (bClick & MASK_KEY_USER2) {
       if (!oskbActive) {
         oskbActive = true;
       }
@@ -344,7 +344,7 @@ void c64_Input(int bClick) {
         oskbActive = false; 
       }       
     } 
-    else if (bClick & MASK_KEY_USER2) {
+    else if (bClick & MASK_KEY_USER1) {
       if (firsttime) {
         firsttime = false;
         textseq = textload;
