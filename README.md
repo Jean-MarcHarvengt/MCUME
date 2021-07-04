@@ -4,6 +4,11 @@
 </p>
 
 # News
+July 2021: Add support for TFT dispays on PICO<br>
+- MCUME_REV2 supports VGA and TFT (ST or ILI) on same layout
+- Add specific support for PICOMPUTER (TFT and full keyboard microswitch)
+<br>
+
 May 13th 2021: C64 emulator improvement for PICO<br>
 - Overclocked to 250MHz for better speed
 - Add on screen keyboard for text input
@@ -227,6 +232,19 @@ Game console systems supported and status on various MCU platforms<br>
 - Adapt ./flashapp.sh according your OS (I use OSX)
 - make, ./flashapp.sh
 
+# Compilation (PICO)
+- git clone -b master https://github.com/raspberrypi/pico-sdk.git
+- cd pico-sdk/
+- git submodule update --init
+- export PICO_SDK_PATH=path-to-pico-sdk
+- Insure MCUME_pico is NEXT to pico-sdk directory
+- go to MCUME_pico/build
+- select emulator to compile in CMakeLists.txt (uncomment ${XXX_SOURCES} and comment out the rest)
+- select platform options in config/platform_confih.h (e.g. PICOMPUTER, default is MCUME_REV1)
+- cmake ..
+- make
+- drag and drop mcume.uf2 after having boouted the PICO os mass storage mode
+
 # Status and known issues
 - 64 (C64):
   - Full speed with sound
@@ -314,6 +332,12 @@ Game console systems supported and status on various MCU platforms<br>
 - You can then play the game with the analog joystick and the FIRE/USER1 keys  
 - press the USER1+USER2 to reboot the emulator and load another ROM
 - USER2 can be used to swap joystick 1/2 in some emulators
+
+# Running on the PICOMPUTER
+- Fire button is mapped to key 'Q'
+- USER2 is mapped to key "fn"
+- USER1 is mapped to "fn+DEL"
+- for PICO64, fb+DEL can be used to load selected game
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
