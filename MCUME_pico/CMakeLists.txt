@@ -280,10 +280,10 @@ target_link_libraries(mcume pico_multicore
 IF (NOT DEFINED N_SD_CARDS)
     SET(N_SD_CARDS 1)
 ENDIF()
-target_compile_definitions(mcume PUBLIC DEBUG N_SD_CARDS=${N_SD_CARDS})
+target_compile_definitions(mcume PUBLIC N_SD_CARDS=${N_SD_CARDS})
 
 
-#pico_enable_stdio_uart(mcume 0)
-pico_enable_stdio_usb(mcume 1)
+pico_enable_stdio_uart(mcume 0)
+pico_enable_stdio_usb(mcume 0)
 
 pico_add_extra_outputs(mcume)

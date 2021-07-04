@@ -60,6 +60,7 @@ void keyjoy(void) {
 	riotRead[0x280]=(v1 << 4) | v2;
 }
 
+static int kswitches = 0;
 
 void keycons(void) {
 //---------------------------------------------------------
@@ -67,14 +68,42 @@ void keycons(void) {
 //---------------------------------------------------------
 	int key = emu_ReadKeys();;
   int sw = emu_GetPad() & 0xff;
+	int hk = emu_ReadI2CKeyboard();    
 		
+	kswitches = 0;	
+  if (hk == 1) {
+  	if (kswitches & 0x01)
+  		kswitches &= ~0x01;
+  	else	
+  		kswitches |= 0x01;
+  }
+  else if (hk == 2) {
+  	if (kswitches & 0x02)
+  		kswitches &= ~0x02;
+  	else	
+  		kswitches |= 0x02;
+  }
+  else if (hk == 3) {
+  	if (kswitches & 0x04)
+  		kswitches &= ~0x04;
+  	else	
+  		kswitches |= 0x04;
+  }
+  else if (hk == 4) {
+  	if (kswitches & 0x08)
+  		kswitches &= ~0x08;
+  	else	
+  		kswitches |= 0x08;
+  }
+
+
 	// read the keyboard state. The return value (in keys) is a pointer to a
 	// 256 byte buffer which holds the state of all the keyboard keys. If a 
 	// byte's upper bit is set to 1, the key is pressed.
   
 	riotRead[SWCHB] |= 0x03;
 	
-	if ( (key & MASK_KEY_USER3) | (sw == 2) ) // 
+	if ( (key & MASK_KEY_USER3) /*|| (sw == 2)*/ || (kswitches & 0x04)  ) // 
     nOptions_Color = !nOptions_Color;
     
 	if (!nOptions_Color) 
@@ -83,9 +112,9 @@ void keycons(void) {
 		riotRead[SWCHB] |= 0x08;	/* Color */
 
 
-	if ( (key & MASK_KEY_USER1) | (sw == 4) )
+	if ( (key & MASK_KEY_USER1) /*|| (sw == 4)*/ || (kswitches & 0x02) )
 		riotRead[SWCHB] &= 0xFE;	/* Reset */
-	if ( (key & MASK_KEY_USER2) | (sw == 3) )  
+	if ( (key & MASK_KEY_USER2) /*|| (sw == 3)*/ || (kswitches & 0x01) )  
 		riotRead[SWCHB] &= 0xFD;	/* Select */
 
 	if (nOptions_P1Diff) riotRead[SWCHB] &= 0xBF; 	/* P0 amateur */

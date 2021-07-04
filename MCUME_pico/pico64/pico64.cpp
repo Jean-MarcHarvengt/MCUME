@@ -56,7 +56,7 @@ int main(void) {
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
               tft.startDMA();
               struct repeating_timer timer;
-              add_repeating_timer_ms(50, repeating_timer_callback, NULL, &timer);      
+              add_repeating_timer_ms(25, repeating_timer_callback, NULL, &timer);      
             }  
             tft.waitSync();
         }
@@ -86,12 +86,14 @@ void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int 
     }
 }
 
-//void emu_DrawVsync(void)
-//{
-//    skip += 1;
-//    skip &= VID_FRAME_SKIP;
-//    //tft.waitSync(); 
-//}
+#ifdef PICOMPUTER
+void emu_DrawVsync(void)
+{
+    skip += 1;
+    skip &= VID_FRAME_SKIP;
+    //tft.waitSync(); 
+}
+#endif
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
@@ -108,7 +110,7 @@ void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line)
 {
     if (skip == 0) {
 #ifdef USE_VGA                        
-      tft.writeLine(width,height,line, VBuf);
+      tft.writeLine(width,height,line, VBuf);      
 #endif      
     }
 } 
@@ -118,6 +120,8 @@ void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line)
     if (skip == 0) {
 #ifdef USE_VGA        
         tft.writeLine16(width,height,line, VBuf);
+#else
+        tft.writeLine(width,height,line, VBuf);
 #endif        
     }
 }  

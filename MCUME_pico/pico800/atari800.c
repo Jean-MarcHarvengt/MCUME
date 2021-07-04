@@ -288,13 +288,13 @@ void at8_Step(void)
   else which=&cont1;
 
   // Start
-  if (j & MASK_KEY_USER1)
+  if (j & MASK_KEY_USER2)
     INPUT_key_consol &= ~0x01;
   else
     INPUT_key_consol |= 0x01;   
 
   // Select
-  if (j & MASK_KEY_USER2)
+  if (j & MASK_KEY_USER1)
     INPUT_key_consol &= ~0x02;
   else
     INPUT_key_consol |= 0x02;   
@@ -308,7 +308,10 @@ void at8_Step(void)
   if (k != 0) {
     INPUT_key_code = k-1;  
   }
-  else if (hk != 0) {
+  else {
+    INPUT_key_code = AKEY_NONE;    
+  }
+  if (hk != 0) {
     INPUT_key_code = hk-1;  
   }
   else {

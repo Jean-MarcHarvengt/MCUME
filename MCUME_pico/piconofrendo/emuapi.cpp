@@ -53,11 +53,14 @@ static char selection[MAX_FILENAME_SIZE+1]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
-static bool i2cKeyboardPresent = false;
-static unsigned short * keys;
 static int keyMap;
-   
-static int keypadval=0; 
+#ifdef PICOMPUTER
+static unsigned short * keys;
+static unsigned char keymatrix[6];
+static int keymatrix_hitrow=-1;
+static bool key_fn=false;
+#endif
+
 static bool joySwapped = false;
 static uint16_t bLastState;
 static int xRef;
@@ -138,16 +141,10 @@ void emu_Free(void * pt)
 
 
 
-
-
 int emu_ReadAnalogJoyX(int min, int max) 
 {
-#ifdef PIN_JOY2_A1X  
   adc_select_input(0);
   int val = adc_read();
-#else
-  int val = 0;
-#endif  
 #if INVX
   val = 4095 - val;
 #endif
@@ -160,12 +157,8 @@ int emu_ReadAnalogJoyX(int min, int max)
 
 int emu_ReadAnalogJoyY(int min, int max) 
 {
-#ifdef PIN_JOY2_A2Y  
   adc_select_input(1);  
   int val = adc_read();
-#else
-  int val = 0;
-#endif   
 #if INVY
   val = 4095 - val;
 #endif
@@ -182,7 +175,7 @@ int emu_ReadAnalogJoyY(int min, int max)
 static uint16_t readAnalogJoystick(void)
 {
   uint16_t joysval = 0;
-
+#ifdef PIN_JOY2_A1X
   int xReading = emu_ReadAnalogJoyX(0,256);
   if (xReading > 128) joysval |= MASK_JOY2_LEFT;
   else if (xReading < 128) joysval |= MASK_JOY2_RIGHT;
@@ -190,10 +183,11 @@ static uint16_t readAnalogJoystick(void)
   int yReading = emu_ReadAnalogJoyY(0,256);
   if (yReading < 128) joysval |= MASK_JOY2_UP;
   else if (yReading > 128) joysval |= MASK_JOY2_DOWN;
-  
+#endif  
 #ifdef PIN_JOY2_BTN
   joysval |= (gpio_get(PIN_JOY2_BTN) ? 0 : MASK_JOY2_BTN);
 #endif
+
   return (joysval);     
 }
 
@@ -212,7 +206,7 @@ int emu_SwapJoysticks(int statusOnly) {
 
 int emu_GetPad(void) 
 {
-  return(keypadval/*|((joySwapped?1:0)<<7)*/);
+  return(bLastState/*|((joySwapped?1:0)<<7)*/);
 }
 
 int emu_ReadKeys(void) 
@@ -280,6 +274,58 @@ int emu_ReadKeys(void)
   if ( !gpio_get(PIN_KEY_USER4) ) retval |= MASK_KEY_USER4;
 #endif
 
+#ifdef PICOMPUTER
+  keymatrix_hitrow = -1;
+  unsigned char row;
+  unsigned short cols[6]={1,2,3,4,5,14};
+  for (int i=0;i<6;i++){
+//    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 0);
+    row=0; 
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(8) ? 0 : 0x02);
+    row |= (gpio_get(6) ? 0 : 0x04);
+    row |= (gpio_get(15) ? 0 : 0x08);
+    row |= (gpio_get(7) ? 0 : 0x10);
+    row |= (gpio_get(22) ? 0 : 0x20);
+    gpio_put(cols[i], 1);
+//    gpio_set_dir(cols[i], GPIO_IN);
+
+    keymatrix[i]=row;
+    if (row) keymatrix_hitrow=i;
+  }
+
+  //6,9,15,8,7,22
+#if INVX
+  if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
+  if ( row & 0x1  ) retval |= MASK_JOY2_RIGHT;
+#else
+  if ( row & 0x1  ) retval |= MASK_JOY2_LEFT;
+  if ( row & 0x2  ) retval |= MASK_JOY2_RIGHT;
+#endif
+#if INVY
+  if ( row & 0x8  ) retval |= MASK_JOY2_DOWN;
+  if ( row & 0x4  ) retval |= MASK_JOY2_UP;  
+#else
+  if ( row & 0x4  ) retval |= MASK_JOY2_DOWN;
+  if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
+#endif
+
+  if ( keymatrix[0] & 0x02 ) { 
+    key_fn = true;
+  }
+  else  {
+    key_fn = false;  
+  }
+
+  if ( keymatrix[0] & 0x20) retval |= MASK_JOY2_BTN;
+  if ( key_fn ) retval |= MASK_KEY_USER2;
+  if ( ( key_fn ) && (row == 0x20 )) retval |= MASK_KEY_USER1;
+#endif
+
   //Serial.println(retval,HEX);
 
   if ( ((retval & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
@@ -301,10 +347,35 @@ unsigned short emu_DebounceLocalKeys(void)
 
 int emu_ReadI2CKeyboard(void) {
   int retval=0;
-
+#ifdef PICOMPUTER
+  if (key_fn) {
+    keys = (unsigned short *)key_map2;    
+  }
+  else {
+    keys = (unsigned short *)key_map1;    
+  }
+  if (keymatrix_hitrow >=0 ) {
+    unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
+    if ( (match == 0x002 )  ) return 0; // shift or fn
+    if (match < 0x100 ) match = match & ~0x002; // ignore shift key
+    for (int i=0; i<sizeof(matkeys); i++) {
+      if (match == matkeys[i]) {    
+        return (keys[i]);
+//        return (match);
+      }
+    }
+  }
+#endif
   return(retval);
 }
 
+unsigned char emu_ReadI2CKeyboard2(int row) {
+  int retval=0;
+#ifdef PICOMPUTER
+  retval = keymatrix[row];
+#endif
+  return retval;
+}
 void emu_InitJoysticks(void) { 
 
   // Second Joystick   
@@ -362,8 +433,6 @@ void emu_InitJoysticks(void) {
     yRef += adc_read();
     sleep_ms(20);
   }
-#endif
-
 #if INVX
   xRef = 4095 -xRef/10;
 #else
@@ -373,11 +442,73 @@ void emu_InitJoysticks(void) {
   yRef = 4095 -yRef/10;
 #else
   yRef /= 10;
-#endif   
+#endif
+#endif
+
+#ifdef PICOMPUTER
+  // Output (rows)
+  gpio_init(1);
+  gpio_init(2);
+  gpio_init(3);
+  gpio_init(4);
+  gpio_init(5);
+  gpio_init(14);
+  gpio_set_dir(1, GPIO_OUT); 
+  gpio_set_dir(2, GPIO_OUT); 
+  gpio_set_dir(3, GPIO_OUT); 
+  gpio_set_dir(4, GPIO_OUT); 
+  gpio_set_dir(5, GPIO_OUT); 
+  gpio_set_dir(14, GPIO_OUT);
+   
+  gpio_put(1, 1);
+  gpio_put(2, 1);
+  gpio_put(3, 1);
+  gpio_put(4, 1);
+  gpio_put(5, 1);
+  gpio_put(14, 1);
+  
+/*
+  gpio_put(1, 0);
+  gpio_put(2, 0);
+  gpio_put(3, 0);
+  gpio_put(4, 0);
+  gpio_put(5, 0);
+  gpio_put(14, 0);
+  gpio_set_pulls(1,true,true);
+  gpio_set_pulls(2,true,true);
+  gpio_set_pulls(3,true,true);
+  gpio_set_pulls(4,true,true);
+  gpio_set_pulls(5,true,true);
+  gpio_set_pulls(14,true,true);
+  gpio_set_dir(1, GPIO_IN); 
+  gpio_set_dir(2, GPIO_IN); 
+  gpio_set_dir(3, GPIO_IN); 
+  gpio_set_dir(4, GPIO_IN); 
+  gpio_set_dir(5, GPIO_IN); 
+  gpio_set_dir(14, GPIO_IN); 
+*/
+
+  // Input pins (cols)
+  gpio_init(6);
+  gpio_init(9);
+  gpio_init(15);
+  gpio_init(8);
+  gpio_init(7);
+  gpio_init(22);
+  gpio_set_pulls(6,true,false);
+  gpio_set_dir(6,GPIO_IN);  
+  gpio_set_pulls(9,true,false);
+  gpio_set_dir(9,GPIO_IN);  
+  gpio_set_pulls(15,true,false);
+  gpio_set_dir(15,GPIO_IN);  
+  gpio_set_pulls(8,true,false);
+  gpio_set_dir(8,GPIO_IN);  
+  gpio_set_pulls(7,true,false);
+  gpio_set_dir(7,GPIO_IN);  
+  gpio_set_pulls(22,true,false);
+  gpio_set_dir(22,GPIO_IN);  
+#endif
 }
-
-
-
 
 int emu_setKeymap(int index) {
 }
@@ -800,7 +931,6 @@ void emu_init(void)
 
 void emu_start(void)
 {
-
   usbnavpad = 0;
   
   keys = (unsigned short *)key_map1;

@@ -1275,7 +1275,7 @@ typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint1
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
 
-//static tpixel linebuffer[SCREEN_WIDTH];
+static tpixel linebuffer[SCREEN_WIDTH];
 
 void vic_do(void) {
 
@@ -1396,9 +1396,11 @@ void vic_do(void) {
   }
 
   //max_x =  (!cpu.vic.CSEL) ? 40:38;
-  //p = SCREENMEM + (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH;
-  //p = &linebuffer[0]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+#ifdef USE_VGA
   p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE));
+#else
+  p = &linebuffer[0];
+#endif
   pe = p + SCREEN_WIDTH;
   //Left Screenborder: Cycle 10
   spl = &cpu.vic.spriteLine[24];
@@ -1561,10 +1563,11 @@ g-Zugriff
   if (!cpu.vic.CSEL) {
     cpu_clock(1);
     uint16_t col = cpu.vic.colors[0];
-    //p = &screen[r - FIRSTDISPLAYLINE][0];
-    //p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH  + BORDER_LEFT;
-    //p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+#ifdef USE_VGA
     p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + BORDER_LEFT;
+#else
+    p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+#endif
 #if 0
     // Sprites im Rand
     uint16_t sprite;
@@ -1586,11 +1589,12 @@ g-Zugriff
 #endif
 
     //Rand rechts:
-    //p = &screen[r - FIRSTDISPLAYLINE][SCREEN_WIDTH - 9];
-	//p = SCREENMEM +  (r - FIRSTDISPLAYLINE) * LINE_MEM_WIDTH + SCREEN_WIDTH - 9 + BORDER_LEFT;
-	//p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
-  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
-  pe = p + 9;
+#ifdef USE_VGA
+    p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+#else
+    p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+#endif
+    pe = p + 9;
 
 #if 0
     // Sprites im Rand
@@ -1609,7 +1613,14 @@ g-Zugriff
 
   }
 
-//  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+#ifdef USE_VGA
+  //emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+#else
+  emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+  //memset(&linebuffer[0],0,320*2);
+#endif
+
+
 
 
 //Rechter Rand nach CSEL, im Textbereich

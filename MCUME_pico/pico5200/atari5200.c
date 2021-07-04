@@ -500,7 +500,7 @@ void at5_Step(void)
   else which=&cont1;
 
   // Start
-  if (j & MASK_KEY_USER1)
+  if (j & MASK_KEY_USER2)
       which->key[12] = 1;    
   else
       which->key[12] = 0;    

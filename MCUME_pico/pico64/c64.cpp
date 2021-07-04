@@ -161,7 +161,7 @@ uint8_t cia1PORTA(void) {
 
   v = ~cpu.cia1.R[0x02] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]);
   int keys = 0;
-  if (!oskbActive) keys = emu_ReadKeys();
+  if (!oskbActive) keys = emu_GetPad();
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY2_BTN) v &= 0xEF;
     if (keys & MASK_JOY2_UP) v &= 0xFE;
@@ -210,7 +210,7 @@ uint8_t cia1PORTB(void) {
 
   v = ~cpu.cia1.R[0x03] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]) ;
   int keys = 0;
-  if (!oskbActive) keys = emu_ReadKeys();
+  if (!oskbActive) keys = emu_GetPad();
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY1_BTN) v &= 0xEF;
     if (keys & MASK_JOY1_UP) v &= 0xFE;
@@ -301,6 +301,7 @@ int emu_oskbActive(void) {
   return (oskbActive?1:0);
 }
 
+#ifndef PICOMPUTER
 void emu_DrawVsync(void)
 {
     char sel[2]={0,0};
@@ -314,11 +315,51 @@ void emu_DrawVsync(void)
     }
     //skip += 1;
     //skip &= VID_FRAME_SKIP;
-    //tft.waitSync(); 
+#ifdef USE_VGA
+    tft.waitSync(); 
+#endif    
 }
+#endif
 
+//#define DEBUG 1
+
+#ifdef DEBUG
+static const char * digits = "0123456789ABCDEF";
+static char buf[5] = {0,0,0,0,0};
+#endif
 
 void c64_Input(int bClick) {
+#ifdef DEBUG
+        /*
+        buf[2] = 0;
+        int key = emu_ReadI2CKeyboard2(0);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*4,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        key = emu_ReadI2CKeyboard2(1);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*5,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        key = emu_ReadI2CKeyboard2(2);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*6,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        key = emu_ReadI2CKeyboard2(3);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*7,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        key = emu_ReadI2CKeyboard2(4);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        key = emu_ReadI2CKeyboard2(5);
+        buf[0] = digits[(key>>4)&0xf];
+        buf[1] = digits[key&0xf];
+        tft.drawText(4*8,16*9,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        */
+#endif
+
+#ifndef PICOMPUTER
   if (oskbActive) {
     if (bClick & MASK_JOY2_BTN) {    
       if (oskbXPos == 10) textkey[0] = 13;
@@ -334,8 +375,9 @@ void c64_Input(int bClick) {
     if (bClick & MASK_JOY2_UP) oskbYPos = 0;
     if (bClick & MASK_JOY2_DOWN) oskbYPos = 1;
   }
-
+#endif
   if (nbkeys == 0) {
+#ifndef PICOMPUTER
     if (bClick & MASK_KEY_USER2) {
       if (!oskbActive) {
         oskbActive = true;
@@ -344,7 +386,9 @@ void c64_Input(int bClick) {
         oskbActive = false; 
       }       
     } 
-    else if (bClick & MASK_KEY_USER1) {
+    else
+#endif 
+    if (bClick & MASK_KEY_USER1) {
       if (firsttime) {
         firsttime = false;
         textseq = textload;
@@ -359,6 +403,13 @@ void c64_Input(int bClick) {
     {
       int hk = emu_ReadI2CKeyboard();
       if ( (hk != 0) && (res == false) ) {
+#ifdef DEBUG        
+        buf[3] = 0;
+        buf[0] = digits[(hk>>8)&0xf];
+        buf[1] = digits[(hk>>4)&0xf];
+        buf[2] = digits[hk&0xf];        
+        tft.drawText(0,0,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+#endif
         setKey(ascii2scan[hk],true);
         res = true;
       } 
