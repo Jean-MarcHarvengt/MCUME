@@ -6,7 +6,7 @@
 # News
 July 2021: Add support for TFT dispays on PICO<br>
 - MCUME_REV2 supports VGA and TFT (ST or ILI) on same layout
-- Add specific support for PICOMPUTER (TFT and full keyboard microswitch)
+- Add specific support for PICOMPUTER (TFT and full keyboard microswitch)<br>
 https://www.youtube.com/watch?v=4tL9K5tXZtY
 <br>
 
