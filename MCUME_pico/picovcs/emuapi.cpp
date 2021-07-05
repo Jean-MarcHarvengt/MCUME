@@ -50,7 +50,7 @@ static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
 #ifdef PICOMPUTER
-static unsigned short * keys;
+static const unsigned short * keys;
 static unsigned char keymatrix[6];
 static int keymatrix_hitrow=-1;
 static bool key_fn=false;
@@ -67,7 +67,9 @@ static bool menuOn=true;
 
 
 
-
+/********************************
+ * Generic output and malloc
+********************************/ 
 void emu_printf(char * text)
 {
   printf("%s\n",text);
@@ -137,6 +139,9 @@ void emu_Free(void * pt)
 
 
 
+/********************************
+ * Input and keyboard
+********************************/ 
 int emu_ReadAnalogJoyX(int min, int max) 
 {
   adc_select_input(0);
@@ -317,7 +322,7 @@ int emu_ReadKeys(void)
     key_fn = false;  
   }
 
-  if ( keymatrix[0] & 0x20) retval |= MASK_JOY2_BTN;
+  if ( row & 0x10) retval |= MASK_JOY2_BTN;
   if ( key_fn ) retval |= MASK_KEY_USER2;
   if ( ( key_fn ) && (row == 0x20 )) retval |= MASK_KEY_USER1;
 #endif
@@ -345,19 +350,18 @@ int emu_ReadI2CKeyboard(void) {
   int retval=0;
 #ifdef PICOMPUTER
   if (key_fn) {
-    keys = (unsigned short *)key_map2;    
+    keys = (const unsigned short *)key_map2;    
   }
   else {
-    keys = (unsigned short *)key_map1;    
+    keys = (const unsigned short *)key_map1;    
   }
   if (keymatrix_hitrow >=0 ) {
     unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
     if ( (match == 0x002 )  ) return 0; // shift or fn
     if (match < 0x100 ) match = match & ~0x002; // ignore shift key
-    for (int i=0; i<sizeof(matkeys); i++) {
+    for (int i=0; i<sizeof(matkeys)/sizeof(unsigned short); i++) {
       if (match == matkeys[i]) {    
         return (keys[i]);
-//        return (match);
       }
     }
   }
@@ -511,6 +515,9 @@ int emu_setKeymap(int index) {
 
 
 
+/********************************
+ * Menu file loader UI
+********************************/ 
 #include "ff.h"
 static FATFS fatfs;
 static FIL file; 
@@ -680,15 +687,11 @@ char * menuSelection(void)
 {
   return (selection);  
 }
-  
 
 
-
-
-
-
-
-
+/********************************
+ * File IO
+********************************/ 
 int emu_FileOpen(char * filename)
 {
   int retval = 0;
@@ -750,7 +753,6 @@ unsigned char emu_FileGetc(void) {
   return c; 
 }
 
-
 void emu_FileClose(void)
 {
   f_close(&file); 
@@ -777,6 +779,10 @@ int emu_FileSeek(int seek)
   return (seek);
 }
 
+int emu_FileTell(void) 
+{
+  return (f_tell(&file));
+}
 
 int emu_LoadFile(char * filename, char * buf, int size)
 {
@@ -804,105 +810,12 @@ int emu_LoadFile(char * filename, char * buf, int size)
   return(filesize);
 }
 
-#ifdef SDIO
-
-
-int emu_FileTell(void) 
-{
-#ifdef USE_SDFS
-  return (f_tell(&file));
-#else
-  return (50);
-#endif
-}
-
-
-int emu_LoadFile(char * filename, char * buf, int size)
-{
-  int filesize = 0;
-    
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
-  emu_printf("LoadFile...");
-  emu_printf(filepath);
-#ifdef USE_SDFS
-  if( !(f_open(&file, filepath, FA_READ)) ) {
-    filesize = f_size(&file);
-    emu_printf(filesize);
-    if (size >= filesize)
-    {
-      int retval=0;
-      if( (f_read (&file, buf, filesize, &retval)) ) {
-        emu_printf("File read failed");        
-      }
-    }
-    f_close(&file);
-  }
-#else
-  if ((file = SD.open(filepath, O_READ))) 
-  {
-    filesize = file.size(); 
-    emu_printf(filesize);
-    
-    if (size >= filesize)
-    {
-      if (emu_FileRead(buf, filesize) != filesize) 
-      {
-        emu_printf("File read failed");
-      }        
-    }
-    file.close();
-  }
-#endif  
-  
-  return(filesize);
-}
-
-int emu_LoadFileSeek(char * filename, char * buf, int size, int seek)
-{
-  int filesize = 0;
-    
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
-  emu_printf("LoadFileSeek...");
-  emu_printf(filepath);
-#ifdef USE_SDFS
-  if( !(f_open(&file, filepath, FA_READ)) ) {
-    f_lseek(&file, seek);
-    emu_printf(size);
-    if (size >= filesize)
-    {
-      int retval=0;
-      if( (!f_read (&file, buf, size, &retval)) ) 
-      if (retval != size)
-      {
-        emu_printf("File read failed");      
-      }
-    }
-    f_close(&file);
-  }
-#else
-  if ((file = SD.open(filepath, O_READ))) 
-  {
-    file.seek(seek);
-    emu_printf(size);
-    if (file.read(buf, size) != size) {
-      emu_printf("File read failed");
-    }        
-    file.close();
-  }
-#endif  
-  
-  return(filesize);
-}
-#endif
 
 
 
+/********************************
+ * Initialization
+********************************/ 
 void emu_init(void)
 {
   sd_init_driver(); 

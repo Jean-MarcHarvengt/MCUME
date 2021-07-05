@@ -50,14 +50,13 @@ static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
 #ifdef PICOMPUTER
-static unsigned short * keys;
+static const unsigned short * keys;
 static unsigned char keymatrix[6];
 static int keymatrix_hitrow=-1;
 static bool key_fn=false;
 #endif
 static int keyMap;
-   
-static int keypadval=0; 
+
 static bool joySwapped = false;
 static uint16_t bLastState;
 static int xRef;
@@ -68,7 +67,9 @@ static bool menuOn=true;
 
 
 
-
+/********************************
+ * Generic output and malloc
+********************************/ 
 void emu_printf(char * text)
 {
   printf("%s\n",text);
@@ -138,6 +139,9 @@ void emu_Free(void * pt)
 
 
 
+/********************************
+ * Input and keyboard
+********************************/ 
 int emu_ReadAnalogJoyX(int min, int max) 
 {
   adc_select_input(0);
@@ -203,7 +207,7 @@ int emu_SwapJoysticks(int statusOnly) {
 
 int emu_GetPad(void) 
 {
-  return(keypadval/*|((joySwapped?1:0)<<7)*/);
+  return(bLastState/*|((joySwapped?1:0)<<7)*/);
 }
 
 int emu_ReadKeys(void) 
@@ -276,10 +280,9 @@ int emu_ReadKeys(void)
   unsigned char row;
   unsigned short cols[6]={1,2,3,4,5,14};
   for (int i=0;i<6;i++){
-
+//    gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 0);
-    row=0;
-    
+    row=0; 
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
@@ -289,20 +292,11 @@ int emu_ReadKeys(void)
     row |= (gpio_get(15) ? 0 : 0x08);
     row |= (gpio_get(7) ? 0 : 0x10);
     row |= (gpio_get(22) ? 0 : 0x20);
-    /*
-    if ( !gpio_get(9) ) row |= 0x01;
-    if ( !gpio_get(9) ) row |= 0x01;
-    if ( !gpio_get(9) ) row |= 0x01;
-    if ( !gpio_get(9) ) row |= 0x01;
-    if ( !gpio_get(8) ) row |= 0x02;
-    if ( !gpio_get(6) ) row |= 0x04;
-    if ( !gpio_get(15) ) row |= 0x08;  
-    if ( !gpio_get(7) ) row |= 0x10;
-    if ( !gpio_get(22) ) row |= 0x20;
-    */
+    gpio_put(cols[i], 1);
+//    gpio_set_dir(cols[i], GPIO_IN);
+
     keymatrix[i]=row;
     if (row) keymatrix_hitrow=i;
-    gpio_put(cols[i], 1);
   }
 
   //6,9,15,8,7,22
@@ -320,8 +314,17 @@ int emu_ReadKeys(void)
   if ( row & 0x4  ) retval |= MASK_JOY2_DOWN;
   if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
 #endif
-  if ( row & 0x10 ) retval |= MASK_JOY2_BTN;
-  if ( row & 0x20 ) retval |= MASK_KEY_USER1;
+
+  if ( keymatrix[0] & 0x02 ) { 
+    key_fn = true;
+  }
+  else  {
+    key_fn = false;  
+  }
+
+  if ( row & 0x10) retval |= MASK_JOY2_BTN;
+  if ( key_fn ) retval |= MASK_KEY_USER2;
+  if ( ( key_fn ) && (row == 0x20 )) retval |= MASK_KEY_USER1;
 #endif
 
   //Serial.println(retval,HEX);
@@ -346,20 +349,18 @@ unsigned short emu_DebounceLocalKeys(void)
 int emu_ReadI2CKeyboard(void) {
   int retval=0;
 #ifdef PICOMPUTER
-  if ( keymatrix[0] & 0x02 ) { 
-    key_fn = true;
-  }  
   if (key_fn) {
-    keys = (unsigned short *)key_map2;    
+    keys = (const unsigned short *)key_map2;    
   }
   else {
-    keys = (unsigned short *)key_map1;    
+    keys = (const unsigned short *)key_map1;    
   }
   if (keymatrix_hitrow >=0 ) {
     unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
-    for (int i=0; i<sizeof(matkeys); i++) {
+    if ( (match == 0x002 )  ) return 0; // shift or fn
+    if (match < 0x100 ) match = match & ~0x002; // ignore shift key
+    for (int i=0; i<sizeof(matkeys)/sizeof(unsigned short); i++) {
       if (match == matkeys[i]) {    
-        key_fn = false;  
         return (keys[i]);
       }
     }
@@ -368,6 +369,13 @@ int emu_ReadI2CKeyboard(void) {
   return(retval);
 }
 
+unsigned char emu_ReadI2CKeyboard2(int row) {
+  int retval=0;
+#ifdef PICOMPUTER
+  retval = keymatrix[row];
+#endif
+  return retval;
+}
 void emu_InitJoysticks(void) { 
 
   // Second Joystick   
@@ -438,31 +446,55 @@ void emu_InitJoysticks(void) {
 #endif
 
 #ifdef PICOMPUTER
+  // Output (rows)
   gpio_init(1);
   gpio_init(2);
   gpio_init(3);
   gpio_init(4);
   gpio_init(5);
   gpio_init(14);
-
-  gpio_init(6);
-  gpio_init(9);
-  gpio_init(15);
-  gpio_init(8);
-  gpio_init(7);
-  gpio_init(22);
   gpio_set_dir(1, GPIO_OUT); 
   gpio_set_dir(2, GPIO_OUT); 
   gpio_set_dir(3, GPIO_OUT); 
   gpio_set_dir(4, GPIO_OUT); 
   gpio_set_dir(5, GPIO_OUT); 
-  gpio_set_dir(14, GPIO_OUT); 
+  gpio_set_dir(14, GPIO_OUT);
+   
   gpio_put(1, 1);
   gpio_put(2, 1);
   gpio_put(3, 1);
   gpio_put(4, 1);
   gpio_put(5, 1);
   gpio_put(14, 1);
+  
+/*
+  gpio_put(1, 0);
+  gpio_put(2, 0);
+  gpio_put(3, 0);
+  gpio_put(4, 0);
+  gpio_put(5, 0);
+  gpio_put(14, 0);
+  gpio_set_pulls(1,true,true);
+  gpio_set_pulls(2,true,true);
+  gpio_set_pulls(3,true,true);
+  gpio_set_pulls(4,true,true);
+  gpio_set_pulls(5,true,true);
+  gpio_set_pulls(14,true,true);
+  gpio_set_dir(1, GPIO_IN); 
+  gpio_set_dir(2, GPIO_IN); 
+  gpio_set_dir(3, GPIO_IN); 
+  gpio_set_dir(4, GPIO_IN); 
+  gpio_set_dir(5, GPIO_IN); 
+  gpio_set_dir(14, GPIO_IN); 
+*/
+
+  // Input pins (cols)
+  gpio_init(6);
+  gpio_init(9);
+  gpio_init(15);
+  gpio_init(8);
+  gpio_init(7);
+  gpio_init(22);
   gpio_set_pulls(6,true,false);
   gpio_set_dir(6,GPIO_IN);  
   gpio_set_pulls(9,true,false);
@@ -478,14 +510,14 @@ void emu_InitJoysticks(void) {
 #endif
 }
 
-
-
-
 int emu_setKeymap(int index) {
 }
 
 
 
+/********************************
+ * Menu file loader UI
+********************************/ 
 #include "ff.h"
 static FATFS fatfs;
 static FIL file; 
@@ -498,7 +530,6 @@ static int readNbFiles(char * rootdir) {
   FILINFO entry;
   FRESULT fr = f_findfirst(&dir, &entry, rootdir, "*");
   while ( (fr == FR_OK) && (entry.fname[0]) && (totalFiles<MAX_FILES) ) {  
-//    f_readdir(&dir, &entry);
     if (!entry.fname[0]) {
       // no more files
       break;
@@ -656,15 +687,11 @@ char * menuSelection(void)
 {
   return (selection);  
 }
-  
 
 
-
-
-
-
-
-
+/********************************
+ * File IO
+********************************/ 
 int emu_FileOpen(char * filename)
 {
   int retval = 0;
@@ -726,7 +753,6 @@ unsigned char emu_FileGetc(void) {
   return c; 
 }
 
-
 void emu_FileClose(void)
 {
   f_close(&file); 
@@ -747,28 +773,16 @@ int emu_FileSize(char * filename)
   return(filesize);    
 }
 
-
-#ifdef SDIO
-
 int emu_FileSeek(int seek) 
 {
-#ifdef USE_SDFS
   f_lseek(&file, seek);
-#else
-  file.seek(seek);
-#endif
   return (seek);
 }
 
 int emu_FileTell(void) 
 {
-#ifdef USE_SDFS
   return (f_tell(&file));
-#else
-  return (50);
-#endif
 }
-
 
 int emu_LoadFile(char * filename, char * buf, int size)
 {
@@ -780,82 +794,28 @@ int emu_LoadFile(char * filename, char * buf, int size)
   strcat(filepath, filename);
   emu_printf("LoadFile...");
   emu_printf(filepath);
-#ifdef USE_SDFS
   if( !(f_open(&file, filepath, FA_READ)) ) {
     filesize = f_size(&file);
     emu_printf(filesize);
     if (size >= filesize)
     {
-      int retval=0;
+      unsigned int retval=0;
       if( (f_read (&file, buf, filesize, &retval)) ) {
         emu_printf("File read failed");        
       }
     }
     f_close(&file);
   }
-#else
-  if ((file = SD.open(filepath, O_READ))) 
-  {
-    filesize = file.size(); 
-    emu_printf(filesize);
-    
-    if (size >= filesize)
-    {
-      if (emu_FileRead(buf, filesize) != filesize) 
-      {
-        emu_printf("File read failed");
-      }        
-    }
-    file.close();
-  }
-#endif  
-  
+ 
   return(filesize);
 }
 
-int emu_LoadFileSeek(char * filename, char * buf, int size, int seek)
-{
-  int filesize = 0;
-    
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
-  emu_printf("LoadFileSeek...");
-  emu_printf(filepath);
-#ifdef USE_SDFS
-  if( !(f_open(&file, filepath, FA_READ)) ) {
-    f_lseek(&file, seek);
-    emu_printf(size);
-    if (size >= filesize)
-    {
-      int retval=0;
-      if( (!f_read (&file, buf, size, &retval)) ) 
-      if (retval != size)
-      {
-        emu_printf("File read failed");      
-      }
-    }
-    f_close(&file);
-  }
-#else
-  if ((file = SD.open(filepath, O_READ))) 
-  {
-    file.seek(seek);
-    emu_printf(size);
-    if (file.read(buf, size) != size) {
-      emu_printf("File read failed");
-    }        
-    file.close();
-  }
-#endif  
-  
-  return(filesize);
-}
-#endif
 
 
 
+/********************************
+ * Initialization
+********************************/ 
 void emu_init(void)
 {
   sd_init_driver(); 
