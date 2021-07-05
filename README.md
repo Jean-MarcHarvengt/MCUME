@@ -7,6 +7,7 @@
 July 2021: Add support for TFT dispays on PICO<br>
 - MCUME_REV2 supports VGA and TFT (ST or ILI) on same layout
 - Add specific support for PICOMPUTER (TFT and full keyboard microswitch)
+https://www.youtube.com/watch?v=4tL9K5tXZtY
 <br>
 
 May 13th 2021: C64 emulator improvement for PICO<br>
@@ -334,7 +335,7 @@ Game console systems supported and status on various MCU platforms<br>
 - USER2 can be used to swap joystick 1/2 in some emulators
 
 # Running on the PICOMPUTER
-- Fire button is mapped to key 'Q'
+- Fire button is mapped to key 'TAB'
 - USER2 is mapped to key "fn"
 - USER1 is mapped to "fn+DEL"
 - for PICO64, fb+DEL can be used to load selected game
