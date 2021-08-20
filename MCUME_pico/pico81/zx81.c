@@ -241,14 +241,16 @@ static void updateKeyboard (void)
   }
   else {
     // scan all possibilities
+    int key = hk & 0xff;
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
-        if ( (k == map_qw[j][i]) || (hk == map_qw[j][i]) ) {
+        if ( (k == map_qw[j][i]) || (key == map_qw[j][i]) ) {
             keyboard[j] &= ~ (1<<(4-i));
             nb_keys++;
         }   
       }  
-    }    
+    }
+    if (hk & 0x100) keyboard[0] &= ~ 1;     
   } 
 }
 

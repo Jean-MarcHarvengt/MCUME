@@ -15,7 +15,11 @@
 
 #define SPICLOCK 60000000 
 #ifdef ST7789
+#ifdef ST7789_POL
+#define SPI_MODE SPI_CPOL_0
+#else
 #define SPI_MODE SPI_CPOL_1
+#endif
 #endif
 #ifdef ILI9341
 #define SPI_MODE SPI_CPOL_0
@@ -215,12 +219,18 @@ TFT_T_DMA::TFT_T_DMA()
   _mosi = TFT_MOSI;
   _sclk = TFT_SCLK;
   //_miso = TFT_MISO;
+  _bkl = TFT_BACKLIGHT;
   gpio_init(_dc);
   gpio_set_dir(_dc, GPIO_OUT); 
   gpio_init(_cs);
   gpio_set_dir(_cs, GPIO_OUT);
   digitalWrite(_cs, 1);
   digitalWrite(_dc, 1);
+  if (_bkl != 0xff) {
+    gpio_init(_bkl);
+    gpio_set_dir(_bkl, GPIO_OUT); 
+    digitalWrite(_bkl, 1);
+  } 
 }
 
 
@@ -282,7 +292,6 @@ void TFT_T_DMA::begin(void) {
     sleep_ms(200);
   }
 
-
   const uint8_t *addr = init_commands;
   digitalWrite(_cs, 0);
 #ifdef ILI9341 
@@ -313,7 +322,7 @@ void TFT_T_DMA::begin(void) {
   digitalWrite(_dc, 1);
   digitalWrite(_cs, 1);
 #endif
-#ifdef ST7789 
+#ifdef ST7789
   uint8_t  numCommands, numArgs;
   uint16_t ms;
   numCommands = *addr++;    // Number of commands to follow
@@ -357,7 +366,7 @@ void TFT_T_DMA::begin(void) {
 #ifdef ST7789 
   if (TFT_REALWIDTH != TFT_REALHEIGHT)
   {
-    flipscreen(true);      
+    //flipscreen(true);      
   }
 #endif 
 };

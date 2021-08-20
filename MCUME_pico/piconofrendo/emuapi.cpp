@@ -296,6 +296,20 @@ int emu_ReadKeys(void)
 //    gpio_set_dir(cols[i], GPIO_IN);
 
     keymatrix[i]=row;
+    //if (row) keymatrix_hitrow=i;
+  }
+
+#ifdef PICOMPUTERMAX
+  // Swap ALT and DEL  
+  unsigned char alt = keymatrix[0] & 0x02;
+  unsigned char del = keymatrix[5] & 0x20;
+  keymatrix[0] &= ~0x02;
+  keymatrix[5] &= ~0x20;
+  if (alt) keymatrix[5] |= 0x20;
+  if (del) keymatrix[0] |= 0x02;
+#endif
+  for (int i=0;i<6;i++){
+    row = keymatrix[i];
     if (row) keymatrix_hitrow=i;
   }
 
@@ -820,7 +834,6 @@ void emu_init(void)
 {
   sd_init_driver(); 
   FRESULT fr = f_mount(&fatfs, "0:", 1);    
-  //emu_FileSystemInit();
 
   strcpy(romspath,ROMSDIR);
   nbFiles = readNbFiles(romspath); 
@@ -834,6 +847,10 @@ void emu_init(void)
 #else
   joySwapped = false;   
 #endif  
+
+  // Flip screen if UP pressed
+  if (emu_ReadKeys() & MASK_JOY2_UP)
+    tft.flipscreen(true);
 
   toggleMenu(true);
 }

@@ -209,7 +209,7 @@ class TFT_T_DMA
 
   protected:   
   uint8_t _rst, _cs, _dc;
-  uint8_t _miso, _mosi, _sclk;
+  uint8_t _miso, _mosi, _sclk, _bkl;
   bool flipped=false;
 
   void wait(void);  

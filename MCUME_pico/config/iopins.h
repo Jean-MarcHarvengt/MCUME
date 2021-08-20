@@ -26,6 +26,7 @@
 #define TFT_DC          28
 #define TFT_CS          13  // 255 for LORES ST7789 (NO CS)
 #define TFT_RST         255 // 255 for ILI/ST if connected to 3.3V
+#define TFT_BACKLIGHT   255 // hardwired to 3.3v
 
 // SD (see SPI0 in code!!!)
 #define SD_SPIREG       spi0
@@ -67,9 +68,15 @@
 #define TFT_SCLK        18
 #define TFT_MOSI        19
 #define TFT_MISO        255 // Not required, used for DC... 
-#define TFT_DC          16  //28
-#define TFT_CS          255 //17  // 255 for LORES ST7789 (NO CS)
-#define TFT_RST         21 //255  // 255 for ILI/ST if connected to 3.3V, required by 256x256 ST
+#define TFT_DC          16
+#define TFT_RST         21
+#ifdef PICOMPUTERMAX
+#define TFT_CS          17
+#define TFT_BACKLIGHT   20
+#else
+#define TFT_CS          255
+#define TFT_BACKLIGHT   255
+#endif
 
 // SD (see SPI0 in code!!!)
 #define SD_SPIREG       spi1
