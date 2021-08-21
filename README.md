@@ -4,6 +4,10 @@
 </p>
 
 # News
+August 2021: Add support for PICOMPUTERMAX on PICO<br>
+- TFT 7789 320x240
+<br>
+
 July 2021: Add support for TFT dispays on PICO<br>
 - MCUME_REV2 supports VGA and TFT (ST or ILI) on same layout
 - Add specific support for PICOMPUTER (TFT and full keyboard microswitch)<br>
