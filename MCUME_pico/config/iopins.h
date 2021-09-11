@@ -70,13 +70,20 @@
 #define TFT_MISO        255 // Not required, used for DC... 
 #define TFT_DC          16
 #define TFT_RST         21
+#ifdef PICOMPUTER
 #ifdef PICOMPUTERMAX
 #define TFT_CS          17
 #define TFT_BACKLIGHT   20
 #else
 #define TFT_CS          255
-#define TFT_BACKLIGHT   255
+#define TFT_BACKLIGHT   20
 #endif
+#else
+// MCUME_REV2 (ILI)
+#define TFT_CS          17
+#define TFT_BACKLIGHT   255 // hardwired to 3.3v
+#endif
+
 
 // SD (see SPI0 in code!!!)
 #define SD_SPIREG       spi1
@@ -88,20 +95,36 @@
 
 #ifdef PICOMPUTER
 // Keyboard matrix 
-
 //Cols (out)
 //1,2,3,4,5,14
 //Rows (in)
 //6,9,15,8,7,22
+#define KLED            25
 
 #else
-// Analog joystick (primary) for JOY2 and 3 extra buttons
+#ifdef MCUME_REV1
+
+// Analog joystick (primary) for JOY2 and 2 extra buttons
 #define PIN_JOY2_A1X    26
 #define PIN_JOY2_A2Y    27
 #define PIN_JOY2_BTN    22
 #define PIN_KEY_USER1   20
 #define PIN_KEY_USER2   21 
+#else
 
+// Digital joystick (primary) for JOY2 and 2 extra buttons
+//#define PIN_JOY2_A1X    26
+//#define PIN_JOY2_A2Y    27
+
+#define PIN_JOY2_1      27  // UP
+#define PIN_JOY2_2      26  // DOWN
+#define PIN_JOY2_3      28  // RIGHT
+#define PIN_JOY2_4      22  // LEFT
+#define PIN_JOY2_BTN    1
+#define PIN_KEY_USER1   20
+#define PIN_KEY_USER2   21 
+
+#endif
 #endif
 
 #endif

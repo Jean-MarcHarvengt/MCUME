@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/CMakeFiles/PioasmBuild"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/CMakeFiles/PioasmBuild.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/CMakeFiles/PioasmBuild-complete.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-install.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-download.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-update.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-configure.rule"
+		},
+		{
+			"file" : "/Users/jean-marcharvengt/Documents/MCUME/MCUME_pico/build/pioasm/src/PioasmBuild-stamp/PioasmBuild-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"PioasmBuild"
+		],
+		"name" : "PioasmBuild"
+	}
+}

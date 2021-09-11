@@ -7,11 +7,12 @@
 
 
 //#define PICOMPUTER     1
-#define PICOMPUTERMAX  1
+//#define PICOMPUTERMAX  1
 //#define MCUME_REV1      1
-//#define MCUME_REV2      1
+#define MCUME_REV2      1
 
 #ifdef PICOMPUTER
+//#define SWAP_ALT_DEL   1
 #define ST7789         1
 #define LOHRES         1
 #define FLIP_SCREEN    1
@@ -36,8 +37,8 @@
 #endif
 
 #ifdef MCUME_REV2
-//#define USE_VGA        1
-#define ILI9341        1
+#define USE_VGA        1
+//#define ILI9341        1
 #define INVX           1
 #define HAS_SND        1
 #endif

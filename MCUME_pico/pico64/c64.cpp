@@ -60,7 +60,7 @@ const uint32_t ascii2scan[] = {
    //sp  !       "     #     $      %      &      '     (        )   *    +    ,    -    .    / 
    0x2c,0x201e,0x201f,0x2020,0x2021,0x2022,0x2023,0x2024,0x2025,0x2026,0x55,0x57,0x36,0x56,0x37,0x54,
    //0  1    2    3    4    5    6    7    8    9    :    ;    <      =    >      ?
-   0x27,0x1e,0x1f,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x33,0x34,0x2036,0x32,0x2037,0x0238,
+   0x27,0x1e,0x1f,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x33,0x34,0x2036,0x32,0x2037,0x2054,
    //@    A    B    C    D    E    F    G    H    I    J    K    L    M    N    O
    47,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,
    //P  Q    R    S    T    U    V    W    X    Y    Z    [      \     ]     ^    _  
@@ -360,6 +360,7 @@ void c64_Input(int bClick) {
 #endif
 
 #ifndef PICOMPUTER
+  int fbwidth;  
   if (oskbActive) {
     if (bClick & MASK_JOY2_BTN) {    
       if (oskbXPos == 10) textkey[0] = 13;
@@ -369,6 +370,9 @@ void c64_Input(int bClick) {
       textseq = textkey;
       nbkeys = 1;   
       kcnt = 0;
+      oskbActive = false;
+      tft.get_frame_buffer_size(&fbwidth,NULL);       
+      tft.drawRect(0,OSKB_YPOS,fbwidth,16,RGBVAL16(0, 0, 0));
     }
     if (bClick & MASK_JOY2_RIGHT) if (oskbXPos != 0) oskbXPos--;
     if (bClick & MASK_JOY2_LEFT) if (oskbXPos != 39)  oskbXPos++;
@@ -383,7 +387,9 @@ void c64_Input(int bClick) {
         oskbActive = true;
       }
       else {
-        oskbActive = false; 
+        oskbActive = false;
+        tft.get_frame_buffer_size(&fbwidth,NULL);       
+        tft.drawRect(0,OSKB_YPOS,fbwidth,16,RGBVAL16(0, 0, 0));
       }       
     } 
     else
