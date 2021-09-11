@@ -4,6 +4,11 @@
 </p>
 
 # News
+September 2021: Some more PICO platforms improvement<br>
+- MCUME_REV2 had now digital inputs for UP/DOWN/LEFT/RIGHT so external C64 joystick can be connected (VGA & TFT binaries)
+- PICOMPUTERMAX now supporting ALT and FN(long press on ALT) keys so more C64 keys can be mapped (FN for Function keys for e.g.)
+<br>
+
 August 2021: Add support for PICOMPUTERMAX on PICO<br>
 - TFT 7789 320x240
 <br>
