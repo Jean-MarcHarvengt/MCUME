@@ -4275,129 +4275,128 @@ static __inline__ void pfield_draw_line(int lineno, int gfx_ypos, int follow_ypo
     dp_for_drawing = 0;
     dip_for_drawing = 0;
     switch (linestate[lineno]) {
-     case LINE_AS_PREVIOUS:
-     case LINE_REMEMBERED_AS_PREVIOUS:
-	{
-	    static int warned = 0;
-	    if (!warned)
-		write_log ("Shouldn't get here... this is a bug.\n"), warned++;
-	}
-	line_decisions[lineno].which = -2;
-	return;
+      case LINE_AS_PREVIOUS:
+      case LINE_REMEMBERED_AS_PREVIOUS:
+	      {
+	        static int warned = 0;
+	        if (!warned)
+		        write_log ("Shouldn't get here... this is a bug.\n"), warned++;
+	      }
+	      line_decisions[lineno].which = -2;
+	      return;
 
      case LINE_BORDER_PREV:
-	border = 1;
-	dp_for_drawing = line_decisions + lineno - 1;
-	dip_for_drawing = curr_drawinfo + lineno - 1;
-	break;
+	     border = 1;
+	     dp_for_drawing = line_decisions + lineno - 1;
+	     dip_for_drawing = curr_drawinfo + lineno - 1;
+	     break;
 
      case LINE_BORDER_NEXT:
-	border = 1;
-	dp_for_drawing = line_decisions + lineno + 1;
-	dip_for_drawing = curr_drawinfo + lineno + 1;
-	break;
+	     border = 1;
+	     dp_for_drawing = line_decisions + lineno + 1;
+	     dip_for_drawing = curr_drawinfo + lineno + 1;
+	     break;
 
      case LINE_DONE_AS_PREVIOUS:
-	line_decisions[lineno].which = -2;
-	/* fall through */
+	     line_decisions[lineno].which = -2;
+	     /* fall through */
      case LINE_DONE:
-	return;
+	     return;
 
      case LINE_DECIDED_DOUBLE:
-	line_decisions[lineno+1].which = -2;
-	if (follow_ypos != -1) {
-	    do_double = 1;
-	    linetoscr_double_offset = gfxvidinfo.rowbytes * (follow_ypos - gfx_ypos);
-	}
-
-	/* fall through */
+	     line_decisions[lineno+1].which = -2;
+	     if (follow_ypos != -1) {
+	       do_double = 1;
+	       linetoscr_double_offset = gfxvidinfo.rowbytes * (follow_ypos - gfx_ypos);
+	     }
+	   /* fall through */
      default:
-	dip_for_drawing = curr_drawinfo + lineno;
-	dp_for_drawing = line_decisions + lineno;
-	if (dp_for_drawing->which != 1)
-	    border = 1;
-	break;
+	     dip_for_drawing = curr_drawinfo + lineno;
+	     dp_for_drawing = line_decisions + lineno;
+	     if (dp_for_drawing->which != 1)
+	       border = 1;
+	     break;
     }
 
+
     if (!line_changed[lineno] && !frame_redraw_necessary) {
-	/* The case where we can skip redrawing this line. If this line
-	 * is supposed to be doubled, and the next line is remembered as
-	 * having been doubled, then the next line is done as well. */
-	if (do_double) {
-	    if (linestate[lineno+1] != LINE_REMEMBERED_AS_PREVIOUS) {
-		if (gfxvidinfo.linemem == NULL)
-		    memcpy (row_map[follow_ypos], row_map[gfx_ypos], gfxvidinfo.rowbytes);
-		line_decisions[lineno + 1].which = -2;
-		do_flush_line (follow_ypos);
+	    /* The case where we can skip redrawing this line. If this line
+	     * is supposed to be doubled, and the next line is remembered as
+	     * having been doubled, then the next line is done as well. */
+	    if (do_double) {
+	      if (linestate[lineno+1] != LINE_REMEMBERED_AS_PREVIOUS) {
+		      if (gfxvidinfo.linemem == NULL)
+		        memcpy (row_map[follow_ypos], row_map[gfx_ypos], gfxvidinfo.rowbytes);
+		      line_decisions[lineno + 1].which = -2;
+		      do_flush_line (follow_ypos);
+	      }
+	      linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
 	    }
-	    linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
-	}
-	linestate[lineno] = LINE_DONE;
-	return;
+	    linestate[lineno] = LINE_DONE;
+	    return;
     }
 
     if (!border) {
-	xlinebuffer = gfxvidinfo.linemem;
-	if (xlinebuffer == NULL)
+	    xlinebuffer = gfxvidinfo.linemem;
+	  if (xlinebuffer == NULL)
 	    xlinebuffer = row_map[gfx_ypos];
-	xlinebuffer -= linetoscr_x_adjust_bytes;
-	aga_lbufptr = aga_linebuf;
+	  xlinebuffer -= linetoscr_x_adjust_bytes;
+    aga_lbufptr = aga_linebuf;
 
-	pfield_expand_dp_bplcon ();
+	  pfield_expand_dp_bplcon ();
 
 #ifdef LORES_HACK
-	if (gfxvidinfo.can_double && !bplhires && !currprefs.gfx_lores
-	    && dip_for_drawing->nr_color_changes == 0 && !bplham)
+	  if (gfxvidinfo.can_double && !bplhires && !currprefs.gfx_lores && dip_for_drawing->nr_color_changes == 0 && !bplham)
 	    currprefs.gfx_lores = 2;
 #endif
-	pfield_init_linetoscr ();
-	if (dip_for_drawing->first_delay_change != dip_for_drawing->last_delay_change) {
+	  pfield_init_linetoscr ();
+	  if (dip_for_drawing->first_delay_change != dip_for_drawing->last_delay_change) {
 	    bpldelay1 = bpldelay2 = 0;
 	    if (currprefs.gfx_lores)
-		pfield_doline_l (lineno);
+		    pfield_doline_l (lineno);
 	    else
-		pfield_doline_h (lineno);
+		    pfield_doline_h (lineno);
 	    pfield_adjust_delay ();
-	} else {
+	  } else {
 	    if (currprefs.gfx_lores)
-		pfield_doline_l (lineno);
+		    pfield_doline_l (lineno);
 	    else
-		pfield_doline_h (lineno);
-	}
+		    pfield_doline_h (lineno);
+	  }
 
-	/* Check color0 adjust only if we have color changes - shouldn't happen
-	 * otherwise. */
-	adjust_drawing_colors (dp_for_drawing->ctable, bplham || bplehb);
+	  /* Check color0 adjust only if we have color changes - shouldn't happen
+	   * otherwise. */
+	  adjust_drawing_colors (dp_for_drawing->ctable, bplham || bplehb);
 
-	/* The problem is that we must call decode_ham6() BEFORE we do the
-	 * sprites. */
-	if (bplham) {
+	  /* The problem is that we must call decode_ham6() BEFORE we do the
+	   * sprites. */
+	  if (bplham) {
 	    init_ham_decoding(linetoscr_x_adjust);
 	    if (dip_for_drawing->nr_color_changes == 0) {
-		/* The easy case: need to do HAM decoding only once for the
-		 * full line. */
-		decode_ham6 (linetoscr_x_adjust, linetoscr_right_x);
+		    /* The easy case: need to do HAM decoding only once for the
+		    * full line. */
+		    decode_ham6 (linetoscr_x_adjust, linetoscr_right_x);
 	    } else /* Argh. */ {
-		adjust_color0_for_color_change ();
-		do_color_changes (decode_ham6);
-		adjust_drawing_colors (dp_for_drawing->ctable, bplham || bplehb);
+		    adjust_color0_for_color_change ();
+		    do_color_changes (decode_ham6);
+		    adjust_drawing_colors (dp_for_drawing->ctable, bplham || bplehb);
 	    }
-	}
+	  }
 
-	if (dip_for_drawing->nr_sprites != 0) {
+	  if (dip_for_drawing->nr_sprites != 0) {
 	    int spr;
 	    walk_sprites (curr_sprite_positions + dip_for_drawing->first_sprite_draw, dip_for_drawing->nr_sprites);
-	}
-	if (dip_for_drawing->nr_color_changes == 0) {
+	  }
+	  if (dip_for_drawing->nr_color_changes == 0) {
 	    pfield_do_linetoscr_full (gfxvidinfo.linemem == NULL ? do_double : 0);
 	    do_flush_line (gfx_ypos);
 	    linestate[lineno] = LINE_DONE;
 
 	    if (do_double) {
-		linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
-		do_flush_line (follow_ypos);
+		    linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
+		    do_flush_line (follow_ypos);
 	    }
-	} else {
+	  } else {
 	    int lastpos = 0, nextpos, i;
 
 	    adjust_color0_for_color_change ();
@@ -4406,18 +4405,21 @@ static __inline__ void pfield_draw_line(int lineno, int gfx_ypos, int follow_ypo
 	    linestate[lineno] = LINE_DONE;
 	    do_flush_line (gfx_ypos);
 	    if (do_double) {
-		if (gfxvidinfo.linemem == NULL)
-		    memcpy (row_map[follow_ypos], row_map[gfx_ypos], gfxvidinfo.rowbytes);
-		linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
-		line_decisions[lineno + 1].which = -2;
-		do_flush_line (follow_ypos);
+		    if (gfxvidinfo.linemem == NULL)
+		      memcpy (row_map[follow_ypos], row_map[gfx_ypos], gfxvidinfo.rowbytes);
+		    linestate[lineno + 1] = LINE_DONE_AS_PREVIOUS;
+		    line_decisions[lineno + 1].which = -2;
+		    do_flush_line (follow_ypos);
 	    }
-	}
+	  }
+   
 #ifdef LORES_HACK
-	if (currprefs.gfx_lores == 2)
+	  if (currprefs.gfx_lores == 2)
 	    currprefs.gfx_lores = 0;
 #endif
-    } else {
+  } 
+    
+    else {
 	/* Border. */
 	int i, lastpos = 0, nextpos;
 	struct color_change *cc;
@@ -5030,7 +5032,7 @@ void customreset (void)
 #endif
 
     for (i = 0; i < sizeof current_colors.color_regs / sizeof *current_colors.color_regs; i++)
-	current_colors.color_regs[i] = -1;
+	    current_colors.color_regs[i] = -1;
 
 #ifdef FRAME_RATE_HACK
     did_reset = 1;
@@ -5064,12 +5066,12 @@ void customreset (void)
 
     if (needmousehack()) {
 #if 0
-	if (mousestate != follow_mouse) setfollow();
+	    if (mousestate != follow_mouse) setfollow();
 #else
-	if (mousestate != dont_care_mouse) setdontcare();
+	    if (mousestate != dont_care_mouse) setdontcare();
 #endif
     } else {
-	mousestate = normal_mouse;
+	    mousestate = normal_mouse;
     }
     ievent_alive = 0;
 
@@ -5085,7 +5087,7 @@ void customreset (void)
 #else
     for (i = 0; i < (maxvpos+1)*2 + 1; i++) {
 #endif  
-	   linestate[i] = LINE_UNDECIDED;
+	    linestate[i] = LINE_UNDECIDED;
     }
     xlinebuffer = gfxvidinfo.bufmem;
 
@@ -5106,9 +5108,9 @@ void customreset (void)
     init_eventtab ();
 
     if (native2amiga_line_map)
-	free (native2amiga_line_map);
+	    free (native2amiga_line_map);
     if (amiga2aspect_line_map)
-	free (amiga2aspect_line_map);
+	    free (amiga2aspect_line_map);
 
     /* At least for this array the +1 is necessary. */ 
 #ifdef HALF_HEIGHT
@@ -5119,62 +5121,61 @@ void customreset (void)
     native2amiga_line_map = (int *)emu_Malloc (sizeof (int) * gfxvidinfo.height);
 
     if (currprefs.gfx_correct_aspect)
-	native_lines_per_amiga_line = ((double)gfxvidinfo.height
-				       * (currprefs.gfx_lores ? 320 : 640)
+	    native_lines_per_amiga_line = ((double)gfxvidinfo.height * (currprefs.gfx_lores ? 320 : 640)
 				       / (currprefs.gfx_linedbl ? 512 : 256)
 				       / gfxvidinfo.width);
     else
-	native_lines_per_amiga_line = 1;
+	    native_lines_per_amiga_line = 1;
 
     maxl = (maxvpos+1) * (currprefs.gfx_linedbl ? 2 : 1);
     min_ypos_for_screen = minfirstline << (currprefs.gfx_linedbl ? 1 : 0);
     max_drawn_amiga_line = -1;
     for (i = 0; i < maxl; i++) {
-	int v = (i - min_ypos_for_screen) * native_lines_per_amiga_line;
-	if (v >= gfxvidinfo.height && max_drawn_amiga_line == -1)
-	    max_drawn_amiga_line = i-min_ypos_for_screen;
-	if (i < min_ypos_for_screen || v >= gfxvidinfo.height)
-	    v = -1;
-	amiga2aspect_line_map[i] = v;
+	    int v = (i - min_ypos_for_screen) * native_lines_per_amiga_line;
+	    if (v >= gfxvidinfo.height && max_drawn_amiga_line == -1)
+	      max_drawn_amiga_line = i-min_ypos_for_screen;
+	    if (i < min_ypos_for_screen || v >= gfxvidinfo.height)
+	      v = -1;
+	    amiga2aspect_line_map[i] = v;
     }
     if (currprefs.gfx_linedbl)
-	max_drawn_amiga_line >>= 1;
+	    max_drawn_amiga_line >>= 1;
 
     if (currprefs.gfx_ycenter && !(currprefs.gfx_correct_aspect)) {
-	extra_y_adjust = (gfxvidinfo.height - (maxvpos << (currprefs.gfx_linedbl ? 1 : 0))) >> 1;
-	if (extra_y_adjust < 0)
-	    extra_y_adjust = 0;
+	    extra_y_adjust = (gfxvidinfo.height - (maxvpos << (currprefs.gfx_linedbl ? 1 : 0))) >> 1;
+	    if (extra_y_adjust < 0)
+	      extra_y_adjust = 0;
     }
 
     for (i = 0; i < gfxvidinfo.height; i++)
-	native2amiga_line_map[i] = -1;
+	    native2amiga_line_map[i] = -1;
 
     if (native_lines_per_amiga_line < 1) {
-	/* Must omit drawing some lines. */
-	for (i = maxl-1; i > min_ypos_for_screen; i--) {
-	    if (amiga2aspect_line_map[i] == amiga2aspect_line_map[i-1]) {
-		if (currprefs.gfx_linedbl && (i & 1) == 0 && amiga2aspect_line_map[i+1] != -1) {
-		    /* If only the first line of a line pair would be omitted,
-		     * omit the second one instead to avoid problems with line
-		     * doubling. */
-		    amiga2aspect_line_map[i] = amiga2aspect_line_map[i+1];
-		    amiga2aspect_line_map[i+1] = -1;
-		} else
-		    amiga2aspect_line_map[i] = -1;
-	    }
-	}
-    }
+	    /* Must omit drawing some lines. */
+	    for (i = maxl-1; i > min_ypos_for_screen; i--) {
+	      if (amiga2aspect_line_map[i] == amiga2aspect_line_map[i-1]) {
+		      if (currprefs.gfx_linedbl && (i & 1) == 0 && amiga2aspect_line_map[i+1] != -1) {
+		        /* If only the first line of a line pair would be omitted,
+		         * omit the second one instead to avoid problems with line
+		         * doubling. */
+		        amiga2aspect_line_map[i] = amiga2aspect_line_map[i+1];
+		        amiga2aspect_line_map[i+1] = -1;
+		      } else
+		        amiga2aspect_line_map[i] = -1;
+	        }
+	      }
+      }
 
-    for (i = maxl-1; i >= min_ypos_for_screen; i--) {
-	int j;
-	if (amiga2aspect_line_map[i] == -1)
-	    continue;
-	for (j = amiga2aspect_line_map[i]; j < gfxvidinfo.height && native2amiga_line_map[j] == -1; j++)
-	    native2amiga_line_map[j] = i >> (currprefs.gfx_linedbl ? 1 : 0);
+      for (i = maxl-1; i >= min_ypos_for_screen; i--) {
+	    int j;
+	    if (amiga2aspect_line_map[i] == -1)
+	      continue;
+	    for (j = amiga2aspect_line_map[i]; j < gfxvidinfo.height && native2amiga_line_map[j] == -1; j++)
+	      native2amiga_line_map[j] = i >> (currprefs.gfx_linedbl ? 1 : 0);
     }
 
     if (line_drawn == 0)
-	line_drawn = (char *)malloc (gfxvidinfo.height);
+	    line_drawn = (char *)malloc (gfxvidinfo.height);
     init_row_map();
 
     init_sprites ();

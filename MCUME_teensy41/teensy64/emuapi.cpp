@@ -610,7 +610,7 @@ void emu_InitJoysticks(void) {
 
 
 int emu_setKeymap(int index) {
-/*
+  /*
   int xoff = 16;
   if (keyMap == 1) {  
     keyMap = 0;     
@@ -640,7 +640,7 @@ int emu_setKeymap(int index) {
     tft.drawText(xoff,96+16, "joystick mode                           ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     delay(200);     
   }
-*/  
+  */
 }
 
 
@@ -754,7 +754,7 @@ int handleMenu(uint16_t bClick)
   }
   else if ( bClick & MASK_KEY_USER2  ) {
       menuRedraw=true;  
-      //action = ACTION_RUN3;    
+      action = ACTION_RUN3;    
       emu_SwapJoysticks(0);
   }  
   else if ( (bClick & MASK_JOY2_UP) || (bClick & MASK_JOY1_UP) ) {
@@ -827,10 +827,10 @@ int handleMenu(uint16_t bClick)
 #ifndef HAS_T4_VGA
     tft.drawSpriteNoDma(0,MENU_JOYS_YOFFSET,(uint16_t*)bmpjoy);
 #endif      
-//    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, "FLOPPY2:", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
-    tft.drawRectNoDma(120,MENU_JOYS_YOFFSET+8, MENU_FILE_W, 8, RGBVAL16(0x00,0x00,0x00));
-    tft.drawTextNoDma(120,MENU_JOYS_YOFFSET+8, shown_selection, RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
+    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, (emu_SwapJoysticks(1)?(char*)"SWAP=1":(char*)"SWAP=0"), RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+//    tft.drawTextNoDma(48,MENU_JOYS_YOFFSET+8, "FLOPPY2:", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), false);
+//    tft.drawRectNoDma(120,MENU_JOYS_YOFFSET+8, MENU_FILE_W, 8, RGBVAL16(0x00,0x00,0x00));
+//    tft.drawTextNoDma(120,MENU_JOYS_YOFFSET+8, shown_selection, RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), false);
     menuRedraw=false;     
   }
 

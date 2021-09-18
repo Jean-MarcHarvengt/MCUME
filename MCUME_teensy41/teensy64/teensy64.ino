@@ -1,11 +1,9 @@
-//#include "iopins.h"  
-#include "emuapi.h"  
+extern "C" {
+  #include "iopins.h"  
+  #include "emuapi.h"  
+}
 
-//extern "C" {
-#include "uae.h"
-//}
-
-
+#include "c64.h"
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
@@ -23,8 +21,6 @@ static IntervalTimer myTimer;
 volatile boolean vbl=true;
 static int skip=0;
 static elapsedMicros tius;
-
-
 
 static void vblCount() { 
   if (vbl) {
@@ -55,6 +51,8 @@ void emu_DrawVsync(void)
     while (vbl==vb) {};
 #endif
   }
+  uint16_t bClick = emu_DebounceLocalKeys();
+  emu_Input(bClick);  
 }
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
@@ -76,18 +74,20 @@ void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line)
       tft.writeLine(width,height,line, VBuf);
 #endif      
     }
-  }     
+  }      
 } 
 
 void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line) 
 {
   if (!vgaMode) {
     if (skip==0) {
-#ifndef HAS_T4_VGA
+#ifdef HAS_T4_VGA
+      tft.writeLine16(width,height,line, VBuf);
+#else
       tft.writeLine(width,height,line, VBuf);
 #endif      
     }
-  }    
+  }      
 } 
 
 void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride) 
@@ -103,13 +103,6 @@ void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride)
   } 
 }
 
-void emu_CopyLine(int width, int height, int ysrc, int ydst)
-{
-#ifdef HAS_T4_VGA
-  tft.copyLine(width,height,ysrc,ydst);
-#endif  
-}
-
 int emu_FrameSkip(void)
 {
   return skip;
@@ -119,13 +112,7 @@ void * emu_LineBuffer(int line)
 {
   if (!vgaMode) {
     return (void*)tft.getLineBuffer(line);    
-  }
-}
-
-void emu_tweakVideo(int shiftdelta, int numdelta, int denomdelta) {
-#ifdef HAS_T4_VGA
-  tft.tweak_video(shiftdelta, numdelta, denomdelta);
-#endif  
+  }  
 }
 
 
@@ -135,50 +122,45 @@ void emu_tweakVideo(int shiftdelta, int numdelta, int denomdelta) {
 void setup() {
 
 #ifdef HAS_T4_VGA
-#ifdef HIRES
-  tft.begin(VGA_MODE_640x480);
-#else
   tft.begin(VGA_MODE_320x240);
-#endif
-  //NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
 #else
   tft.begin();
 #endif  
   
-  emu_init(); 
-
-  
-  myTimer.begin(vblCount, 20000);  //to run every 20ms  
+  emu_init();
 }
+
 
 // ****************************************************
 // the loop() method runs continuously
 // ****************************************************
 void loop(void) 
 {
-  static char floppy2[64]="";
   if (menuActive()) {
     uint16_t bClick = emu_DebounceLocalKeys();
     int action = handleMenu(bClick);
-    char * floppy1 = menuSelection();
+    char * filename = menuSelection();    
     if (action == ACTION_RUN1) {
       toggleMenu(false);
-      vgaMode = false;   
-      tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
+      vgaMode = false;       
       emu_start();
-      emu_Init(floppy1,floppy2);      
+      emu_Init(filename);
+      //digitalWrite(TFT_CS, 1);
+      //digitalWrite(SD_CS, 1);       
+      tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
-      emu_Init2();      
+      myTimer.begin(vblCount, 40000);  //to run every 40ms  
     }    
-    else if (action == ACTION_RUN2)  {
-      strcpy(floppy2,menuSelection());                        
-    }         
     delay(20);
   }
   else {
-    emu_Step();  
-    uint16_t bClick = 0; //emu_DebounceLocalKeys();
-    emu_Input(bClick);      
+      emu_Step();
+      //delay(20);
+      //uint16_t bClick = emu_DebounceLocalKeys();
+      //if (bClick & MASK_KEY_USER1) {
+      //  emu_Input(bClick); 
+      //}           
   }  
 }
 

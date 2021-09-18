@@ -29,7 +29,11 @@ extern void m68k_go(int);
 }
 
 #define WIN_W                     TFT_WIDTH
+#ifdef HIRES
+#define WIN_H                     TFT_HEIGHT*2
+#else
 #define WIN_H                     TFT_HEIGHT
+#endif
 
 //#define HAS_MEMDISK 1
 
@@ -146,21 +150,21 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x1E */ INV_KEY,
 /* 0x1F */ INV_KEY,
 /* 0x20 */ AK_SPC,
-/* 0x21 */ INV_KEY,
-/* 0x22 */ INV_KEY,
-/* 0x23 */ INV_KEY,
-/* 0x24 */ INV_KEY,
-/* 0x25 */ INV_KEY,
-/* 0x26 */ INV_KEY,
-/* 0x27 */ INV_KEY,
-/* 0x28 */ INV_KEY,
-/* 0x29 */ INV_KEY,
+/* 0x21 */ INV_KEY, // exclamation mark
+/* 0x22 */ INV_KEY, // double quote
+/* 0x23 */ INV_KEY, // diese
+/* 0x24 */ INV_KEY, // dollar
+/* 0x25 */ INV_KEY, // procent
+/* 0x26 */ INV_KEY, // and
+/* 0x27 */ AK_QUOTE,
+/* 0x28 */ AK_NPLPAREN,
+/* 0x29 */ AK_NPRPAREN,
 /* 0x2A */ AK_NPMUL,
-/* 0x2B */ INV_KEY,
+/* 0x2B */ AK_NPADD,
 /* 0x2C */ AK_COMMA,
-/* 0x2D */ INV_KEY,
-/* 0x2E */ INV_KEY,
-/* 0x2F */ INV_KEY,
+/* 0x2D */ AK_NPSUB,
+/* 0x2E */ AK_PERIOD,
+/* 0x2F */ AK_NPDIV,
 /* 0x30 */ AK_0,
 /* 0x31 */ AK_1,
 /* 0x32 */ AK_2,
@@ -171,14 +175,14 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x37 */ AK_7,
 /* 0x38 */ AK_8,
 /* 0x39 */ AK_9,
-/* 0x3A */ INV_KEY,
-/* 0x3B */ INV_KEY, // semi colon
-/* 0x3C */ INV_KEY,
-/* 0x3D */ INV_KEY,
-/* 0x3E */ INV_KEY,
-/* 0x3F */ INV_KEY,
-/* 0x40 */ INV_KEY,
-/* 0x41 */ INV_KEY,
+/* 0x3A */ INV_KEY, // colon :
+/* 0x3B */ AK_SEMICOLON, // semi colon
+/* 0x3C */ INV_KEY, // <
+/* 0x3D */ AK_EQUAL, // =
+/* 0x3E */ INV_KEY, // >
+/* 0x3F */ INV_KEY, // ?
+/* 0x40 */ INV_KEY, // Arobas
+/* 0x41 */ INV_KEY, // capital A
 /* 0x42 */ INV_KEY,
 /* 0x43 */ INV_KEY,
 /* 0x44 */ INV_KEY,
@@ -204,12 +208,12 @@ const int16_t keyboardAsciiConv[] = // QWERTY Keyboard
 /* 0x58 */ INV_KEY,
 /* 0x59 */ INV_KEY,
 /* 0x5A */ INV_KEY,
-/* 0x5B */ INV_KEY,
-/* 0x5C */ INV_KEY,
-/* 0x5D */ INV_KEY,
-/* 0x5E */ INV_KEY,
-/* 0x5F */ INV_KEY,
-/* 0x60 */ INV_KEY,
+/* 0x5B */ AK_LBRACKET, // open crochet
+/* 0x5C */ AK_BACKSLASH, // back slash
+/* 0x5D */ AK_RBRACKET, // close crochet
+/* 0x5E */ INV_KEY, // circonflex
+/* 0x5F */ INV_KEY, // underscore
+/* 0x60 */ AK_BACKQUOTE,
 /* 0x61 */ AK_A,
 /* 0x62 */ AK_B,
 /* 0x63 */ AK_C,
@@ -267,10 +271,10 @@ const int16_t keyboardSpecialConv[] = // Functions and other keys
 /* 0xD2 */ INV_KEY,
 /* 0xD3 */ INV_KEY,
 /* 0xD4 */ AK_DEL,
-/* 0xD5 */ INV_KEY,
-/* 0xD6 */ INV_KEY,
-/* 0xD7 */ INV_KEY,
-/* 0xD8 */ INV_KEY,
+/* 0xD5 */ AK_UP,
+/* 0xD6 */ AK_DN,
+/* 0xD7 */ AK_LF,
+/* 0xD8 */ AK_RT,
 /* 0xD9 */ INV_KEY,
 /* 0xDA */ INV_KEY,
 /* 0xDB */ INV_KEY,
@@ -283,12 +287,13 @@ const int16_t keyboardSpecialConv[] = // Functions and other keys
 
 const int i2ckeyConv[] = 
 {
-  AK_1,AK_2,AK_3,AK_4,AK_5,AK_6,AK_7,AK_8,AK_9,AK_0,
-  AK_Q,AK_W,AK_E,AK_R,AK_T,AK_Y,AK_U,AK_I,AK_O,AK_P,
-  AK_A,AK_S,AK_D,AK_F,AK_G,AK_H,AK_J,AK_K,AK_L,AK_ENT,
-  AK_Z,AK_C,AK_C,AK_V,AK_B,AK_N,AK_M,AK_COMMA,AK_BS,AK_SPC,
-  AK_F1,AK_F2,AK_F3,AK_F4,AK_F5,AK_F6,AK_F7,AK_F8,AK_F9,AK_F10,
-  AK_NPMUL,AK_NPDEL,AK_DEL   
+  AK_1,AK_2,AK_3,AK_4,AK_5,AK_6,AK_7,AK_8,AK_9,AK_0, // 0
+  AK_Q,AK_W,AK_E,AK_R,AK_T,AK_Y,AK_U,AK_I,AK_O,AK_P, // 1
+  AK_A,AK_S,AK_D,AK_F,AK_G,AK_H,AK_J,AK_K,AK_L,AK_ENT, // 2
+  AK_Z,AK_X,AK_C,AK_V,AK_B,AK_N,AK_M,AK_COMMA,AK_BS,AK_SPC, // 3
+  AK_F1,AK_F2,AK_F3,AK_F4,AK_F5,AK_F6,AK_F7,AK_F8,AK_F9,AK_F10, //4
+  AK_NPMUL,AK_NPSUB,AK_NPADD,AK_NPDIV,AK_NPDEL,AK_QUOTE,AK_BACKQUOTE,AK_SEMICOLON,AK_BACKSLASH,AK_PERIOD, //5
+  AK_NPLPAREN,AK_NPRPAREN,AK_LBRACKET,AK_RBRACKET,AK_EQUAL,AK_UP,AK_DN,AK_LF,AK_RT //6
 };
 
 
@@ -486,7 +491,20 @@ void flush_line(int y)
 {
     if(y >= 0 && y < WIN_H) {
 #ifdef HAS_T4_VGA
-      emu_DrawLine8((unsigned char *)slinebuf, WIN_W , WIN_H, y);
+      if (currprefs.gfx_correct_aspect) {
+        emu_DrawLine8((unsigned char *)slinebuf, WIN_W , WIN_H, y);        
+      }      
+      else {
+        if (currprefs.gfx_height > 256) {
+          int nexty = ((y+1) * currprefs.gfx_height)/256;
+          y = (y * currprefs.gfx_height)/256;
+          if (y<WIN_H) emu_DrawLine8((unsigned char *)slinebuf, WIN_W , WIN_H, y);
+          if ( (nexty != y) && ((y+1)<WIN_H))  emu_CopyLine(WIN_W, WIN_H, y, y+1);               
+        } 
+        else {
+          emu_DrawLine8((unsigned char *)slinebuf, WIN_W , WIN_H, y);
+        }                 
+      }      
 #else
       emu_DrawLine16((unsigned short *)slinebuf, WIN_W , WIN_H, y);
 #endif      
@@ -620,20 +638,7 @@ void flush_screen(int ystart,int ystop)
 }
 
 
-#ifdef HAS_PSRAM
-#include "psram_t.h"
 
-PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
-
-extern "C" unsigned char read_rom(int address) {
-  return (psram.psread(address)); 
-}
-
-extern "C" void  write_rom(int address, unsigned char val)  {
-  psram.pswrite(address,val); 
-
-}
-#endif
 
 
 void SND_Process(void *stream, int len) {  
@@ -742,11 +747,7 @@ void uae_Init(void)
 static void floppy_to_mem(char * floppy, int region) {
   int pos = FLOPPY_SIZE*region;
 //  for (int i=pos; i<(pos+FLOPPY_SIZE); i++) {
-//#ifdef HAS_PSRAM
-//    write_rom(i,0);
-//#else
 //    disk_memWrite(i,0);
-//#endif  
 //  }
   int n;
   char buf[512];
@@ -755,11 +756,7 @@ static void floppy_to_mem(char * floppy, int region) {
     while ( (n = emu_FileRead(buf,512) ) ) {
       size += n;
       for (int i=0; i<n; i++) {
-#ifdef HAS_PSRAM
-        write_rom(pos++,buf[i]);
-#else
-        disk_memWrite(pos++,buf[i]);
-#endif  
+        disk_memWrite(pos++,buf[i]); 
       }
       //emu_printi(size);            
       //emu_printi(n);          
@@ -775,9 +772,6 @@ void uae_Start(char * floppy1, char * floppy2)
   emu_printf(floppy1);  
   emu_printf(floppy2);  
 #ifdef HAS_MEMDISK
-#ifdef HAS_PSRAM
-  psram.begin();
-#endif 
   floppy_to_mem(floppy1, 0);
   floppy_to_mem(floppy2, 1); 
 #else

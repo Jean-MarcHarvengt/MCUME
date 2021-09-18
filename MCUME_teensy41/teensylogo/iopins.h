@@ -7,18 +7,6 @@
 
 // Teecomputer layout
 
-// VGA
-// R                    3  2K
-// R                    4  1K
-// R                    33 500
-// G                    11 2K
-// G                    13 1K
-// G                    2  500
-// B                    10 820
-// B                    12 390
-// HSYNC                15 82
-// VSYNC                8  82
-
 // Display
 #define TFT_SCLK        27
 #define TFT_MOSI        26
@@ -38,7 +26,7 @@
 #define AUDIO_I2S_LCK   20
 
 // Keyboard matrix
-#define KLED            14
+#define KLED            13
 //Cols (out)
 //pico 1,2,3,4,5,14
 //teen 25,28,29,30,31,32
@@ -61,6 +49,7 @@
 #define PIN_KEY_USER1   40
 #define PIN_KEY_USER2   41
 //#define PIN_KEY_USER3   24
+// 14 is free
 
 // Second joystick (external)
 #define PIN_JOY1_BTN     34
