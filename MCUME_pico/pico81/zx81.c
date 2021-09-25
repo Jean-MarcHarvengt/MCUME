@@ -201,7 +201,7 @@ void do_interrupt()
 
 void bitbufBlit(unsigned char * buf)
 {
-emu_DrawVsync();  
+  emu_DrawVsync();  
   memset( XBuf, 1, WIDTH*8 ); 
   buf = buf + (ZX_VID_MARGIN*(ZX_VID_FULLWIDTH/8));
   int y,x,i;
@@ -529,7 +529,7 @@ void z81_Step(void)
   sighandler(0);
   //if (strlen(tapename)) handleKeyBuf();   
   updateKeyboard();
-  Loop8910(&ay,20);     
+  Loop8910(&ay,20);
 }
 
 static int endsWith(const char * s, const char * suffix)

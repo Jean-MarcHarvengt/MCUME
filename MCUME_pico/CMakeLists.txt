@@ -242,16 +242,17 @@ set(TESTTFT_SOURCES
 		testtft/emuapi.cpp
 	)
 
+add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
+#		${PICO64_SOURCES}
 #		${PICO81_SOURCES}
-#		${PICOSPECCY_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
-		${PICO64_SOURCES}
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
+		${PICOSPECCY_SOURCES}
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
@@ -283,7 +284,7 @@ ENDIF()
 target_compile_definitions(mcume PUBLIC N_SD_CARDS=${N_SD_CARDS})
 
 
-pico_enable_stdio_uart(mcume 0)
-pico_enable_stdio_usb(mcume 0)
+#pico_enable_stdio_uart(mcume 0)
+#pico_enable_stdio_usb(mcume 0)
 
 pico_add_extra_outputs(mcume)

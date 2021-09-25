@@ -2,7 +2,7 @@
 #define __ATARI__
 
 // define globals
-#define MEMORY_SIZE 0xC000 //0x10000
+#define MEMORY_SIZE 0x10000
 
 #define ATARI_WIDTH  384
 #define ATARI_HEIGHT 240

@@ -160,22 +160,27 @@ static void InitKeyboard(void){
 
 static void UpdateKeyboard (void)
 {
-  int nb_keys=0;
+  //int nb_keys=0;
   int k = emu_GetPad();
   int hk = emu_ReadI2CKeyboard();  
   if ( (k == 0) && (hk == 0) )  {
     memset(key_ram, 0xff, sizeof(key_ram));    
   }
   else {
+    int shift = hk;
+    if (hk >=128) hk -= 128;
+    else if (hk >=64) hk -= 64;    
     // scan all possibilities
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
         if ( (k == map_qw[j][i]) || (hk == map_qw[j][i]) ) {
             key_ram[j] &= ~ (1<<(4-i));
-            nb_keys++;
+            //nb_keys++;
         }   
       }  
-    }    
+    } 
+    if (shift >=128) key_ram[0] &= ~ (1<<0);  // SHift 
+    else if (shift >=64) key_ram[7] &= ~ (1<<1);  // SHift symboles     
   } 
 }
 
@@ -214,7 +219,7 @@ void spec_Start(char * filename) {
     ZX_ReadFromFlash_Z80(&myCPU, game,size); 
     emu_Free(game);  
   }
-#if HAS_SND
+#ifdef HAS_SND
   emu_sndInit(); 
 #endif  
 }
@@ -248,22 +253,18 @@ void spec_Init(void) {
 
 
 void spec_Step(void) {
-// 32+256+32
-//#define NBLINES (48+192+56+16)
-
   // Now run the emulator for all the real screen (192 lines)
+  // 32+256+32
   /*
+  #define NBLINES (48+192+56+16)
   int scanl;
-  for (scanl = 0; scanl < NBLINES; scanl++) {
-    int ref=0;
-    emu_resetus();
-    ExecZ80(&myCPU,hwopt.ts_line);
-    while (emu_us() < (20000/NBLINES)) { 
-    }
+  for (scanl = 0; scanl < 15; scanl++) {
+    ExecZ80(&myCPU,CYCLES_PER_FRAME/15);
+    sleep_ms(1);
   }
   */
-
   ExecZ80(&myCPU,CYCLES_PER_FRAME); // 3.5MHz ticks for 6 lines @ 30 kHz = 700 cycles
+
 #if ALT_Z80CORE
 #else
   IntZ80(&myCPU,INT_IRQ); // must be called every 20ms
@@ -319,7 +320,7 @@ void buzz(int val, int currentTstates)
   {  
     int sound_size = (currentTstates-lastaudio);
     if (sound_size < 0) sound_size += CYCLES_PER_FRAME;    
-#if HAS_SND
+#ifdef HAS_SND
     emu_sndPlayBuzz(sound_size,buzzer_val);  
 #endif    
     //if (val)
@@ -343,7 +344,7 @@ void OutZ80(register word Port,register byte Value)
     bordercolor = (Value & 0x07);
     byte mic = (Value & 0x08);
     byte ear = (Value & 0x10);
-    buzz(((/*mic|*/ear)?1:0), CYCLES_PER_FRAME-myCPU.ICount);
+    buzz(((ear)?1:0), CYCLES_PER_FRAME-myCPU.ICount);
   }
   else if((Port&0xFF)==0xFE) {
     out_ram=Value; // update it

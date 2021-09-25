@@ -1070,6 +1070,7 @@ static void AUDIO_isr() {
   long s = i2s_tx_buffer16[cnt++]; 
   s += i2s_tx_buffer16[cnt++];
   s = s/2 + 32767; 
+  cnt += 2;
   pwm_set_gpio_level(AUDIO_PIN, s >> 8);
   cnt = cnt & (sampleBufferSize*2-1);
 

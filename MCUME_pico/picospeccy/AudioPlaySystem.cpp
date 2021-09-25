@@ -104,7 +104,7 @@ void AudioPlaySystem::snd_Mixer(short *  stream, int len )
 #else
     int i;
     long s;     
-    len = len >> 1;   
+    len = len >> 1;
     short v0=chan[0].vol;
     short v1=chan[1].vol;
     short v2=chan[2].vol;

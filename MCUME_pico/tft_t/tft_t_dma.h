@@ -21,10 +21,18 @@
 #define TFT_WIDTH      240 
 #define TFT_REALWIDTH  240
 #else
+#ifdef OVERRULE_WIDTH
+#define TFT_WIDTH      OVERRULE_WIDTH
+#else 
 #define TFT_WIDTH      320 
+#endif
 #define TFT_REALWIDTH  320
 #endif
+#ifdef OVERRULE_HEIGHT
+#define TFT_HEIGHT     OVERRULE_HEIGHT
+#else 
 #define TFT_HEIGHT     240
+#endif
 #define TFT_REALHEIGHT 240
 
 

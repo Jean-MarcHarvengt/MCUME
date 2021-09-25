@@ -60,7 +60,7 @@ typedef struct
 
 // global variables
 int tv_mode = TV_PAL;
-//unsigned char mem[MEMORY_SIZE];
+unsigned char mem[MEMORY_SIZE];
 unsigned char * memory=NULL; //mem;
 
 // local variables
@@ -478,7 +478,7 @@ void at5_Init(void)
 #endif
 
   emu_printf("Allocating RAM");
-  if (memory == NULL) memory = emu_Malloc(MEMORY_SIZE);
+  if (memory == NULL) memory = &mem[0]; //emu_Malloc(MEMORY_SIZE);
 
   Initialise();
 }
@@ -563,8 +563,10 @@ void at5_Step(void)
   else
       which->right = 0; 
 
+#if ANALOGJOY
   which->analog_h = emu_ReadAnalogJoyX(0,230);
   which->analog_v = emu_ReadAnalogJoyY(0,230);
+#endif
   
   GTIA_Frame();
   ANTIC_Frame(1); 

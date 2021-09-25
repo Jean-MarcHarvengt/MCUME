@@ -16,12 +16,32 @@ extern "C" {
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
+volatile bool vbl=true;
+
+bool repeating_timer_callback(struct repeating_timer *t) {
+    if (vbl) {
+        vbl = false;
+    } else {
+        vbl = true;
+    }   
+    return true;
+}
 #endif
 TFT_T_DMA tft;
 
 static int skip=0;
 
+#include "hardware/clocks.h"
+#include "hardware/vreg.h"
+
 int main(void) {
+    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    set_sys_clock_khz(125000, true);    
+//    set_sys_clock_khz(150000, true);    
+//    set_sys_clock_khz(133000, true);    
+//    set_sys_clock_khz(200000, true);    
+//    set_sys_clock_khz(225000, true);    
+    set_sys_clock_khz(150000, true);
     stdio_init_all();
 #ifdef USE_VGA    
 //    tft.begin(VGA_MODE_400x240);
@@ -41,6 +61,10 @@ int main(void) {
               emu_Init(filename);      
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
               tft.startDMA();      
+#ifndef USE_VGA
+              struct repeating_timer timer;
+              add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);
+#endif             
             }  
             tft.waitSync();
         }
@@ -73,7 +97,12 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    //tft.waitSync(); 
+#ifdef USE_VGA   
+    tft.waitSync();                   
+#else                      
+    volatile bool vb=vbl; 
+    while (vbl==vb) {};
+#endif
 }
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 

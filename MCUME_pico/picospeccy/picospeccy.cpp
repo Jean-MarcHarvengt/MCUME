@@ -16,12 +16,32 @@ extern "C" {
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
+volatile bool vbl=true;
+
+bool repeating_timer_callback(struct repeating_timer *t) {
+    if (vbl) {
+        vbl = false;
+    } else {
+        vbl = true;
+    }   
+    return true;
+}
 #endif
 TFT_T_DMA tft;
 
 static int skip=0;
 
+#include "hardware/clocks.h"
+#include "hardware/vreg.h"
+
 int main(void) {
+    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    set_sys_clock_khz(125000, true);    
+//    set_sys_clock_khz(150000, true);    
+//    set_sys_clock_khz(133000, true);    
+//    set_sys_clock_khz(200000, true);    
+//    set_sys_clock_khz(225000, true);    
+    set_sys_clock_khz(250000, true);    
     stdio_init_all();
 #ifdef USE_VGA    
     tft.begin(VGA_MODE_320x240);
@@ -39,14 +59,18 @@ int main(void) {
               emu_start();        
               emu_Init(filename);      
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-              tft.startDMA();      
+              tft.startDMA();
+#ifndef USE_VGA   
+              struct repeating_timer timer;
+              add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);
+#endif                                 
             }  
             tft.waitSync();
         }
         else {  
             emu_Step(); 
             uint16_t bClick = emu_DebounceLocalKeys();
-            emu_Input(bClick);      
+            emu_Input(bClick);     
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {
@@ -72,8 +96,14 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    //tft.waitSync(); 
+#ifdef USE_VGA   
+    tft.waitSync();                   
+#else                      
+    volatile bool vb=vbl; 
+    while (vbl==vb) {};
+#endif
 }
+
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {
@@ -127,10 +157,13 @@ void * emu_LineBuffer(int line)
 #ifdef HAS_SND
 #include "AudioPlaySystem.h"
 AudioPlaySystem mymixer;
-
-void emu_sndInit() {
+#include "hardware/pwm.h"
+void emu_sndInit() {  
   tft.begin_audio(256, mymixer.snd_Mixer);
-  mymixer.start();    
+  mymixer.start();
+  //gpio_init(AUDIO_PIN);
+  //gpio_set_dir(AUDIO_PIN, GPIO_OUT);
+  //gpio_put(AUDIO_PIN, 1);       
 }
 
 void emu_sndPlaySound(int chan, int volume, int freq)
@@ -141,7 +174,9 @@ void emu_sndPlaySound(int chan, int volume, int freq)
 }
 
 void emu_sndPlayBuzz(int size, int val) {
-  mymixer.buzz(size,val); 
+  //gpio_put(AUDIO_PIN, (val?1:0));
+  pwm_set_gpio_level(AUDIO_PIN, (val?128:255));
+  //mymixer.buzz(size,val); 
 }
 
 #endif
