@@ -15,15 +15,22 @@ extern "C" {
 #else
 #include "tft_t_dma.h"
 #endif
+volatile bool vbl=true;
+
+bool repeating_timer_callback(struct repeating_timer *t) {
+    uint16_t bClick = emu_DebounceLocalKeys();
+    emu_Input(bClick);     
+    if (vbl) {
+        vbl = false;
+    } else {
+        vbl = true;
+    }   
+    return true;
+}
 TFT_T_DMA tft;
 
 static int skip=0;
 
-bool repeating_timer_callback(struct repeating_timer *t) {
-    uint16_t bClick = emu_DebounceLocalKeys();
-    emu_Input(bClick);    
-    return true;
-}
 
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
@@ -60,9 +67,7 @@ int main(void) {
             }  
             tft.waitSync();
         }
-        else {  
-            //uint16_t bClick = emu_DebounceLocalKeys();
-            //emu_Input(bClick);              
+        else {               
             emu_Step();   
         }
         
@@ -86,14 +91,19 @@ void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int 
     }
 }
 
-#ifdef PICOMPUTER
+
 void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    //tft.waitSync(); 
-}
+#ifdef USE_VGA   
+    tft.waitSync();                   
+#else                      
+  //  volatile bool vb=vbl; 
+  //  while (vbl==vb) {};
 #endif
+}
+
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
 {

@@ -5,6 +5,8 @@
 
 //#define TIMER_REND  1
 #define EXTRA_HEAP  0x10
+//#define CUSTOM_SND  1
+
 
 // Title:     <                        >
 #define TITLE "    SPECTRUM Emulator"
@@ -12,7 +14,7 @@
 
 #define emu_Init(ROM) {spec_Init(); spec_Start(ROM);}
 #define emu_Step(x) {spec_Step();}
-#define emu_Input(x) {}
+#define emu_Input(x) {spec_Input(x);}
 
 #define PALETTE_SIZE         16
 #define VID_FRAME_SKIP       0x0
@@ -27,32 +29,22 @@
 
 
 #ifdef KEYMAP_PRESENT
-#ifdef PICOMPUTER
-/*   
-const unsigned short key_map1[] = {
-  30,31,32,33,34,35,36,37,38,39,
-  0, 20,26, 8,21,23,28,25,12,18,19,
-  0,  4, 9, 7,22, 4,11,13,14,15,40,
-  25, 6,27,29,224,5,17,16,225,44 
-  };
-*/
-
 /*
-    {25, 6,27,29,224}, // vcxz<caps shift=Lshift>
+    {25, 6,27,29,224},// vcxz<caps shift=Lshift>
     {10, 9, 7,22, 4}, // gfdsa
     {23,21, 8,26,20}, // trewq
     {34,33,32,31,30}, // 54321
     {35,36,37,38,39}, // 67890
     {28,24,12,18,19}, // yuiop
     {11,13,14,15,40}, // hjkl<enter>
-    { 5,17,16,225,44}, // bnm <symbshift=RSHift> <space>
+    { 5,17,16,225,44},// bnm <symbshift=RSHift> <space>
 */
 
 const unsigned short key_map1[] = {
   20,26,8,21,23,28,24,12,18,19,39+128,
   0, 4, 22, 7,9, 10,11,13,14,15,40,
   0,29,27,6,25,5,17,16,16+64,44, 
-  36+128,34+128,37+128,35+128   //up,left,right,down
+  0,0,0,0   //up,left,right,down
   };  
 
 const unsigned short key_map2[] = {
@@ -63,8 +55,8 @@ const unsigned short key_map2[] = {
   };  
 
 const unsigned short key_map3[] = {
-  20+128,26+128,8+128,21+128,23+128,28+128,25+128,12+128,18+128,19+128,0, // Upper case
-  0, 4+128, 9+128, 7+128,22+128, 4+128,11+128,13+128,14+128,15+128,0,
+  20+128,26+128,8+128,21+128,23+128,28+128,24+128,12+128,18+128,19+128,0, // Upper case
+  0, 4+128, 22+128, 7+128,9+128, 10+128,11+128,13+128,14+128,15+128,0,
   0,29+128,27+128,6+128,25+128,5+128,17+128,16+128,18+64,44+128,
   36+128,34+128,37+128,35+128   //up,left,right,down
   };
@@ -75,7 +67,6 @@ const unsigned short matkeys[] = {
   0x520,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
   0x508,0x501,0x502,0x504 }; // cursor keys
 
-#endif
 #endif
 
 
@@ -93,7 +84,7 @@ const unsigned short matkeys[] = {
 #define MASK_JOY1_DOWN  0x0800
 #define MASK_JOY1_BTN   0x1000
 #define MASK_KEY_USER4  0x2000
-
+#define MASK_OSKB       0x8000
 
 
 extern void emu_init(void);
@@ -125,6 +116,13 @@ extern void emu_DrawLine16(unsigned short * VBuf, int width, int height, int lin
 extern void emu_DrawVsync(void);
 extern int emu_FrameSkip(void);
 extern void * emu_LineBuffer(int line);
+#define RGBVAL32(r,g,b)  ( (r<<16) | (g<<8) | b )
+#define RGBVAL16(r,g,b)  ( (((r>>3)&0x1f)<<11) | (((g>>2)&0x3f)<<5) | (((b>>3)&0x1f)<<0) )
+#define RGBVAL8(r,g,b)   ( (((r>>5)&0x07)<<5) | (((g>>5)&0x07)<<2) | (((b>>6)&0x3)<<0) )
+#define R16(rgb) ((rgb>>8)&0xf8) 
+#define G16(rgb) ((rgb>>3)&0xfc) 
+#define B16(rgb) ((rgb<<3)&0xf8) 
+extern void emu_drawText(unsigned short x, unsigned short y, const char * text, unsigned short fgcolor, unsigned short bgcolor, int doublesize);
 
 extern void emu_InitJoysticks(void);
 extern int emu_SwapJoysticks(int statusOnly);

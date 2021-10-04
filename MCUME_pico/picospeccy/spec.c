@@ -11,6 +11,9 @@
 
 #define CYCLES_PER_FRAME 69888 //3500000/50
 
+#define NBLINES (1) //(48+192+56+16) //(32+256+32)
+#define CYCLES_PER_STEP (CYCLES_PER_FRAME/NBLINES)
+
 typedef struct {
   int port_ff;      // 0xff = emulate the port,  0x00 alwais 0xFF
   int ts_lebo;      // left border t states
@@ -87,9 +90,13 @@ static int h_border=32;
 static int bordercolor=0;
 static byte * XBuf=0; 
 
-static int lastaudio=CYCLES_PER_FRAME;
-static byte buzzer_val;
+static int ik;
+static int ihk;
 
+void spec_Input(int bClick) {
+  ik  = emu_GetPad();
+  ihk = emu_ReadI2CKeyboard();
+}
 
 void displayscanline(int y, int f_flash)
 {
@@ -137,6 +144,35 @@ void displayscanline(int y, int f_flash)
   emu_DrawLine(XBuf, WIDTH, HEIGHT, y);
 }
 
+#ifdef HAS_SND
+#ifdef CUSTOM_SND 
+#define SAMSIZE 32768
+static unsigned char sam[SAMSIZE];
+static int rdsam=0;
+static int wrsam=SAMSIZE/2;
+#endif
+#endif
+
+static int lastBuzzCycle=0;
+static byte lastBuzzVal;
+
+#ifdef HAS_SND
+#ifdef CUSTOM_SND   
+void  SND_Process( short * stream, int len )
+{
+    len = len >> 1;
+    for (int i=0;i<len;i++)
+    {
+      short s = sam[rdsam]?32767:0;
+      rdsam += 180;
+      rdsam &= SAMSIZE-1;
+      *stream++ = (short)(s);
+      *stream++ = (short)(s);
+    }      
+}
+#endif
+#endif 
+
 static void displayScreen(void) {
   int y;
   static int f_flash = 1, f_flash2 = 0;
@@ -148,8 +184,8 @@ static void displayScreen(void) {
   
   for (y = 0; y < HEIGHT; y++)
     displayscanline (y, f_flash);
-
-  emu_DrawVsync();    
+ 
+  emu_DrawVsync();   
 }
 
 
@@ -160,22 +196,22 @@ static void InitKeyboard(void){
 
 static void UpdateKeyboard (void)
 {
-  //int nb_keys=0;
-  int k = emu_GetPad();
-  int hk = emu_ReadI2CKeyboard();  
-  if ( (k == 0) && (hk == 0) )  {
-    memset(key_ram, 0xff, sizeof(key_ram));    
-  }
-  else {
+  //int k = ik; //emu_GetPad();
+  int hk = ihk; //emu_ReadI2CKeyboard();  
+  //if ( hk == 0 )  {
+  memset(key_ram, 0xff, sizeof(key_ram));    
+  //}
+  //else 
+  {
+    //if (k & MASK_KEY_USER1) hk = 39;
     int shift = hk;
     if (hk >=128) hk -= 128;
     else if (hk >=64) hk -= 64;    
     // scan all possibilities
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
-        if ( (k == map_qw[j][i]) || (hk == map_qw[j][i]) ) {
+        if ( /*(k == map_qw[j][i]) ||*/ (hk == map_qw[j][i]) ) {
             key_ram[j] &= ~ (1<<(4-i));
-            //nb_keys++;
         }   
       }  
     } 
@@ -250,20 +286,22 @@ void spec_Init(void) {
 #endif      
 }
 
-
+#include "emuapi.h"
 
 void spec_Step(void) {
-  // Now run the emulator for all the real screen (192 lines)
-  // 32+256+32
-  /*
-  #define NBLINES (48+192+56+16)
   int scanl;
-  for (scanl = 0; scanl < 15; scanl++) {
-    ExecZ80(&myCPU,CYCLES_PER_FRAME/15);
-    sleep_ms(1);
+  for (scanl = 0; scanl < NBLINES; scanl++) {
+    lastBuzzCycle=0;
+    ExecZ80(&myCPU,CYCLES_PER_STEP); // 3.5MHz ticks for 6 lines @ 30 kHz = 700 cycles
+#ifdef HAS_SND
+#ifdef CUSTOM_SND 
+    buzz(lastBuzzVal, CYCLES_PER_STEP);
+#endif
+#endif    
+    //busy_wait_us(1);
+    //sleep_us(1);
   }
-  */
-  ExecZ80(&myCPU,CYCLES_PER_FRAME); // 3.5MHz ticks for 6 lines @ 30 kHz = 700 cycles
+
 
 #if ALT_Z80CORE
 #else
@@ -271,7 +309,7 @@ void spec_Step(void) {
 #endif
   displayScreen();
 
-  int k=emu_ReadKeys();
+  int k=ik; //emu_GetPad();
   
   kempston_ram = 0x00;
   if (k & MASK_JOY2_BTN)
@@ -314,22 +352,21 @@ byte RdZ80(register word Addr)
 
 void buzz(int val, int currentTstates)
 {
-  //if (val==0) val = -1;
-  //if (buzzer_val!=val)
-  //if (val)   
-  {  
-    int sound_size = (currentTstates-lastaudio);
-    if (sound_size < 0) sound_size += CYCLES_PER_FRAME;    
+  int pulse_size = (currentTstates-lastBuzzCycle);
 #ifdef HAS_SND
-    emu_sndPlayBuzz(sound_size,buzzer_val);  
-#endif    
-    //if (val)
-    //  buzzer_val = 0;     
-    //else
-    //  buzzer_val = 1;
-    buzzer_val = val;          
+#ifdef CUSTOM_SND 
+  for (int i = 0; i<pulse_size; i++ ) {
+    sam[wrsam] = lastBuzzVal?0:1;
+    wrsam += 1;
+    wrsam &= SAMSIZE-1;
   } 
-  lastaudio = currentTstates;
+
+  lastBuzzCycle = currentTstates;
+  lastBuzzVal = val;  
+#else
+  emu_sndPlayBuzz(pulse_size,val);
+#endif
+#endif    
 }
 
 void OutZ80(register word Port,register byte Value)
@@ -344,7 +381,7 @@ void OutZ80(register word Port,register byte Value)
     bordercolor = (Value & 0x07);
     byte mic = (Value & 0x08);
     byte ear = (Value & 0x10);
-    buzz(((ear)?1:0), CYCLES_PER_FRAME-myCPU.ICount);
+    buzz(((ear)?1:0), CYCLES_PER_STEP-myCPU.ICount);
   }
   else if((Port&0xFF)==0xFE) {
     out_ram=Value; // update it

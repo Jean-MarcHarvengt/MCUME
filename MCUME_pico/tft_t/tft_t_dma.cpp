@@ -1,5 +1,6 @@
-
 #include "TFT_T_DMA.h"
+
+#if defined(ILI9341) || defined(ST7789)
 
 #include "tft_font8x8.h"
 #include "pico/stdlib.h"
@@ -9,7 +10,6 @@
 #include "hardware/irq.h"
 #include <string.h>
 
-#ifndef USE_VGA
 
 #define digitalWrite(pin, val) gpio_put(pin, val)
 
@@ -24,26 +24,6 @@
 #ifdef ILI9341
 #define SPI_MODE SPI_CPOL_0
 #endif
-
-#ifdef TFT_STATICFB
-static uint16_t fb0[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
-static uint16_t fb1[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
-static uint16_t fb2[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
-static uint16_t fb3[(TFT_HEIGHT-3*LINES_PER_BLOCK)*TFT_WIDTH];// __attribute__ ((aligned(2048)));
-static uint16_t * blocks[NR_OF_BLOCK]={fb0,fb1,fb2,fb3};
-static uint16_t blocklens[NR_OF_BLOCK];
-#else
-static uint16_t * blocks[NR_OF_BLOCK];
-static uint16_t blocklens[NR_OF_BLOCK];
-#endif
-
-
-static dma_channel_config dmaconfig;
-const uint dma_tx = dma_claim_unused_channel(true);
-static volatile uint8_t rstop = 0;
-static volatile bool cancelled = false;
-static volatile uint8_t curTransfer = 0;
-static uint8_t nbTransfer = 0;
 
 
 static void SPItransfer(uint8_t val)
@@ -119,97 +99,6 @@ static const uint8_t init_commands[] = {
 #endif       
 };
 
-static void dma_isr() { 
-  irq_clear(DMA_IRQ_0);
-  dma_hw->ints0 = 1u << dma_tx;
-  curTransfer++;
-  if (curTransfer >= nbTransfer) {
-    curTransfer = 0;
-  }
-  if (cancelled) {
-    rstop = 1;
-  }
-  else 
-  {
-    dma_channel_transfer_from_buffer_now ( dma_tx, blocks[curTransfer], blocklens[curTransfer]);
-  }  
-}
-
-static void setDmaStruct() {
-  uint32_t remaining = TFT_HEIGHT*TFT_WIDTH*2;
-  int i=0;
-  nbTransfer = 0;
-  uint16_t col=RGBVAL16(0x00,0x00,0x00);;
-  while (remaining > 0) {
-    uint16_t * fb = blocks[i];
-    int32_t len = (remaining >= (LINES_PER_BLOCK*TFT_WIDTH*2)?LINES_PER_BLOCK*TFT_WIDTH*2:remaining);
-#ifdef TFT_DEBUG 
-    printf("%d\n",(unsigned long)blocks[i]);        
-    printf("%d\n",remaining);        
-#endif        
-    switch (i) {
-      case 0:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
-        //fb=&fb0[0];
-#ifdef TFT_DEBUG        
-        col = RGBVAL16(0x00,0xff,0x00);
-#endif        
-        break;
-      case 1:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
-        //fb=&fb1[0];
-#ifdef TFT_DEBUG        
-        col = RGBVAL16(0x00,0xff,0xff);
-#endif        
-        break;
-      case 2:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
-        //fb=&fb2[0];
-#ifdef TFT_DEBUG        
-        col = RGBVAL16(0x00,0x00,0xff);
-#endif        
-        break;
-      case 3:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
-        //fb=&fb3[0];
-#ifdef TFT_DEBUG        
-        col = RGBVAL16(0xff,0x00,0xff);
-#endif        
-        break;
-    }
-    blocks[i] = fb;
-    blocklens[i] = len/2;
-    if (blocks[i] == 0) {
-      printf("LI9341 allocaltion failed for block %d\n",i);
-      sleep_ms(10000);    
-    }
-    nbTransfer++;
-    remaining -= len;    
-    i++;
-  }    
-    
-
-  // Setup the control channel
-  dmaconfig = dma_channel_get_default_config(dma_tx);
-  channel_config_set_transfer_data_size(&dmaconfig, DMA_SIZE_16);
-  channel_config_set_dreq(&dmaconfig, TFT_SPIDREQ);  
-  //channel_config_set_read_increment(&dmaconfig, true); // read incrementing
-  //channel_config_set_write_increment(&dmaconfig, false); // no write incrementing
-
-  dma_channel_configure(
-      dma_tx,
-      &dmaconfig,
-      &spi_get_hw(TFT_SPIREG)->dr, // write address
-      blocks[0],
-      blocklens[0],
-      false
-  ); 
-
-  irq_set_exclusive_handler(DMA_IRQ_0, dma_isr);
-  dma_channel_set_irq0_enabled(dma_tx, true);
-  irq_set_enabled(DMA_IRQ_0, true);
-  dma_hw->ints0 = 1u << dma_tx;  
-}
 
 TFT_T_DMA::TFT_T_DMA()
 {
@@ -356,8 +245,6 @@ void TFT_T_DMA::begin(void) {
 #endif
   setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);  
 
-  cancelled = false;
-
 #ifdef FLIP_SCREEN          
   flipscreen(true);           
 #else
@@ -371,8 +258,6 @@ void TFT_T_DMA::begin(void) {
 #endif 
 };
 
-
-  
 void TFT_T_DMA::flipscreen(bool flip)
 {
   digitalWrite(_dc, 0);
@@ -413,65 +298,6 @@ bool TFT_T_DMA::isflipped(void)
   return(flipped);
 }
   
-
-void TFT_T_DMA::startDMA(void) {
-  curTransfer = 0;  
-  rstop = 0;     
-  digitalWrite(_cs, 1);
-  setDmaStruct();
-  fillScreen(RGBVAL16(0x00,0x00,0x00));
-
-  digitalWrite(_cs, 0); 
-  setArea((TFT_REALWIDTH-TFT_WIDTH)/2, (TFT_REALHEIGHT-TFT_HEIGHT)/2, (TFT_REALWIDTH-TFT_WIDTH)/2 + TFT_WIDTH-1, (TFT_REALHEIGHT-TFT_HEIGHT)/2+TFT_HEIGHT-1);  
-  // we switch to 16bit mode!!
-  spi_set_format(TFT_SPIREG, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
-  dma_start_channel_mask(1u << dma_tx);
-}
-
-
-void TFT_T_DMA::stopDMA(void) { 
-  rstop = 0;
-  wait();
-  sleep_ms(100);
-  cancelled = false;  
-  //dmatx.detachInterrupt();
-  fillScreen(RGBVAL16(0x00,0x00,0x00));
-  digitalWrite(_cs, 1);
-  // we switch to 8bit mode!!
-  //spi_set_format(TFT_SPIREG, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);  
-//#ifdef ST7789  
-  begin();
-//#endif
-//#ifdef ILI9341 
-//  SPI.begin();
-//  digitalWrite(_cs, 0);
-//  SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));  
-//  SPI.endTransaction();
-//  digitalWrite(_cs, 1);
-//  digitalWrite(_dc, 1); 
-//#endif    
-  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);    
-}
-
-void TFT_T_DMA::wait(void) {
-  rstop = 1;
-  unsigned long m = time_us_32()*1000;   
-  cancelled = true; 
-  while (!rstop)  {
-    if ((time_us_32()*1000 - m) > 100) break;
-    sleep_ms(100);
-    asm volatile("wfi");
-  };
-  rstop = 0;
-}
-
-
-int TFT_T_DMA::get_frame_buffer_size(int *width, int *height){
-  if (width != nullptr) *width = TFT_REALWIDTH;
-  if (height != nullptr) *height = TFT_REALHEIGHT;
-  return TFT_REALWIDTH;  
-} 
-
 void  TFT_T_DMA::waitSync() {
 } 
 
@@ -499,8 +325,6 @@ void TFT_T_DMA::fillScreenNoDma(uint16_t color) {
   digitalWrite(_cs, 1);
   setArea(0, 0, (TFT_REALWIDTH-1), (TFT_REALHEIGHT-1));     
 }
-
-
 
 
 void TFT_T_DMA::drawRectNoDma(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
@@ -699,10 +523,183 @@ void TFT_T_DMA::drawTextNoDma(int16_t x, int16_t y, const char * text, uint16_t 
 }
 
 
-
 /***********************************************************************************************
     DMA functions
  ***********************************************************************************************/
+#ifndef USE_VGA
+
+#ifdef TFT_STATICFB
+static uint16_t fb0[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
+static uint16_t fb1[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
+static uint16_t fb2[LINES_PER_BLOCK*TFT_WIDTH]; //__attribute__ ((aligned(2048)));
+static uint16_t fb3[(TFT_HEIGHT-3*LINES_PER_BLOCK)*TFT_WIDTH];// __attribute__ ((aligned(2048)));
+static uint16_t * blocks[NR_OF_BLOCK]={fb0,fb1,fb2,fb3};
+static uint16_t blocklens[NR_OF_BLOCK];
+#else
+static uint16_t * blocks[NR_OF_BLOCK];
+static uint16_t blocklens[NR_OF_BLOCK];
+#endif
+
+
+static dma_channel_config dmaconfig;
+const uint dma_tx = dma_claim_unused_channel(true);
+static volatile uint8_t rstop = 0;
+static volatile bool cancelled = false;
+static volatile uint8_t curTransfer = 0;
+static uint8_t nbTransfer = 0;
+
+static void dma_isr() { 
+  irq_clear(DMA_IRQ_0);
+  dma_hw->ints0 = 1u << dma_tx;
+  curTransfer++;
+  if (curTransfer >= nbTransfer) {
+    curTransfer = 0;
+  }
+  if (cancelled) {
+    rstop = 1;
+  }
+  else 
+  {
+    dma_channel_transfer_from_buffer_now ( dma_tx, blocks[curTransfer], blocklens[curTransfer]);
+  }  
+}
+
+static void setDmaStruct() {
+  uint32_t remaining = TFT_HEIGHT*TFT_WIDTH*2;
+  int i=0;
+  nbTransfer = 0;
+  uint16_t col=RGBVAL16(0x00,0x00,0x00);;
+  while (remaining > 0) {
+    uint16_t * fb = blocks[i];
+    int32_t len = (remaining >= (LINES_PER_BLOCK*TFT_WIDTH*2)?LINES_PER_BLOCK*TFT_WIDTH*2:remaining);
+#ifdef TFT_DEBUG 
+    printf("%d\n",(unsigned long)blocks[i]);        
+    printf("%d\n",remaining);        
+#endif        
+    switch (i) {
+      case 0:
+        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //fb=&fb0[0];
+#ifdef TFT_DEBUG        
+        col = RGBVAL16(0x00,0xff,0x00);
+#endif        
+        break;
+      case 1:
+        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //fb=&fb1[0];
+#ifdef TFT_DEBUG        
+        col = RGBVAL16(0x00,0xff,0xff);
+#endif        
+        break;
+      case 2:
+        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //fb=&fb2[0];
+#ifdef TFT_DEBUG        
+        col = RGBVAL16(0x00,0x00,0xff);
+#endif        
+        break;
+      case 3:
+        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //fb=&fb3[0];
+#ifdef TFT_DEBUG        
+        col = RGBVAL16(0xff,0x00,0xff);
+#endif        
+        break;
+    }
+    blocks[i] = fb;
+    blocklens[i] = len/2;
+    if (blocks[i] == 0) {
+      printf("LI9341 allocaltion failed for block %d\n",i);
+      sleep_ms(10000);    
+    }
+    nbTransfer++;
+    remaining -= len;    
+    i++;
+  }    
+    
+
+  // Setup the control channel
+  dmaconfig = dma_channel_get_default_config(dma_tx);
+  channel_config_set_transfer_data_size(&dmaconfig, DMA_SIZE_16);
+  channel_config_set_dreq(&dmaconfig, TFT_SPIDREQ);  
+  //channel_config_set_read_increment(&dmaconfig, true); // read incrementing
+  //channel_config_set_write_increment(&dmaconfig, false); // no write incrementing
+
+  dma_channel_configure(
+      dma_tx,
+      &dmaconfig,
+      &spi_get_hw(TFT_SPIREG)->dr, // write address
+      blocks[0],
+      blocklens[0],
+      false
+  ); 
+
+  irq_set_exclusive_handler(DMA_IRQ_0, dma_isr);
+  dma_channel_set_irq0_enabled(dma_tx, true);
+  irq_set_enabled(DMA_IRQ_0, true);
+  dma_hw->ints0 = 1u << dma_tx;  
+}
+
+
+void TFT_T_DMA::startDMA(void) {
+  curTransfer = 0;  
+  rstop = 0;     
+  digitalWrite(_cs, 1);
+  setDmaStruct();
+  fillScreen(RGBVAL16(0x00,0x00,0x00));
+
+  digitalWrite(_cs, 0); 
+  setArea((TFT_REALWIDTH-TFT_WIDTH)/2, (TFT_REALHEIGHT-TFT_HEIGHT)/2, (TFT_REALWIDTH-TFT_WIDTH)/2 + TFT_WIDTH-1, (TFT_REALHEIGHT-TFT_HEIGHT)/2+TFT_HEIGHT-1);  
+  // we switch to 16bit mode!!
+  spi_set_format(TFT_SPIREG, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+  dma_start_channel_mask(1u << dma_tx);
+}
+
+
+void TFT_T_DMA::stopDMA(void) { 
+  rstop = 0;
+  wait();
+  sleep_ms(100);
+  cancelled = false;  
+  //dmatx.detachInterrupt();
+  fillScreen(RGBVAL16(0x00,0x00,0x00));
+  digitalWrite(_cs, 1);
+  // we switch to 8bit mode!!
+  //spi_set_format(TFT_SPIREG, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);  
+//#ifdef ST7789  
+  begin();
+//#endif
+//#ifdef ILI9341 
+//  SPI.begin();
+//  digitalWrite(_cs, 0);
+//  SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE));  
+//  SPI.endTransaction();
+//  digitalWrite(_cs, 1);
+//  digitalWrite(_dc, 1); 
+//#endif    
+  setArea(0, 0, TFT_REALWIDTH-1, TFT_REALHEIGHT-1);    
+}
+
+void TFT_T_DMA::wait(void) {
+  rstop = 1;
+  unsigned long m = time_us_32()*1000;   
+  cancelled = true; 
+  while (!rstop)  {
+    if ((time_us_32()*1000 - m) > 100) break;
+    sleep_ms(100);
+    asm volatile("wfi");
+  };
+  rstop = 0;
+}
+
+
+int TFT_T_DMA::get_frame_buffer_size(int *width, int *height){
+  if (width != nullptr) *width = TFT_REALWIDTH;
+  if (height != nullptr) *height = TFT_REALHEIGHT;
+  return TFT_REALWIDTH;  
+} 
+
+
 uint16_t * TFT_T_DMA::getLineBuffer(int j)
 {
   uint16_t * block=blocks[j>>6];  
@@ -1158,4 +1155,6 @@ void TFT_T_DMA::end_audio()
     free(i2s_tx_buffer);
   }  
 }
+#endif
+
 #endif

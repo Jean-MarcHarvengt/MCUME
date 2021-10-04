@@ -28,8 +28,7 @@
 #define ACTION_RUNVGA        130
 
 #ifdef KEYMAP_PRESENT
-#ifdef PICOMPUTER
-   
+ 
 const unsigned short key_map1[] = {
   'Q','W','E','R','T','Y','U','I','O','P',157,
   0,'A','S','D','F','G','H','J','K','L',0x0D,
@@ -58,7 +57,6 @@ const unsigned short matkeys[] = {
   0x508,0x501,0x502,0x504 }; // cursor keys
  
 #endif
-#endif
 
 
 #define MASK_JOY2_RIGHT 0x0001
@@ -75,6 +73,7 @@ const unsigned short matkeys[] = {
 #define MASK_JOY1_DOWN  0x0800
 #define MASK_JOY1_BTN   0x1000
 #define MASK_KEY_USER4  0x2000
+#define MASK_OSKB       0x8000
 
 
 

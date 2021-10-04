@@ -13,9 +13,11 @@
 /**     changes to this file.                               **/
 /*************************************************************/
 
+#include "platform_config.h"
 #include "Z80.h"
 #include "Tables.h"
 #include <stdio.h>
+
 #undef DEBUG
 /** INLINE ***************************************************/
 /** C99 standard has "inline", but older compilers used     **/
@@ -525,6 +527,72 @@ int ExecZ80(register Z80 *R,register int RunCycles)
       /* Count cycles */
       R->ICount-=Cycles[I];
 
+      for (int l=0; l< Cycles[I] ;l++) {
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop"); 
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop"); 
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop"); 
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");       
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop"); 
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");      
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop"); 
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");   
+
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+#ifndef USE_VGA
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+        asm volatile("nop");
+#endif        
+      }
       /* Interpret opcode */
       switch(I)
       {

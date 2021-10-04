@@ -16,9 +16,12 @@ extern "C" {
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
+#endif
 volatile bool vbl=true;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
+    uint16_t bClick = emu_DebounceLocalKeys();
+    emu_Input(bClick);     
     if (vbl) {
         vbl = false;
     } else {
@@ -26,7 +29,6 @@ bool repeating_timer_callback(struct repeating_timer *t) {
     }   
     return true;
 }
-#endif
 TFT_T_DMA tft;
 
 static int skip=0;
@@ -59,18 +61,14 @@ int main(void) {
               emu_start();        
               emu_Init(filename);      
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-              tft.startDMA();
-#ifndef USE_VGA   
+              tft.startDMA(); 
               struct repeating_timer timer;
-              add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);
-#endif                                 
+              add_repeating_timer_ms(20, repeating_timer_callback, NULL, &timer);                               
             }  
             tft.waitSync();
         }
-        else {  
+        else {      
             emu_Step(); 
-            uint16_t bClick = emu_DebounceLocalKeys();
-            emu_Input(bClick);     
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {
@@ -99,8 +97,8 @@ void emu_DrawVsync(void)
 #ifdef USE_VGA   
     tft.waitSync();                   
 #else                      
-    volatile bool vb=vbl; 
-    while (vbl==vb) {};
+  //  volatile bool vb=vbl; 
+  //  while (vbl==vb) {};
 #endif
 }
 
@@ -162,8 +160,7 @@ void emu_sndInit() {
   tft.begin_audio(256, mymixer.snd_Mixer);
   mymixer.start();
   //gpio_init(AUDIO_PIN);
-  //gpio_set_dir(AUDIO_PIN, GPIO_OUT);
-  //gpio_put(AUDIO_PIN, 1);       
+  //gpio_set_dir(AUDIO_PIN, GPIO_OUT);     
 }
 
 void emu_sndPlaySound(int chan, int volume, int freq)
@@ -174,9 +171,10 @@ void emu_sndPlaySound(int chan, int volume, int freq)
 }
 
 void emu_sndPlayBuzz(int size, int val) {
+#ifndef CUSTOM_SND 
   //gpio_put(AUDIO_PIN, (val?1:0));
-  pwm_set_gpio_level(AUDIO_PIN, (val?128:255));
-  //mymixer.buzz(size,val); 
+  pwm_set_gpio_level(AUDIO_PIN, (val?255:128));
+#endif    
 }
 
 #endif

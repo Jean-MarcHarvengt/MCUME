@@ -12,10 +12,10 @@
 
 #define emu_Init(ROM) {z81_Start(ROM); z81_Init(); }
 #define emu_Step(x) {z81_Step();}
-#define emu_Input(x) {}
+#define emu_Input(x) {z81_Input(x);}
 
 #define PALETTE_SIZE         2
-#define VID_FRAME_SKIP       0x3
+#define VID_FRAME_SKIP       0x0
 #define TFT_VBUFFER_YCROP    0
 #define SINGLELINE_RENDERING 1
 
@@ -27,45 +27,43 @@
 
 
 #ifdef KEYMAP_PRESENT
-#ifdef PICOMPUTER
-/*   
-const unsigned short key_map1[] = {
-  30,31,32,33,34,35,36,37,38,39,
-  20,26, 8,21,23,28,25,12,18,19,
-   4, 9, 7,22, 4,11,13,14,15,40,
-  25, 6,27,29,224,5,17,16,225,44 
-  }; 
+/*
+    {25, 6,27,29,224},// vcxz<caps shift=Lshift>
+    {10, 9, 7,22, 4}, // gfdsa
+    {23,21, 8,26,20}, // trewq
+    {34,33,32,31,30}, // 54321
+    {35,36,37,38,39}, // 67890
+    {28,24,12,18,19}, // yuiop
+    {11,13,14,15,40}, // hjkl<enter>
+    { 5,17,16,1,44},  // bnm. <space>
 */
 
 const unsigned short key_map1[] = {
-  20,26,8,21,23, 28,25,12,18, 19,0x100+39,
-  0x100+30, 4, 9,7, 22, 10,11,13,14, 15,40,
-  0, 6,27,29,224,5, 17,16,225,44, 
-  0x100+36,0x100+34,0x100+37,0x100+35
+  20,26,8,21,23,28,24,12,18,19,39+64,
+  0, 4, 22, 7,9, 10,11,13,14,15,40,
+  0,29,27,6,25,5,17,16,1,44, 
+  0,0,0,0   //up,left,right,down
   };  
 
 const unsigned short key_map2[] = {
-  30,31,32,33,34,35,36,37,38,39,0x100+19,
-//  0x100+20, 0x100+26,0x100+8, 0x100+21, 0x100+23,0x100+28,0x100+25,0x100+12, 0x100+18,0x100+19,0,
-  0x100+31, 0x100+4 ,0x100+9, 0x100+7,  0x100+22,0x100+10,0x100+11,0x100+13, 0x100+14,0x100+15,0x100+40,
-  0,0,0,0,0,0x100+5, 0x100+17,0x100+16,0x100+225,0x100+44, 
-  0,0,0,0
+  30,31,32,33,34,35,36,37,38,39,15+64,
+  0, 0,0,0,24+64,0,14+64,0,5+64,13+64,0,
+  0, 12+64,18+64,6+64,25+64,19+64,17+64,16+64,1+64,29+64,
+  36+64,34+64,37+64,35+64   //up,left,right,down
   };  
 
 const unsigned short key_map3[] = {
-  0,0,0,0,0,0,0,0,0,0,0, // function keys
+  0, 0,0,0,0,0,0,0,0,0,0, // Upper case
   0, 0,0,0,0,0,0,0,0,0,0,
-  0, 0,0,0,0,0,0,0,0,0,
-  0,0,0,0
+  0, 0,0,0,0,0,0,0,27+64,0,
+  36+64,34+64,37+64,35+64   //up,left,right,down
   };
 
 const unsigned short matkeys[] = {
   0x020,0x120,0x220,0x320,0x420,0x408,0x308,0x208,0x108,0x008,0x002, // row 1
   0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
   0x520,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
-  0x508,0x501,0x502,0x504 }; // cursor keys
- 
-#endif
+  0x508,0x501,0x502,0x504 }; // cursor keys 
 #endif
 
 
@@ -83,6 +81,7 @@ const unsigned short matkeys[] = {
 #define MASK_JOY1_DOWN  0x0800
 #define MASK_JOY1_BTN   0x1000
 #define MASK_KEY_USER4  0x2000
+#define MASK_OSKB       0x8000
 
 
 extern void emu_init(void);

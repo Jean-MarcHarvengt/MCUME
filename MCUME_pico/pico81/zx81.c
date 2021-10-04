@@ -23,7 +23,7 @@ int interrupted=0;
 int ramsize=32; //32;
 
 /* the keyboard state and other */
-static byte keyboard[ 9 ] = {0xff,0xff,0xff,0xff, 0xff,0xff,0xff,0xff, 0xff};;
+static byte keyboard[ 8 ] = {0xff,0xff,0xff,0xff, 0xff,0xff,0xff,0xff};;
 static byte * XBuf=0; 
 int zx80=0;
 int autoload=1;
@@ -34,15 +34,16 @@ struct { unsigned char R,G,B; } Palette[16] = {
   { 255, 255, 255}
 };
 
+
 const byte map_qw[8][5] = {
-    {224,29,27,6,25}, // vcxz<caps shift=Lshift>
-    {10,22, 7, 9, 4}, // gfdsa
+    {25, 6,27,29,224},// vcxz<caps shift=Lshift>
+    {10, 9, 7,22, 4}, // gfdsa
     {23,21, 8,26,20}, // trewq
     {34,33,32,31,30}, // 54321
     {35,36,37,38,39}, // 67890
     {28,24,12,18,19}, // yuiop
     {11,13,14,15,40}, // hjkl<enter>
-    { 5,17,16,225,44}, // bnm <symbshift=RSHift> <space>
+    { 5,17,16,1,44},  // bnm. <space>
 };
 
 static char tapename[64]={0};
@@ -199,6 +200,14 @@ void do_interrupt()
     interrupted=0;
 }
 
+static int ik;
+static int ihk;
+
+void z81_Input(int bClick) {
+  ik  = emu_GetPad();
+  ihk = emu_ReadI2CKeyboard();
+}
+
 void bitbufBlit(unsigned char * buf)
 {
   emu_DrawVsync();  
@@ -233,27 +242,30 @@ void bitbufBlit(unsigned char * buf)
 
 static void updateKeyboard (void)
 {
-  int nb_keys=0;
-  int k = emu_GetPad();
-  int hk = emu_ReadI2CKeyboard();  
-  if ( (k == 0) && (hk == 0) )  {
-    memset(keyboard, 0xff, sizeof(keyboard));    
-  }
-  else {
+  //int k = ik; //emu_GetPad();
+  int hk = ihk; //emu_ReadI2CKeyboard();  
+  //if ( hk == 0 )  {
+  memset(keyboard, 0xff, sizeof(keyboard));    
+  //}
+  //else 
+  {
+    int shift = hk;
+    if (hk >=128) hk -= 128;
+    else if (hk >=64) hk -= 64;    
     // scan all possibilities
-    int key = hk & 0xff;
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
-        if ( (k == map_qw[j][i]) || (key == map_qw[j][i]) ) {
+        if ( /*(k == map_qw[j][i]) ||*/ (hk == map_qw[j][i]) ) {
             keyboard[j] &= ~ (1<<(4-i));
-            nb_keys++;
         }   
       }  
-    }
-    if (hk & 0x100) keyboard[0] &= ~ 1;     
-  } 
+    } 
+    if (shift >=64) keyboard[0] &= ~ (1<<0);  // SHift 
+    //else if (shift >=64) keyboard[7] &= ~ (1<<1);  // SHift symboles     
+  }
 }
 
+/*
 static void handleKeyBuf(void)
 {
   if (timeout) {
@@ -291,6 +303,8 @@ static void handleKeyBuf(void)
     }       
   }
 }
+*/
+
 
 /* despite the name, this also works for the ZX80 :-) */
 void reset81()
@@ -495,6 +509,7 @@ void z81_Init(void)
   for(J=0;J<2;J++)
     emu_SetPaletteEntry(Palette[J].R,Palette[J].G,Palette[J].B, J);
 
+
   emu_printf("Allocating RAM");
   if (mem == 0) mem = emu_Malloc(MEMORYRAM_SIZE); //&memo[0];
   
@@ -558,11 +573,12 @@ void z81_Start(char * filename)
     emu_FileClose();
   }
 
-  emu_setKeymap(1); 
+  //emu_setKeymap(1); 
+  
   if ( (endsWith(filename, ".80")) || (endsWith(filename, ".o")) || (endsWith(filename, ".O")))  {
     zx80=1;
     ramsize=48;
-    emu_setKeymap(0);    
+    //emu_setKeymap(0);    
   }
   else if (endsWith(filename, ".56") ) {
     ramsize = 56;

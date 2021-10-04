@@ -17,9 +17,11 @@ AudioPlaySID playSID;
 
 using namespace std;
 
-#define OSKB_YPOS (240-16)
+#ifndef PICOMPUTER
+/*
 static bool oskbActive=false;
-
+*/
+#endif
 
 /* IRAM_ATTR */
 static void oneRasterLine(void) {
@@ -160,8 +162,12 @@ uint8_t cia1PORTA(void) {
   uint8_t v;
 
   v = ~cpu.cia1.R[0x02] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]);
-  int keys = 0;
-  if (!oskbActive) keys = emu_GetPad();
+  int keys = emu_GetPad();
+#ifndef PICOMPUTER
+  /*
+  if (oskbActive) keys = 0;
+  */
+#endif  
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY2_BTN) v &= 0xEF;
     if (keys & MASK_JOY2_UP) v &= 0xFE;
@@ -209,8 +215,12 @@ uint8_t cia1PORTB(void) {
   uint8_t v;
 
   v = ~cpu.cia1.R[0x03] | (cpu.cia1.R[0x00] & cpu.cia1.R[0x02]) ;
-  int keys = 0;
-  if (!oskbActive) keys = emu_GetPad();
+  int keys = emu_GetPad();
+#ifndef PICOMPUTER
+  /*
+  if (oskbActive) keys = 0;
+  */
+#endif  
   if (!cpu.swapJoysticks) {
     if (keys & MASK_JOY1_BTN) v &= 0xEF;
     if (keys & MASK_JOY1_UP) v &= 0xFE;
@@ -288,6 +298,10 @@ static char textkey[1];
 static bool res=false;
 static bool firsttime=true;
 
+#ifndef PICOMPUTER
+/*
+#define OSKB_YPOS (240-16)
+
 static char * oskbtext1 = "FFFFFFFF  RD\"$ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static char * oskbtext2 = "12345678  TL  ,.*     0123456789        ";
 static int oskbXPos = 10;
@@ -301,7 +315,6 @@ int emu_oskbActive(void) {
   return (oskbActive?1:0);
 }
 
-#ifndef PICOMPUTER
 void emu_DrawVsync(void)
 {
     char sel[2]={0,0};
@@ -319,6 +332,7 @@ void emu_DrawVsync(void)
     tft.waitSync(); 
 #endif    
 }
+*/
 #endif
 
 //#define DEBUG 1
@@ -360,6 +374,7 @@ void c64_Input(int bClick) {
 #endif
 
 #ifndef PICOMPUTER
+/*  
   int fbwidth;  
   if (oskbActive) {
     if (bClick & MASK_JOY2_BTN) {    
@@ -379,9 +394,11 @@ void c64_Input(int bClick) {
     if (bClick & MASK_JOY2_UP) oskbYPos = 0;
     if (bClick & MASK_JOY2_DOWN) oskbYPos = 1;
   }
+*/  
 #endif
   if (nbkeys == 0) {
 #ifndef PICOMPUTER
+/*    
     if (bClick & MASK_KEY_USER2) {
       if (!oskbActive) {
         oskbActive = true;
@@ -393,8 +410,9 @@ void c64_Input(int bClick) {
       }       
     } 
     else
+*/    
 #endif 
-    if (bClick & MASK_KEY_USER1) {
+    if ( (bClick & MASK_KEY_USER1) && !(emu_GetPad() & MASK_OSKB) ) {
       if (firsttime) {
         firsttime = false;
         textseq = textload;
