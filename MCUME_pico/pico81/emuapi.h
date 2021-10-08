@@ -38,6 +38,9 @@
     { 5,17,16,1,44},  // bnm. <space>
 */
 
+#define keylables_map1_0 (char *)"qwertyuiop\x1a"
+#define keylables_map1_1 (char *)" asdfghjkl\x19"
+#define keylables_map1_2 (char *)" zxcvbnm.\x10 "
 const unsigned short key_map1[] = {
   20,26,8,21,23,28,24,12,18,19,39+64,
   0, 4, 22, 7,9, 10,11,13,14,15,40,
@@ -45,6 +48,9 @@ const unsigned short key_map1[] = {
   0,0,0,0   //up,left,right,down
   };  
 
+#define keylables_map2_0 (char *)"1234567890="
+#define keylables_map2_1 (char *)"    $ + *- "
+#define keylables_map2_2 (char *)" ()?/\"<>,: "
 const unsigned short key_map2[] = {
   30,31,32,33,34,35,36,37,38,39,15+64,
   0, 0,0,0,24+64,0,14+64,0,5+64,13+64,0,
@@ -52,6 +58,9 @@ const unsigned short key_map2[] = {
   36+64,34+64,37+64,35+64   //up,left,right,down
   };  
 
+#define keylables_map3_0 (char *)"           "
+#define keylables_map3_1 (char *)"           "
+#define keylables_map3_2 (char *)"        ;  "
 const unsigned short key_map3[] = {
   0, 0,0,0,0,0,0,0,0,0,0, // Upper case
   0, 0,0,0,0,0,0,0,0,0,0,

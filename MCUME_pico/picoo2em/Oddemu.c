@@ -41,11 +41,6 @@ static char * lorom=0;  //[MAX_ROM_SIZE];
 /****************************************************************************
 * Exported procedures
 ****************************************************************************/
-void emu_KeyboardOnDown(int keymodifer, int key) {
-}
-
-void emu_KeyboardOnUp(int keymodifer, int key) {
-}
 
 void odd_Init(void)
 {
@@ -201,8 +196,7 @@ void odd_Stop(void)
 void odd_Step(void)
 {
   run();
-
-//emu_printf("s");  
+ 
 	emu_DrawScreen((unsigned char *)getGBuf()+BORDERW/2, BMPW-BORDERW, BMPH, BMPW);
   emu_DrawVsync();
 }

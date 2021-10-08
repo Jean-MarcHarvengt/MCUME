@@ -263,27 +263,28 @@ void SetColor(byte N,byte R,byte G,byte B)
 void Joysticks(void)
 {
   int k;
-  int j;
-  int ij;
+  //int j;
+  int hk;
   int N=0;
   word JS[2] = { 0xFFFF,0xFFFF };
 
-  k=emu_ReadKeys();
-  j=emu_GetPad();
-  ij=emu_ReadI2CKeyboard();
+  k = emu_GetPad() & 0x7fff;
+  hk = emu_ReadI2CKeyboard();
 
-  if (j & 0x8000) N = 1;
-  else N = 0;
+  //if (j & 0x8000) N = 1;
+  //else N = 0;
 
-  if(j)
-     JS[N]=(JS[N]&0xFFF0)|(j-1);
-  if(ij)
-     JS[N]=(JS[N]&0xFFF0)|(ij-1);
+  if(k)
+     JS[N]=(JS[N]&0xFFF0)|(k-1);
+  if(hk)
+     JS[N]=(JS[N]&0xFFF0)|(hk-1);
 
   if (k & MASK_JOY2_BTN)
   {
           JS[N]&=0xBFFF; //Fire 1
   }
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+#else  
   if (k & MASK_KEY_USER1)
   {
           JS[N]&=0xFFBF; //Fire 2
@@ -292,6 +293,7 @@ void Joysticks(void)
   {
           JS[0]=(JS[0]&0xFFF0)|(2); //1
   }
+#endif  
   //   JS[0]=(JS[0]&0xFFF0)|(12);
   //   JS[0]=(JS[0]&0xFFF0)|(13);
 

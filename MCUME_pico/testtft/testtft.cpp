@@ -25,10 +25,19 @@ static int fb_width, fb_height;
 #include "hardware/vreg.h"
 
 static const char * digits = "0123456789ABCDEF";
+static int hk = 0;
+static int prevhk = 0;
+static int col=0;
+static int row=0;
+
+
+void emu_Input(uint16_t bClick) {
+    hk = emu_ReadI2CKeyboard();
+}
 
 bool repeating_timer_callback(struct repeating_timer *t) {
     uint16_t bClick = emu_DebounceLocalKeys();
-    //emu_Input(bClick);    
+    emu_Input(bClick);    
     return true;
 }
 
@@ -49,14 +58,14 @@ int main(void) {
     emu_start();
 	//tft.startDMA();
     struct repeating_timer timer;
-    add_repeating_timer_ms(25, repeating_timer_callback, NULL, &timer);      
+    add_repeating_timer_ms(20, repeating_timer_callback, NULL, &timer);      
     
 	tft.fillScreenNoDma(LIGHT_BLUE);
 	tft.get_frame_buffer_size(&fb_width, &fb_height);
 	tft.drawRectNoDma((fb_width-320)/2,(fb_height-200)/2, 320,200, BLUE);
-	tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+1*8,"    **** COMMODORE 64 BASIC V2 ****     ",LIGHT_BLUE,BLUE,false);
-	tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+3*8," 64K RAM SYSTEM  38911 BASIC BYTES FREE ",LIGHT_BLUE,BLUE,false);
-	tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+5*8,"READY.",LIGHT_BLUE,BLUE,false);
+	//tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+1*8,"    **** COMMODORE 64 BASIC V2 ****     ",LIGHT_BLUE,BLUE,false);
+	//tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+3*8," 64K RAM SYSTEM  38911 BASIC BYTES FREE ",LIGHT_BLUE,BLUE,false);
+	//tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+5*8,"READY.",LIGHT_BLUE,BLUE,false);
 
     char buf[4] = {32,32,32,0};
 	uint sys_clk = clock_get_hz(clk_sys)/1000000;
@@ -68,7 +77,7 @@ int main(void) {
 	buf[0] = digits[r1];
 	buf[1] = digits[r2];
 	buf[2] = digits[r3];
-	tft.drawTextNoDma(4*8,0,buf,BLUE,LIGHT_BLUE,false);
+	tft.drawTextNoDma(0,0,buf,BLUE,LIGHT_BLUE,false);
 
     while (true) {
         uint16_t bClick = emu_GetPad();
@@ -77,40 +86,61 @@ int main(void) {
         buf[1] = digits[(bClick>>8)&0xf];
         buf[2] = digits[(bClick>>4)&0xf];
         buf[3] = digits[bClick&0xf];
-        tft.drawTextNoDma(4*8,16,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(4*8,0,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),false);
         buf[3] = 0;
         int key = emu_ReadI2CKeyboard();
         buf[0] = digits[(key>>8)&0xf];
         buf[1] = digits[(key>>4)&0xf];
         buf[2] = digits[key&0xf];        
-        tft.drawTextNoDma(4*8,16*2,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(4*8,8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),false);
 
         buf[2] = 0;
         key = emu_ReadI2CKeyboard2(0);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*4,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+0*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         key = emu_ReadI2CKeyboard2(1);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*5,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+1*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         key = emu_ReadI2CKeyboard2(2);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*6,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+2*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         key = emu_ReadI2CKeyboard2(3);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*7,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+3*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         key = emu_ReadI2CKeyboard2(4);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+4*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         key = emu_ReadI2CKeyboard2(5);
         buf[0] = digits[(key>>4)&0xf];
         buf[1] = digits[key&0xf];
-        tft.drawTextNoDma(4*8,16*9,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
+        tft.drawTextNoDma(9*8+5*24,0*8,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),true);
         
+        if ( (hk != 0) && (hk < 128) ) {
+            buf[0] = (char)(hk&0xff);  
+            buf[1] = 0;
+            tft.drawTextNoDma(col*8,(row+3)*8,buf,LIGHT_BLUE,BLUE,false);
+            col += 1;
+            if (col >= 40) {
+                col=0;
+                row += 1;
+                if (row >= 25) {
+                    row=0;  
+                }
+            }
+            if (hk != prevhk) {
+                sleep_ms(200);
+            }
+            else {
+                sleep_ms(100);
+            }
+        }
+        prevhk = hk;
+
         sleep_ms(20);
           	
 /*

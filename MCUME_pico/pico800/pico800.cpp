@@ -19,6 +19,7 @@ extern "C" {
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
+#endif
 volatile bool vbl=true;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
@@ -29,7 +30,6 @@ bool repeating_timer_callback(struct repeating_timer *t) {
     }   
     return true;
 }
-#endif
 TFT_T_DMA tft;
 
 static int skip=0;
@@ -62,10 +62,8 @@ int main(void) {
               emu_Init(filename);      
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
               tft.startDMA();
-#ifndef USE_VGA
               struct repeating_timer timer;
               add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);
-#endif                                        
             }  
             tft.waitSync();
         }

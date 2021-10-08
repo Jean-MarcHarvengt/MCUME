@@ -129,6 +129,21 @@ static unsigned int key_map[6][8]= {
 };
 
 
+static int k = 0;
+static int hk = 0;
+
+void odd_Input(int key) {
+  k = emu_GetPad();
+  hk = emu_ReadI2CKeyboard() & 0x7f;  
+}
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+}
+
+
 static void do_kluges(void);
 static void setvideomode(int t);
 
@@ -260,15 +275,14 @@ void write_p1(Byte d){
 
 Byte read_P2(void){
 	int i,si,so,km;
-    int k;
+  int hksim = 0;
 
-	k=emu_GetPad()&0x7f;
-  int hk = emu_ReadI2CKeyboard()&0x7f;  
-  
-  int key = emu_ReadKeys();
-  if (key & MASK_KEY_USER1) { // 1
-    k = 1;
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+#else    
+  if (k & MASK_KEY_USER1) { // 1
+    hksim = 1;
   }
+#endif
 
   if (!(p1 & 0x04)) {
     si = (p2 & 7);
@@ -276,14 +290,18 @@ Byte read_P2(void){
     if (si<6) {
       for (i=0; i<8; i++) {
         km = key_map[si][i];
-                if ( (km == (k-1)) && (k) )
-        {
-          so = i ^ 0x07;
+        if (hk) {
+	        if ( km == (hk-1) )
+	        {
+	          so = i ^ 0x07;        
+	        }
         }
-        else if ( (km == (hk-1)) && (hk) )
-        {
-          so = i ^ 0x07;
-        }       
+        else if (hksim) {
+	        if ( km == (hksim-1) )
+	        {
+	          so = i ^ 0x07;        
+	        }
+        }
 //        if ((key[km] && ((!joykeystab[km]) || (key_shifts & KB_CAPSLOCK_FLAG))) || (key2[km])) {
 //          so = i ^ 0x07;
 //        }
@@ -374,8 +392,6 @@ Byte ext_read(ADDRESS adr){
 
 Byte in_bus(void){
 	Byte si=0,d=0,mode=0,jn=0;
-    int key;
-
 
 	if ((p1 & 0x08) && (p1 & 0x10)) {
 		/* Handle joystick read */
@@ -383,13 +399,17 @@ Byte in_bus(void){
 			si = (p2 & 7);
 		}
 		d=0xFF;
+
 		/* Get current input */
-		key = emu_ReadKeys();
+		int key = 0;
+		if ( !(k & MASK_OSKB) ) {
+			key = k;
+		}   
    
     app_data.stick[0]=0;
     app_data.stick[1]=1;
     /*  
-		if ( emu_GetPad() & 0x80 )
+		if ( key & 0x80 )
 		{
 			app_data.stick[0]=1;
 			app_data.stick[1]=0;
@@ -410,8 +430,9 @@ Byte in_bus(void){
 		}
     */
 		mode=1;
-		if (key & 0x8000) jn=1;
-		else jn=0;
+		
+		//if (key & 0x8000) jn=1;
+		//else jn=0;
 
 		switch(mode) {
 			case 1:			    
@@ -424,7 +445,6 @@ Byte in_bus(void){
         
 			case 2: 
                 /* Get current input */
-//                key = emu_GetPad();
 //                if (key & JKEY_PLEFT)  d &= 0xF7;
 //                if (key & JKEY_PRIGHT) d &= 0xFD;
 //                if (key & JKEY_PUP)    d &= 0xFE;

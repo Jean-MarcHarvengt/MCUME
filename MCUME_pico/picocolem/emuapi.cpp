@@ -13,10 +13,18 @@ extern "C" {
   #include "iopins.h"
 }
 
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+// Dual display config, initialize TFT
+#include "tft_t_dma.h"
+static TFT_T_DMA tft;
+#else
+// Non Dual display config
 #ifdef USE_VGA
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
+#endif
+extern TFT_T_DMA tft;
 #endif
 
 
@@ -39,7 +47,7 @@ extern "C" {
 #define MENU_VGA_XOFFSET    (MENU_FILE_XOFFSET+MENU_FILE_W+8)
 #define MENU_VGA_YOFFSET    (MENU_VBAR_YOFFSET+MENU_FILE_H-32-37)
 
-extern TFT_T_DMA tft;
+
 
 static char romspath[64];
 static int nbFiles=0;
@@ -142,7 +150,174 @@ void emu_Free(void * pt)
   free(pt);
 }
 
+void emu_drawText(unsigned short x, unsigned short y, const char * text, unsigned short fgcolor, unsigned short bgcolor, int doublesize)
+{
+  tft.drawText(x, y, text, fgcolor, bgcolor, doublesize?true:false);
+}
 
+
+/********************************
+ * OSKB handling
+********************************/ 
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+// On screen keyboard position
+#define KXOFF      28 //64
+#define KYOFF      96
+#define KWIDTH     11 //22
+#define KHEIGHT    3
+
+static bool oskbOn = false;
+static int cxpos = 0;
+static int cypos = 0;
+static int oskbMap = 0;
+static uint16_t oskbBLastState = 0;
+
+static void lineOSKB2(int kxoff, int kyoff, char * str, int row)
+{
+  char c[2] = {'A',0};
+  const char * cpt = str;
+  for (int i=0; i<KWIDTH; i++)
+  {
+    c[0] = *cpt++;
+    c[1] = 0;
+    uint16_t bg = RGBVAL16(0x00,0x00,0xff);
+    if ( (cxpos == i) && (cypos == row) ) bg = RGBVAL16(0xff,0x00,0x00);
+    tft.drawTextNoDma(kxoff+8*i,kyoff, &c[0], RGBVAL16(0x00,0xff,0xff), bg, ((i&1)?false:true));
+  } 
+}
+
+static void lineOSKB(int kxoff, int kyoff, char * str, int row)
+{
+  char c[4] = {' ',0,' ',0};
+  const char * cpt = str;
+  for (int i=0; i<KWIDTH; i++)
+  {
+    c[1] = *cpt++;
+    uint16_t bg;
+    if (row&1) bg = (i&1)?RGBVAL16(0xff,0xff,0xff):RGBVAL16(0xe0,0xe0,0xe0);
+    else bg = (i&1)?RGBVAL16(0xe0,0xe0,0xe0):RGBVAL16(0xff,0xff,0xff);
+    if ( (cxpos == i) && (cypos == row) ) bg = RGBVAL16(0x00,0xff,0xff);
+    tft.drawTextNoDma(kxoff+24*i,kyoff+32*row+0 , "   ", RGBVAL16(0x00,0x00,0x00), bg, false);
+    tft.drawTextNoDma(kxoff+24*i,kyoff+32*row+8 , &c[0], RGBVAL16(0x00,0x00,0x00), bg, true);
+    tft.drawTextNoDma(kxoff+24*i,kyoff+32*row+24, "   ", RGBVAL16(0x00,0x00,0x00), bg, false);
+  } 
+}
+
+
+static void drawOskb(void)
+{
+//  lineOSKB2(KXOFF,KYOFF+0,  (char *)"Q1W2E3R4T5Y6U7I8O9P0<=",  0);
+//  lineOSKB2(KXOFF,KYOFF+16, (char *)"  A!S@D#F$G%H+J&K*L-EN",  1);
+//  lineOSKB2(KXOFF,KYOFF+32, (char *)"  Z(X)C?V/B\"N<M>.,SP  ", 2);
+  if (oskbMap == 0) {
+    lineOSKB(KXOFF,KYOFF, keylables_map1_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map1_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map1_2,  2);
+  }
+  else if (oskbMap == 1) {
+    lineOSKB(KXOFF,KYOFF, keylables_map2_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map2_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map2_2,  2);
+  }
+  else {
+    lineOSKB(KXOFF,KYOFF, keylables_map3_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map3_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map3_2,  2);
+  }
+}
+
+void toggleOskb(bool forceoff) {
+  if (forceoff) oskbOn=true; 
+  if (oskbOn) {
+    oskbOn = false;
+    tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
+    tft.drawTextNoDma(0,32, "Press USER2 to toggle onscreen keyboard.", RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), true);
+  } else {
+    oskbOn = true;
+    tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
+    tft.drawTextNoDma(0,32, " Press USER2 to exit onscreen keyboard. ", RGBVAL16(0xff,0xff,0xff), RGBVAL16(0x00,0x00,0x00), true);
+    tft.drawTextNoDma(0,64, "    (USER1 to toggle between keymaps)   ", RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);
+    tft.drawRectNoDma(KXOFF,KYOFF, 22*8, 3*16, RGBVAL16(0x00,0x00,0xFF));
+    drawOskb();        
+  }
+}
+
+static int handleOskb(void)
+{  
+  int retval = 0;
+
+  uint16_t bClick = bLastState & ~oskbBLastState;
+  oskbBLastState = bLastState;
+  /*
+  static const char * digits = "0123456789ABCDEF";
+  char buf[5] = {0,0,0,0,0};
+  int val = bClick;
+  buf[0] = digits[(val>>12)&0xf];
+  buf[1] = digits[(val>>8)&0xf];
+  buf[2] = digits[(val>>4)&0xf];
+  buf[3] = digits[val&0xf];
+  tft.drawTextNoDma(0,KYOFF+ 64,buf,RGBVAL16(0x00,0x00,0x00),RGBVAL16(0xFF,0xFF,0xFF),1);
+  */
+  if (bClick & MASK_KEY_USER2)
+  { 
+    toggleOskb(false);
+  }
+  if (oskbOn)
+  {
+    bool updated = true;
+    if (bClick & MASK_KEY_USER1)
+    { 
+      oskbMap += 1;
+      if (oskbMap == 3) oskbMap = 0;
+    }    
+    else if (bClick & MASK_JOY2_LEFT)
+    {  
+      cxpos++;
+      if (cxpos >= KWIDTH) cxpos = 0;
+    }
+    else if (bClick & MASK_JOY2_RIGHT)
+    {  
+      cxpos--;
+      if (cxpos < 0) cxpos = KWIDTH-1;
+    }
+    else if (bClick & MASK_JOY2_DOWN)
+    {  
+      cypos++;
+      if (cypos >= KHEIGHT) cypos = 0;
+    }
+    else if (bClick & MASK_JOY2_UP)
+    {  
+      cypos--;
+      if (cypos < 0) cypos = KHEIGHT-1;
+    }
+    else if (oskbBLastState & MASK_JOY2_BTN)
+    {  
+      retval = cypos*KWIDTH+cxpos+1;
+      if (retval) {
+        retval--;
+        //if (retval & 1) retval = key_map2[retval>>1];
+        //else retval = key_map1[retval>>1];
+        if (oskbMap == 0) {
+          retval = key_map1[retval];
+        }
+        else if (oskbMap == 1) {
+          retval = key_map2[retval];
+        }
+        else {
+          retval = key_map3[retval];
+        }
+        if (retval) { toggleOskb(true); updated=false; };
+      }
+    }
+    else {
+      updated=false;
+    }    
+    if (updated) drawOskb();
+  }
+
+  return retval;    
+}
+#endif
 
 /********************************
  * Input and keyboard
@@ -318,13 +493,15 @@ int emu_ReadKeys(void)
   keymatrix_hitrow = -1;
   unsigned char row;
   unsigned short cols[6]={1,2,3,4,5,14};
+  unsigned char keymatrixtmp[6];
+
   for (int i=0;i<6;i++){
-//    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 0);
 #ifdef SWAP_ALT_DEL
     sleep_us(1);
     //__asm volatile ("nop\n"); // 4-8ns
-#endif    
+#endif
     row=0; 
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
@@ -335,27 +512,80 @@ int emu_ReadKeys(void)
     row |= (gpio_get(15) ? 0 : 0x08);
     row |= (gpio_get(7) ? 0 : 0x10);
     row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
-//    gpio_set_dir(cols[i], GPIO_IN);   
-    keymatrix[i]=row;
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
+    keymatrixtmp[i] = row;
   }
 
+#ifdef MULTI_DEBOUNCE
+  for (int i=0;i<6;i++){
+    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 0);
+#ifdef SWAP_ALT_DEL
+    sleep_us(1);
+    //__asm volatile ("nop\n"); // 4-8ns
+#endif
+    row=0; 
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(8) ? 0 : 0x02);
+    row |= (gpio_get(6) ? 0 : 0x04);
+    row |= (gpio_get(15) ? 0 : 0x08);
+    row |= (gpio_get(7) ? 0 : 0x10);
+    row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 1);
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
+    keymatrixtmp[i] |= row;
+  }
+
+  for (int i=0;i<6;i++){
+    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 0);
+#ifdef SWAP_ALT_DEL
+    sleep_us(1);
+    //__asm volatile ("nop\n"); // 4-8ns
+#endif
+    row=0; 
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(9) ? 0 : 0x01);
+    row |= (gpio_get(8) ? 0 : 0x02);
+    row |= (gpio_get(6) ? 0 : 0x04);
+    row |= (gpio_get(15) ? 0 : 0x08);
+    row |= (gpio_get(7) ? 0 : 0x10);
+    row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 1);
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
+    keymatrixtmp[i] |= row;
+  }
+#endif
+  
 #ifdef SWAP_ALT_DEL
   // Swap ALT and DEL  
-  unsigned char alt = keymatrix[0] & 0x02;
-  unsigned char del = keymatrix[5] & 0x20;
-  keymatrix[0] &= ~0x02;
-  keymatrix[5] &= ~0x20;
-  if (alt) keymatrix[5] |= 0x20;
-  if (del) keymatrix[0] |= 0x02;
+  unsigned char alt = keymatrixtmp[0] & 0x02;
+  unsigned char del = keymatrixtmp[5] & 0x20;
+  keymatrixtmp[0] &= ~0x02;
+  keymatrixtmp[5] &= ~0x20;
+  if (alt) keymatrixtmp[5] |= 0x20;
+  if (del) keymatrixtmp[0] |= 0x02;
 #endif
 
   bool alt_pressed=false;
-  if ( keymatrix[5] & 0x20 ) {alt_pressed=true; keymatrix[5] &= ~0x20;};
+  if ( keymatrixtmp[5] & 0x20 ) {alt_pressed=true; keymatrixtmp[5] &= ~0x20;};
 
   for (int i=0;i<6;i++){
-    row = keymatrix[i];
+    row = keymatrixtmp[i];
     if (row) keymatrix_hitrow=i;
+    keymatrix[i] = row;
   }
 
   //6,9,15,8,7,22
@@ -399,7 +629,8 @@ int emu_ReadKeys(void)
         hundred_ms_cnt += 1; // 2
         if (hundred_ms_cnt >= 2) 
         { 
-          hundred_ms_cnt = 0; 
+          hundred_ms_cnt = 0;
+          /* 
           if ( (time_ms-keypress_t_ms) < 500) 
           {
             if (key_alt == false) 
@@ -411,13 +642,14 @@ int emu_ReadKeys(void)
               key_alt = false;
             } 
           }
+          */
         }        
       }
     }
     else {
       // Keep press
       if (hundred_ms_cnt == 1) {
-        if ((to_ms_since_boot (get_absolute_time())-keypress_t_ms) > 1000) 
+        if ((to_ms_since_boot (get_absolute_time())-keypress_t_ms) > 2000) 
         {
           if (key_alt == false) 
           {
@@ -460,6 +692,12 @@ int emu_ReadKeys(void)
      || (retval & MASK_KEY_USER4 ) )
   {  
   }
+
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+  if (oskbOn) {
+    retval |= MASK_OSKB; 
+  }  
+#endif  
   
   return (retval);
 }
@@ -487,8 +725,6 @@ int emu_ReadI2CKeyboard(void) {
   }
   if (keymatrix_hitrow >=0 ) {
     unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
-    //if ( (match == 0x002 )  ) return 0; // shift or fn
-    //if (match < 0x100 ) match = match & ~0x002; // ignore shift key
     for (int i=0; i<sizeof(matkeys)/sizeof(unsigned short); i++) {
       if (match == matkeys[i]) {
         hundred_ms_cnt = 0;    
@@ -497,6 +733,11 @@ int emu_ReadI2CKeyboard(void) {
     }
   }
 #endif
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+  if (!menuOn) {
+    retval = handleOskb(); 
+  }  
+#endif  
   return(retval);
 }
 
@@ -621,35 +862,26 @@ void emu_InitJoysticks(void) {
   gpio_set_dir(4, GPIO_OUT); 
   gpio_set_dir(5, GPIO_OUT); 
   gpio_set_dir(14, GPIO_OUT);
-   
   gpio_put(1, 1);
   gpio_put(2, 1);
   gpio_put(3, 1);
   gpio_put(4, 1);
   gpio_put(5, 1);
   gpio_put(14, 1);
-  
-/*
-  gpio_put(1, 0);
-  gpio_put(2, 0);
-  gpio_put(3, 0);
-  gpio_put(4, 0);
-  gpio_put(5, 0);
-  gpio_put(14, 0);
-  gpio_set_pulls(1,true,true);
-  gpio_set_pulls(2,true,true);
-  gpio_set_pulls(3,true,true);
-  gpio_set_pulls(4,true,true);
-  gpio_set_pulls(5,true,true);
-  gpio_set_pulls(14,true,true);
+  // but set as input floating when not used!
   gpio_set_dir(1, GPIO_IN); 
   gpio_set_dir(2, GPIO_IN); 
   gpio_set_dir(3, GPIO_IN); 
   gpio_set_dir(4, GPIO_IN); 
   gpio_set_dir(5, GPIO_IN); 
-  gpio_set_dir(14, GPIO_IN); 
-*/
-
+  gpio_set_dir(14, GPIO_IN);
+  gpio_disable_pulls(1); 
+  gpio_disable_pulls(2); 
+  gpio_disable_pulls(3); 
+  gpio_disable_pulls(4); 
+  gpio_disable_pulls(5); 
+  gpio_disable_pulls(14);
+  
   // Input pins (cols)
   gpio_init(6);
   gpio_init(9);
@@ -657,18 +889,18 @@ void emu_InitJoysticks(void) {
   gpio_init(8);
   gpio_init(7);
   gpio_init(22);
-  gpio_set_pulls(6,true,false);
   gpio_set_dir(6,GPIO_IN);  
-  gpio_set_pulls(9,true,false);
   gpio_set_dir(9,GPIO_IN);  
-  gpio_set_pulls(15,true,false);
   gpio_set_dir(15,GPIO_IN);  
-  gpio_set_pulls(8,true,false);
   gpio_set_dir(8,GPIO_IN);  
-  gpio_set_pulls(7,true,false);
   gpio_set_dir(7,GPIO_IN);  
-  gpio_set_pulls(22,true,false);
   gpio_set_dir(22,GPIO_IN);  
+  gpio_pull_up(6);
+  gpio_pull_up(9);
+  gpio_pull_up(15);
+  gpio_pull_up(8);
+  gpio_pull_up(7);
+  gpio_pull_up(22);
 #endif
 }
 
@@ -722,6 +954,14 @@ void backgroundMenu(void) {
     tft.drawTextNoDma(0,0, TITLE, RGBVAL16(0x00,0xff,0xff), RGBVAL16(0x00,0x00,0xff), true);           
 }
 
+
+static void menuLeft(void)
+{
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+  toggleOskb(true);  
+#endif
+}
+
 int handleMenu(uint16_t bClick)
 {
   int action = ACTION_NONE;
@@ -741,12 +981,13 @@ int handleMenu(uint16_t bClick)
         strcpy(romspath,newpath);
         curFile = 0;
         nbFiles = readNbFiles(newpath);             
+        menuRedraw=true;
     }
     else
     {
-      action = ACTION_RUNTFT;               
+      action = ACTION_RUNTFT;
+      menuLeft();                     
     }
-    menuRedraw=true;
   }
   else if ( (bClick & MASK_KEY_USER1) ) {
       menuRedraw=true;
@@ -980,6 +1221,11 @@ int emu_LoadFile(char * filename, char * buf, int size)
 ********************************/ 
 void emu_init(void)
 {
+  // Dual display config, initialize TFT
+#if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
+  tft.begin();
+#endif
+
   sd_init_driver(); 
   FRESULT fr = f_mount(&fatfs, "0:", 1);    
 

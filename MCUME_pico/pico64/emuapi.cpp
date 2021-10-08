@@ -210,19 +210,19 @@ static void drawOskb(void)
 //  lineOSKB2(KXOFF,KYOFF+16, (char *)"  A!S@D#F$G%H+J&K*L-EN",  1);
 //  lineOSKB2(KXOFF,KYOFF+32, (char *)"  Z(X)C?V/B\"N<M>.,SP  ", 2);
   if (oskbMap == 0) {
-    lineOSKB(KXOFF,KYOFF, (char *)"qwertyuiop\x1a",  0);
-    lineOSKB(KXOFF,KYOFF, (char *)" asdfghjkl\x19",  1);
-    lineOSKB(KXOFF,KYOFF, (char *)" zxcvbnm.\x10 ",  2);
+    lineOSKB(KXOFF,KYOFF, keylables_map1_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map1_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map1_2,  2);
   }
   else if (oskbMap == 1) {
-    lineOSKB(KXOFF,KYOFF, (char *)"1234567890=",  0);
-    lineOSKB(KXOFF,KYOFF, (char *)" !@#$%+&*- ",  1);
-    lineOSKB(KXOFF,KYOFF, (char *)" ()?/\"<>,: ",  2);
+    lineOSKB(KXOFF,KYOFF, keylables_map2_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map2_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map2_2,  2);
   }
   else {
-    lineOSKB(KXOFF,KYOFF, (char *)"\x11\x12\x13\x14\x15\x16\x17\x18   ",  0);
-    lineOSKB(KXOFF,KYOFF, (char *)"           ",  1);
-    lineOSKB(KXOFF,KYOFF, (char *)"        ;  ",  2);
+    lineOSKB(KXOFF,KYOFF, keylables_map3_0,  0);
+    lineOSKB(KXOFF,KYOFF, keylables_map3_1,  1);
+    lineOSKB(KXOFF,KYOFF, keylables_map3_2,  2);
   }
 }
 
@@ -306,6 +306,7 @@ static int handleOskb(void)
         else {
           retval = key_map3[retval];
         }
+        //if (retval) { toggleOskb(true); updated=false; };
       }
     }
     else {
@@ -495,7 +496,12 @@ int emu_ReadKeys(void)
   unsigned char keymatrixtmp[6];
 
   for (int i=0;i<6;i++){
-    gpio_put(cols[i], 0);  
+    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_put(cols[i], 0);
+#ifdef SWAP_ALT_DEL
+    sleep_us(1);
+    //__asm volatile ("nop\n"); // 4-8ns
+#endif
     row=0; 
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
@@ -506,17 +512,21 @@ int emu_ReadKeys(void)
     row |= (gpio_get(15) ? 0 : 0x08);
     row |= (gpio_get(7) ? 0 : 0x10);
     row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
     keymatrixtmp[i] = row;
   }
 
+#ifdef MULTI_DEBOUNCE
   for (int i=0;i<6;i++){
-//    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 0);
 #ifdef SWAP_ALT_DEL
     sleep_us(1);
     //__asm volatile ("nop\n"); // 4-8ns
-#endif    
+#endif
     row=0; 
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
@@ -527,18 +537,20 @@ int emu_ReadKeys(void)
     row |= (gpio_get(15) ? 0 : 0x08);
     row |= (gpio_get(7) ? 0 : 0x10);
     row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
-//    gpio_set_dir(cols[i], GPIO_IN);   
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
     keymatrixtmp[i] |= row;
   }
 
   for (int i=0;i<6;i++){
-//    gpio_set_dir(cols[i], GPIO_OUT);
+    gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 0);
 #ifdef SWAP_ALT_DEL
     sleep_us(1);
     //__asm volatile ("nop\n"); // 4-8ns
-#endif    
+#endif
     row=0; 
     row |= (gpio_get(9) ? 0 : 0x01);
     row |= (gpio_get(9) ? 0 : 0x01);
@@ -549,11 +561,13 @@ int emu_ReadKeys(void)
     row |= (gpio_get(15) ? 0 : 0x08);
     row |= (gpio_get(7) ? 0 : 0x10);
     row |= (gpio_get(22) ? 0 : 0x20);
+    //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
-//    gpio_set_dir(cols[i], GPIO_IN);   
+    gpio_set_dir(cols[i], GPIO_IN);
+    gpio_disable_pulls(cols[i]); 
     keymatrixtmp[i] |= row;
   }
-
+#endif
   
 #ifdef SWAP_ALT_DEL
   // Swap ALT and DEL  
@@ -848,35 +862,26 @@ void emu_InitJoysticks(void) {
   gpio_set_dir(4, GPIO_OUT); 
   gpio_set_dir(5, GPIO_OUT); 
   gpio_set_dir(14, GPIO_OUT);
-   
   gpio_put(1, 1);
   gpio_put(2, 1);
   gpio_put(3, 1);
   gpio_put(4, 1);
   gpio_put(5, 1);
   gpio_put(14, 1);
-  
-/*
-  gpio_put(1, 0);
-  gpio_put(2, 0);
-  gpio_put(3, 0);
-  gpio_put(4, 0);
-  gpio_put(5, 0);
-  gpio_put(14, 0);
-  gpio_set_pulls(1,true,true);
-  gpio_set_pulls(2,true,true);
-  gpio_set_pulls(3,true,true);
-  gpio_set_pulls(4,true,true);
-  gpio_set_pulls(5,true,true);
-  gpio_set_pulls(14,true,true);
+  // but set as input floating when not used!
   gpio_set_dir(1, GPIO_IN); 
   gpio_set_dir(2, GPIO_IN); 
   gpio_set_dir(3, GPIO_IN); 
   gpio_set_dir(4, GPIO_IN); 
   gpio_set_dir(5, GPIO_IN); 
-  gpio_set_dir(14, GPIO_IN); 
-*/
-
+  gpio_set_dir(14, GPIO_IN);
+  gpio_disable_pulls(1); 
+  gpio_disable_pulls(2); 
+  gpio_disable_pulls(3); 
+  gpio_disable_pulls(4); 
+  gpio_disable_pulls(5); 
+  gpio_disable_pulls(14);
+  
   // Input pins (cols)
   gpio_init(6);
   gpio_init(9);
@@ -884,18 +889,18 @@ void emu_InitJoysticks(void) {
   gpio_init(8);
   gpio_init(7);
   gpio_init(22);
-  gpio_set_pulls(6,true,false);
   gpio_set_dir(6,GPIO_IN);  
-  gpio_set_pulls(9,true,false);
   gpio_set_dir(9,GPIO_IN);  
-  gpio_set_pulls(15,true,false);
   gpio_set_dir(15,GPIO_IN);  
-  gpio_set_pulls(8,true,false);
   gpio_set_dir(8,GPIO_IN);  
-  gpio_set_pulls(7,true,false);
   gpio_set_dir(7,GPIO_IN);  
-  gpio_set_pulls(22,true,false);
   gpio_set_dir(22,GPIO_IN);  
+  gpio_pull_up(6);
+  gpio_pull_up(9);
+  gpio_pull_up(15);
+  gpio_pull_up(8);
+  gpio_pull_up(7);
+  gpio_pull_up(22);
 #endif
 }
 

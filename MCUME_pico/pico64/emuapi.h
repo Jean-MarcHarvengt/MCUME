@@ -28,7 +28,10 @@
 #define ACTION_RUNVGA        130
 
 #ifdef KEYMAP_PRESENT
- 
+   
+#define keylables_map1_0 (char *)"qwertyuiop\x1a"
+#define keylables_map1_1 (char *)" asdfghjkl\x19"
+#define keylables_map1_2 (char *)" zxcvbnm.\x10 "
 const unsigned short key_map1[] = {
   'Q','W','E','R','T','Y','U','I','O','P',157,
   0,'A','S','D','F','G','H','J','K','L',0x0D,
@@ -36,6 +39,9 @@ const unsigned short key_map1[] = {
   145,157,29,17
   };  
 
+#define keylables_map2_0 (char *)"1234567890 "
+#define keylables_map2_1 (char *)" !@#$%+&*- "
+#define keylables_map2_2 (char *)" ()?/\"<>,: "
 const unsigned short key_map2[] = {
   '1','2','3','4','5','6','7','8','9','0',0,
   0, '!','@','#','$','%','+','&','*','-','\/',
@@ -43,6 +49,9 @@ const unsigned short key_map2[] = {
   0,0,0,0
   };  
 
+#define keylables_map3_0 (char *)"\x11\x12\x13\x14\x15\x16\x17\x18   "
+#define keylables_map3_1 (char *)"           "
+#define keylables_map3_2 (char *)"        ;= "
 const unsigned short key_map3[] = {
   133,134,135,136,137,138,139,140,0,0,0, // function keys
   0, 0,0,0,0,0,0,0,0,0,0,
@@ -55,7 +64,7 @@ const unsigned short matkeys[] = {
   0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
   0x520,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
   0x508,0x501,0x502,0x504 }; // cursor keys
- 
+   
 #endif
 
 

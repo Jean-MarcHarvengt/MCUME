@@ -25,12 +25,6 @@ extern void mainloop(void);
 /****************************************************************************
 * Exported procedures
 ****************************************************************************/
-void emu_KeyboardOnDown(int keymodifer, int key) {
-}
-
-void emu_KeyboardOnUp(int keymodifer, int key) {
-}
-
 void vcs_Init(void)
 {
   init_machine();	

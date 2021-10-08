@@ -32,8 +32,10 @@
 
 
 #ifdef KEYMAP_PRESENT
-#ifdef PICOMPUTER
    
+#define keylables_map1_0 (char *)"           "
+#define keylables_map1_1 (char *)"           "
+#define keylables_map1_2 (char *)"           "
 const unsigned short key_map1[] = {
   15+1,14+1,13+1,11+1,10+1,9+1,7+1,6+1,5+1,2+1,0,
   0,12+1,8+1,4+1,0+1,1+1,3+1,0,0,0,0,
@@ -47,6 +49,9 @@ const unsigned short key_map1[] = {
 // [PAUSE] 8  [ 6 ] 9  [ 5 ] 10 [ 4 ] 11
 // [START] 12 [ 3 ] 13 [ 2 ] 14 [ 1 ] 15
 
+#define keylables_map2_0 (char *)"           "
+#define keylables_map2_1 (char *)"           "
+#define keylables_map2_2 (char *)"           "
 const unsigned short key_map2[] = {
   0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,
@@ -54,6 +59,9 @@ const unsigned short key_map2[] = {
   0,0,0,0
   };  
 
+#define keylables_map3_0 (char *)"           "
+#define keylables_map3_1 (char *)"           "
+#define keylables_map3_2 (char *)"           "
 const unsigned short key_map3[] = {
   0,0,0,0,0,0,0,0,0,0,0, // function keys
   0, 0,0,0,0,0,0,0,0,0,0,
@@ -67,7 +75,6 @@ const unsigned short matkeys[] = {
   0x520,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
   0x508,0x501,0x502,0x504 }; // cursor keys
  
-#endif
 #endif
 
 
@@ -86,7 +93,7 @@ const unsigned short matkeys[] = {
 #define MASK_JOY1_DOWN  0x0800
 #define MASK_JOY1_BTN   0x1000
 #define MASK_KEY_USER4  0x2000
-
+#define MASK_OSKB       0x8000
 
 
 extern void emu_init(void);
