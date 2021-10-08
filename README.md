@@ -4,6 +4,11 @@
 </p>
 
 # News
+October 2021: yet more PICO platforms improvements<br>
+- MCUME_REV2 has now dual screen support (TFT+VGA binaries where TFT can be used for keyboard control, or VGA only binaries wo keyboard control)
+- Fix keyboard scan for PICOMPUTERMAX (C64,ZX81,ZX Spectrum and Atari800 have now usable keyboard for basic program typing)
+<br>
+
 September 2021: More PICO platforms improvements<br>
 - MCUME_REV2 has now digital inputs for UP/DOWN/LEFT/RIGHT so external C64 joystick can be connected (VGA & TFT binaries)
 - PICOMPUTERMAX now supporting ALT and FN(long press on ALT) so more C64 keys can be mapped (FN for Function keys for e.g.)
