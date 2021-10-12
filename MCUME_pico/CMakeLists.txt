@@ -19,6 +19,7 @@ add_subdirectory(FatFs_SPI build)
 include_directories(config)
 include_directories(vga_t4)
 include_directories(tft_t)
+include_directories(psram)
 
 
 set(PICO81_SOURCES 
@@ -193,6 +194,19 @@ set(PICONOFRENDO_SOURCES
 		piconofrendo/AudioPlaySystem.cpp
 	)
 
+set(PICO8086_SOURCES 
+		pico8086/cpu.cpp 
+		pico8086/disk.cpp
+		pico8086/network.cpp
+		pico8086/ports.cpp
+		pico8086/i8253.cpp
+		pico8086/i8259.cpp
+		pico8086/pc.cpp
+		pico8086/emuapi.cpp
+		pico8086/pico8086.cpp
+		pico8086/AudioPlaySystem.cpp
+	)
+
 set(PICOSND_SOURCES 
 #		picosnd/LibFC14/Dump.cpp
 #		picosnd/LibFC14/FC_Data.cpp
@@ -220,6 +234,10 @@ set(VGA_T4_SOURCES
 		vga_t4/scanvideo.c
 	)
 
+set(PSRAM_SOURCES 
+		psram/psram_t.cpp
+	)
+
 set(TFT_T_SOURCES 
 		tft_t/tft_t_dma.cpp
 	)
@@ -242,6 +260,11 @@ set(TESTTFT_SOURCES
 		testtft/emuapi.cpp
 	)
 
+set(TESTPSRAM_SOURCES 
+		testpsram/testpsram.cpp
+		testpsram/emuapi.cpp
+	)
+
 #add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
@@ -249,6 +272,7 @@ add_executable(mcume
 #		${PICO81_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
+#		${PICO8086_SOURCES}
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
@@ -258,6 +282,8 @@ add_executable(mcume
 #		${TESTIO_SOURCES}
 #		${TESTVGA_SOURCES}
 #		${TESTTFT_SOURCES}
+#		${TESTPSRAM_SOURCES}
+		${PSRAM_SOURCES}
 		${VGA_T4_SOURCES}
 		${TFT_T_SOURCES}
 	)

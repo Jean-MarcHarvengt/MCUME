@@ -93,6 +93,14 @@
 #define SD_CS           13
 #define SD_DETECT       255 // 22
 
+// PSRAM (exclusive with TFT)
+#define PSRAM_SPIREG    spi0
+#define PSRAM_SCLK      18
+#define PSRAM_MOSI      19
+#define PSRAM_MISO      16 // DC
+#define PSRAM_CS        17
+
+
 #ifdef PICOMPUTER
 // Keyboard matrix 
 //Cols (out)

@@ -37,10 +37,11 @@
 #endif
 
 #ifdef MCUME_REV2
+//#define HAS_PSRAM      1
 #define USE_VGA        1
 //#define ILI9341        1
-#define ST7789         1
-#define ST7789_POL     1
+//#define ST7789         1
+//#define ST7789_POL     1
 #define INVX           1
 #define HAS_SND        1
 #endif
