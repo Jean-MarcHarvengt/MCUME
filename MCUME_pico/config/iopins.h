@@ -69,17 +69,19 @@
 #define TFT_MOSI        19
 #define TFT_MISO        255 // Not required, used for DC... 
 #define TFT_DC          16
-#define TFT_RST         21
 #ifdef PICOMPUTER
 #ifdef PICOMPUTERMAX
-#define TFT_CS          17
+#define TFT_RST         255
+#define TFT_CS          21
 #define TFT_BACKLIGHT   20
 #else
+#define TFT_RST         21
 #define TFT_CS          255
 #define TFT_BACKLIGHT   20
 #endif
 #else
 // MCUME_REV2 (ILI)
+#define TFT_RST         21
 #define TFT_CS          17
 #define TFT_BACKLIGHT   255 // hardwired to 3.3v
 #endif
