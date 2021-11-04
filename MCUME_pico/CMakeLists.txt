@@ -69,6 +69,22 @@ set(PICO5200_SOURCES
 		pico5200/pico5200.cpp
 	)
 
+set(PICO20_SOURCES 
+		pico20/IC.cpp
+#		pico20/MOS6502.cpp
+#		pico20/Register8.cpp
+#		pico20/Register16.cpp
+#		pico20/cpu.cpp
+#		pico20/cpu.c
+		pico20/mos6502.cpp
+		pico20/MOS6522.cpp
+		pico20/MOS6561.cpp
+		pico20/v20.cpp
+		pico20/emuapi.cpp
+		pico20/AudioPlaySystem.cpp
+		pico20/pico20.cpp
+	)
+
 set(PICO64_SOURCES 
 		pico64/c64.cpp 
 		pico64/cia1.cpp
@@ -268,7 +284,8 @@ set(TESTPSRAM_SOURCES
 #add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
-		${PICO64_SOURCES}
+		${PICO20_SOURCES}
+#		${PICO64_SOURCES}
 #		${PICO81_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
