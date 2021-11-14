@@ -1,0 +1,277 @@
+
+; ============================================================================
+;                  VGA output - base layer (15 instructions)
+; ============================================================================
+; Control word of "dark" command (left shift):
+;  - bit 0..7 (8 bits) output color (set to 0 if not used)
+;  - bit 8..26 (19 bits) loop counter N
+;  - bit 27..31 (5 bits) jump address
+; Control word of other commands (left shift):
+;  - bit 0..27 (27 bits) loop counter N
+;  - bit 27..31 (5 bits) jump address
+; Clocks per pixel: minimum 2, maximum 17.
+
+.program vga
+.side_set 1 ; SYNC output (no opt, wait can be max. 15)
+.origin 17  ; must load at offset 17 (BASE_OFF)
+
+; ===== [3 instructions] SYNC pulse, N=delay in clock cycles - 3
+
+public sync:
+    out x,27        side 1      ; [1] get length of SYNC pulse - 3, start of SYNC pulse
+sync_loop:
+    jmp x--,sync_loop   side 1      ; [N+1] loop
+public entry:
+    out pc,5        side 1      ; [1] get next control word and jump to function
+
+; ===== [4 instructions] DARK (or color) pulse, N=delay in clock cycles - 4
+; Sets color output at time +1
+
+public dark:
+    out x,19        side 0      ; [1] get length of delay pulse - 4, start of delay pulse
+    out pins,8      side 0      ; [1] dark output (or color)
+dark_loop:
+    jmp x--,dark_loop   side 0      ; [N+1] loop
+    out pc,5        side 0      ; [1] get next control word and jump to function
+
+; ===== [4 instructions] layer synchronisation (delay 9 clock cycles)
+; Output first pixel at time +9 after IRQ
+
+public irqset:
+    irq clear 4     side 0      ; [1] clear IRQ4 flag
+    out null,27     side 0      ; [1] destroy command parameter
+    irq set 4       side 0  [5] ; [6] set IRQ flag
+.wrap_target
+    out pc,5        side 0      ; [1] get next control word and jump to function
+
+; ===== [4 instructions] output pixels at CPP clock, N=number of pixels-2 (number of pixels must be multiple of 4)
+; Output first pixel at time +1
+; Missing 2 clock cycles after last pixel
+
+public output:
+    out x,27        side 0      ; [1] get number of pixels-2
+output_loop:
+public extra1:
+    out pins,8      side 0  [0] ; [1+CPP-2] output pixels (set extra wait CPP-2)
+    jmp x--,output_loop side 0      ; [1] loop
+public extra2:
+    out pins,8      side 0  [0] ; [1+CPP-2] output pixels (set extra wait CPP-2)
+    ; missing 1 extra clock cycles - add it to front porch
+    ; wrap jump to instruction out pc,5
+.wrap
+
+; ============================================================================
+;              VGA output - layer with key color (13 instructions)
+; ============================================================================
+; Control word (left shift):
+;  - bit 0..10 (11 bits) number of pixels - 1 (number of pixels must be multiple of 4)
+;  - bit 11..18 (8 bits) key color
+;  - bit 19..31 (13 bits) start delay D = clock cycles - 7 between irq and first pixel
+; Clocks per pixel: minimum 6, maximum 37.
+
+.program keylayer
+.origin 0   ; must load at offset 0 (LAYER_OFF)
+
+    ; idle wait
+.wrap_target
+public idle:
+    pull    block               ; [1] idle wait
+
+public entry:
+    wait    0 irq 4             ; [1] wait for IRQ sync goes 0
+    out x,13                ; [1] get length of delay - 7
+layer_wait:
+    jmp x--,layer_wait          ; [1] delay loop
+    out y,8             ; [1] get key color
+    out x,11                ; [1] get number of pixels-1
+layer_loop:
+    mov isr,x               ; [1] save pixel counter into ISR
+    out x,8             ; [1] get output pixel
+    jmp x!=y,layer_2            ; [1] jump if pixel is not transparent
+    jmp layer_3             ; [1] jump to end of loop
+layer_2:
+    mov pins,x              ; [1] output pixel to pins
+layer_3:
+public extra1:
+    mov x,isr           [0] ; [1+CPP-6] return pixel counter (set extra wait CPP-6)
+    jmp x--,layer_loop          ; [1] loop next pixel
+    ; wrap jump to idle
+.wrap
+
+; ============================================================================
+;              VGA output - layer with black key color (11 instructions)
+; ============================================================================
+; Control word (left shift):
+;  - bit 0..15 (16 bits) number of pixels - 1 (number of pixels must be multiple of 4)
+;  - bit 16..31 (16 bits) start delay D = clock cycles - 5 between irq and first pixel
+; Cannot display black pixel (it is used as transparency)
+; Clocks per pixel: minimum 4, maximum 34.
+
+.program blacklayer
+.origin 0   ; must load at offset 0 (LAYER_OFF)
+
+    ; idle wait
+.wrap_target
+public idle:
+    pull    block               ; [1] idle wait
+
+public entry:
+    wait    0 irq 4             ; [1] wait for IRQ sync goes 0
+    out x,16                ; [1] get length of delay - 5
+layer_wait:
+    jmp x--,layer_wait          ; [1] delay loop
+    out x,16                ; [1] get number of pixels-1
+layer_loop:
+    out y,8             ; [1] get output pixel
+    jmp !y,layer_2          ; [1] jump if pixel is transparent (color = 0)
+    mov pins,y              ; [1] output pixel to pins
+public extra1:
+    jmp x--,layer_loop      [0] ; [1+CPP-4] loop next pixel (set extra wait CPP-4)
+    jmp idle                ; [1] go idle
+layer_2:
+public extra2:
+    jmp x--,layer_loop      [0] ; [1+CPP-3] loop next pixel (set extra wait CPP-3)
+    ; wrap jump to idle
+.wrap
+
+; ============================================================================
+;        VGA output - layer with white key color (10 instructions)
+; ============================================================================
+; Control word (left shift):
+;  - bit 0..15 (16 bits) number of pixels - 1 (number of pixels must be multiple of 4)
+;  - bit 16..31 (16 bits) start delay D = clock cycles - 5 between irq and first pixel
+; Cannot display white pixel (it is used as transparency). Source pixels must be incremented + 1.
+; Clocks per pixel: minimum 4, maximum 35.
+
+.program whitelayer
+.origin 0   ; must load at offset 0 (LAYER_OFF)
+
+    ; idle wait
+.wrap_target
+public idle:
+    pull    block               ; [1] idle wait
+
+public entry:
+    wait    0 irq 4             ; [1] wait for IRQ sync goes 0
+    out x,16                ; [1] get length of delay - 7
+layer_wait:
+    jmp x--,layer_wait          ; [1] delay loop
+    out x,16                ; [1] get number of pixels-1
+layer_loop:
+    out y,8             ; [1] get output pixel
+    jmp y--,layer_2         ; [1] jump if pixel is not transparent (color != 0)
+    jmp layer_3             ; [1] jump to end of loop
+layer_2:
+    mov pins,y              ; [1] output pixel to pins
+public extra1:
+layer_3:
+    jmp x--,layer_loop      [0] ; [1+CPP-4] loop next pixel (set extra wait CPP-4)
+    ; wrap jump to idle
+.wrap
+
+; ============================================================================
+;       VGA output - layer with mono or color pattern (16 instructions)
+; ============================================================================
+; Control word (left shift):
+;  - bit 0 (1 bit) flag 0=use color opaque mode, 1=use mono transparent mode
+;  - bit 1..11 (11 bits) number of pixels - 1 (number of pixels must be multiple of 32 in mono, or 4 in color)
+;  - bit 12..19 (8 bits) key color
+;  - bit 20..31 (12 bits) start delay D = clock cycles - 8 between irq and first mono pixel, or 6 for color pixel
+; Mono, clocks per pixel: minimum 4, maximum 35.
+; Color, clocks per pixel: minimum 2, maximum 33.
+
+.program monolayer
+.origin 0   ; must load at offset 0 (LAYER_OFF)
+
+.wrap_target
+public idle:
+    pull    block               ; [1] idle wait
+
+public entry:
+    wait    0 irq 4             ; [1] wait for IRQ sync goes 0
+    out x,12                ; [1] get length of delay - 8 (or 6 in color)
+layer_wait:
+    jmp x--,layer_wait          ; [1] delay loop
+    out isr,8               ; [1] get key color
+    out y,11                ; [1] get number of pixels-1
+    out x,1             ; [1] get mode flag
+    jmp !x,layer_color          ; [1] 0=use color mode
+layer_loop:
+    out x,1             ; [1] get one bit
+    jmp !x,layer_out            ; [1] bit=0, output pixel
+    jmp layer_skip          ; [1] jump to end of loop
+layer_out:
+    mov pins,isr            ; [1] output pixel
+layer_skip:
+public extra1:
+    jmp y--,layer_loop      [0] ; [1+CPP-4] loop next pixel (set extra wait CPP-4)
+    jmp idle
+
+layer_color:
+    out pins,8
+public extra2:
+    jmp y--,layer_color     [0] ; [1+CPP-2] loop next pixel (set extra wait CPP-2)
+    ; wrap jump to idle
+.wrap
+
+; ============================================================================
+;              VGA output - layer with RLE compression (17 instructions)
+; ============================================================================
+; Input is left shifted with byte-swap (lower byte comes first)
+; Requires 3 clock cycles per pixel.
+; Clocks per pixel: minimum 3, maximum 32.
+
+.program rlelayer
+.origin 0   ; must load at offset 0 (LAYER_OFF)
+
+    ; [1 instruction] idle wait (tokens: {8} ignored, {8} 'idle' command)
+public idle:
+    out pc,8                ; [1] idle wait
+
+    ; [4 instructions] start
+public entry:
+    wait    0 irq 4             ; [1] wait for IRQ sync goes 0
+    out x,32            [2] ; [3] get length of delay - 7
+entry_wait:
+    jmp x--,entry_wait          ; [1] delay
+    jmp raw_next            ; [1]
+
+    ; [1 instruction] skip N+2 (2..257) pixels (tokens: {8} N = number of pixels - 2, {8} 'skip' command)
+public skip:
+public extra1:
+    jmp x--,skip        [0] ; [1+CPP-1] wait (set extra wait CPP-1)
+
+    ; [1 instruction] skip 1 pixel (tokens: {8} ignored, {8} 'skip1' command)
+public skip1:
+public extra2:
+    jmp raw_next        [0] ; [1+CPP-3] jump (set extra wait CPP-3)
+
+    ; [4 instructions] repeat N+3 (3..258) pixels (tokens: {8} pixel to repeat, {8} 'run' command, {8} N = number of pixels - 3)
+public run:
+public extra3:
+    mov pins,x          [0] ; [1+CPP-2] output pixel (set extra wait CPP-2)
+    out y,8             ; [1] get counter N
+run_loop:
+public extra4:
+    mov pins,x          [0] ; [1+CPP-2] output pixel (set extra wait CPP-2)
+    jmp y--,run_loop            ; [1] next pixel
+
+    ; [1 instruction] output 1 RAW pixel (tokens: {8} pixel, {8} 'raw1' command)
+public raw1:
+public extra5:
+    mov pins,x          [0] ; [1+CPP-3] output pixel (set extra wait CPP-3)
+.wrap_target
+raw_next:
+    out x,8             ; [1] get counter N
+    out pc,8                ; [1] jump
+
+    ; [5 instructions] output N+2 (2..257) RAW pixels (tokens: {8} N = number of pixels - 2, {8} 'raw' command, {(N+2)*8} pixels)
+public raw: ; 14:
+raw_loop:
+public extra6:
+    out pins,8          [0] ; [1+CPP-2] output pixel (set extra wait CPP-2)
+    jmp x--,raw_loop            ; [1] loop next pixel
+public extra7:
+    out pins,8          [0] ; [1+CPP-3] output pixel (set extra wait CPP-3)
+    ; wrap jump to raw_next
+.wrap

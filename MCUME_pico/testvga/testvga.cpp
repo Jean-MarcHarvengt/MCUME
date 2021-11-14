@@ -26,11 +26,13 @@ int main(void) {
 //    set_sys_clock_khz(133000, true);    
 //    set_sys_clock_khz(200000, true);    
 //    set_sys_clock_khz(225000, true);    
-    set_sys_clock_khz(250000, true);    
+    set_sys_clock_khz(252000, true);    
+
 
     stdio_init_all();
 
     printf("start\n");   
+
 //    vga.begin(VGA_MODE_400x240);
     vga.begin(VGA_MODE_320x240);
     //tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
@@ -41,17 +43,18 @@ int main(void) {
 	vga.drawText((fb_width-320)/2,(fb_height-200)/2+3*8," 64K RAM SYSTEM  38911 BASIC BYTES FREE ",LIGHT_BLUE,BLUE,false);
 	vga.drawText((fb_width-320)/2,(fb_height-200)/2+5*8,"READY.",LIGHT_BLUE,BLUE,false);
 
+	uint newclock = clock_get_hz(clk_sys)/1000000;
+	
     char buf[4] = {32,32,32,0};
-	uint sys_clk = clock_get_hz(clk_sys)/1000000;
-	uint r1 = sys_clk/100;
-	uint r = sys_clk - r1*100;
+	uint r1 = newclock/100;
+	uint r = newclock - r1*100;
 	uint r2 = r/10;
-	r = sys_clk - r1*100 - r2*10;
+	r = newclock - r1*100 - r2*10;
 	uint r3 = r;
 	buf[0] = digits[r1];
 	buf[1] = digits[r2];
 	buf[2] = digits[r3];
-	vga.drawText(4*8,0,buf,BLUE,LIGHT_BLUE,false);
+	vga.drawText(4*8,8,buf,BLUE,LIGHT_BLUE,false);
 
 
     while (true) {

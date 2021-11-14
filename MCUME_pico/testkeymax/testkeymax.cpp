@@ -2,18 +2,19 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 
+extern "C" {
+  #include "iopins.h"  
+  #include "emuapi.h"  
+}
+
 #ifdef USE_VGA
 #include "vga_t_dma.h"
 #else
 #include "tft_t_dma.h"
 #endif
 
-extern "C" {
-  #include "iopins.h"  
-  #include "emuapi.h"  
-}
-
 TFT_T_DMA tft;
+
 
 #define BLUE       RGBVAL16(0, 0, 170)
 #define LIGHT_BLUE RGBVAL16(0, 136, 255)
@@ -48,12 +49,16 @@ int main(void) {
 //    set_sys_clock_khz(133000, true);    
 //    set_sys_clock_khz(200000, true);    
 //    set_sys_clock_khz(225000, true);    
-    set_sys_clock_khz(250000, true);    
-
+    set_sys_clock_khz(250000, true);
     stdio_init_all();
 
     printf("start\n"); 
-    tft.begin();  
+#ifdef USE_VGA    
+//    tft.begin(VGA_MODE_400x240);
+    tft.begin(VGA_MODE_320x240);
+#else
+    tft.begin();
+#endif  
     emu_init();
     emu_start();
 	//tft.startDMA();
@@ -61,6 +66,8 @@ int main(void) {
     add_repeating_timer_ms(20, repeating_timer_callback, NULL, &timer);      
     
 	tft.fillScreenNoDma(LIGHT_BLUE);
+
+
 	tft.get_frame_buffer_size(&fb_width, &fb_height);
 	tft.drawRectNoDma((fb_width-320)/2,(fb_height-200)/2, 320,200, BLUE);
 	//tft.drawTextNoDma((fb_width-320)/2,(fb_height-200)/2+1*8,"    **** COMMODORE 64 BASIC V2 ****     ",LIGHT_BLUE,BLUE,false);
@@ -77,7 +84,7 @@ int main(void) {
 	buf[0] = digits[r1];
 	buf[1] = digits[r2];
 	buf[2] = digits[r3];
-	tft.drawTextNoDma(0,0,buf,BLUE,LIGHT_BLUE,false);
+	tft.drawTextNoDma(8,8,buf,BLUE,LIGHT_BLUE,false);
 
     while (true) {
         uint16_t bClick = emu_GetPad();

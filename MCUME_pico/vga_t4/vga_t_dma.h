@@ -42,7 +42,8 @@ class TFT_T_DMA: public VGA_T4
     // fake DMA functions
     void startDMA(void) { };
     void stopDMA(void) { };
-    
+    void flipscreen(bool flip) { };
+
     // fake no DMA functions
     void writeScreenNoDma(const vga_pixel *pcolors) { writeScreen(pcolors); }
     void fillScreenNoDma(vga_pixel color) { clear(color); }

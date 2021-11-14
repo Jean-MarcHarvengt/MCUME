@@ -51,16 +51,24 @@
 
 #else
 
+#if (defined(PICOMPUTER) && defined(USE_VGA) )   
 // Speaker
-#define AUDIO_PIN       0 //28
-
+#define AUDIO_PIN       9
 // VGA
-/*
-2-9 RRRGGGBB
-10-11 VSYNC and HSYNC
-*/
+/* RRRGGGBB
+   CSYNC */
+#define VGA_COLORBASE   0
+#define VGA_SYNCBASE    8
+#else
+// Speaker
+#define AUDIO_PIN       0
+// VGA
+/* RRRGGGBB
+   VSYNC and HSYNC */
 #define VGA_COLORBASE   2
 #define VGA_SYNCBASE    14
+#endif
+
 
 // TFT
 #define TFT_SPIREG      spi0
@@ -104,11 +112,40 @@
 
 
 #ifdef PICOMPUTER
+#if defined(USE_VGA)  
 // Keyboard matrix 
 //Cols (out)
-//1,2,3,4,5,14
+#define KCOLOUT1        20
+#define KCOLOUT2        21
+#define KCOLOUT3        22
+#define KCOLOUT4        26
+#define KCOLOUT5        27
+#define KCOLOUT6        28
 //Rows (in)
-//6,9,15,8,7,22
+#define KROWIN1         14
+#define KROWIN2         15
+#define KROWIN3         16
+#define KROWIN4         17
+#define KROWIN5         18
+#define KROWIN6         19
+#else
+// Keyboard matrix 
+//Cols (out)
+#define KCOLOUT1        1
+#define KCOLOUT2        2
+#define KCOLOUT3        3
+#define KCOLOUT4        4
+#define KCOLOUT5        5
+#define KCOLOUT6        14
+//Rows (in)
+#define KROWIN1         6
+#define KROWIN2         9
+#define KROWIN3         15
+#define KROWIN4         8
+#define KROWIN5         7
+#define KROWIN6         22
+#endif
+
 #define KLED            25
 
 #else

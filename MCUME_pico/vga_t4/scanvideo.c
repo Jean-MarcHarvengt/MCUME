@@ -437,8 +437,8 @@ static bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scan
     __mem_fence_release();
 
     uint pin_mask = 3u << PICO_SCANVIDEO_SYNC_PIN_BASE;
-    bi_decl_if_func_used(bi_2pins_with_names(PICO_SCANVIDEO_SYNC_PIN_BASE, "HSync",
-                                               PICO_SCANVIDEO_SYNC_PIN_BASE + 1, "VSync"));
+    //bi_decl_if_func_used(bi_2pins_with_names(PICO_SCANVIDEO_SYNC_PIN_BASE, "HSync",
+    //                                           PICO_SCANVIDEO_SYNC_PIN_BASE + 1, "VSync"));
     static_assert(PICO_SCANVIDEO_PIXEL_RSHIFT + PICO_SCANVIDEO_PIXEL_RCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "red bits do not fit in color pins");
     static_assert(PICO_SCANVIDEO_PIXEL_GSHIFT + PICO_SCANVIDEO_PIXEL_GCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "green bits do not fit in color pins");
     static_assert(PICO_SCANVIDEO_PIXEL_BSHIFT + PICO_SCANVIDEO_PIXEL_BCOUNT <= PICO_SCANVIDEO_COLOR_PIN_COUNT, "blue bits do not fit in color pins");
@@ -448,9 +448,9 @@ static bool scanvideo_setup_with_timing(const scanvideo_mode_t *mode, const scan
     pin_mask |= RMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_RSHIFT);
     pin_mask |= GMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_GSHIFT);
     pin_mask |= BMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_BSHIFT);
-    bi_decl_if_func_used(bi_pin_mask_with_name(RMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_RSHIFT), RMASK == 1 ? "Red" : ("Red 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_GCOUNT))));
-    bi_decl_if_func_used(bi_pin_mask_with_name(GMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_GSHIFT), GMASK == 1 ? "Green" : ("Green 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_GCOUNT))));
-    bi_decl_if_func_used(bi_pin_mask_with_name(BMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_BSHIFT), BMASK == 1 ? "Blue" : ("Blue 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_BCOUNT))));
+    //bi_decl_if_func_used(bi_pin_mask_with_name(RMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_RSHIFT), RMASK == 1 ? "Red" : ("Red 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_GCOUNT))));
+    //bi_decl_if_func_used(bi_pin_mask_with_name(GMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_GSHIFT), GMASK == 1 ? "Green" : ("Green 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_GCOUNT))));
+    //bi_decl_if_func_used(bi_pin_mask_with_name(BMASK << (PICO_SCANVIDEO_COLOR_PIN_BASE + PICO_SCANVIDEO_PIXEL_BSHIFT), BMASK == 1 ? "Blue" : ("Blue 0-" __XSTRING(PICO_SCANVIDEO_PIXEL_BCOUNT))));
 
     for(uint8_t i = 0; pin_mask; i++, pin_mask>>=1u) {
         if (pin_mask & 1) gpio_set_function(i, GPIO_FUNC_PIO0);

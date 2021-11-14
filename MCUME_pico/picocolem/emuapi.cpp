@@ -306,7 +306,7 @@ static int handleOskb(void)
         else {
           retval = key_map3[retval];
         }
-        if (retval) { toggleOskb(true); updated=false; };
+        //if (retval) { toggleOskb(true); updated=false; };
       }
     }
     else {
@@ -492,7 +492,7 @@ int emu_ReadKeys(void)
 #ifdef PICOMPUTER
   keymatrix_hitrow = -1;
   unsigned char row;
-  unsigned short cols[6]={1,2,3,4,5,14};
+  unsigned short cols[6]={KCOLOUT1,KCOLOUT2,KCOLOUT3,KCOLOUT4,KCOLOUT5,KCOLOUT6};
   unsigned char keymatrixtmp[6];
 
   for (int i=0;i<6;i++){
@@ -503,15 +503,15 @@ int emu_ReadKeys(void)
     //__asm volatile ("nop\n"); // 4-8ns
 #endif
     row=0; 
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(8) ? 0 : 0x02);
-    row |= (gpio_get(6) ? 0 : 0x04);
-    row |= (gpio_get(15) ? 0 : 0x08);
-    row |= (gpio_get(7) ? 0 : 0x10);
-    row |= (gpio_get(22) ? 0 : 0x20);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN4) ? 0 : 0x02);
+    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
+    row |= (gpio_get(KROWIN3) ? 0 : 0x08);
+    row |= (gpio_get(KROWIN5) ? 0 : 0x10);
+    row |= (gpio_get(KROWIN6) ? 0 : 0x20);
     //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
     gpio_set_dir(cols[i], GPIO_IN);
@@ -528,15 +528,15 @@ int emu_ReadKeys(void)
     //__asm volatile ("nop\n"); // 4-8ns
 #endif
     row=0; 
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(8) ? 0 : 0x02);
-    row |= (gpio_get(6) ? 0 : 0x04);
-    row |= (gpio_get(15) ? 0 : 0x08);
-    row |= (gpio_get(7) ? 0 : 0x10);
-    row |= (gpio_get(22) ? 0 : 0x20);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN4) ? 0 : 0x02);
+    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
+    row |= (gpio_get(KROWIN3) ? 0 : 0x08);
+    row |= (gpio_get(KROWIN5) ? 0 : 0x10);
+    row |= (gpio_get(KROWIN6) ? 0 : 0x20);
     //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
     gpio_set_dir(cols[i], GPIO_IN);
@@ -552,15 +552,15 @@ int emu_ReadKeys(void)
     //__asm volatile ("nop\n"); // 4-8ns
 #endif
     row=0; 
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(9) ? 0 : 0x01);
-    row |= (gpio_get(8) ? 0 : 0x02);
-    row |= (gpio_get(6) ? 0 : 0x04);
-    row |= (gpio_get(15) ? 0 : 0x08);
-    row |= (gpio_get(7) ? 0 : 0x10);
-    row |= (gpio_get(22) ? 0 : 0x20);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
+    row |= (gpio_get(KROWIN4) ? 0 : 0x02);
+    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
+    row |= (gpio_get(KROWIN3) ? 0 : 0x08);
+    row |= (gpio_get(KROWIN5) ? 0 : 0x10);
+    row |= (gpio_get(KROWIN6) ? 0 : 0x20);
     //gpio_set_dir(cols[i], GPIO_OUT);
     gpio_put(cols[i], 1);
     gpio_set_dir(cols[i], GPIO_IN);
@@ -850,57 +850,57 @@ void emu_InitJoysticks(void) {
   gpio_put(KLED, 1);
 
   // Output (rows)
-  gpio_init(1);
-  gpio_init(2);
-  gpio_init(3);
-  gpio_init(4);
-  gpio_init(5);
-  gpio_init(14);
-  gpio_set_dir(1, GPIO_OUT); 
-  gpio_set_dir(2, GPIO_OUT); 
-  gpio_set_dir(3, GPIO_OUT); 
-  gpio_set_dir(4, GPIO_OUT); 
-  gpio_set_dir(5, GPIO_OUT); 
-  gpio_set_dir(14, GPIO_OUT);
-  gpio_put(1, 1);
-  gpio_put(2, 1);
-  gpio_put(3, 1);
-  gpio_put(4, 1);
-  gpio_put(5, 1);
-  gpio_put(14, 1);
+  gpio_init(KCOLOUT1);
+  gpio_init(KCOLOUT2);
+  gpio_init(KCOLOUT3);
+  gpio_init(KCOLOUT4);
+  gpio_init(KCOLOUT5);
+  gpio_init(KCOLOUT6);
+  gpio_set_dir(KCOLOUT1, GPIO_OUT); 
+  gpio_set_dir(KCOLOUT2, GPIO_OUT); 
+  gpio_set_dir(KCOLOUT3, GPIO_OUT); 
+  gpio_set_dir(KCOLOUT4, GPIO_OUT); 
+  gpio_set_dir(KCOLOUT5, GPIO_OUT); 
+  gpio_set_dir(KCOLOUT6, GPIO_OUT);
+  gpio_put(KCOLOUT1, 1);
+  gpio_put(KCOLOUT2, 1);
+  gpio_put(KCOLOUT3, 1);
+  gpio_put(KCOLOUT4, 1);
+  gpio_put(KCOLOUT5, 1);
+  gpio_put(KCOLOUT6, 1);
   // but set as input floating when not used!
-  gpio_set_dir(1, GPIO_IN); 
-  gpio_set_dir(2, GPIO_IN); 
-  gpio_set_dir(3, GPIO_IN); 
-  gpio_set_dir(4, GPIO_IN); 
-  gpio_set_dir(5, GPIO_IN); 
-  gpio_set_dir(14, GPIO_IN);
-  gpio_disable_pulls(1); 
-  gpio_disable_pulls(2); 
-  gpio_disable_pulls(3); 
-  gpio_disable_pulls(4); 
-  gpio_disable_pulls(5); 
-  gpio_disable_pulls(14);
+  gpio_set_dir(KCOLOUT1, GPIO_IN); 
+  gpio_set_dir(KCOLOUT2, GPIO_IN); 
+  gpio_set_dir(KCOLOUT3, GPIO_IN); 
+  gpio_set_dir(KCOLOUT4, GPIO_IN); 
+  gpio_set_dir(KCOLOUT5, GPIO_IN); 
+  gpio_set_dir(KCOLOUT6, GPIO_IN);
+  gpio_disable_pulls(KCOLOUT1); 
+  gpio_disable_pulls(KCOLOUT2); 
+  gpio_disable_pulls(KCOLOUT3); 
+  gpio_disable_pulls(KCOLOUT4); 
+  gpio_disable_pulls(KCOLOUT5); 
+  gpio_disable_pulls(KCOLOUT6);
   
   // Input pins (cols)
-  gpio_init(6);
-  gpio_init(9);
-  gpio_init(15);
-  gpio_init(8);
-  gpio_init(7);
-  gpio_init(22);
-  gpio_set_dir(6,GPIO_IN);  
-  gpio_set_dir(9,GPIO_IN);  
-  gpio_set_dir(15,GPIO_IN);  
-  gpio_set_dir(8,GPIO_IN);  
-  gpio_set_dir(7,GPIO_IN);  
-  gpio_set_dir(22,GPIO_IN);  
-  gpio_pull_up(6);
-  gpio_pull_up(9);
-  gpio_pull_up(15);
-  gpio_pull_up(8);
-  gpio_pull_up(7);
-  gpio_pull_up(22);
+  gpio_init(KROWIN1);
+  gpio_init(KROWIN2);
+  gpio_init(KROWIN3);
+  gpio_init(KROWIN4);
+  gpio_init(KROWIN5);
+  gpio_init(KROWIN6);
+  gpio_set_dir(KROWIN1,GPIO_IN);  
+  gpio_set_dir(KROWIN2,GPIO_IN);  
+  gpio_set_dir(KROWIN3,GPIO_IN);  
+  gpio_set_dir(KROWIN4,GPIO_IN);  
+  gpio_set_dir(KROWIN5,GPIO_IN);  
+  gpio_set_dir(KROWIN6,GPIO_IN);  
+  gpio_pull_up(KROWIN1);
+  gpio_pull_up(KROWIN2);
+  gpio_pull_up(KROWIN3);
+  gpio_pull_up(KROWIN4);
+  gpio_pull_up(KROWIN5);
+  gpio_pull_up(KROWIN6);
 #endif
 }
 
@@ -1247,7 +1247,9 @@ void emu_init(void)
   if (emu_ReadKeys() & MASK_JOY2_UP)
   {
 #ifdef PICOMPUTERMAX
+#ifndef USE_VGA    
     tft.flipscreen(true);
+#endif
 #else
     tft.flipscreen(true);
 #endif
@@ -1255,7 +1257,9 @@ void emu_init(void)
   else 
   {
 #ifdef PICOMPUTERMAX
+#ifndef USE_VGA    
     tft.flipscreen(false);
+#endif
 #else
     tft.flipscreen(false);
 #endif
