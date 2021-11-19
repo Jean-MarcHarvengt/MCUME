@@ -569,11 +569,6 @@ int ExecZ80(register Z80 *R,register int RunCycles)
         asm volatile("nop");
         asm volatile("nop");   
 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
 #ifndef USE_VGA
         asm volatile("nop");
         asm volatile("nop");

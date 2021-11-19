@@ -67,6 +67,8 @@
    VSYNC and HSYNC */
 #define VGA_COLORBASE   2
 #define VGA_SYNCBASE    14
+#define VGA_VSYNC       15
+
 #endif
 
 

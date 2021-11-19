@@ -78,7 +78,7 @@ static void core1_func()
         //VgaTerm(); // terminate
       }
       else
-        VgaInit(v);
+        VgaInit(v,(u8*)framebuffer,320,240,320);
       __dmb();
       VgaVmodeReq = NULL;
     }
@@ -133,7 +133,7 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
   sem_init(&core1_initted, 0, 1);
 
   multicore_launch_core1(core1_func);
-  vmode = Video(DEV_VGA, RES_QVGA, FORM_8BIT, framebuffer);
+  vmode = Video(DEV_VGA, RES_QVGA);
   VgaInitReql(vmode);
 
   // wait for initialization of audio to be complete

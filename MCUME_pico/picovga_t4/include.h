@@ -3,6 +3,10 @@
 //                                 
 //                           Global common definitions
 //
+// file derived from the PicoVGA project
+// https://github.com/Panda381/PicoVGA
+// by Miroslav Nemecek
+//
 // ****************************************************************************
 
 // ----------------------------------------------------------------------------
@@ -47,8 +51,10 @@ typedef unsigned char Bool;
 
 // align array to 4-bytes
 #define ALIGNED __attribute__((aligned(4)))
+#define ALIGN4(x) ((x) & ~3)
 
-#define LED_PIN 25
+// swap bytes of command
+#define BYTESWAP(n) ((((n)&0xff)<<24)|(((n)&0xff00)<<8)|(((n)&0xff0000)>>8)|(((n)&0xff000000)>>24))
 
 // ----------------------------------------------------------------------------
 //                               Constants
@@ -96,8 +102,6 @@ typedef unsigned char Bool;
 #define PI 3.14159265358979324
 #define PI2 (3.14159265358979324*2)
 
-//extern const ALIGNED u8 FontBoldB8x16[4096];
-
 #define VGA_RGB(r,g,b)   ( (((r>>5)&0x07)<<5) | (((g>>5)&0x07)<<2) | (((b>>6)&0x3)<<0) )
 
 
@@ -125,12 +129,8 @@ typedef unsigned char Bool;
 
 
 // PicoVGA includes
-#include "define.h"	     // common definitions of C and ASM
-#include "canvas.h"      // canvas
+#include "vga_config.h"	 // VGA configuration
 #include "vga_vmode.h"	 // VGA videomodes
-#include "vga_layer.h"	 // VGA layers
-#include "vga_screen.h"  // VGA screen layout
-#include "vga_pal.h"	 // VGA palette
 #include "vga.h"	     // VGA output
 #include "picovga.pio.h" // PIO
 

@@ -20,15 +20,15 @@ static char * digits = "0123456789";
 
 static uint8_t pix = 0;
 int main(void) {
-    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    vreg_set_voltage(VREG_VOLTAGE_1_05);
 //    set_sys_clock_khz(125000, true);    
 //    set_sys_clock_khz(150000, true);    
 //    set_sys_clock_khz(133000, true);    
 //    set_sys_clock_khz(200000, true);    
+//    set_sys_clock_khz(210000, true);    
+    set_sys_clock_khz(230000, true);    
 //    set_sys_clock_khz(225000, true);    
-    set_sys_clock_khz(252000, true);    
-
-
+//    set_sys_clock_khz(250000, true);  
     stdio_init_all();
 
     printf("start\n");   
@@ -55,7 +55,6 @@ int main(void) {
 	buf[1] = digits[r2];
 	buf[2] = digits[r3];
 	vga.drawText(4*8,8,buf,BLUE,LIGHT_BLUE,false);
-
 
     while (true) {
         //tft.fillScreenNoDma( pix++ );
