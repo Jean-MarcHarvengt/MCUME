@@ -1,6 +1,6 @@
 extern "C" {
-  #include "iopins.h"  
   #include "emuapi.h"  
+  #include "iopins.h"  
 }
 
 #include "c64.h"
@@ -150,7 +150,7 @@ void loop(void)
       //digitalWrite(SD_CS, 1);       
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
-      myTimer.begin(vblCount, 40000);  //to run every 40ms  
+      myTimer.begin(vblCount, 20000);  //to run every 20ms  
     }    
     delay(20);
   }
@@ -169,28 +169,17 @@ void loop(void)
 #include "AudioPlaySystem.h"
 
 AudioPlaySystem mymixer;
-#ifndef HAS_T4_VGA
-#include <Audio.h>
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-//AudioOutputMQS  mqs;
-//AudioConnection patchCord9(mymixer, 0, mqs, 1);
-AudioOutputI2S  i2s1;
-AudioConnection patchCord8(mymixer, 0, i2s1, 0);
-AudioConnection patchCord9(mymixer, 0, i2s1, 1);
-AudioControlSGTL5000     sgtl5000_1;
-#else
-AudioOutputAnalog dac1;
-AudioConnection   patchCord1(mymixer, dac1);
-#endif
-#endif
+
 
 void emu_sndInit() {
   Serial.println("sound init");  
 #ifdef HAS_T4_VGA
   tft.begin_audio(256, mymixer.snd_Mixer);  
+#else
+  mymixer.begin_audio(256, mymixer.snd_Mixer);  
+#endif
  // sgtl5000_1.enable();
  // sgtl5000_1.volume(0.6);
-#endif  
   mymixer.start();
 }
 

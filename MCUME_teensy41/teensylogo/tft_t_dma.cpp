@@ -512,6 +512,12 @@ void TFT_T_DMA::wait(void) {
   rstop = 0;
 }
 
+int TFT_T_DMA::get_frame_buffer_size(int *width, int *height){
+  if (width != nullptr) *width = TFT_REALWIDTH;
+  if (height != nullptr) *height = TFT_REALHEIGHT;
+  return TFT_REALWIDTH;  
+} 
+
 
 /***********************************************************************************************
     Touch functions

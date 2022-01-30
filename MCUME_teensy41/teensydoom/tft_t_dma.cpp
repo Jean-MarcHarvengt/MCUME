@@ -8,6 +8,26 @@
 
 #include "font8x8.h"
 
+// LPSPI4 = SPI0 in Teensy 4.0
+// LPSPI3 = SPI1 in Teensy 4.0
+// LPSPI1 = SPI2 in Teensy 4.0 (used for SD on T4.0 but not T4.1) 
+#ifdef TFTSPI1
+#define SPI SPI1
+#define LPSPIP_TDR LPSPI3_TDR
+#define LPSPIP_CR LPSPI3_CR
+#define LPSPIP_CFGR1 LPSPI3_CFGR1
+#define LPSPIP_TCR LPSPI3_TCR
+#define LPSPIP_DER LPSPI3_DER
+#define DMAMUX_SOURCE_LPSPIP_TX DMAMUX_SOURCE_LPSPI3_TX
+#else
+#define LPSPIP_TDR LPSPI4_TDR
+#define LPSPIP_CR LPSPI4_CR
+#define LPSPIP_CFGR1 LPSPI4_CFGR1
+#define LPSPIP_TCR LPSPI4_TCR
+#define LPSPIP_DER LPSPI4_DER
+#define DMAMUX_SOURCE_LPSPIP_TX DMAMUX_SOURCE_LPSPI4_TX
+#endif
+
 
 #define SPICLOCK 60000000 //144e6 //Just a number..max speed
 #ifdef ILI9341
@@ -120,9 +140,7 @@ static void dmaInterrupt() {
         rstop = 1;
     }
   }
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
-  arm_dcache_flush(blocks[curTransfer], LINES_PER_BLOCK*TFT_WIDTH*2);
-#endif  
+  arm_dcache_flush(blocks[curTransfer], LINES_PER_BLOCK*TFT_WIDTH*2);  
 }
 
 static void setDmaStruct() {
@@ -175,15 +193,9 @@ static void setDmaStruct() {
        
     for (int j=0;j<len/2;j++) fb[j]=col;
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)    
     dmasettings[i].sourceBuffer(fb, len);
-    dmasettings[i].destination((uint8_t &)  LPSPI4_TDR);
+    dmasettings[i].destination((uint8_t &)  LPSPIP_TDR);
     dmasettings[i].TCD->ATTR_DST = 1;
-#else
-    dmasettings[i].sourceBuffer(fb, len);
-    dmasettings[i].destination((uint8_t &)  SPI0_PUSHR);
-    dmasettings[i].TCD->ATTR_DST = 1;
-#endif       
     dmasettings[i].replaceSettingsOnCompletion(dmasettings[i+1]);
     dmasettings[i].interruptAtCompletion();
     remaining -= len;
@@ -446,28 +458,16 @@ void TFT_T_DMA::startDMA(void) {
   digitalWrite(_cs, HIGH);
   SPI.begin();
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
-#ifdef TFT_DEBUG          
-  PRREG(LPSPI4_CCR);
-  PRREG(LPSPI4_TCR);
-  PRREG(LPSPI4_FCR);
-  Serial.printf("SPI CLOCK %d CCR freq %.1f MHz\n", SPICLOCK, 528. / 7 / ((0xff & LPSPI4_CCR) + 2));
-#endif
-  LPSPI4_CR &= ~LPSPI_CR_MEN;//disable LPSPI:
-  LPSPI4_CFGR1 |= LPSPI_CFGR1_NOSTALL; //prevent stall from RX
-  LPSPI4_TCR = 15; // Framesize 16 Bits
-  //LPSPI4_FCR = 0; // Fifo Watermark
-  LPSPI4_DER = LPSPI_DER_TDDE; //TX DMA Request Enable
-  LPSPI4_CR |= LPSPI_CR_MEN; //enable LPSPI:
-  dmatx.triggerAtHardwareEvent( DMAMUX_SOURCE_LPSPI4_TX );
-#else  
-  SPI0_RSER |= SPI_RSER_TFFF_DIRS | SPI_RSER_TFFF_RE;  // Set ILI_DMA Interrupt Request Select and Enable register
-  SPI0_MCR &= ~SPI_MCR_HALT;  //Start transfers.
-  SPI0_CTAR0 = SPI0_CTAR1;
-  (*(volatile uint16_t *)((int)&SPI0_PUSHR + 2)) = (SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT) >> 16; //Enable 16 Bit Transfers + Continue-Bit
-  dmatx.triggerAtHardwareEvent(DMAMUX_SOURCE_SPI0_TX );
-#endif
+
+  LPSPIP_CR &= ~LPSPI_CR_MEN;//disable LPSPI:
+  LPSPIP_CFGR1 |= LPSPI_CFGR1_NOSTALL; //prevent stall from RX
+  LPSPIP_TCR = 15; // Framesize 16 Bits
+  //LPSPIP_FCR = 0; // Fifo Watermark
+  LPSPIP_DER = LPSPI_DER_TDDE; //TX DMA Request Enable
+  LPSPIP_CR |= LPSPI_CR_MEN; //enable LPSPI:
+  dmatx.triggerAtHardwareEvent( DMAMUX_SOURCE_LPSPIP_TX );
+
   dmatx = dmasettings[0];
   digitalWrite(_cs, 0); 
   setArea((TFT_REALWIDTH-TFT_WIDTH)/2, (TFT_REALHEIGHT-TFT_HEIGHT)/2, (TFT_REALWIDTH-TFT_WIDTH)/2+TFT_WIDTH-1, (TFT_REALHEIGHT-TFT_HEIGHT)/2+TFT_HEIGHT-1);  
@@ -511,6 +511,12 @@ void TFT_T_DMA::wait(void) {
   };
   rstop = 0;
 }
+
+int TFT_T_DMA::get_frame_buffer_size(int *width, int *height){
+  if (width != nullptr) *width = TFT_REALWIDTH;
+  if (height != nullptr) *height = TFT_REALHEIGHT;
+  return TFT_REALWIDTH;  
+} 
 
 
 /***********************************************************************************************
@@ -1235,6 +1241,3 @@ void TFT_T_DMA::drawSprite(int16_t x, int16_t y, const uint16_t *bitmap, uint16_
   } 
 }
 #endif
-
-
-

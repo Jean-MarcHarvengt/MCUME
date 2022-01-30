@@ -20,6 +20,7 @@
 #define G16(rgb) ((rgb>>3)&0xfc) 
 #define B16(rgb) ((rgb<<3)&0xf8) 
 
+#define PAL_COLOR_MASK 0xff
 
 #ifdef LOHRES
 #define TFT_WIDTH      240 
@@ -28,9 +29,11 @@
 #define TFT_WIDTH      320 
 #define TFT_REALWIDTH  320
 #endif
-#define TFT_HEIGHT     200
+#define TFT_HEIGHT     240
 #define TFT_REALHEIGHT 240
 
+//#define WIDTH  272
+//#define HEIGHT 228
 
 #define LINES_PER_BLOCK         64
 #define NR_OF_BLOCK             4
@@ -179,14 +182,15 @@
 class TFT_T_DMA
 {
   public:
-  	TFT_T_DMA(uint8_t _CS, uint8_t _DC, uint8_t _RST = 255, uint8_t _MOSI=11, uint8_t _SCLK=13, uint8_t _MISO=12,  uint8_t touch_cs=38,  uint8_t touch_irq=37);
+    TFT_T_DMA(uint8_t _CS, uint8_t _DC, uint8_t _RST = 255, uint8_t _MOSI=11, uint8_t _SCLK=13, uint8_t _MISO=12,  uint8_t touch_cs=38,  uint8_t touch_irq=37);
 
     void setArea(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);  
-	void begin(void);
-	void flipscreen(bool flip);
+    void begin(void);
+    void flipscreen(bool flip);
     boolean isflipped(void);
-	void startDMA(void);
-	void stopDMA();
+    void startDMA(void);
+    void stopDMA();
+    int get_frame_buffer_size(int *width, int *height);
 
     // Touch screen functions
     #define TOUCH_ENABLED() ((_touch_cs != 255) && (_touch_irq != 255))      
@@ -208,23 +212,23 @@ class TFT_T_DMA
     void writeScreen(int width, int height, int stride, uint8_t *buffer, uint16_t *palette16);
     void writeLine(int width, int height, int stride, uint8_t *buffer, uint16_t *palette16);
     void  writeLine(int width, int height, int y, uint16_t *buf);
-	void fillScreen(uint16_t color);
+    void fillScreen(uint16_t color);
     void drawText(int16_t x, int16_t y, const char * text, uint16_t fgcolor, uint16_t bgcolor, bool doublesize);
     void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
     void drawSprite(int16_t x, int16_t y, const uint16_t *bitmap);
     void drawSprite(int16_t x, int16_t y, const uint16_t *bitmap, uint16_t croparx, uint16_t cropary, uint16_t croparw, uint16_t croparh);
 
-	
   protected:   
     uint8_t _rst, _cs, _dc;
-	uint8_t _miso, _mosi, _sclk;
+    uint8_t _miso, _mosi, _sclk;
     uint8_t _touch_irq=255, _touch_cs=255;
-	bool flipped=false;
+    bool flipped=false;
 
     void wait(void);  
-	void enableTouchIrq();
+    void enableTouchIrq();
 };
 
 #endif
 #endif
+
 

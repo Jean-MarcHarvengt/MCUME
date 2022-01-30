@@ -7,15 +7,28 @@
 
 // Teecomputer layout
 
+// VGA
+// R                    3  2K
+// R                    4  1K
+// R                    33 500
+// G                    11 2K
+// G                    13 1K
+// G                    2  500
+// B                    10 820
+// B                    12 390
+// HSYNC                15 82
+// VSYNC                8  82
+
 // Display
 #define TFT_SCLK        27
 #define TFT_MOSI        26
-#define TFT_MISO        39
+#define TFT_MISO        255
 #define TFT_TOUCH_CS    255
 #define TFT_TOUCH_INT   255
 #define TFT_DC          23
 #define TFT_CS          22 // 255 for LORES ST7789 (NO CS)
-#define TFT_RST         255 // 255 for ILI/ST if connected to 3.3V
+#define TFT_RST         255 // 255 for ILI/ST if connected to 3.3V or 24 if really needed
+
 
 // SD
 #define SD_CS           BUILTIN_SDCARD
@@ -26,30 +39,29 @@
 #define AUDIO_I2S_LCK   20
 
 // Keyboard matrix
-#define KLED            13
+#define KLED            14
 //Cols (out)
 //pico 1,2,3,4,5,14
-//teen 25,28,29,30,31,32
-#define KCOLOUT1        25
-#define KCOLOUT2        28
-#define KCOLOUT3        29
-#define KCOLOUT4        30
-#define KCOLOUT5        31
-#define KCOLOUT6        32
+//teen 16,6,24,25,28,31
+#define KCOLOUT1        16
+#define KCOLOUT2        6
+#define KCOLOUT3        24
+#define KCOLOUT4        25
+#define KCOLOUT5        28
+#define KCOLOUT6        31
 //Rows (in)
 //pico 9,8,6,15,7,22
-//teen 5,6,16,17,18,19
-#define KROWIN1         5
-#define KROWIN2         6
-#define KROWIN3         16
-#define KROWIN4         17
-#define KROWIN5         18
-#define KROWIN6         19
+//teen 19,18,17,5,29,30,32 //5,6,16,17,18,19
+#define KROWIN1         19
+#define KROWIN2         18
+#define KROWIN3         17
+#define KROWIN4         5
+#define KROWIN5         29
+#define KROWIN6         30
+#define KROWIN7         32
 
-#define PIN_KEY_USER1   40
-#define PIN_KEY_USER2   41
-//#define PIN_KEY_USER3   24
-// 14 is free
+#define PIN_KEY_USER1   41
+#define PIN_KEY_USER2   40
 
 // Second joystick (external)
 #define PIN_JOY1_BTN     34

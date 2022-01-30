@@ -1,0 +1,4 @@
+HEX can be found in bin directory.
+
+All compiled with Arduino 1.8.19 + Teensyduino 1.56
+Except UAE TEECOMPUTER for TFT that needs Arduino 1.8.13 + 1.54
