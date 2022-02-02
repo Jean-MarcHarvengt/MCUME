@@ -3,7 +3,7 @@ extern "C" {
   #include "iopins.h"  
 }
 
-#include "c64.h"
+#include "v20.h"
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
@@ -51,8 +51,6 @@ void emu_DrawVsync(void)
     while (vbl==vb) {};
 #endif
   }
-  uint16_t bClick = emu_DebounceLocalKeys();
-  emu_Input(bClick);  
 }
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
@@ -123,7 +121,7 @@ void setup() {
 
 #ifdef HAS_T4_VGA
   tft.begin(VGA_MODE_320x240);
-  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
+//  NVIC_SET_PRIORITY(IRQ_QTIMER3, 0);
 #else
   tft.begin();
 #endif  
@@ -145,7 +143,7 @@ void loop(void)
       toggleMenu(false);
       vgaMode = false;       
       emu_start();
-      emu_Init(filename);      
+      emu_Init(filename);       
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
       myTimer.begin(vblCount, 20000);  //to run every 20ms  
@@ -153,8 +151,10 @@ void loop(void)
     delay(20);
   }
   else {
+      uint16_t bClick = emu_DebounceLocalKeys();
+      emu_Input(bClick);  
       emu_Step();
-      //delay(20);
+      delay(10);
       //uint16_t bClick = emu_DebounceLocalKeys();
       //if (bClick & MASK_KEY_USER1) {
       //  emu_Input(bClick); 

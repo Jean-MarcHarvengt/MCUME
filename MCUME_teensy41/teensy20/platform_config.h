@@ -14,7 +14,6 @@
 #else
 
 #define HAS_T4_VGA     1
-#define HIRES          1
 //#define INVX           1
 #define INVY           1
 #define HAS_SND        1

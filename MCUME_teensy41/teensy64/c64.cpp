@@ -45,11 +45,36 @@ static void oneRasterLine(void) {
 
 }
 
+/*
+const uint32_t ascii2scanvic20[] = {
+ //0 1 2 3 4 5 6 7 8 9 A B C D E F
+   0,0,0,0,0,0,0,0,0,0,0xfd7f,0,0,0xfd7f,0,0, // return
+   //                            31:RUNSTOP
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0xf7fe,
+   //sp    !       "       #       $       %       &       '       (       )       *       +       ,       -       .       / 
+   0xeffe ,0x1fefe,0x17ffe,0x1fe02,0x17ffd,0x1fefb,0x17ffb,0x1fef7,0x17ff7,0x1feef,0xfdbf ,0xfedf ,0xf7df ,0x7fDf ,0xefdf ,0xf7bf,
+   //0     1       2       3       4       5       6       7       8       9       :       ;       <       =       >       ?
+   0x7fef ,0xfefe ,0x7ffe ,0xfefd ,0x7ffd ,0xfefb ,0x7ffb ,0xfef7 ,0x7ff7 ,0xfeef ,0xdfdf ,0xfbbf ,0x1f7df,0xdfbf ,0x1efdf,0x1f7bf,
+   //@     A       B       C       D       E       F       G       H       I       J       K       L       M       N       O
+   0xbfdf ,0xfbfd ,0xeff7 ,0xeffb ,0xfbfb ,0xbffd ,0xdffb ,0xfbf7 ,0xdff7 ,0xfdef ,0xfbef ,0xdfef ,0xfbdf ,0xefef ,0xf7ef ,0xbfef,
+   //P     Q       R       S       T       U       V       W       X       Y       Z       [       \       ]       ^       _  
+   0xfddf ,0xbffe ,0xfdfb ,0xdffd ,0xbffb ,0xbff7 ,0xf7f7 ,0xfdfd ,0xf7fb ,0xfdf7 ,0xeffd ,0x1dfdf,0xffff ,0x1fbbf,0 ,0,
+   //'     a       c       c       d       e       f       g       h       i       j       k       l       m       n       o
+   0      ,0xfbfd ,0xeff7 ,0xeffb ,0xfbfb ,0xbffd ,0xdffb ,0xfbf7 ,0xdff7 ,0xfdef ,0xfbef ,0xdfef ,0xfbdf ,0xefef ,0xf7ef ,0xbfef,
+   //p     q       r       s       t       u       v       w       x       y       z       {       |       }       ~  DEL  
+   0xfddf ,0xbffe ,0xfdfb ,0xdffd ,0xbffb ,0xbff7 ,0xf7f7 ,0xfdfd ,0xf7fb ,0xfdf7 ,0xeffd ,0,      0 ,     0,      0xfe7f ,0x1fb7f,
+   // 129:f1 f2      f3     f4      f5     f6      f7     f8 
+   0,0xef7f,0x1ef7f,0xdf7f,0x1df7f,0xbf7f,0x1bf7f,0x7f7f,0x17f7f,0,0,0,0,0,0,0,  // 128-143
+   //           150:right  left    down   up
+   0,0,0,0,0,0, 0xfb7f,0x1fb7f,0xf77f,0x1f77f,0,0,0,0,0,0   // 144-159 
+};
+*/
+
+
 const uint32_t ascii2scan[] = {
  //0 1 2 3 4 5 6 7 8 9 A B C D E F
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0x28,0,0, // return
- //     17:down                                                     29:right
-   0x00,0x51,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x4f,0x00,0x00,
+   0,0,0,0,0,0,0,0,0,0,0x28,0,0,0x28,0,0, // 0x0A: return
+   0x00,0x0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //31:RUNSTOP
    //sp  !       "     #     $      %      &      '     (        )   *    +    ,    -    .    / 
    0x2c,0x201e,0x201f,0x2020,0x2021,0x2022,0x2023,0x2024,0x2025,0x2026,0x55,0x57,0x36,0x56,0x37,0x54,
    //0  1    2    3    4    5    6    7    8    9    :    ;    <      =    >      ?
@@ -58,13 +83,17 @@ const uint32_t ascii2scan[] = {
    47,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,
    //P  Q    R    S    T    U    V    W    X    Y    Z    [      \     ]     ^    _  
    0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x2026,0x31,0x2027,0x00,0x00,
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // ' a b c d e f g h i j k l m n o
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x49,0, // p q r s t u v w x y z { | } ~ DEL
- //up left arr      133:f1   f2   f3   f4   f5   f6   f7   f8 
-   75,78,0x00,0x00,0x00,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x00,0x00,0x00,  // 128-143
- //     145:up                                                      157:left
-   0x00,0x2051,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x204f,0x00,0x00   // 144-159
+    //'    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o
+   0,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,
+   //p  w    r    s    t    u    v    w    x    y    z    {      |    } ~  DEL  
+   0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0,     0,   0,0x49,0x204f,
+    // 129:f1 f2      f3     f4      f5     f6      f7     f8 
+   0,  0x3a,  0x3b,   0x3c,  0x3d,   0x3e,  0x3f,   0x40,  0x41,0,0,0,0,0,0,0,  // 128-143
+    //           150:right  left    down   up
+   0,0,0,0,0,0, 0x4f,      0x204f, 0x51,  0x2051,0,0,0,0,0,0   // 144-159 
+
 };
+
 
 // we also use USB matrix for the moment
 static const uint8_t keymatrixmap[2][256] = {
@@ -123,13 +152,23 @@ struct {
 } kbdData = {0, 0, 0};
 
 
-
-
-static void setKey(uint32_t k, boolean pressed) {
+static void setKey(uint8_t c, boolean pressed) {
+  uint32_t k = ascii2scan[c];
+  /*
+  uint32_t kvic20 = ascii2scanvic20[c];
+  bool shiftPressed;
+  if (k & 0x10000) shiftPressed = true;
+  else shiftPressed = false;  
+  if (pressed) {
+    kbdData.kv = k & 0xffff;    
+  }
+  */
   if (pressed) {
     kbdData.kv = (k << 16);
     kbdData.ke = kbdData.k2;
     kbdData.k2 = 0;
+    //Serial.println(~kvic20, HEX);
+    //Serial.println((keymatrixmap[1][kbdData.k]<<8)+keymatrixmap[0][kbdData.k], HEX);
   }
   else
   {
@@ -137,12 +176,13 @@ static void setKey(uint32_t k, boolean pressed) {
   }
 }
 
+
 static void pushStringToTextEntry(char * text) {
     char c;
     while ((c = *text++)) {
-        setKey(ascii2scan[c], true); 
+        setKey(c, true); 
         delay(20);
-        setKey(ascii2scan[c], false); 
+        setKey(c, false); 
         delay(20);
     }
 }
@@ -168,14 +208,22 @@ uint8_t cia1PORTA(void) {
     if (keys & MASK_JOY1_LEFT) v &= 0xF7;
   }	
 
-
   if (!kbdData.kv) return v; //Keine Taste gedrückt
 
   uint8_t filter = ~cpu.cia1.R[0x01] & cpu.cia1.R[0x03];
-  
+
+/*
+  uint8_t column = ~((kbdData.kv >> 8) & 0xFF); // output
+  uint8_t row = ~(kbdData.kv & 0xFF); //input
+  if (kbdData.kv) {
+    if (column & filter)  v &= ~row ;
+  }
+*/   
+
   if (kbdData.k) {
     if ( keymatrixmap[1][kbdData.k] & filter)  v &= ~keymatrixmap[0][kbdData.k];
   }
+
 
   if (kbdData.ke) {
     if (kbdData.ke & 0x02) { //Shift-links
@@ -221,6 +269,14 @@ uint8_t cia1PORTB(void) {
   if (!kbdData.kv) return v; //Keine Taste gedrückt
 
   uint8_t filter = ~cpu.cia1.R[0x00] & cpu.cia1.R[0x02];
+
+/*
+  uint8_t column = ~((kbdData.kv >> 8) & 0xFF); // output
+  uint8_t row = ~(kbdData.kv & 0xFF); //input
+  if (kbdData.kv) {
+     if (row & filter)  v &= ~column ;
+  }
+*/    
 
   if (kbdData.k) {
     if ( keymatrixmap[0][kbdData.k] & filter) v &= ~keymatrixmap[1][kbdData.k];
@@ -280,6 +336,8 @@ static char textkey[1];
 static bool res=false;
 static bool firsttime=true;
 
+static int iusbhk;// USB keyboard key
+
 void c64_Input(int bClick) {
 
   if (nbkeys == 0) {
@@ -312,19 +370,21 @@ void c64_Input(int bClick) {
     else  
     {
       int hk = emu_ReadI2CKeyboard();
+      if (iusbhk) hk = iusbhk;
+      
       if ( (hk != 0) && (res == false) ) {
-        setKey(ascii2scan[hk],true);
+        setKey(hk,true);
         res = true;
       } 
       else if (hk == 0){
-        setKey(ascii2scan[hk],false);
+        setKey(hk,false);
         res = false;
       }        
     }
   }
   else {
     char k = textseq[kcnt];
-    if (k != '\t') setKey(ascii2scan[k],toggle);
+    if (k != '\t') setKey(k, toggle);
     if (!toggle) {
       kcnt++;
       nbkeys--;
@@ -337,9 +397,23 @@ void c64_Input(int bClick) {
 }
 
 void emu_KeyboardOnDown(int keymodifer, int key) {
+  int keyCode = -1;
+  if ((key >=0xc0) && (key <=0xdf)) {
+    keyCode = ((key-0xc0) & 0x1f) + 0x7f;
+  }
+  else {
+    keyCode = key & 0x7f;
+  }
+  
+  //Serial.println(keyCode);
+  
+  if (keyCode != -1) {
+    iusbhk = keyCode;
+  }
 }
 
 void emu_KeyboardOnUp(int keymodifer, int key) {
+  iusbhk = 0;
 }
 
 #ifdef HAS_SND      

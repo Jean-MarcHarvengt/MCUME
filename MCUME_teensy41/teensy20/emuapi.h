@@ -9,12 +9,12 @@
 #define EXTRA_HEAP  0x10
 
 // Title:     <                        >
-#define TITLE "    C64 Emulator "
-#define ROMSDIR "c64"
+#define TITLE "    Vic20 Emulator "
+#define ROMSDIR "v20"
 
-#define emu_Init(ROM) {c64_Start(ROM); c64_Init(); }
-#define emu_Step(x) { c64_Step(); }
-#define emu_Input(x) { c64_Input(x); }
+#define emu_Init(ROM) { v20_Init(); v20_Start(ROM);}
+#define emu_Step(x) { v20_Step(); }
+#define emu_Input(x) { v20_Input(x); }
 
 #define MAX_FILENAME_PATH    64
 #define NB_FILE_HANDLER      4
@@ -42,7 +42,7 @@
 #define keylables_map0_2 (char *)" ZXCVBNM,.;/"
 #define keylables_map0_3 (char *)" +\x10-"
 const unsigned short key_map0[] = {
-  'Q','W','E','R','T','Y','U','I','O','P',127, //default C64 uppercase always
+  'Q','W','E','R','T','Y','U','I','O','P',157, //default C64 uppercase always
   0,'A','S','D','F','G','H','J','K','L',10,
   0,'Z','X','C','V','B','N','M',',','.',';','/',
   0,0,0,0,
