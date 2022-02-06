@@ -5,13 +5,13 @@
 
 
 // Display
-#define TFT_SCLK        13 //27
-#define TFT_MOSI        11 //26
+#define TFT_SCLK        27
+#define TFT_MOSI        26
 #define TFT_MISO        255
 #define TFT_TOUCH_CS    255
 #define TFT_TOUCH_INT   255
-#define TFT_DC          9   //23
-#define TFT_CS          22  //22 // 255 for LORES ST7789 (NO CS)
+#define TFT_DC          23
+#define TFT_CS          22  // 255 for LORES ST7789 (NO CS)
 #define TFT_RST         255 // 255 for ILI/ST if connected to 3.3V or 24 if really needed
 
 
