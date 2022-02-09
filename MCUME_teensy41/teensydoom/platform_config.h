@@ -5,9 +5,9 @@
 
 #ifdef TEECOMPUTER
 //#define ILI9341        1
-#define ST7789         1
-#define TFTSPI1        1
-//#define HAS_T4_VGA     1
+//#define ST7789         1
+//#define TFTSPI1        1
+#define HAS_T4_VGA     1
 //#define HIRES          1
 //#define HAS_SND        1
 #define HAS_USBKEY     1

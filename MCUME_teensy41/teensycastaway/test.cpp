@@ -174,10 +174,6 @@ void Redraw16_hi ( int row, int vid_adr )
 #endif
 
 
-static uint8 disk0[256];
-static uint8 disk1[256];
-
-
 void ast_Init(void)
 {
   emu_printf("Allocating RAM");
@@ -188,10 +184,6 @@ void ast_Init(void)
         
   rombase = (int8*)&tos[0]-ROMBASE;   
   (void) memcpy (membase, &tos[0], 8);
-
-  extern unsigned char * disc[2];
-  disc [ 0 ] = (uint8*) &disk0[0];
-  disc [ 1 ] = (uint8*) &disk1[0];
 }
 
 static int mouse_x = XRES/2;
@@ -1005,32 +997,13 @@ void ast_Step(void)
 }
 
 
-
-// disk IO mapped to File
-
-int disk_Size(char * filename) {
-  return emu_FileSize(filename);
-}
-
-int disk_Open(char * filename) {   
-  return emu_FileOpen(filename,"a+r");
-}
-
-int disk_Read(char * buf, int size, int handler) {    
-  return emu_FileRead(buf, size, handler);
-}
-
-int disk_Seek(int seek, int handler) { 
-  return emu_FileSeek(handler, seek, 0);
-}
-
 void ast_Start(char * floppy1, char * floppy2, int mode)
 {
   if (mode) display_mode = MONO;
   
   emu_printf("init started");
-  strncpy (disk[0].name, floppy1, sizeof(disk[0].name));
-  strncpy (disk[1].name, floppy2, sizeof(disk[1].name));
+  strncpy (disk[0].name, floppy1, strlen(floppy1));
+  strncpy (disk[1].name, floppy2, strlen(floppy2));
 
   initialize_memmap();
   FDCInit(0);

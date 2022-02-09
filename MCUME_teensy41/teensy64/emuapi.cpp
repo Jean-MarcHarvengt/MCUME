@@ -20,6 +20,11 @@ USBHIDParser hid1(myusb);
 MouseController mouse1(myusb);
 MIDIDevice midi1(myusb);
 #endif
+
+static bool emu_writeConfig(void);
+static bool emu_readConfig(void);
+static bool emu_eraseConfig(void);
+
 static bool mouseDetected = false;
 static bool keyboardDetected = false;
 static uint8_t usbnavpad=0;
@@ -28,6 +33,8 @@ static uint8_t usbnavpad=0;
 static File file;
 
 #define MAX_FILES           64
+#define AUTORUN_FILENAME    "autorun.txt"
+
 #define MAX_FILENAME_SIZE   24
 #define MAX_MENULINES       9
 #define TEXT_HEIGHT         16
@@ -57,6 +64,7 @@ static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static char selected_filename[MAX_FILENAME_SIZE]=""; 
 static char second_selected_filename[MAX_FILENAME_SIZE]="";
 static bool menuRedraw=true;
+static bool autorun=false;
 
 static const unsigned short * keys;
 #ifdef TEECOMPUTER
@@ -972,8 +980,11 @@ void backgroundMenu(void) {
 
 int handleMenu(uint16_t bClick)
 {
+  if (autorun) {
+      return (ACTION_RUN1);                    
+  }  
+  
   int action = ACTION_NONE;
-
   if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_JOY1_BTN) ) {     
       char newpath[MAX_FILENAME_PATH];
       strcpy(newpath, selection);
@@ -988,7 +999,12 @@ int handleMenu(uint16_t bClick)
         nbFiles = readNbFiles();             
       }
       else {
-        action = ACTION_RUN1;               
+        action = ACTION_RUN1;
+#ifdef TEECOMPUTER
+        if (key_extmode) {
+          emu_writeConfig();
+        }
+#endif                       
       }
       menuRedraw=true;
   }
@@ -1293,7 +1309,7 @@ int emu_FileOpen(const char * filepath, const char * mode)
   int handler = getFreeFileHandler();
   if (handler >= 0) {
     if ((file_handlers[handler] = SD.open(filepath, O_READ))) {
-      emu_printi(handler+1);
+ //     emu_printi(handler+1);
       retval = handler+1;  
     }
     else {
@@ -1427,6 +1443,50 @@ unsigned int emu_LoadFileSeek(const char * filepath, void * buf, int size, int s
     lofile.close();
   }
   return(filesize);
+}
+
+static bool emu_writeConfig(void)
+{
+  bool retval = false;
+  if ((lofile = SD.open(ROMSDIR "/" AUTORUN_FILENAME, O_CREAT | O_WRITE)))
+  {
+    if (lofile.write(selection, strlen(selection)) != strlen(selection)) {
+      emu_printf("Config write failed");
+    }
+    else {
+      retval = true;
+    }
+    lofile.close();
+  }
+  return retval;
+}
+
+static bool emu_readConfig(void)
+{
+  bool retval = false;
+
+  if ((lofile = SD.open(ROMSDIR "/" AUTORUN_FILENAME, O_READ)))
+  {
+    unsigned int filesize = lofile.size();
+    unsigned int sizeread = lofile.read(selection, filesize);
+    if (sizeread != filesize) {
+      emu_printf("Config read failed");
+    }
+    else {
+      if (sizeread == filesize)
+      {
+        selection[filesize]=0;
+        retval = true;
+      }
+    }
+    lofile.close();
+  }
+  return retval;
+}
+
+static bool emu_eraseConfig(void)
+{
+  SD.remove (ROMSDIR "/" AUTORUN_FILENAME);
 }
 
 /********************************
@@ -1646,8 +1706,20 @@ void emu_init(void)
 #ifdef TEECOMPUTER
 #ifndef HAS_T4_VGA
     tft.flipscreen(false);
-#endif    
 #endif
+#endif
+  int keypressed = emu_ReadKeys();
+  if (keypressed & MASK_JOY2_DOWN) {
+    tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
+    tft.drawTextNoDma(64,48,    (char*)" AUTURUN file erased", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
+    emu_eraseConfig();
+    delay(1000);
+  }
+  else {
+    if (emu_readConfig()) {
+      autorun = true;
+    }
+  }  
 
   toggleMenu(true);
 }

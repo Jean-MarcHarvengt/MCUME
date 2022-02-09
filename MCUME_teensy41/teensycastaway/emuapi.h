@@ -177,6 +177,7 @@ extern void emu_Free(void * pt);
 
 extern int emu_FileOpen(const char * filepath, const char * mode);
 extern int emu_FileRead(void * buf, int size, int handler);
+extern int emu_FileWrite(void * buf, int size, int handler);
 extern int emu_FileGetc(int handler);
 extern int emu_FileSeek(int handler, int seek, int origin);
 extern int emu_FileTell(int handler);
