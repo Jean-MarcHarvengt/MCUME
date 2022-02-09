@@ -4,6 +4,15 @@
 </p>
 
 # News
+February 2022: introducing TEECOMPUTER platform based on Teensy41 MCU<br>
+- improved USB keyboard support for existing Teensy41 emus
+- add new emus for Teensy41: for VIC20 and Apple2 based on aiie!
+<br>
+
+December 2021:<br>
+- Add vic20 emulation to the PICO
+<br>
+
 October 2021: yet more PICO platforms improvements<br>
 - MCUME_REV2 has now dual screen support (TFT+VGA binaries where TFT can be used for keyboard control, or VGA only binaries wo keyboard control)
 - Fix keyboard scan for PICOMPUTERMAX (C64,ZX81,ZX Spectrum and Atari800 have now usable keyboard for basic program typing)
