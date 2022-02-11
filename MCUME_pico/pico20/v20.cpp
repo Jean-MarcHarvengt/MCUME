@@ -117,14 +117,14 @@ static void loadROM(char * filepath, uint16_t atMemoryLocation) {
   uint16_t loadAddress;
   uint16_t endAddress;
   int lSize = emu_FileSize(filepath);
-  emu_FileOpen(filepath);
+  int f = emu_FileOpen(filepath, "r+b");
   char * ext = strext(filepath);
   if ( (ext[0] == 'p') ||  (ext[0] == 'P') ) {
     unsigned char buffer[2];
-    emu_FileRead((char *)&buffer[0], 2);
+    emu_FileRead((char *)&buffer[0], 2, f);
     loadAddress = buffer[0] | buffer[1] << 8;
     endAddress = loadAddress + lSize-2;
-    emu_FileRead((char *)&vicmemory[loadAddress], lSize-2);
+    emu_FileRead((char *)&vicmemory[loadAddress], lSize-2, f);
   }
   else {
     switch (ext[0]) {
@@ -143,9 +143,9 @@ static void loadROM(char * filepath, uint16_t atMemoryLocation) {
         break;
     }
     endAddress = loadAddress + lSize;  
-    emu_FileRead((char *)&vicmemory[loadAddress], lSize);
+    emu_FileRead((char *)&vicmemory[loadAddress], lSize, f);
   }
-  emu_FileClose();
+  emu_FileClose(f);
   // Set basic memory pointers
   
   silentWriteDWord(0x2B, loadAddress);

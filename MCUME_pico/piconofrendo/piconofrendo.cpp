@@ -23,7 +23,17 @@ TFT_T_DMA tft;
 static int skip=0;
 
 int main(void) {
+//    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    set_sys_clock_khz(125000, true);    
+//    set_sys_clock_khz(150000, true);    
+//    set_sys_clock_khz(133000, true);    
+//    set_sys_clock_khz(200000, true);    
+//    set_sys_clock_khz(210000, true);    
+    set_sys_clock_khz(230000, true);    
+//    set_sys_clock_khz(225000, true);    
+//    set_sys_clock_khz(250000, true);  
     stdio_init_all();
+    
 #ifdef USE_VGA    
 //    tft.begin(VGA_MODE_400x240);
     tft.begin(VGA_MODE_320x240);

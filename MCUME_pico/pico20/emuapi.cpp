@@ -13,6 +13,11 @@ extern "C" {
   #include "iopins.h"
 }
 
+static bool emu_writeConfig(void);
+static bool emu_readConfig(void);
+static bool emu_eraseConfig(void);
+
+
 #if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
 // Dual display config, initialize TFT
 #include "tft_t_dma.h"
@@ -27,6 +32,10 @@ static TFT_T_DMA tft;
 extern TFT_T_DMA tft;
 #endif
 
+
+#define MAX_FILENAME_PATH   64
+#define NB_FILE_HANDLER     4
+#define AUTORUN_FILENAME    "autorun.txt"
 
 #define MAX_FILES           64
 #define MAX_FILENAME_SIZE   24
@@ -49,11 +58,11 @@ extern TFT_T_DMA tft;
 
 
 
-static char romspath[64];
 static int nbFiles=0;
 static int curFile=0;
 static int topFile=0;
-static char selection[MAX_FILENAME_SIZE+1]="";
+static char selection[MAX_FILENAME_PATH]="";
+static char selected_filename[MAX_FILENAME_SIZE]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
@@ -77,13 +86,13 @@ static int yRef;
 static uint8_t usbnavpad=0;
 
 static bool menuOn=true;
-
+static bool autorun=false;
 
 
 /********************************
  * Generic output and malloc
 ********************************/ 
-void emu_printf(char * text)
+void emu_printf(const char * text)
 {
   printf("%s\n",text);
 }
@@ -930,8 +939,10 @@ static int readNbFiles(char * rootdir) {
     }
     char * filename = entry.fname;   
     if ( !(entry.fattrib & AM_DIR) ) {
-      strncpy(&files[totalFiles][0], filename, MAX_FILENAME_SIZE-1);
-      totalFiles++;
+      if (strcmp(filename,AUTORUN_FILENAME)) {
+        strncpy(&files[totalFiles][0], filename, MAX_FILENAME_SIZE-1);
+        totalFiles++;
+      }  
     }
     else {
       if ( (strcmp(filename,".")) && (strcmp(filename,"..")) ) {
@@ -964,34 +975,43 @@ static void menuLeft(void)
 
 int handleMenu(uint16_t bClick)
 {
+  if (autorun) {
+      menuLeft();
+      return (ACTION_RUNTFT);                    
+  }  
+
   int action = ACTION_NONE;
 
-  char newpath[80];
-  strcpy(newpath, romspath);
-  strcat(newpath, "/");
-  strcat(newpath, selection);
   if ( (bClick & MASK_JOY2_BTN) ) {     
-    emu_printf(newpath);
-    DIR dir;
+    char newpath[MAX_FILENAME_PATH];
+    strcpy(newpath, selection);
+    strcat(newpath, "/");
+    strcat(newpath, selected_filename);
+    strcpy(selection,newpath);
+    emu_printf("new filepath is");
+    emu_printf(selection);
     FILINFO entry;
     FRESULT fr;
-    fr = f_findfirst(&dir, &entry, romspath, selection);
+    fr = f_stat(selection, &entry);
     if ( (fr == FR_OK) && (entry.fattrib & AM_DIR) ) {
-        printf("we enter %s/%s\n", romspath, selection);     
-        strcpy(romspath,newpath);
         curFile = 0;
-        nbFiles = readNbFiles(newpath);             
+        nbFiles = readNbFiles(selection);             
         menuRedraw=true;
     }
     else
     {
       action = ACTION_RUNTFT;
+#ifdef PICOMPUTER
+      if (key_alt) {
+        emu_writeConfig();
+      }
+#endif
       menuLeft();                     
     }
   }
   else if ( (bClick & MASK_KEY_USER1) ) {
       menuRedraw=true;
-      action = ACTION_RUNVGA;    
+      action = ACTION_RUNVGA;
   }
   else if ( (bClick & MASK_JOY2_UP) || (bClick & MASK_JOY1_UP) ) {
     if (curFile!=0) {
@@ -1037,11 +1057,6 @@ int handleMenu(uint16_t bClick)
     if (curFile <= (MAX_MENULINES-1)) topFile=0;
     else topFile=curFile-(MAX_MENULINES/2);
 
-    //Serial.print("curfile: ");
-    //Serial.println(curFile);
-    //Serial.print("topFile: ");
-    //Serial.println(topFile);
-    
     int i=0;
     while (i<MAX_MENULINES) {
       if (fileIndex>=nbFiles) {
@@ -1053,7 +1068,7 @@ int handleMenu(uint16_t bClick)
         if ((i+topFile) < nbFiles ) {
           if ((i+topFile)==curFile) {
             tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
-            strcpy(selection,filename);            
+            strcpy(selected_filename,filename);            
           }
           else {
             tft.drawTextNoDma(MENU_FILE_XOFFSET,i*TEXT_HEIGHT+MENU_FILE_YOFFSET, filename, RGBVAL16(0xff,0xff,0xff), MENU_FILE_BGCOLOR, true);      
@@ -1095,14 +1110,10 @@ char * menuSelection(void)
 /********************************
  * File IO
 ********************************/ 
-int emu_FileOpen(char * filename)
+int emu_FileOpen(const char * filepath, const char * mode)
 {
   int retval = 0;
 
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
   emu_printf("FileOpen...");
   emu_printf(filepath);
   if( !(f_open(&file, filepath, FA_READ)) ) {
@@ -1114,60 +1125,44 @@ int emu_FileOpen(char * filename)
   return (retval);
 }
 
-int emu_FileRead(char * buf, int size)
+int emu_FileRead(void * buf, int size, int handler)
 {
-  unsigned char buffer[256];
-  int remaining = size;
-  int byteread = 0;
   unsigned int retval=0; 
-  if (size < 256) {
-    if( !(f_read (&file, buffer, size, &retval)) )
-    if (retval>0) {
-      memcpy(buf,buffer,retval);
-      byteread += retval;   
-    }   
-  }
-  else {
-    while (remaining>0) {
-      if( !(f_read (&file, buffer, 256, &retval)) )
-      //f_read (&file, buffer, 256, &retval);
-      if (retval>0) {
-        //emu_printi(retval);
-        memcpy(buf,buffer,retval);
-        buf += retval;
-        byteread += retval;     
-        remaining -= retval;
-      }
-      else {
-        break;
-      }
-    }    
-  }
-  return byteread; 
+  f_read (&file, (void*)buf, size, &retval);
+  return retval; 
 }
 
-unsigned char emu_FileGetc(void) {
+int emu_FileGetc(int handler)
+{
   unsigned char c;
   unsigned int retval=0;
   if( !(f_read (&file, &c, 1, &retval)) )
   if (retval != 1) {
     emu_printf("emu_FileGetc failed");
   }  
-  return c; 
+  return (int)c; 
 }
 
-void emu_FileClose(void)
+void emu_FileClose(int handler)
 {
   f_close(&file); 
 }
 
-int emu_FileSize(char * filename) 
+int emu_FileSeek(int handler, int seek, int origin)
+{
+  f_lseek(&file, seek);
+  return (seek);
+}
+
+int emu_FileTell(int handler)
+{
+  return (f_tell(&file));
+}
+
+
+unsigned int emu_FileSize(const char * filepath)
 {
   int filesize=0;
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
   emu_printf("FileSize...");
   emu_printf(filepath);
   FILINFO entry;
@@ -1176,25 +1171,10 @@ int emu_FileSize(char * filename)
   return(filesize);    
 }
 
-int emu_FileSeek(int seek) 
-{
-  f_lseek(&file, seek);
-  return (seek);
-}
-
-int emu_FileTell(void) 
-{
-  return (f_tell(&file));
-}
-
-int emu_LoadFile(char * filename, char * buf, int size)
+unsigned int emu_LoadFile(const char * filepath, void * buf, int size)
 {
   int filesize = 0;
     
-  char filepath[80];
-  strcpy(filepath, romspath);
-  strcat(filepath, "/");
-  strcat(filepath, filename);
   emu_printf("LoadFile...");
   emu_printf(filepath);
   if( !(f_open(&file, filepath, FA_READ)) ) {
@@ -1213,7 +1193,48 @@ int emu_LoadFile(char * filename, char * buf, int size)
   return(filesize);
 }
 
+static FIL outfile; 
 
+static bool emu_writeConfig(void)
+{
+  bool retval = false;
+  if( !(f_open(&outfile, ROMSDIR "/" AUTORUN_FILENAME, FA_CREATE_NEW | FA_WRITE)) ) {
+    unsigned int sizeread=0;
+    if( (f_write (&outfile, selection, strlen(selection), &sizeread)) ) {
+      emu_printf("Config write failed");        
+    }
+    else {
+      retval = true;
+    }  
+    f_close(&outfile);   
+  } 
+  return retval; 
+}
+
+static bool emu_readConfig(void)
+{
+  bool retval = false;
+  if( !(f_open(&outfile, ROMSDIR "/" AUTORUN_FILENAME, FA_READ)) ) {
+    unsigned int filesize = f_size(&outfile);
+    unsigned int sizeread=0;
+    if( (f_read (&outfile, selection, filesize, &sizeread)) ) {
+      emu_printf("Config read failed");        
+    }
+    else {
+      if (sizeread == filesize) {
+        selection[filesize]=0;
+        retval = true;
+      }
+    }  
+    f_close(&outfile);   
+  }  
+  return retval; 
+}
+
+static bool emu_eraseConfig(void)
+{
+  f_unlink (ROMSDIR "/" AUTORUN_FILENAME);
+}
 
 
 /********************************
@@ -1229,8 +1250,8 @@ void emu_init(void)
   sd_init_driver(); 
   FRESULT fr = f_mount(&fatfs, "0:", 1);    
 
-  strcpy(romspath,ROMSDIR);
-  nbFiles = readNbFiles(romspath); 
+  strcpy(selection,ROMSDIR);
+  nbFiles = readNbFiles(selection); 
 
   emu_printf("SD initialized, files found: ");
   emu_printi(nbFiles);
@@ -1242,9 +1263,10 @@ void emu_init(void)
   joySwapped = false;   
 #endif  
 
+  int keypressed = emu_ReadKeys();
 #ifdef PICOMPUTER
   // Flip screen if UP pressed
-  if (emu_ReadKeys() & MASK_JOY2_UP)
+  if (keypressed & MASK_JOY2_UP)
   {
 #ifdef PICOMPUTERMAX
 #ifndef USE_VGA    
@@ -1265,7 +1287,18 @@ void emu_init(void)
 #endif
   }
 #endif
-  
+
+  if (keypressed & MASK_JOY2_DOWN) {
+    tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
+    tft.drawTextNoDma(64,48,    (char*)" AUTURUN file erased", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
+    tft.drawTextNoDma(64,48+24, (char*)"Please reset the board!", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
+    emu_eraseConfig();
+  }
+  else {
+    if (emu_readConfig()) {
+      autorun = true;
+    }
+  }  
   toggleMenu(true);
 }
 

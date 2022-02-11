@@ -182,17 +182,17 @@ void INPUT_Scanline(void)
 static void load_CART(char * cartname) 
 {
   int flen = emu_FileSize(cartname);
-  emu_FileOpen(cartname);
+  int f=emu_FileOpen(cartname, "r+b");
   if (flen < 16384) {
     emu_printf("8k");
-    for(int i=0; i<flen; i++) memory[0xA000 + i] = emu_FileGetc();    
+    for(int i=0; i<flen; i++) memory[0xA000 + i] = emu_FileGetc(f);    
   }
   else {
     emu_printf("16k");    
-    for(int i=0; i<flen; i++) memory[0x8000 + i] = emu_FileGetc();
+    for(int i=0; i<flen; i++) memory[0x8000 + i] = emu_FileGetc(f);
   }
 
-  emu_FileClose(); 
+  emu_FileClose(f); 
 }
 
   

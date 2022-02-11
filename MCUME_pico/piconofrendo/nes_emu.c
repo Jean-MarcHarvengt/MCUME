@@ -276,11 +276,12 @@ void nes_Start(char * filename)
 	romdata = (char*)emu_Malloc(romsize);
 	if (romdata)
 	{
-		if (emu_FileOpen(filename)) {
-			if (emu_FileRead((char*)romdata, romsize) != romsize ) {
+      int f = emu_FileOpen(filename, "r+b");
+		if (f) {
+			if (emu_FileRead((char*)romdata, romsize, f) != romsize ) {
 			  	romdata = NULL;
 			}
-			emu_FileClose();
+			emu_FileClose(f);
 		} else {
 			romdata = NULL;
 		}  

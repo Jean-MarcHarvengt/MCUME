@@ -275,7 +275,7 @@ static void load_CART(char * cartname)
 
   flen = emu_FileSize(cartname);
   
-  emu_FileOpen(cartname);
+  int f = emu_FileOpen(cartname,"r+b");
   // set POT left and right values to default
   pot_max_left = POT_LEFT;
   pot_max_right = POT_RIGHT;
@@ -288,7 +288,7 @@ static void load_CART(char * cartname)
   switch (flen)
   {
     case 32768: // 32k cart
-      for (i = 0; i < 32768; i++) memory[0x4000 + i] = emu_FileGetc();
+      for (i = 0; i < 32768; i++) memory[0x4000 + i] = emu_FileGetc(f);
       // get crc32 from 32k data
       crc32 = calc_crc32(memory + 0x4000, 32768);
       sprintf(logmsg, "32 Trying to load '%s', crc32=0x%08X\n", cartname, (unsigned int)crc32);
@@ -296,7 +296,7 @@ static void load_CART(char * cartname)
       break;
     case 16384: // 16k cart
       // here we hack and load it twice (mapped like that?)
-      for (i = 0; i < 16384; i++) memory[0x4000 + i] = memory[0x8000 + i] = emu_FileGetc();
+      for (i = 0; i < 16384; i++) memory[0x4000 + i] = memory[0x8000 + i] = emu_FileGetc(f);
 
       // get crc32 from 16k data
       crc32 = calc_crc32(memory + 0x4000, 16384);
@@ -384,15 +384,15 @@ static void load_CART(char * cartname)
         break;
 #endif
       // default to 16k+8k mapping
-      emu_FileSeek(0);
-      for(i=0; i<16384; i++) memory[0x6000 + i] = emu_FileGetc();
+      emu_FileSeek(f,0,0);
+      for(i=0; i<16384; i++) memory[0x6000 + i] = emu_FileGetc(f);
       for(i=0; i<8192; i++) memory[0xA000 + i] = memory[0x8000 + i];
       break;
     case 8192 : // 8k cart
       // Load mirrored 4 times
       for(i = 0; i < 8192; i++)
         {
-        uint8 c = emu_FileGetc();
+        uint8 c = emu_FileGetc(f);
         memory[0x4000 + i] = c;
         memory[0x6000 + i] = c;
         memory[0x8000 + i] = c;
@@ -431,7 +431,7 @@ static void load_CART(char * cartname)
   //if(memory[0xBFE7] == 0x02) printf("Cart is PAL-compatible!\n");
   //else printf("Cart is *not* PAL-compatible.\n");
 
-  emu_FileClose(); 
+  emu_FileClose(f); 
 }
 
 static void Initialise(void)

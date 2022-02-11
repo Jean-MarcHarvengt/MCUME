@@ -50,7 +50,7 @@ typedef uint16_t Pixel;
 // 27 33 -5 -19
 
 
-static Pixel vicPalette[15];
+static Pixel vicPalette[16];
 static uint16_t remap[16] = {
   0x8000,
   0x8400,

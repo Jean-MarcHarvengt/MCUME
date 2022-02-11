@@ -173,7 +173,7 @@ int coc_Start(char * Cartridge)
 
   if(Verbose) emu_printf("OK\nLoading ROMs:\nOpening COLECO.ROM...");
   P=NULL;
-  if (emu_LoadFile("coleco.rom", (unsigned char *)RAM, 0x2000) != 0x2000)
+  if (emu_LoadFile(ROMSDIR "/" "coleco.rom", (unsigned char *)RAM, 0x2000) != 0x2000)
     P="NOT FOUND OR SHORT FILE";
  
   //if(P) { if(Verbose) puts(P);return(0); }

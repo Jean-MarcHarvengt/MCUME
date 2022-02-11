@@ -100,22 +100,20 @@ extern void emu_init(void);
 extern void emu_start(void);
 extern void emu_resetSD(void);
 
-extern void emu_printf(char * text);
+extern void emu_printf(const char * text);
 extern void emu_printi(int val);
 extern void * emu_Malloc(int size);
 extern void emu_Free(void * pt);
 
-extern int emu_FileOpen(char * filename);
-extern int emu_FileRead(char * buf, int size);
-extern unsigned char emu_FileGetc(void);
-extern int emu_FileSeek(int seek);
-extern void emu_FileClose(void);
-extern int emu_FileSize(char * filename);
-extern int emu_LoadFile(char * filename, char * buf, int size);
-extern int emu_LoadFileSeek(char * filename, char * buf, int size, int seek);
-extern void emu_FileTempInit(void); 
-extern void emu_FileTempRead(int addr, unsigned char * val, int n); 
-extern void emu_FileTempWrite(int addr, unsigned char val); 
+extern int emu_FileOpen(const char * filepath, const char * mode);
+extern int emu_FileRead(void * buf, int size, int handler);
+extern int emu_FileGetc(int handler);
+extern int emu_FileSeek(int handler, int seek, int origin);
+extern int emu_FileTell(int handler);
+extern void emu_FileClose(int handler);
+
+extern unsigned int emu_FileSize(const char * filepath);
+extern unsigned int emu_LoadFile(const char * filepath, void * buf, int size);
 
 extern void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index);
 extern void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride);

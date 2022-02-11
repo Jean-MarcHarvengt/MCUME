@@ -171,7 +171,7 @@ static void load_cart(char *file)
 
 void odd_Start(char * filename)
 {
-	load_bios("o2rom.bin");
+	load_bios(ROMSDIR "/" "o2rom.bin");
 	load_cart(filename);
 	init_display();
 	init_cpu();

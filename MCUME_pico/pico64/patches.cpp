@@ -197,7 +197,7 @@ uint16_t addr,size;
   //emu_resetSD();
   tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
 #endif  
-	if (emu_FileOpen(filename) == 0) {
+	if (emu_FileOpen(filename, "r+b") == 0) {
 		//Serial.println("not found");
 		cpu.pc = 0xf530; //Jump to $F530
 #ifdef EXTERNAL_SD  
@@ -207,11 +207,11 @@ uint16_t addr,size;
 	}
 
 	size = emu_FileSize(filename);
-	emu_FileOpen(filename);
-	emu_FileRead(buffer, 2);
+	int f = emu_FileOpen(filename, "r+b");
+	emu_FileRead(buffer, 2, f);
 	addr = buffer[1] * 256 + buffer[0];
-	emu_FileRead((char*)&cpu.RAM[addr], size - 2);
-	emu_FileClose();
+	emu_FileRead((char*)&cpu.RAM[addr], size - 2, f);
+	emu_FileClose(f);
 
 	cpu.RAM[0xAF] = (addr + size - 2) & 0xff;
 	cpu.RAM[0xAE] = (addr + size - 2) / 256;

@@ -333,18 +333,18 @@ void load_p(int a)
   }
 */    
   emu_printf(tapename);
-  int size = emu_FileSize(tapename);  
-  if ( !emu_FileOpen(tapename) ) {
+  int size = emu_FileSize(tapename);
+  int f = emu_FileOpen(tapename, "r+b");  
+  if ( !f ) {
     /* the partial snap will crash without a file, so reset */
     if(autoload)
       reset81(),autoload=0;
-    return;    
-
+    return;
   }
 
   autoload=0;
-  emu_FileRead(mem + (zx80?0x4000:0x4009), size);
-  emu_FileClose();
+  emu_FileRead(mem + (zx80?0x4000:0x4009), size, f);
+  emu_FileClose(f);
 
   if(zx80)
     store(0x400b,fetch(0x400b)+1);         
@@ -564,13 +564,14 @@ void z81_Start(char * filename)
 {
   char c;
   strncpy(tapename,filename,64);
-  if ( emu_FileOpen(tapename) ) {
-    int fsize = emu_FileRead(&c, 1);
+  int f = emu_FileOpen(tapename, "r+b");
+  if ( f ) {
+    int fsize = emu_FileRead(&c, 1, f);
     if ( fsize == 0) { 
       autoload = 0;
       emu_printf("no autoload");
     }
-    emu_FileClose();
+    emu_FileClose(f);
   }
 
   //emu_setKeymap(1); 
