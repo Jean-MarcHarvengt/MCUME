@@ -6,7 +6,8 @@
 # News
 February 2022: introducing TEECOMPUTER platform based on Teensy41 MCU<br>
 - improved USB keyboard support for existing Teensy41 emus
-- add new emus for Teensy41: for VIC20 and Apple2 based on aiie!
+- add new emus for Teensy41: for Vic20 and Apple2 based on aiie!
+- add AUTORUN feature to Teensy and PICO platforms
 <br>
 
 December 2021:<br>
@@ -27,6 +28,7 @@ September 2021: More PICO platforms improvements<br>
 <details>
   <summary>Click for more new</summary>
   
+<br>
 August 2021: Add support for PICOMPUTERMAX on PICO<br>
 - TFT 7789 320x240
 <br>
@@ -161,7 +163,7 @@ https://youtu.be/6rr2hMqprO0<br>
 <img src="/images/esp321.jpg" width="200" />  
 <img src="/images/esp322.jpg" width="200" />  
 </p>
-A collection of 80th game Console and Computer emulators ported to Teensy and ESP32 MCUs.<br>
+A collection of 80th game Console and Computer emulators ported to Teensy, raspberry PICO and ESP32 MCUs.<br>
 Have a look at the video:
 https://youtu.be/jlqoWH2X6gk<br><br>
 This project is a spin-off of the TeensyCEC project https://github.com/Jean-MarcHarvengt/TeensyCEC<br>
@@ -177,6 +179,8 @@ Computer systems supported and status on various MCU platforms<br>
 | Zx spectrum | X | X | X | X | X | X | X |
 | Atari 800   | X | X | X | X | X | X | X |
 | C64         | X | X | X | X | X | X | X |
+| VIC20       |   |   |   | X |   |   | X |
+| Apple2      |   |   |   | X |   |   |   |
 | Atari 520ST | - | full speed! | X | X (640x400!) | - | slow | - |
 | 8086 XT PC  | - | full speed! | X | X | - | slow | - |
 | MSX1/2      | - | full speed! | X | X | - | - | - |
@@ -210,9 +214,9 @@ Game console systems supported and status on various MCU platforms<br>
 - 3 buttons (FIRE, USER1 and USER2)
 
 # Optional requirements:
-- I2C custom keyboard (for computers emulators)
-- Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0)
-- VGA output (Teensy 3.6 and Teensy 4.1 only)
+- I2C custom keyboard or integrated one (for computers emulators)
+- Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0, PWM for PICO)
+- VGA output (Teensy 3.6, Teensy 4.1 and Raspberry PICO only)
 - 2 extra buttons (USER3 and USER4) mostly for NES emu
 
 # Wiring
@@ -232,6 +236,8 @@ Game console systems supported and status on various MCU platforms<br>
   - "5200" => for atari5200, put your Atari 5200 roms here (.bin)
   - "800"  => for atari800, put your Atari 800 cartridges here (.rom)
   - 'c64"  => for c64, put your C64 programs here (.prg), with sub-dirs or not
+  - "vic20"  => for VIC20, put your V20 programs (.prg), with sub-dirs or not 
+  - "apple2"  => for Apple2 disks, put your ".dsk" files here, with sub-dirs or not 
   - "o2em" => for odyssey/videopac, put your Videopac/Odysssey roms here (.bin)
   - "coleco" => for colem, put your Colecovision roms here (.rom, including coleco.rom)
   - "nes"  => for nes/nofrendo, put your .nes files here (e.g. galaga,xevious,mario1...)
@@ -365,11 +371,12 @@ Game console systems supported and status on various MCU platforms<br>
 - press the USER1+USER2 to reboot the emulator and load another ROM
 - USER2 can be used to swap joystick 1/2 in some emulators
 
-# Running on the PICOMPUTER
+# Running on the PICOMPUTER/TEECOMPUTER
 - Fire button is mapped to key 'TAB'
 - USER2 is mapped to key "fn"
 - USER1 is mapped to "fn+DEL"
 - for PICO64, fb+DEL can be used to load selected game
+- AUTORUN: keep fn key pressed until LED flashes. Launch game with fire. (to remove AUTORUN, press down key at reset)
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
