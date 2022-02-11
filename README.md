@@ -23,6 +23,10 @@ September 2021: More PICO platforms improvements<br>
 - PICOMPUTERMAX now supporting ALT and FN(long press on ALT) so more C64 keys can be mapped (FN for Function keys for e.g.)
 <br>
 
+
+<details>
+  <summary>Click for more new</summary>
+  
 August 2021: Add support for PICOMPUTERMAX on PICO<br>
 - TFT 7789 320x240
 <br>
@@ -134,6 +138,10 @@ Sep 2019: Teensy 4.0 now running Atari 520ST emulator (68k core based)!!! <br>
 https://youtu.be/UCOaOGmYYso<br>
 https://youtu.be/6rr2hMqprO0<br>
 <br>
+
+</details>
+
+
 
 <p align="center">
 <img src="/images/teensy4SD.png" width="200" />  
