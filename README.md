@@ -26,7 +26,7 @@ September 2021: More PICO platforms improvements<br>
 
 
 <details>
-  <summary>Click for more new</summary>
+  <summary>Click for more news</summary>
   
 <br>
 August 2021: Add support for PICOMPUTERMAX on PICO<br>
