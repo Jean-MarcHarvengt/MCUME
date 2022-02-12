@@ -210,7 +210,7 @@ void setup() {
 #endif  
   emu_init(); 
 
-  myTimer.begin(vblCount, 20000);  //to run every 20ms  
+  myTimer.begin(vblCount, 16666);  //to run every 16.6666ms  
 }
 
 // ****************************************************
