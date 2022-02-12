@@ -254,7 +254,7 @@ Game console systems supported and status on various MCU platforms<br>
   - "amiga"  => for Amiga floppies, put your ".adf" and ".hdf" files here.
   - "data"  => for Doom, put your WAD files there (doom1,doom2,plutonia or tnt)
   
--- insert the card into the SD slot
+- insert the card into the SD slot
 
 # Compilation/flashing (Teensy)
 - open the respective ino file with Arduino SDK
@@ -320,8 +320,8 @@ Game console systems supported and status on various MCU platforms<br>
   - I2C custom keyboard support!
   - Full speed with sound
 - Castaway (AtariST):
-  - floppy support
-  - I2C custom keyboard support!
+  - floppy support now with Read and Write access
+  - I2C or integrated (TEECOMPUTER) keyboard support!
   - USB mouse and keyboard support (T4.1)
   - with sound
   - full speed on Teensy4.0 only!!
@@ -359,6 +359,12 @@ Game console systems supported and status on various MCU platforms<br>
   - Improved compatibility (still no AGA support!)
 - Doom:
   - Full speed without sound
+- Vic20:
+  - Initial Audio
+  - Compatibility issues (dont expect to run mario and other demos!)
+- Apple2:
+  - No Audio
+  - Compatibility issues
   
 # Running
 - ESP32 only: Select the emulator from the app selector screen and press FIRE (wait a bit that the SD get mounted)
