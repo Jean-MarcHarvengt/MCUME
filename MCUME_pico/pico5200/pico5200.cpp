@@ -49,7 +49,7 @@ int main(void) {
             if (action == ACTION_RUNTFT) {
               toggleMenu(false);
               emu_start();        
-              emu_Init(filename);      
+              emu_Init(filename);     
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
               tft.startDMA();      
             }  

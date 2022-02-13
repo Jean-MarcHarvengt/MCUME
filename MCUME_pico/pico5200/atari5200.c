@@ -563,18 +563,17 @@ void at5_Step(void)
   else
       which->right = 0; 
 
-#if ANALOGJOY
-  which->analog_h = emu_ReadAnalogJoyX(0,230);
-  which->analog_v = emu_ReadAnalogJoyY(0,230);
+#ifdef ANALOGJOY
+  which->analog_h = 128; //emu_ReadAnalogJoyX(0,230);
+  which->analog_v = 128; //emu_ReadAnalogJoyY(0,230);
 #endif
-  
+
   GTIA_Frame();
   ANTIC_Frame(1); 
   emu_DrawVsync();
+#ifdef HAS_SND  
   POKEY_Frame();
-  //int i;
-  //for (i=0xC000; i< 0x10000; i++)
-  //  if (memory[i] !=0) emu_printf("bug");  
+#endif
 
   framesdrawn = framesdrawn +1;
 }
