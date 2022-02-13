@@ -251,7 +251,7 @@ void loop(void)
       // In VGA mode, we show the keyboard on TFT
       toggleVirtualkeyboard(true); // keepOn
       Serial.println("Starting");
-      myTimer.begin(vblCount, 40000);  //to run every 20ms  
+      myTimer.begin(vblCount, 16666);  // 60Hz = 1/0.016666
 #endif                      
     }         
     delay(20);

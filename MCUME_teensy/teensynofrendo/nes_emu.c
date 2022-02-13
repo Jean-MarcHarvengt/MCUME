@@ -91,7 +91,7 @@ static int osd_init_sound(void)
 
 void osd_getsoundinfo(sndinfo_t *info)
 {
-   info->sample_rate = (22050*20000)/16666; // fix for 60Hz
+   info->sample_rate = 44100
    info->bps = 16;
 }
 
