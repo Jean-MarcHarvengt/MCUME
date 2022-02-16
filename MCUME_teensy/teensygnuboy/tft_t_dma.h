@@ -23,10 +23,10 @@
 #define PAL_COLOR_MASK 0xff
 
 #ifdef LOHRES
-#define TFT_WIDTH      240 
+#define TFT_WIDTH      160 
 #define TFT_REALWIDTH  240
 #else
-#define TFT_WIDTH      320 
+#define TFT_WIDTH      160 
 #define TFT_REALWIDTH  320
 #endif
 #define TFT_HEIGHT     144

@@ -35,6 +35,8 @@ extern "C" void  write_rom(int address, uint8 val)  {
 
 #else
 
+#ifdef HAS_PSRAM
+
 #include "psram_t.h"
 
 PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
@@ -46,6 +48,20 @@ extern "C" uint8 read_rom(int address) {
 extern "C" void  write_rom(int address, uint8 val)  {
   psram.pswrite(address,val); 
 }
+
+#else
+
+DMAMEM static unsigned char MemPool[490*1024];
+
+extern "C" uint8 read_rom(int address) {
+  return (MemPool[address+rom_offset]); 
+}
+
+extern "C" void  write_rom(int address, uint8 val)  {
+  MemPool[address]=val;
+}
+
+#endif
 #endif
 
 void emu_KeyboardOnDown(int keymodifer, int key) {
@@ -60,7 +76,7 @@ void emu_KeyboardOnUp(int keymodifer, int key) {
 void gbe_Init(void)
 {
   emu_printf("Allocating MEM");
-#ifndef HAS_T41     
+#ifdef HAS_PSRAM
   psram.begin();
 #endif  
   mem_init();    
@@ -144,7 +160,9 @@ void gbe_Step(void)
     hw.pad|=PAD_B;
   }
 
-  if (k & MASK_KEY_USER2)  hw.pad|=PAD_START; //PAD_SELECT;
+  if (k & MASK_KEY_USER2)  hw.pad|=PAD_START;
+
+  if (k & MASK_KEY_USER3)  hw.pad|=PAD_SELECT;
 
 
 //  cpu_emulate(2280);
