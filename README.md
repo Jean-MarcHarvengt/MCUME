@@ -4,14 +4,13 @@
 </p>
 
 # News
-February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU<br>
-- improved USB keyboard support for existing Teensy41 emus
-- add new emus for Teensy41: for Vic20 and Apple2 based on aiie!
+February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU:<br>
+- T-COMPUTER has VGA and TFT video out, Audio out, USB input, embedded 42 keys keyboard and a DB9 joystick input!
+- Now supported on T-COMPUTER: Apple2, Vic20, C64, ZX81, ZXSpectrum, Atari ST, Amiga, Genesis, NES, SMS and Doom
+- new emus for Teensy41: Vic20 and Apple2 based on aiie!
 - add AUTORUN feature to Teensy and PICO platforms
 - add Floppy write support to Castaway ST emulator
-- Now supported on T-COMPUTER: Apple2, Vic20, C64, ZX81, ZXSpectrum, Atari ST, Amiga, Genesis, NES, SMS and Doom
-- T-COMPUTER has VGA and TFT video out, Audio out, USB input, embedded 42 keys keyboard and a DB9 joystick input!
- 
+- improved USB keyboard support for existing Teensy41 emus
 <br>
 
 December 2021:<br>
@@ -177,7 +176,7 @@ Now ported to much more MCUs! <br>
 
 Computer systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover | Pico |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4.0 +PSRAM | Teensy4.1 +PSRAM | ESP32 | ESP32-Wrover | Pico |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Zx81        | X | X | X | X | X | X | X |
 | Zx spectrum | X | X | X | X | X | X | X |
@@ -192,12 +191,12 @@ Computer systems supported and status on various MCU platforms<br>
 | Doom        | - | - | - | x | - | - | - |
 
 Please compile for smallest code on the Teensy4.0 else you will run out of memory<br><br>
-For Teensy 4.1 with PSRAM try compiling for faster code (unless it complains at compilation).<br> 
-Doom for example only works if compiled for faster code!
+For Teensy 4.1 with PSRAM try compiling for smallest code (unless it complains at compilation).<br> 
+Doom for example only works if compiled for smallest code!
 
 Game console systems supported and status on various MCU platforms<br>
 
-| System | Teensy3.6 | Teensy 4.0 | Teensy4 +PSRAM | Teensy4.1 +PSRAM+VGA | ESP32 | ESP32-Wrover | Pico |
+| System | Teensy3.6 | Teensy 4.0 | Teensy4 +PSRAM | Teensy4.1 +PSRAM | ESP32 | ESP32-Wrover | Pico |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Atari 2600                   | X | X | X | X | X | X | X |
 | Odyssey/Videopac             | X | X | X | X | X | X | X |
@@ -219,7 +218,7 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Optional requirements:
 - I2C custom keyboard or integrated one (for computers emulators)
-- Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0, PWM for PICO)
+- Sound (DAC for ESP and Teensy3.6, MQS for Teensy4.0, I2S for Teensy4.1, PWM for PICO)
 - VGA output (Teensy 3.6, Teensy 4.1 and Raspberry PICO only)
 - 2 extra buttons (USER3 and USER4) mostly for NES emu
 
@@ -227,10 +226,14 @@ Game console systems supported and status on various MCU platforms<br>
 - see pinout.txt file in the respective project (ESP32 or Teensy)
 - Some KICAD image also available for ESP32
 
-# I2C keyboard (for computer emus)
+# I2C keyboard (for computer emus on Teensy 3.6 only)
 - see i2ckeyboard sub-directory
 - the I2C keyboard is using a separate atmega328p MCU handling the keys matrix
 - with 10x4 or 10x5 keys
+
+# Embedded 42 keys keyboard (on T-COMPUTER and PICOMPUTER)
+
+# USB keyboard (on T-COMPUTER and other Teensy 4.1 platforms)
 
 # Installation
 - Format the SD card as FAT32
@@ -381,7 +384,7 @@ Game console systems supported and status on various MCU platforms<br>
 - press the USER1+USER2 to reboot the emulator and load another ROM
 - USER2 can be used to swap joystick 1/2 in some emulators
 
-# Running on the PICOMPUTER/TEECOMPUTER
+# Running on the PICOMPUTER/T-COMPUTER
 - Fire button is mapped to key 'TAB'
 - USER2 is mapped to key "fn"
 - USER1 is mapped to "fn+DEL"
@@ -390,7 +393,7 @@ Game console systems supported and status on various MCU platforms<br>
 
 # Credits
 I mostly ported the emulators from existing projects, all the credit goes to the authors of
-colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu), Bernd Schmidt (UAE) and  Mike Chambers for his 8086 Arduino project!<br>
+colem, o2em , x2600, moarnes, mc-4u, sz81, atari800, Vice, Nofrendo, jun52, dcastaway, vectrexemu (sorry if I don't mention their name), Charles Macdonald (TGemu), Bernd Schmidt (UAE), Author of Aiie, Vic20 emu and  Mike Chambers for his 8086 Arduino project!<br>
 Doom is based on the ST32 port of chocolate doom so thanks for initial porting effort.<br>
 Thanks a lot also to Frank Boesing for his ILI DMA library from which I started from and his great Teensy64 project https://github.com/FrankBoesing/Teensy64
 
