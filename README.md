@@ -4,7 +4,7 @@
 </p>
 
 # News
-February 2022: introducing TEECOMPUTER platform based on Teensy41 MCU<br>
+February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU<br>
 - improved USB keyboard support for existing Teensy41 emus
 - add new emus for Teensy41: for Vic20 and Apple2 based on aiie!
 - add AUTORUN feature to Teensy and PICO platforms
