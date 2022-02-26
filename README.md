@@ -8,6 +8,10 @@ February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU<br>
 - improved USB keyboard support for existing Teensy41 emus
 - add new emus for Teensy41: for Vic20 and Apple2 based on aiie!
 - add AUTORUN feature to Teensy and PICO platforms
+- add Floppy write support to Castaway ST emulator
+- Now supported on T-COMPUTER: Apple2, Vic20, C64, ZX81, ZXSpectrum, Atari ST, Amiga, Genesis, NES, SMS and Doom
+- T-COMPUTER has VGA and TFT video out, Audio out, USB input, embedded 42 keys keyboard and a DB9 joystick input!
+ 
 <br>
 
 December 2021:<br>
