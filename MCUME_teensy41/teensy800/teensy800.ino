@@ -3,7 +3,9 @@ extern "C" {
   #include "emuapi.h"  
 }
 
-#include "nes_emu.h"
+extern "C" {
+#include "atari800.h"
+}
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
@@ -46,10 +48,11 @@ void emu_DrawVsync(void)
   skip &= VID_FRAME_SKIP;
   if (!vgaMode) {
 #ifdef HAS_T4_VGA
-    tft.waitSync();
+//    tft.waitSync();
 #else
-    while (vbl==vb) {};
+//    while (vbl==vb) {};
 #endif
+    while (vbl==vb) {};
   }
 }
 
@@ -146,19 +149,14 @@ void loop(void)
       emu_Init(filename);       
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
-      myTimer.begin(vblCount, 20000);  //to run every 20ms  
+      myTimer.begin(vblCount, 10000/*16666*/);  //to run every 16.666ms  
     }    
     delay(20);
   }
   else {
-      uint16_t bClick = emu_DebounceLocalKeys();
-      emu_Input(bClick);  
       emu_Step();
-      delay(10);
-      //uint16_t bClick = emu_DebounceLocalKeys();
-      //if (bClick & MASK_KEY_USER1) {
-      //  emu_Input(bClick); 
-      //}           
+      uint16_t bClick = emu_DebounceLocalKeys();
+      emu_Input(bClick);
   }  
 }
 
@@ -196,7 +194,7 @@ void emu_sndPlaySound(int chan, int volume, int freq)
 }
 
 void emu_sndPlayBuzz(int size, int val) {
-  mymixer.buzz(size,val); 
+  //mymixer.buzz(size,val); 
   //Serial.print((val==1)?1:0); 
   //Serial.print(":"); 
   //Serial.println(size); 
