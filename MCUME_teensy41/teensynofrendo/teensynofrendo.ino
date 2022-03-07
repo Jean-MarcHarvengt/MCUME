@@ -146,7 +146,7 @@ void loop(void)
       emu_Init(filename);       
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
-      myTimer.begin(vblCount, 20000);  //to run every 20ms  
+      myTimer.begin(vblCount, 16666);  //to run every 16.6666ms   
     }    
     delay(20);
   }

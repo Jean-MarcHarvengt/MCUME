@@ -33,8 +33,8 @@ typedef struct
 
 
 // global variables
-EXTMEM static unsigned char MemPool[8*1024*1024];
-unsigned char * memory=&MemPool[0];
+//EXTMEM static unsigned char MemPool[8*1024*1024];
+unsigned char * memory=NULL; //&MemPool[0];
 int tv_mode = TV_PAL;
 UBYTE INPUT_key_consol;
 

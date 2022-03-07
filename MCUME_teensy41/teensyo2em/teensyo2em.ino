@@ -3,7 +3,9 @@ extern "C" {
   #include "emuapi.h"  
 }
 
-#include "emu.h"
+extern "C" {
+#include "Oddemu.h"
+}
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
@@ -146,7 +148,8 @@ void loop(void)
       emu_Init(filename);       
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
-      myTimer.begin(vblCount, 20000);  //to run every 20ms  
+      //myTimer.begin(vblCount, 20000);  //to run every 20ms
+      myTimer.begin(vblCount, 16666);  //to run every 16.6666ms       
     }    
     delay(20);
   }
@@ -154,11 +157,8 @@ void loop(void)
       uint16_t bClick = emu_DebounceLocalKeys();
       emu_Input(bClick);  
       emu_Step();
-      delay(10);
-      //uint16_t bClick = emu_DebounceLocalKeys();
-      //if (bClick & MASK_KEY_USER1) {
-      //  emu_Input(bClick); 
-      //}           
+      //delay(20);
+      //delay(16);          
   }  
 }
 
