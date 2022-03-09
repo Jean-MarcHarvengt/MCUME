@@ -246,6 +246,23 @@ set(PICOSND_SOURCES
 		picosnd/picosnd.cpp
 	)
 
+set(PICOVALIDATION_SOURCES 
+		picovalidation/c64.cpp 
+		picovalidation/cia1.cpp
+		picovalidation/cia2.cpp
+		picovalidation/cpu.cpp
+		picovalidation/patches.cpp
+		picovalidation/pla.cpp
+		picovalidation/roms.cpp
+		picovalidation/sid.cpp
+		picovalidation/util.cpp
+		picovalidation/vic.cpp
+		picovalidation/reSID.cpp
+		picovalidation/emuapi.cpp
+		picovalidation/AudioPlaySystem.cpp
+		picovalidation/pico64.cpp
+	)
+
 set(VGA_T4_SOURCES 
 		vga_t4/VGA_t4.cpp
 		vga_t4/scanvideo.c
@@ -255,41 +272,6 @@ set(PICOVGA_T4_SOURCES
 		picovga_t4/VGA_t4.cpp
 		picovga_t4/vga.cpp
 		picovga_t4/vga_vmode.cpp
-		picovga_t4/vga_layer.cpp
-		picovga_t4/vga_screen.cpp
-		picovga_t4/vga_render.S
-		picovga_t4/vga_blitkey.S
-		picovga_t4/render/vga_atext.S
-		picovga_t4/render/vga_attrib8.S
-		picovga_t4/render/vga_color.S
-		picovga_t4/render/vga_ctext.S
-		picovga_t4/render/vga_dtext.S
-		picovga_t4/render/vga_fastsprite.S
-		picovga_t4/render/vga_ftext.S
-		picovga_t4/render/vga_graph1.S
-		picovga_t4/render/vga_graph2.S
-		picovga_t4/render/vga_graph4.S
-		picovga_t4/render/vga_graph8.S
-		picovga_t4/render/vga_graph8mat.S
-		picovga_t4/render/vga_graph8persp.S
-		picovga_t4/render/vga_gtext.S
-		picovga_t4/render/vga_level.S
-		picovga_t4/render/vga_levelgrad.S
-		picovga_t4/render/vga_mtext.S
-		picovga_t4/render/vga_oscil.S
-		picovga_t4/render/vga_oscline.S
-		picovga_t4/render/vga_persp.S
-		picovga_t4/render/vga_persp2.S
-		picovga_t4/render/vga_plane2.S
-		picovga_t4/render/vga_progress.S
-		picovga_t4/render/vga_sprite.S
-		picovga_t4/render/vga_tile.S
-		picovga_t4/render/vga_tile2.S
-		picovga_t4/render/vga_tilepersp.S
-		picovga_t4/render/vga_tilepersp15.S
-		picovga_t4/render/vga_tilepersp2.S
-		picovga_t4/render/vga_tilepersp3.S
-		picovga_t4/render/vga_tilepersp4.S		
 	)
 
 set(PSRAM_SOURCES 
@@ -323,13 +305,13 @@ set(TESTPSRAM_SOURCES
 		testpsram/emuapi.cpp
 	)
 
-# Vic20,ZX81,ZX Spectrum, Colem
-add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
+# Vic20,ZX81,ZX Spectrum,Colem
+#add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
 
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
 #		${PICO20_SOURCES}
-#		${PICO64_SOURCES}
+		${PICO64_SOURCES}
 #		${PICO81_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
@@ -341,10 +323,11 @@ add_executable(mcume
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
-		${TESTVGA_SOURCES}
+#		${TESTVGA_SOURCES}
 #		${TESTKEYMAX_SOURCES}
 #		${TESTPSRAM_SOURCES}
-		${PSRAM_SOURCES}
+#		${PICOVALIDATION_SOURCES}
+#		${PSRAM_SOURCES}
 #		${VGA_T4_SOURCES}
 		${PICOVGA_T4_SOURCES}
 		${TFT_T_SOURCES}
