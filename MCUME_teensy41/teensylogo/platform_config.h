@@ -12,6 +12,7 @@
 //#define HIRES          1
 //#define HAS_SND        1
 //#define HAS_USBKEY     1
+#define PT8211         1
 
 #else
 

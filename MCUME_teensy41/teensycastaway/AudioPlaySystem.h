@@ -19,13 +19,10 @@ public:
   void buzz(int size, int val);
   void step(void);
   static void snd_Mixer(short *  stream, int len );  
-#ifndef HAS_T4_VGA
   void begin_audio(int samplesize, void (*callback)(short * stream, int len));
   void end_audio();
   static void AUDIO_isr(void);  
-  static void SOFTWARE_isr(void);  
-#endif
-
+  static void SOFTWARE_isr(void);
 };
 
 

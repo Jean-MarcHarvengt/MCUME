@@ -1017,9 +1017,14 @@ int handleMenu(uint16_t bClick)
       action = ACTION_RUN2;    
   }
   else if ( bClick & MASK_KEY_USER2  ) {
-      menuRedraw=true;  
-      //action = ACTION_RUN3;    
-      emu_SwapJoysticks(0);
+      menuRedraw=true;
+      char newpath[MAX_FILENAME_PATH];      
+      strcpy(newpath, selection);
+      strcat(newpath, "/");
+      strcat(newpath, selected_filename);
+      strcpy(selection,newpath);        
+      action = ACTION_RUN3;    
+      //emu_SwapJoysticks(0);
   }  
   else if ( (bClick & MASK_JOY2_UP) || (bClick & MASK_JOY1_UP) ) {
     if (curFile!=0) {

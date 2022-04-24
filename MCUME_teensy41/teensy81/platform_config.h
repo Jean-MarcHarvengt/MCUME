@@ -11,6 +11,8 @@
 #define HAS_SND        1
 #define HAS_USBKEY     1
 #define INVX           1
+#define PT8211         1
+
 #else
 
 #define HAS_T4_VGA     1

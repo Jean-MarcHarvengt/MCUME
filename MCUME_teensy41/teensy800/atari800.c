@@ -245,9 +245,9 @@ static void Initialise(void)
   //add_esc(0xe459, ESC_SIOV);  
 }
 
-#define INV_KEY 0
+#define INV_KEY 255
 
-const int16_t keyboardAsciiConv[] = // Ascii to Spectrum keys
+const int8_t keyboardAsciiConv[] = // Ascii to Spectrum keys
 {
 /* 0x00 */ INV_KEY,
 /* 0x01 */ INV_KEY,

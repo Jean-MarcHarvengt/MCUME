@@ -169,14 +169,8 @@ AudioPlaySystem mymixer;
 
 
 void emu_sndInit() {
-  Serial.println("sound init");  
-#ifdef HAS_T4_VGA
-  tft.begin_audio(256, mymixer.snd_Mixer);  
-#else
-  mymixer.begin_audio(256, mymixer.snd_Mixer);  
-#endif
- // sgtl5000_1.enable();
- // sgtl5000_1.volume(0.6);
+  Serial.println("sound init");
+  mymixer.begin_audio(256, mymixer.snd_Mixer);
   mymixer.start();
 }
 
