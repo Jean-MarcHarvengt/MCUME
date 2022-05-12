@@ -88,7 +88,7 @@ static byte kempston_ram;                       // Kempston-Joystick Buffer
 static int v_border=0;
 static int h_border=32;
 static int bordercolor=0;
-static byte * XBuf=0; 
+static byte * XBuf=0;
 
 static int ik;
 static int ihk;
@@ -111,12 +111,12 @@ void displayscanline(int y, int f_flash)
 
   dir_p = ((y & 0xC0) << 5) + ((y & 0x07) << 8) + ((y & 0x38) << 2);
   dir_a = 0x1800 + (32 * (y >> 3));
-  
+
   for (x = 0; x < 32; x++)
   {
     pixeles=  VRAM[dir_p++];
     atributos=VRAM[dir_a++];
-    
+
     if (((atributos & 0x80) == 0) || (f_flash == 0))
     {
       tinta = (atributos & 0x07) + ((atributos & 0x40) >> 3);
@@ -140,12 +140,12 @@ void displayscanline(int y, int f_flash)
   for (x = 0; x < h_border; x++) {
     XBuf[col++] = bordercolor;
   }
-  
+
   emu_DrawLine(XBuf, WIDTH, HEIGHT, y);
 }
 
 #ifdef HAS_SND
-#ifdef CUSTOM_SND 
+#ifdef CUSTOM_SND
 #define SAMSIZE 32768
 static unsigned char sam[SAMSIZE];
 static int rdsam=0;
@@ -157,7 +157,7 @@ static int lastBuzzCycle=0;
 static byte lastBuzzVal;
 
 #ifdef HAS_SND
-#ifdef CUSTOM_SND   
+#ifdef CUSTOM_SND
 void  SND_Process( short * stream, int len )
 {
     len = len >> 1;
@@ -168,10 +168,10 @@ void  SND_Process( short * stream, int len )
       rdsam &= SAMSIZE-1;
       *stream++ = (short)(s);
       *stream++ = (short)(s);
-    }      
+    }
 }
 #endif
-#endif 
+#endif
 
 static void displayScreen(void) {
   int y;
@@ -181,43 +181,43 @@ static void displayScreen(void) {
     f_flash = 1;
   else
     f_flash = 0;
-  
+
   for (y = 0; y < HEIGHT; y++)
     displayscanline (y, f_flash);
- 
-  emu_DrawVsync();   
+
+  emu_DrawVsync();
 }
 
 
 
 static void InitKeyboard(void){
-  memset(key_ram, 0xff, sizeof(key_ram));   
+  memset(key_ram, 0xff, sizeof(key_ram));
 }
 
 static void UpdateKeyboard (void)
 {
   //int k = ik; //emu_GetPad();
-  int hk = ihk; //emu_ReadI2CKeyboard();  
+  int hk = ihk; //emu_ReadI2CKeyboard();
   //if ( hk == 0 )  {
-  memset(key_ram, 0xff, sizeof(key_ram));    
+  memset(key_ram, 0xff, sizeof(key_ram));
   //}
-  //else 
+  //else
   {
     //if (k & MASK_KEY_USER1) hk = 39;
     int shift = hk;
     if (hk >=128) hk -= 128;
-    else if (hk >=64) hk -= 64;    
+    else if (hk >=64) hk -= 64;
     // scan all possibilities
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
         if ( /*(k == map_qw[j][i]) ||*/ (hk == map_qw[j][i]) ) {
             key_ram[j] &= ~ (1<<(4-i));
-        }   
-      }  
-    } 
-    if (shift >=128) key_ram[0] &= ~ (1<<0);  // SHift 
-    else if (shift >=64) key_ram[7] &= ~ (1<<1);  // SHift symboles     
-  } 
+        }
+      }
+    }
+    if (shift >=128) key_ram[0] &= ~ (1<<0);  // SHift
+    else if (shift >=64) key_ram[7] &= ~ (1<<1);  // SHift symboles
+  }
 }
 
 
@@ -234,7 +234,7 @@ int endsWith(const char * s, const char * suffix)
       retval = 1;
     }
   }
-   return (retval);  
+   return (retval);
 }
 
 
@@ -245,19 +245,25 @@ void emu_KeyboardOnUp(int keymodifer, int key) {
 }
 
 void spec_Start(char * filename) {
+
+  if (!filename) {
+    #include "zxspectrum48rom.inl" // defines
+    ZX_ReadFromFlash_Z80(&myCPU, zxspectrum48rom, sizeof(zxspectrum48_rom) / sizeof(unsigned char));
+  }
+
   memset(Z80_RAM, 0, 0xC000);
   if ( (endsWith(filename, "SNA")) || (endsWith(filename, "sna")) ) {
-    ZX_ReadFromFlash_SNA(&myCPU, filename); 
-  } 
+    ZX_ReadFromFlash_SNA(&myCPU, filename);
+  }
   else if ( (endsWith(filename, "Z80")) || (endsWith(filename, "z80")) ) {
     unsigned char * game = emu_Malloc(MAX_Z80SIZE);
-    int size = emu_LoadFile(filename, game, MAX_Z80SIZE);  
-    ZX_ReadFromFlash_Z80(&myCPU, game,size); 
-    emu_Free(game);  
+    int size = emu_LoadFile(filename, game, MAX_Z80SIZE);
+    ZX_ReadFromFlash_Z80(&myCPU, game,size);
+    emu_Free(game);
   }
 #ifdef HAS_SND
-  emu_sndInit(); 
-#endif  
+  emu_sndInit();
+#endif
 }
 
 
@@ -269,21 +275,21 @@ void spec_Init(void) {
   /* Set up the palette */
   for(J=0;J<16;J++)
     emu_SetPaletteEntry(Palette[J].R,Palette[J].G,Palette[J].B, J);
-  
+
   InitKeyboard();
- 
+
   Reset8910(&ay,3500000,0);
 
-  
+
   if (XBuf == 0) XBuf = (byte *)emu_Malloc(WIDTH);
   VRAM = Z80_RAM;
   memset(Z80_RAM, 0, sizeof(Z80_RAM));
 
   ResetZ80(&myCPU, CYCLES_PER_FRAME);
-#if ALT_Z80CORE  
-  myCPU.RAM = Z80_RAM; 
+#if ALT_Z80CORE
+  myCPU.RAM = Z80_RAM;
   Z80FlagTables();
-#endif      
+#endif
 }
 
 #include "emuapi.h"
@@ -294,10 +300,10 @@ void spec_Step(void) {
     lastBuzzCycle=0;
     ExecZ80(&myCPU,CYCLES_PER_STEP); // 3.5MHz ticks for 6 lines @ 30 kHz = 700 cycles
 #ifdef HAS_SND
-#ifdef CUSTOM_SND 
+#ifdef CUSTOM_SND
     buzz(lastBuzzVal, CYCLES_PER_STEP);
 #endif
-#endif    
+#endif
     //busy_wait_us(1);
     //sleep_us(1);
   }
@@ -310,7 +316,7 @@ void spec_Step(void) {
   displayScreen();
 
   int k=ik; //emu_GetPad();
-  
+
   kempston_ram = 0x00;
   if (k & MASK_JOY2_BTN)
           kempston_ram |= 0x10; //Fire
@@ -325,7 +331,7 @@ void spec_Step(void) {
 
 
   UpdateKeyboard();
-    
+
   Loop8910(&ay,20);
 }
 
@@ -342,7 +348,7 @@ void WrZ80(register word Addr,register byte Value)
 
 byte RdZ80(register word Addr)
 {
-  if (Addr<BASERAM) 
+  if (Addr<BASERAM)
     return rom_zx48_rom[Addr];
   else
     return Z80_RAM[Addr-BASERAM];
@@ -354,29 +360,29 @@ void buzz(int val, int currentTstates)
 {
   int pulse_size = (currentTstates-lastBuzzCycle);
 #ifdef HAS_SND
-#ifdef CUSTOM_SND 
+#ifdef CUSTOM_SND
   for (int i = 0; i<pulse_size; i++ ) {
     sam[wrsam] = lastBuzzVal?0:1;
     wrsam += 1;
     wrsam &= SAMSIZE-1;
-  } 
+  }
 
   lastBuzzCycle = currentTstates;
-  lastBuzzVal = val;  
+  lastBuzzVal = val;
 #else
   emu_sndPlayBuzz(pulse_size,val);
 #endif
-#endif    
+#endif
 }
 
 void OutZ80(register word Port,register byte Value)
 {
   if ((Port & 0xC002) == 0xC000) {
     WrCtrl8910(&ay,(Value &0x0F));
-  }  
+  }
   else if ((Port & 0xC002) == 0x8000) {
     WrData8910(&ay,Value);
-  }    
+  }
   else if (!(Port & 0x01)) {
     bordercolor = (Value & 0x07);
     byte mic = (Value & 0x08);
@@ -389,11 +395,11 @@ void OutZ80(register word Port,register byte Value)
 }
 
 byte InZ80(register word port)
-{  
+{
     if (port == 0xFFFD) {
       return (RdData8910(&ay));
     }
-  
+
     if((port&0xFF)==0x1F) {
         // kempston RAM
         return kempston_ram;
@@ -410,18 +416,18 @@ byte InZ80(register word port)
             case 0xBF : return key_ram[6]; break;
             case 0x7F : return key_ram[7]; break;
         }
-    } 
+    }
 
-    if ((port & 0xFF) == 0xFF) {  
+    if ((port & 0xFF) == 0xFF) {
       if (hwopt.port_ff == 0xFF) {
-       return 0xFF;        
+       return 0xFF;
       }
       else {
        //code = 1;
        //if (code == 0xFF) code = 0x00;
        return 1;
       }
-    }    
+    }
     return 0xFF;
 }
 

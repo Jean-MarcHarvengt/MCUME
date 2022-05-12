@@ -1,21 +1,21 @@
 #ifndef _PLATFORM_CONFIG_H_
 #define _PLATFORM_CONFIG_H_
 
-// MCUME_REV2 is new layout with VGA+TFT+AnalogJoy+3buttons+Sound  
-// MCUME_REV1 had only support for VGA+AnalogJoy+3buttons+Sound 
-// PICOMPUTER has support for TFT+keymatrix+Sound 
+// MCUME_REV2 is new layout with VGA+TFT+AnalogJoy+3buttons+Sound
+// MCUME_REV1 had only support for VGA+AnalogJoy+3buttons+Sound
+// PICOMPUTER has support for TFT+keymatrix+Sound
 
 
-//#define PICOMPUTER     1
+#define PICOMPUTER     1
 //#define PICOMPUTERMAX  1
 //#define PICORETROVGA   1
 //#define MCUME_REV1      1
-#define MCUME_REV2      1
+//#define MCUME_REV2      1
 
 #ifdef PICOMPUTER
 //#define SWAP_ALT_DEL   1
 #define ST7789         1
-#define LOHRES         1
+//#define LOHRES         1
 #define FLIP_SCREEN    1
 #define INVX           1
 #define HAS_SND        1

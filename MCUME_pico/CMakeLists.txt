@@ -23,8 +23,8 @@ include_directories(tft_t)
 include_directories(psram)
 
 
-set(PICO81_SOURCES 
-		pico81/Z80.c 
+set(PICO81_SOURCES
+		pico81/Z80.c
 		pico81/AY8910.c
 		pico81/zx81.c
 		pico81/emuapi.cpp
@@ -32,8 +32,8 @@ set(PICO81_SOURCES
 		pico81/AudioPlaySystem.cpp
 	)
 
-set(PICOSPECCY_SOURCES 
-		picospeccy/Z80.c 
+set(PICOSPECCY_SOURCES
+		picospeccy/Z80.c
 		picospeccy/AY8910.c
 		picospeccy/spec.c
 		picospeccy/zx_filetyp_z80.c
@@ -42,8 +42,8 @@ set(PICOSPECCY_SOURCES
 		picospeccy/AudioPlaySystem.cpp
 	)
 
-set(PICO800_SOURCES 
-		pico800/antic.c 
+set(PICO800_SOURCES
+		pico800/antic.c
 		pico800/atari800.c
 		pico800/cpu.c
 		pico800/crc32.c
@@ -57,8 +57,8 @@ set(PICO800_SOURCES
 		pico800/pico800.cpp
 	)
 
-set(PICO5200_SOURCES 
-		pico5200/antic.c 
+set(PICO5200_SOURCES
+		pico5200/antic.c
 		pico5200/atari5200.c
 		pico5200/cpu.c
 		pico5200/crc32.c
@@ -70,7 +70,7 @@ set(PICO5200_SOURCES
 		pico5200/pico5200.cpp
 	)
 
-set(PICO20_SOURCES 
+set(PICO20_SOURCES
 		pico20/IC.cpp
 #		pico20/MOS6502.cpp
 #		pico20/Register8.cpp
@@ -86,8 +86,8 @@ set(PICO20_SOURCES
 		pico20/pico20.cpp
 	)
 
-set(PICO64_SOURCES 
-		pico64/c64.cpp 
+set(PICO64_SOURCES
+		pico64/c64.cpp
 		pico64/cia1.cpp
 		pico64/cia2.cpp
 		pico64/cpu.cpp
@@ -103,8 +103,8 @@ set(PICO64_SOURCES
 		pico64/pico64.cpp
 	)
 
-set(PICOCOLEM_SOURCES 
-		picocolem/Z80.c 
+set(PICOCOLEM_SOURCES
+		picocolem/Z80.c
 		picocolem/SN76489.c
 		picocolem/Colem.c
 		picocolem/emuapi.cpp
@@ -112,8 +112,8 @@ set(PICOCOLEM_SOURCES
 		picocolem/AudioPlaySystem.cpp
 	)
 
-set(PICOO2EM_SOURCES 
-		picoo2em/audio.c 
+set(PICOO2EM_SOURCES
+		picoo2em/audio.c
 		picoo2em/cpu.c
 		picoo2em/crc32.c
 		picoo2em/cset.c
@@ -128,8 +128,8 @@ set(PICOO2EM_SOURCES
 		picoo2em/AudioPlaySystem.cpp
 	)
 
-set(PICOVCS_SOURCES 
-		picovcs/At2600.c 
+set(PICOVCS_SOURCES
+		picovcs/At2600.c
 		picovcs/Collision.c
 		picovcs/Cpu.c
 		picovcs/Display.c
@@ -147,8 +147,8 @@ set(PICOVCS_SOURCES
 		picovcs/AudioPlaySystem.cpp
 	)
 
-set(PICONOFRENDO_SOURCES 
-		piconofrendo/bitmap.c 
+set(PICONOFRENDO_SOURCES
+		piconofrendo/bitmap.c
 		piconofrendo/config.c
 		piconofrendo/event.c
 		piconofrendo/log.c
@@ -211,8 +211,8 @@ set(PICONOFRENDO_SOURCES
 		piconofrendo/AudioPlaySystem.cpp
 	)
 
-set(PICO8086_SOURCES 
-		pico8086/cpu.cpp 
+set(PICO8086_SOURCES
+		pico8086/cpu.cpp
 		pico8086/disk.cpp
 		pico8086/network.cpp
 		pico8086/ports.cpp
@@ -224,7 +224,7 @@ set(PICO8086_SOURCES
 		pico8086/AudioPlaySystem.cpp
 	)
 
-set(PICOSND_SOURCES 
+set(PICOSND_SOURCES
 #		picosnd/LibFC14/Dump.cpp
 #		picosnd/LibFC14/FC_Data.cpp
 #		picosnd/LibFC14/FC.cpp
@@ -246,8 +246,8 @@ set(PICOSND_SOURCES
 		picosnd/picosnd.cpp
 	)
 
-set(PICOVALIDATION_SOURCES 
-		picovalidation/c64.cpp 
+set(PICOVALIDATION_SOURCES
+		picovalidation/c64.cpp
 		picovalidation/cia1.cpp
 		picovalidation/cia2.cpp
 		picovalidation/cpu.cpp
@@ -263,44 +263,44 @@ set(PICOVALIDATION_SOURCES
 		picovalidation/pico64.cpp
 	)
 
-set(VGA_T4_SOURCES 
+set(VGA_T4_SOURCES
 		vga_t4/VGA_t4.cpp
 		vga_t4/scanvideo.c
 	)
 
-set(PICOVGA_T4_SOURCES 
+set(PICOVGA_T4_SOURCES
 		picovga_t4/VGA_t4.cpp
 		picovga_t4/vga.cpp
 		picovga_t4/vga_vmode.cpp
 	)
 
-set(PSRAM_SOURCES 
+set(PSRAM_SOURCES
 		psram/psram_t.cpp
 	)
 
-set(TFT_T_SOURCES 
+set(TFT_T_SOURCES
 		tft_t/tft_t_dma.cpp
 	)
 
-set(GFXENGINE_SOURCES 
+set(GFXENGINE_SOURCES
 		gfxengine/gfxengine.cpp
 	)
 
-set(TESTIO_SOURCES 
+set(TESTIO_SOURCES
 		testio/testio.cpp
 		testio/emuapi.cpp
 	)
 
-set(TESTVGA_SOURCES 
+set(TESTVGA_SOURCES
 		testvga/testvga.cpp
 	)
 
-set(TESTKEYMAX_SOURCES 
+set(TESTKEYMAX_SOURCES
 		testkeymax/testkeymax.cpp
 		testkeymax/emuapi.cpp
 	)
 
-set(TESTPSRAM_SOURCES 
+set(TESTPSRAM_SOURCES
 		testpsram/testpsram.cpp
 		testpsram/emuapi.cpp
 	)
@@ -311,7 +311,7 @@ set(TESTPSRAM_SOURCES
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
 #		${PICO20_SOURCES}
-		${PICO64_SOURCES}
+#		${PICO64_SOURCES}
 #		${PICO81_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
@@ -319,7 +319,7 @@ add_executable(mcume
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
-#		${PICOSPECCY_SOURCES}
+		${PICOSPECCY_SOURCES}
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
@@ -329,7 +329,7 @@ add_executable(mcume
 #		${PICOVALIDATION_SOURCES}
 #		${PSRAM_SOURCES}
 #		${VGA_T4_SOURCES}
-		${PICOVGA_T4_SOURCES}
+#		${PICOVGA_T4_SOURCES}
 		${TFT_T_SOURCES}
 	)
 
@@ -344,7 +344,7 @@ target_link_libraries(mcume pico_multicore
 #	    pico_scanvideo_dpi
 	    hardware_adc
 	    hardware_pio
-        hardware_pwm	    
+        hardware_pwm
 	)
 
 
