@@ -102,7 +102,6 @@ typedef uint8 SNESPixel;
 #define FIRST_COLOR_MASK   0xF800
 #define SECOND_COLOR_MASK  0x07E0
 #define THIRD_COLOR_MASK   0x001F
-#define ALPHA_BITS_MASK    0x0000
 
 // RGB are 5,5,5 => 0x00-0x1F values
 
@@ -114,25 +113,54 @@ typedef uint8 SNESPixel;
 #define RGB_REMOVE_LOW_BITS_MASK   (~RGB_LOW_BITS_MASK)
 
 #else
+
+/*
+#define RED_SHIFT_BITS     10
+#define GREEN_SHIFT_BITS   5
+//7C00   3E0   1F
+//RRRRRGGGGGBBBBB
+#define RED_LOW_BIT_MASK   0x0800
+#define RED_HI_BIT_MASK    0x4000
+#define GREEN_LOW_BIT_MASK 0x0020
+#define GREEN_HI_BIT_MASK  0x0200
+#define BLUE_LOW_BIT_MASK  0x0001
+#define BLUE_HI_BIT_MASK   0x0010
+#define FIRST_COLOR_MASK   0x7C00
+#define SECOND_COLOR_MASK  0x03E0
+#define THIRD_COLOR_MASK   0x001F
+*/
+
+#define RED_SHIFT_BITS     11
+#define GREEN_SHIFT_BITS   6
+#define RED_LOW_BIT_MASK   0x0800
+#define GREEN_LOW_BIT_MASK 0x0020
+#define BLUE_LOW_BIT_MASK  0x0001
+#define RED_HI_BIT_MASK    0x8000
+#define GREEN_HI_BIT_MASK  0x0400
+#define BLUE_HI_BIT_MASK   0x0010
+#define FIRST_COLOR_MASK   0xF800
+#define SECOND_COLOR_MASK  0x07E0
+#define THIRD_COLOR_MASK   0x001F
 /* RGB332 format */
-#define RED_SHIFT_BITS     5
-#define GREEN_SHIFT_BITS   2
+//#define RED_SHIFT_BITS     5
+//#define GREEN_SHIFT_BITS   2
 //842 184 21 
 //000 000 00
-
+/*
 #define RED_LOW_BIT_MASK   0x20
 #define GREEN_LOW_BIT_MASK 0x04
 #define BLUE_LOW_BIT_MASK  0x01
+
 #define RED_HI_BIT_MASK    0x80
 #define GREEN_HI_BIT_MASK  0x10
 #define BLUE_HI_BIT_MASK   0x02
+
 #define FIRST_COLOR_MASK   0xE0
 #define SECOND_COLOR_MASK  0x1C
 #define THIRD_COLOR_MASK   0x03
-#define ALPHA_BITS_MASK    0x00
+*/
 
 
-//#define BUILD_PIXEL(R, G, B)     (((SNESPixel)(R) << 5) /*| ((SNESPixel)(G) << 2)  */  | (SNESPixel)(B>>3) )
 #define BUILD_PIXEL(R, G, B)     (((SNESPixel)(R&0x1C) << 3) | ((SNESPixel)(G&0x1C))  | (SNESPixel)(B>>3) )
 
 #define RGB_LOW_BITS_MASK          (RED_LOW_BIT_MASK | GREEN_LOW_BIT_MASK | BLUE_LOW_BIT_MASK)

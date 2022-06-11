@@ -174,7 +174,13 @@ struct SSettings
 	bool8	TurboMode;
 
 	bool8	DisableGameSpecificHacks;
-
+  bool8 SixteenBitSound;
+  bool8 ReverseStereo;
+  bool8 PAL;
+  uint16 InterpolationMethod;
+  bool8 SeparateEchoBuffer;
+  bool8 MSU1;
+  
 #ifdef DEBUGGER
 	bool8	TraceDMA;
 	bool8	TraceHDMA;

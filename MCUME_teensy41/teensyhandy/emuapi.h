@@ -5,17 +5,17 @@
 
 #define CUSTOM_SND  1
 //#define TIMER_REND  1
-#define EXTPAD      1
+#define EXTPAD  1
 
-#define EXTRA_HEAP  0x14000
+#define EXTRA_HEAP  0x10
 
 // Title:     <                        >
-#define TITLE "    SNES Emulator "
-#define ROMSDIR "snes"
+#define TITLE "    LYNX Emulator "
+#define ROMSDIR "lynx"
 
-#define emu_Init(ROM) { snes_Init(); snes_Start(ROM);}
-#define emu_Step(x) { snes_Step(); }
-#define emu_Input(x) { snes_Input(x); }
+#define emu_Init(ROM) { lnx_Init(); lnx_Start(ROM);}
+#define emu_Step(x) { lnx_Step(); }
+#define emu_Input(x) { lnx_Input(x); }
 
 #define MAX_FILENAME_PATH    64
 #define NB_FILE_HANDLER      4
@@ -195,7 +195,6 @@ extern int emu_ReadKeys(void);
 extern int emu_GetPad(void);
 extern int emu_GetMouse(int *x, int *y, int *buts);
 extern int emu_MouseDetected(void);
-extern int emu_GetJoystick(void);
 extern int emu_KeyboardDetected(void);
 extern int emu_ReadAnalogJoyX(int min, int max);
 extern int emu_ReadAnalogJoyY(int min, int max);

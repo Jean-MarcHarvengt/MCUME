@@ -165,8 +165,9 @@ void S9UpdateLineMatrix(int line)
 #define COLOR_ADD1_2(C1, C2) \
 	((((((C1) & RGB_REMOVE_LOW_BITS_MASK) + \
 	((C2) & RGB_REMOVE_LOW_BITS_MASK)) >> 1) + \
-	((C1) & (C2) & RGB_LOW_BITS_MASK)) | ALPHA_BITS_MASK)
+	((C1) & (C2) & RGB_LOW_BITS_MASK)) )
 #define COLOR_ADD_BRIGHTNESS1_2 COLOR_ADD1_2
+
 
 static inline uint16 COLOR_ADD_BRIGHTNESS(uint32 C1, uint32 C2)
 {
@@ -181,6 +182,8 @@ static inline uint16 COLOR_ADD_BRIGHTNESS(uint32 C1, uint32 C2)
 
 static inline uint16 COLOR_ADD(uint32 C1, uint32 C2)
 {
+//  return C1;
+  
 	const uint32 RED_MASK   = 0x1F << RED_SHIFT_BITS;
 	const uint32 GREEN_MASK = 0x1F << GREEN_SHIFT_BITS;
 	const uint32 BLUE_MASK  = 0x1F;
@@ -194,7 +197,12 @@ static inline uint16 COLOR_ADD(uint32 C1, uint32 C2)
 #if GREEN_SHIFT_BITS == 6
 	retval |= (retval & 0x0400) >> 5;
 #endif
+//  int rr = (retval & 0xF800) >> (2+11);
+//  int gg = (retval & 0x07E0) >> (3+5);
+//  int bb = (retval & 0x001F) >> 3  ;
+//  retval = (rr << 5) + (gg << 2) + bb;
 	return retval;
+  
 }
 
 #define COLOR_SUB1_2(C1, C2) \
@@ -203,6 +211,8 @@ static inline uint16 COLOR_ADD(uint32 C1, uint32 C2)
 
 static inline uint16 COLOR_SUB (uint32 C1, uint32 C2)
 {
+//  return C1;
+  
 	int rb1 = (C1 & (THIRD_COLOR_MASK | FIRST_COLOR_MASK)) | ((0x20 << 0) | (0x20 << RED_SHIFT_BITS));
 	int rb2 = C2 & (THIRD_COLOR_MASK | FIRST_COLOR_MASK);
 	int rb = rb1 - rb2;
@@ -213,7 +223,12 @@ static inline uint16 COLOR_SUB (uint32 C1, uint32 C2)
 #if GREEN_SHIFT_BITS == 6
 	retval |= (retval & 0x0400) >> 5;
 #endif
+//  int rr = (retval & 0xF800) >> (2+11);
+//  int gg = (retval & 0x07E0) >> (3+5);
+//  int bb = (retval & 0x001F) >> 3  ;
+//  retval = (rr << 5) + (gg << 2) + bb;
 	return retval;
+  
 }
 
 // Here are the tile converters, selected by S9xSelectTileConverter().

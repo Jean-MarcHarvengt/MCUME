@@ -20,6 +20,14 @@ USBHIDParser hid1(myusb);
 MouseController mouse1(myusb);
 MIDIDevice midi1(myusb);
 #endif
+#ifdef HAS_USBJOY
+#include "USBHost_t36.h"  // Read this header first for key info
+USBHost myusb;
+USBHub hub1(myusb);
+USBHIDParser hid1(myusb);
+#define COUNT_JOYSTICKS 4
+JoystickController joysticks[COUNT_JOYSTICKS](myusb);
+#endif
 
 static bool emu_writeConfig(void);
 static bool emu_readConfig(void);
@@ -158,7 +166,7 @@ void emu_Free(void * pt)
   free(pt);
 }
 
-#define SMEMPOOL (0x400000+400000)
+#define SMEMPOOL (0x800000) //(0x400000+400000)
 EXTMEM static unsigned char slowmem[SMEMPOOL];
 static int slowmempt = 0;
 
@@ -352,6 +360,11 @@ int emu_ReadKeys(void)
 #endif
   if ( row & 0x02 ) retval |= MASK_JOY2_BTN;
 
+#ifdef EXTPAD
+  if ( fn_pressed ) retval |= MASK_KEY_USER1;
+  if ( sh_pressed ) retval |= MASK_KEY_USER3;
+  digitalWrite(KLED, 0);
+#else
   // Handle LED flash
   uint32_t time_ms=millis();
   if ((time_ms-last_t_ms) > 100) {
@@ -435,8 +448,9 @@ int emu_ReadKeys(void)
  
   if ( key_fn ) retval |= MASK_KEY_USER2;
   if ( ( key_fn ) && (keymatrix[4] == 0x10 )) retval |= MASK_KEY_USER1;
+#endif
 
-  if ( (key_fn) && (key_sh) )
+  if ( (fn_pressed) && (sh_pressed) )
 #else
   if ( ((retval & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
      || (retval & MASK_KEY_USER4 ) )
@@ -476,8 +490,10 @@ int emu_ReadKeys(void)
     while (true) {
       ;
     } 
-#endif 
+#endif
   }
+
+  emu_GetJoystick();
   
   return (retval);
 }
@@ -640,6 +656,23 @@ int emu_GetMouse(int *x, int *y, int *buts) {
     return 1;
   }   
 #endif
+  return 0;
+}
+
+int emu_GetJoystick(void) {
+#ifdef HAS_USBJOY
+  //myusb.Task();
+  for (int joystick_index = 0; joystick_index < COUNT_JOYSTICKS; joystick_index++) {
+    if (joysticks[joystick_index].available()) {
+      uint64_t axis_mask = joysticks[joystick_index].axisMask();
+      uint64_t axis_changed_mask = joysticks[joystick_index].axisChangedMask();
+      uint32_t buttons = joysticks[joystick_index].getButtons();
+      Serial.printf("Joystick(%d): buttons = %x", joystick_index, buttons);
+      Serial.println();    
+    }
+  }
+  return 1;
+#endif     
   return 0;
 }
 
@@ -1707,6 +1740,9 @@ void emu_init(void)
   myusb.begin();
   keyboard1.attachPress(OnPress);
   keyboard1.attachRelease(OnRelease);
+#endif
+#ifdef HAS_USBJOY
+  myusb.begin();
 #endif
 
   while (!SD.begin(SD_CS))

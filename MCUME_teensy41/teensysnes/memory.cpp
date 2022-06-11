@@ -4,6 +4,8 @@
    For further information, consult the LICENSE file in the root directory.
 \*****************************************************************************/
 
+#include <Arduino.h>
+
 #include "snes9x.h"
 #include "memory.h"
 #include "apu.h"
@@ -624,7 +626,7 @@ bool8 S9xMemoryInit (void)
 	Memory.RAM  = (uint8 *) emu_Malloc(0x20000); // calloc(1, 0x20000); // 128k
 	Memory.VRAM = (uint8 *) emu_Malloc(0x10000); //calloc(1, 0x10000); // 64k
 	Memory.SRAM = (uint8 *) emu_Malloc(0x8000); //calloc(1, 0x8000);  // 32k
-	Memory.ROM_MAX_SIZE = 0x400000;
+	Memory.ROM_MAX_SIZE = 0x500000;
 	//Memory.ROM  = (uint8 *) calloc(1, Memory.ROM_MAX_SIZE);
 	// Note: we don't care if ROM alloc fails. It's just to grab a large heap block
 	//       before it gets fragmented. The actual useful alloc is done in S9xLoadROM()

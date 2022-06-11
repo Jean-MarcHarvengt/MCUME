@@ -3,7 +3,7 @@ extern "C" {
   #include "iopins.h"  
 }
 
-#include "snes.h"
+#include "lynx.h"
 
 #ifdef HAS_T4_VGA
 #include "vga_t_dma.h"
@@ -49,8 +49,7 @@ void emu_DrawVsync(void)
   skip &= VID_FRAME_SKIP;
   if (!vgaMode) {
 #ifdef HAS_T4_VGA
-    //while (vbl==vb) {};
-    tft.waitSync();
+    while (vbl==vb) {};
 #else
     while (vbl==vb) {};
 #endif
@@ -161,7 +160,7 @@ void loop(void)
       tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
       tft.startDMA(); 
       emu_Init(filename);       
-      myTimer.begin(vblCount, 16666);  //to run every 20ms  
+      myTimer.begin(vblCount, 12000/*16666*/);  
     }    
     delay(20);
   }
@@ -169,7 +168,6 @@ void loop(void)
       uint16_t bClick = emu_DebounceLocalKeys();
       emu_Input(bClick);  
       emu_Step();
-      //delay(10);
       //uint16_t bClick = emu_DebounceLocalKeys();
       //if (bClick & MASK_KEY_USER1) {
       //  emu_Input(bClick); 

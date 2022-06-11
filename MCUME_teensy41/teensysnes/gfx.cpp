@@ -1543,7 +1543,7 @@ bool8 S9xGraphicsInit (void)
 	GFX.SubScreen  = (SNESPixel *) emu_SMalloc(GFX.ScreenSize * sizeof(SNESPixel));
 
 	GFX.ZBuffer    = (uint8 *)  emu_Malloc(GFX.ScreenSize);
-	GFX.SubZBuffer = (uint8 *)  emu_SMalloc(GFX.ScreenSize);
+	GFX.SubZBuffer = (uint8 *)  emu_Malloc(GFX.ScreenSize);
 	GFX.ZERO       = (SNESPixel *) GFX.SubScreen; // This will cause garbage but for now it's okay
 	IPPU.TileCacheData = (uint8 *) emu_SMalloc(4096 * 64);
 

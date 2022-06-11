@@ -22,7 +22,7 @@ void S9xInitSettings(void)
 	memset(&Settings, 0, sizeof(Settings));
 
 	// Sound
-	Settings.SoundSync                  =  true;
+	Settings.SoundSync                  =  false;
 	Settings.Stereo                     =  true;
 	Settings.SoundPlaybackRate          =  32000;
 	Settings.SoundInputRate             =  31950;
@@ -49,18 +49,25 @@ void S9xInitSettings(void)
 void s9x_init(void) {
 	S9xInitSettings();
 
-	Settings.Stereo = FALSE;
+	Settings.Stereo = true;
 	Settings.SoundPlaybackRate = AUDIO_SAMPLE_RATE;
-	Settings.SoundSync = FALSE;
-	Settings.Mute = TRUE;
-	Settings.Transparency = TRUE;
-	Settings.SkipFrames = 0;
-	Settings.Paused = FALSE;
+	Settings.SoundSync = false;
+	Settings.Mute = false;
+	Settings.Transparency = true;
+	Settings.SkipFrames = 1;
+	Settings.Paused = false;
+
+  Settings.SixteenBitSound = true;
+  Settings.ReverseStereo = false;
+  Settings.PAL = false;
 
 	if (!S9xMemoryInit())
 		emu_printf("Memory init failed!");
 
-	if (!S9xSoundInit(0))
+  if (!S9xInitAPU())
+    emu_printf("APU init failed!");
+
+  if (!S9xInitSound(40,0))
 		emu_printf("Sound init failed!");
 
 	if (!S9xGraphicsInit())
@@ -80,12 +87,24 @@ void s9x_step(void) {
 	{
     emu_DrawVsync();
 	}
-		IPPU.RenderThisFrame = (((++frames_counter) & 1) == 1);
-		//GFX.Screen = (uint16*)currentUpdate->buffer;
 
+  if (++frames_counter == Settings.SkipFrames) 
+  {
+    frames_counter = 0;
+    IPPU.RenderThisFrame = true;
+  }
+  else 
+  {
+    IPPU.RenderThisFrame = false;
+  }
+  //IPPU.RenderThisFrame = (((++frames_counter) & Settings.SkipFrames) == Settings.SkipFrames);
+		//GFX.Screen = (uint16*)currentUpdate->buffer;
 }
 
 
+bool8 S9xOpenSoundDevice(void) {
+  return (TRUE);
+}
       
 void S9xMessage(int, int, char const*) {
 
@@ -98,6 +117,8 @@ const char * S9xBasename (const char *) {
 void S9xExit(void) {
 
 }
+
+
 
 bool8 S9xBlitUpdate(int width, int height)
 {

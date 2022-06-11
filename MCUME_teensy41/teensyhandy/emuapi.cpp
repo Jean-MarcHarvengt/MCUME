@@ -35,11 +35,11 @@ static File file;
 #define MAX_FILES           64
 #define AUTORUN_FILENAME    "autorun.txt"
 
-#define MAX_FILENAME_SIZE   24
+#define MAX_FILENAME_SIZE   34
 #define MAX_MENULINES       9
 #define TEXT_HEIGHT         16
 #define TEXT_WIDTH          8
-#define MENU_FILE_XOFFSET   (6*TEXT_WIDTH)
+#define MENU_FILE_XOFFSET   (2*TEXT_WIDTH)
 #define MENU_FILE_YOFFSET   (2*TEXT_HEIGHT)
 #define MENU_FILE_W         (MAX_FILENAME_SIZE*TEXT_WIDTH)
 #define MENU_FILE_H         (MAX_MENULINES*TEXT_HEIGHT)
@@ -103,7 +103,7 @@ void emu_printf(int val)
 
 void emu_printi(int val)
 {
-  Serial.println(val,HEX);
+  Serial.println(val);
 }
 
 void emu_printh(int val)
@@ -158,6 +158,29 @@ void emu_Free(void * pt)
   free(pt);
 }
 
+#define SMEMPOOL (0x400000+400000)
+EXTMEM static unsigned char slowmem[SMEMPOOL];
+static int slowmempt = 0;
+
+void * emu_SMalloc(unsigned int size) 
+{
+  void * mem = (void*)&slowmem[slowmempt];
+  slowmempt += size;
+
+  if ( slowmempt > SMEMPOOL ) {
+    mem = NULL;
+    emu_printf("failure to allocate slow");
+  }
+  else {
+    emu_printf("could allocate slow static ");
+    emu_printf(size); 
+  }
+  return mem;
+}
+
+void emu_SFree(void * pt)
+{
+}
 /********************************
  * Input and keyboard
 ********************************/ 
@@ -329,6 +352,11 @@ int emu_ReadKeys(void)
 #endif
   if ( row & 0x02 ) retval |= MASK_JOY2_BTN;
 
+#ifdef EXTPAD
+  if ( fn_pressed ) retval |= MASK_KEY_USER1;
+  if ( sh_pressed ) retval |= MASK_KEY_USER3;
+  digitalWrite(KLED, 0);
+#else
   // Handle LED flash
   uint32_t time_ms=millis();
   if ((time_ms-last_t_ms) > 100) {
@@ -412,8 +440,9 @@ int emu_ReadKeys(void)
  
   if ( key_fn ) retval |= MASK_KEY_USER2;
   if ( ( key_fn ) && (keymatrix[4] == 0x10 )) retval |= MASK_KEY_USER1;
+#endif
 
-  if ( (key_fn) && (key_sh) )
+  if ( (fn_pressed) && (sh_pressed) )
 #else
   if ( ((retval & (MASK_KEY_USER1+MASK_KEY_USER2)) == (MASK_KEY_USER1+MASK_KEY_USER2))
      || (retval & MASK_KEY_USER4 ) )
@@ -1140,8 +1169,9 @@ static void lineOSKB(int xoff, bool bottom, char * str, int row)
   char c[4] = {' ',0,' ',0};
   const char * cpt = str;
   int i=0;
-  int fb_width,fb_height,fb_stride;
-  tft.get_frame_buffer_size(&fb_width, &fb_height, &fb_stride);
+  int fb_width,fb_height,fbstride;
+
+  tft.get_frame_buffer_size(&fb_width, &fb_height, &fbstride);
   int ypos = (bottom?(fb_height-2*8):0);
   int line = row + (bottom?2:0);
   while ((c[1] = *cpt++))
@@ -1403,6 +1433,9 @@ unsigned int emu_FileSize(const char * filepath)
     filesize = lofile.size(); 
     emu_printf(filesize);
     lofile.close();    
+  }
+  else {
+    emu_printf("filesize failed");
   }
   return(filesize);
 }

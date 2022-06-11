@@ -146,9 +146,10 @@ static void dmaInterrupt() {
 static void setDmaStruct() {
   uint32_t remaining = TFT_HEIGHT*TFT_WIDTH*2;
   int i=0;
-  uint16_t col=RGBVAL16(0x00,0x00,0x00);;
+  uint16_t col=RGBVAL16(0x00,0x00,0x00);
+  uint16_t * fb = (uint16_t*)((int)malloc(remaining+64)&0xffffffe0);
   while (remaining > 0) {
-    uint16_t * fb = blocks[i];
+    //uint16_t * fb = blocks[i];
     int32_t len = (remaining >= (LINES_PER_BLOCK*TFT_WIDTH*2)?LINES_PER_BLOCK*TFT_WIDTH*2:remaining);
 #ifdef TFT_DEBUG        
     Serial.println((unsigned long)blocks[i]);    
@@ -156,28 +157,28 @@ static void setDmaStruct() {
 #endif        
     switch (i) {
       case 0:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
         //fb=&fb0[0];
 #ifdef TFT_DEBUG        
         col = RGBVAL16(0x00,0xff,0x00);
 #endif        
         break;
       case 1:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
         //fb=&fb1[0];
 #ifdef TFT_DEBUG        
         col = RGBVAL16(0x00,0xff,0xff);
 #endif        
         break;
       case 2:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
         //fb=&fb2[0];
 #ifdef TFT_DEBUG        
         col = RGBVAL16(0x00,0x00,0xff);
 #endif        
         break;
       case 3:
-        if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
+        //if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);
         //fb=&fb3[0];
 #ifdef TFT_DEBUG        
         col = RGBVAL16(0xff,0x00,0xff);
@@ -198,6 +199,7 @@ static void setDmaStruct() {
     dmasettings[i].TCD->ATTR_DST = 1;
     dmasettings[i].replaceSettingsOnCompletion(dmasettings[i+1]);
     dmasettings[i].interruptAtCompletion();
+    fb += len/2;    
     remaining -= len;
     i++;
   }
@@ -513,9 +515,9 @@ void TFT_T_DMA::wait(void) {
 }
 
 int TFT_T_DMA::get_frame_buffer_size(int *width, int *height, int *stride){
-  if (width != nullptr) *width = TFT_REALWIDTH;
-  if (height != nullptr) *height = TFT_REALHEIGHT;
-  if (stride != nullptr) *stride = TFT_REALWIDTH;
+  if (width != nullptr) *width = TFT_WIDTH;
+  if (stride != nullptr) *stride = TFT_WIDTH;
+  if (height != nullptr) *height = TFT_HEIGHT;
   return TFT_REALWIDTH;  
 } 
 
