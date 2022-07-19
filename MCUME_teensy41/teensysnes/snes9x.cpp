@@ -59,7 +59,7 @@ void s9x_init(void) {
 
   Settings.SixteenBitSound = true;
   Settings.ReverseStereo = false;
-  Settings.PAL = false;
+  Settings.PAL = true; //false;
 
 	if (!S9xMemoryInit())
 		emu_printf("Memory init failed!");
@@ -67,7 +67,7 @@ void s9x_init(void) {
   if (!S9xInitAPU())
     emu_printf("APU init failed!");
 
-  if (!S9xInitSound(40,0))
+  if (!S9xInitSound(40,2))
 		emu_printf("Sound init failed!");
 
 	if (!S9xGraphicsInit())

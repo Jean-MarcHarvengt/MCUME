@@ -5,11 +5,13 @@
 
 #ifdef TEECOMPUTER
 //#define ILI9341        1
-//#define ST7789         1
-//#define TFTSPI1        1
-#define HAS_T4_VGA     1
+#define ST7789         1
+#define TFTSPI1        1
+//#define HAS_T4_VGA     1
 #define HAS_SND        1
+#define HAS_USB        1
 //#define HAS_USBKEY     1
+//#define HAS_USBMIDI    1
 //#define HAS_USBJOY     1 // not working yet
 //#define INVX           1
 #define PT8211         1

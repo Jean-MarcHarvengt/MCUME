@@ -11,22 +11,22 @@ extern "C" {
 #include "tft_t_dma.h"
 #endif
 
-#ifdef HAS_USBKEY
+#ifdef HAS_USB
 #include "USBHost_t36.h"  // Read this header first for key info
 USBHost myusb;
 USBHub hub1(myusb);
+#ifdef HAS_USBKEY
 KeyboardController keyboard1(myusb);
 USBHIDParser hid1(myusb);
 MouseController mouse1(myusb);
+#endif
+#ifdef HAS_USBMIDI
 MIDIDevice midi1(myusb);
 #endif
 #ifdef HAS_USBJOY
-#include "USBHost_t36.h"  // Read this header first for key info
-USBHost myusb;
-USBHub hub1(myusb);
-USBHIDParser hid1(myusb);
 #define COUNT_JOYSTICKS 4
 JoystickController joysticks[COUNT_JOYSTICKS](myusb);
+#endif
 #endif
 
 static bool emu_writeConfig(void);
@@ -166,7 +166,7 @@ void emu_Free(void * pt)
   free(pt);
 }
 
-#define SMEMPOOL (0x800000) //(0x400000+400000)
+#define SMEMPOOL (0x800000)
 EXTMEM static unsigned char slowmem[SMEMPOOL];
 static int slowmempt = 0;
 
@@ -661,7 +661,6 @@ int emu_GetMouse(int *x, int *y, int *buts) {
 
 int emu_GetJoystick(void) {
 #ifdef HAS_USBJOY
-  //myusb.Task();
   for (int joystick_index = 0; joystick_index < COUNT_JOYSTICKS; joystick_index++) {
     if (joysticks[joystick_index].available()) {
       uint64_t axis_mask = joysticks[joystick_index].axisMask();
@@ -820,7 +819,7 @@ int emu_KeyboardDetected(void) {
   return (keyboardDetected?1:0); 
 }
 
-#ifdef HAS_USBKEY
+#ifdef HAS_USBMIDI
 static unsigned char midiBuffer[16];
 static unsigned char midiLastCmd=0;
 static int midiDataCnt=0;
@@ -828,8 +827,7 @@ static int midiCmdNbParam=0;
 #endif
 
 void emu_MidiOnDataReceived(unsigned char value) {
-
-#ifdef HAS_USBKEY
+#ifdef HAS_USBMIDI
 //Serial.println(value, HEX);    
 //10000000 = 128 = note off
 //10010000 = 144 = note on
@@ -1736,13 +1734,12 @@ void emu_init(void)
 {
   Serial.begin(115200);
 
-#ifdef HAS_USBKEY
+#ifdef HAS_USB
   myusb.begin();
+#ifdef HAS_USBKEY
   keyboard1.attachPress(OnPress);
   keyboard1.attachRelease(OnRelease);
 #endif
-#ifdef HAS_USBJOY
-  myusb.begin();
 #endif
 
   while (!SD.begin(SD_CS))
