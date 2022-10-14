@@ -306,12 +306,12 @@ set(TESTPSRAM_SOURCES
 	)
 
 # Vic20,ZX81,ZX Spectrum,Colem
-#add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
+add_compile_definitions(OVERRULE_WIDTH=320 OVERRULE_HEIGHT=192)
 
 add_executable(mcume
 #		${GFXENGINE_SOURCES}
 #		${PICO20_SOURCES}
-		${PICO64_SOURCES}
+#		${PICO64_SOURCES}
 #		${PICO81_SOURCES}
 #		${PICO800_SOURCES}
 #		${PICO5200_SOURCES}
@@ -319,7 +319,7 @@ add_executable(mcume
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
-#		${PICOSPECCY_SOURCES}
+		${PICOSPECCY_SOURCES}
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
@@ -328,14 +328,14 @@ add_executable(mcume
 #		${TESTPSRAM_SOURCES}
 #		${PICOVALIDATION_SOURCES}
 #		${PSRAM_SOURCES}
-#		${VGA_T4_SOURCES}
-		${PICOVGA_T4_SOURCES}
+		${VGA_T4_SOURCES}
+#		${PICOVGA_T4_SOURCES}
 		${TFT_T_SOURCES}
 	)
 
-#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
-#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
-pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picovga_t4/picovga.pio)
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
+#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picovga_t4/picovga.pio)
 
 
 target_link_libraries(mcume pico_multicore
@@ -360,3 +360,4 @@ target_compile_definitions(mcume PUBLIC N_SD_CARDS=${N_SD_CARDS})
 #pico_enable_stdio_usb(mcume 0)
 
 pico_add_extra_outputs(mcume)
+
