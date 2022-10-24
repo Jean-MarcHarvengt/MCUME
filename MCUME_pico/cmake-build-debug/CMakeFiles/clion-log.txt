@@ -1,0 +1,14 @@
+/afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/ninja/linux/ninja -DPICO_SDK_PATH:PATH=/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk -G Ninja -S /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico -B /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug
+PICO_SDK_PATH is /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk
+PICO platform is rp2040.
+Build type is Debug
+Using regular optimized debug build (set PICO_DEOPTIMIZED_DEBUG=1 to de-optimize)
+PICO target board is pico.
+Using board configuration from /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/src/boards/include/boards/pico.h
+TinyUSB available at /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040; enabling build support for USB.
+Compiling TinyUSB with CFG_TUSB_DEBUG=1
+cyw43-driver available at /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/lib/cyw43-driver
+lwIP available at /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/lib/lwip
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug

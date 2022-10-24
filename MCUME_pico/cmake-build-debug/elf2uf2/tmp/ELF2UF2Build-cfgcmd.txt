@@ -1,0 +1,1 @@
+cmd='/afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/cmake/linux/bin/cmake;-GNinja;<SOURCE_DIR><SOURCE_SUBDIR>'

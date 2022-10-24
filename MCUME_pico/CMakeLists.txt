@@ -18,7 +18,7 @@ add_subdirectory(FatFs_SPI build)
 
 include_directories(config)
 include_directories(vga_t4)
-#include_directories(picovga_t4)
+include_directories(picovga_t4)
 include_directories(tft_t)
 include_directories(psram)
 
@@ -110,6 +110,20 @@ set(PICOCOLEM_SOURCES
 		picocolem/emuapi.cpp
 		picocolem/picocolem.cpp
 		picocolem/AudioPlaySystem.cpp
+	)
+
+set(PICOCPC_SOURCES
+#		picocpc/Codes.h
+#		picocpc/CodesCB.h
+#		picocpc/CodesED.h
+#		picocpc/CodesXCB.h
+#		picocpc/CodesXX.h
+#		picocpc/rom464.h
+#		picocpc/Tables.h
+#		picocpc/Z80.c
+#		picocpc/Z80.h
+        picocpc/hello.c
+		picocpc/hello.pio
 	)
 
 set(PICOO2EM_SOURCES 
@@ -319,7 +333,8 @@ add_executable(mcume
 #		${PICOCOLEM_SOURCES}
 #		${PICOO2EM_SOURCES}
 #		${PICOVCS_SOURCES}
-		${PICOSPECCY_SOURCES}
+#		${PICOSPECCY_SOURCES}
+		${PICOCPC_SOURCES}
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
@@ -332,6 +347,9 @@ add_executable(mcume
 #		${PICOVGA_T4_SOURCES}
 		${TFT_T_SOURCES}
 	)
+
+# Added for testing the pio
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picocpc/hello.pio)
 
 pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
 pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
@@ -357,7 +375,7 @@ target_compile_definitions(mcume PUBLIC N_SD_CARDS=${N_SD_CARDS})
 
 
 #pico_enable_stdio_uart(mcume 0)
-#pico_enable_stdio_usb(mcume 0)
+pico_enable_stdio_usb(mcume 0)
 
 pico_add_extra_outputs(mcume)
 
