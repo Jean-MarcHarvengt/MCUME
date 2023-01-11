@@ -2,61 +2,84 @@
 Memory Configuration
 
 Name             Origin             Length             Attributes
-SRAM             0x0000000020041f00 0x00000000000000fc xr
-*default*        0x0000000000000000 0xffffffffffffffff
+SRAM             0x20041f00         0x000000fc         xr
+*default*        0x00000000         0xffffffff
 
 Linker script and memory map
 
-                0x0000000020041f00                . = ORIGIN (SRAM)
+                0x20041f00                . = ORIGIN (SRAM)
 
-.text           0x0000000020041f00       0xf0
+.text           0x20041f00       0xf0
  *(.entry)
  *(.text)
- .text          0x0000000020041f00       0xf0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
-                0x0000000020041f00                _stage2_boot
-                0x0000000020041fbc                read_flash_sreg
-                0x0000000020041fcc                literals
-LOAD CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+ .text          0x20041f00       0xf0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+                0x20041f00                _stage2_boot
+                0x20041fbc                read_flash_sreg
+                0x20041fcc                literals
+LOAD CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 START GROUP
-LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/thumb/v6-m/nofp/libgcc.a
-LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libgcc.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libg.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a
 END GROUP
 START GROUP
-LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/thumb/v6-m/nofp/libgcc.a
-LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc.a
-LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libnosys.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libgcc.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a
+LOAD c:/progra~2/armgnu~1/1142da~1.3re/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libnosys.a
 END GROUP
 OUTPUT(bs2_default.elf elf32-littlearm)
 LOAD linker stubs
 
-.data           0x0000000020041ff0        0x0
- .data          0x0000000020041ff0        0x0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+.data           0x20041ff0        0x0
+ .data          0x20041ff0        0x0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 
-.igot.plt       0x0000000020041ff0        0x0
- .igot.plt      0x0000000020041ff0        0x0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+.igot.plt       0x20041ff0        0x0
+ .igot.plt      0x20041ff0        0x0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 
-.glue_7         0x0000000020041ff0        0x0
- .glue_7        0x0000000020041ff0        0x0 linker stubs
+.glue_7         0x20041ff0        0x0
+ .glue_7        0x20041ff0        0x0 linker stubs
 
-.glue_7t        0x0000000020041ff0        0x0
- .glue_7t       0x0000000020041ff0        0x0 linker stubs
+.glue_7t        0x20041ff0        0x0
+ .glue_7t       0x20041ff0        0x0 linker stubs
 
-.vfp11_veneer   0x0000000020041ff0        0x0
- .vfp11_veneer  0x0000000020041ff0        0x0 linker stubs
+.vfp11_veneer   0x20041ff0        0x0
+ .vfp11_veneer  0x20041ff0        0x0 linker stubs
 
-.v4_bx          0x0000000020041ff0        0x0
- .v4_bx         0x0000000020041ff0        0x0 linker stubs
+.v4_bx          0x20041ff0        0x0
+ .v4_bx         0x20041ff0        0x0 linker stubs
 
-.iplt           0x0000000020041ff0        0x0
- .iplt          0x0000000020041ff0        0x0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+.iplt           0x20041ff0        0x0
+ .iplt          0x20041ff0        0x0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 
-.rel.dyn        0x0000000020041ff0        0x0
- .rel.iplt      0x0000000020041ff0        0x0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+.rel.dyn        0x20041ff0        0x0
+ .rel.iplt      0x20041ff0        0x0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 
-.bss            0x0000000020041ff0        0x0
- .bss           0x0000000020041ff0        0x0 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+.bss            0x20041ff0        0x0
+ .bss           0x20041ff0        0x0 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
 
 .ARM.attributes
-                0x0000000000000000       0x22
+                0x00000000       0x22
  .ARM.attributes
-                0x0000000000000000       0x22 CMakeFiles/bs2_default.dir/compile_time_choice.S.obj
+                0x00000000       0x22 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+
+.debug_line     0x00000000       0xed
+ .debug_line    0x00000000       0xed CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+
+.debug_line_str
+                0x00000000      0x17d
+ .debug_line_str
+                0x00000000      0x17d CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+                                0x18d (size before relaxing)
+
+.debug_info     0x00000000       0x25
+ .debug_info    0x00000000       0x25 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+
+.debug_abbrev   0x00000000       0x14
+ .debug_abbrev  0x00000000       0x14 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+
+.debug_aranges  0x00000000       0x20
+ .debug_aranges
+                0x00000000       0x20 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj
+
+.debug_str      0x00000000       0xe1
+ .debug_str     0x00000000       0xe1 CMakeFiles\bs2_default.dir\compile_time_choice.S.obj

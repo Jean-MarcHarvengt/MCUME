@@ -1,1 +1,1 @@
-cmd='/usr/bin/cmake;-GUnix Makefiles;<SOURCE_DIR><SOURCE_SUBDIR>'
+cmd='C:/Program Files/CMake/bin/cmake.exe;-GNMake Makefiles;<SOURCE_DIR><SOURCE_SUBDIR>'

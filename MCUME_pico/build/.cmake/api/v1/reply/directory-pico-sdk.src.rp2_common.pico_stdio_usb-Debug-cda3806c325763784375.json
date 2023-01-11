@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "pico-sdk/src/rp2_common/pico_stdio_usb",
+		"source" : "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb"
+	}
+}

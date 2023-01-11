@@ -69,7 +69,7 @@ void sd_spi_release(sd_card_t *this) {
 
 uint8_t sd_spi_write(sd_card_t *this, const uint8_t value) {
     // TRACE_PRINTF("%s\n", __FUNCTION__);
-    u_int8_t received = SPI_FILL_CHAR;
+    uint8_t received = SPI_FILL_CHAR;
     int num = spi_write_read_blocking(this->spi->hw_inst, &value, &received, 1);
     myASSERT(1 == num);
     return received;

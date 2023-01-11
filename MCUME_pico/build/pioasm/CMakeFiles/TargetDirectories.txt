@@ -1,3 +1,3 @@
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pioasm/CMakeFiles/rebuild_cache.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pioasm/CMakeFiles/edit_cache.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pioasm/CMakeFiles/pioasm.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pioasm/CMakeFiles/pioasm.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pioasm/CMakeFiles/edit_cache.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pioasm/CMakeFiles/rebuild_cache.dir

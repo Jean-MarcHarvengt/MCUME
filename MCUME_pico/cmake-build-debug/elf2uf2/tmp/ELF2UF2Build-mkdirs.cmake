@@ -4,16 +4,16 @@
 cmake_minimum_required(VERSION 3.5)
 
 file(MAKE_DIRECTORY
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/tools/elf2uf2"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/tmp"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src"
-  "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/tools/elf2uf2"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/tmp"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/elf2uf2/src/ELF2UF2Build-stamp/${subDir}")
 endforeach()

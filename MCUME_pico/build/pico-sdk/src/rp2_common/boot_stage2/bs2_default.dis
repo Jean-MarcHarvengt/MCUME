@@ -1,5 +1,5 @@
 
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf:     file format elf32-littlearm
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf:     file format elf32-littlearm
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -7,8 +7,20 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   1 .ARM.attributes 00000022  00000000  00000000  00001ff0  2**0
                   CONTENTS, READONLY
+  2 .debug_line   000000ed  00000000  00000000  00002012  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  3 .debug_line_str 0000017d  00000000  00000000  000020ff  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  4 .debug_info   00000025  00000000  00000000  0000227c  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  5 .debug_abbrev 00000014  00000000  00000000  000022a1  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  6 .debug_aranges 00000020  00000000  00000000  000022b8  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  7 .debug_str    000000e1  00000000  00000000  000022d8  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
 
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf:     file format elf32-littlearm
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf:     file format elf32-littlearm
 
 
 Disassembly of section .text:

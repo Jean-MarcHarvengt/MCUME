@@ -1,24 +1,44 @@
 Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
-Compiler: /usr/bin/arm-none-eabi-gcc 
-Build flags: 
+Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/11.3 rel1/bin/arm-none-eabi-gcc.exe 
+Build flags: ;-mcpu=cortex-m0plus;-mthumb
 Id flags:  
 
 The output was:
 1
-/usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/bin/ld: /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
-/build/newlib-CVVEyx/newlib-3.3.0/build/arm-none-eabi/newlib/libc/stdlib/../../../../../newlib/libc/stdlib/exit.c:64: undefined reference to `_exit'
-collect2: error: ld returned 1 exit status
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-exit.o): in function `exit':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/stdlib/exit.c:65: undefined reference to `_exit'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-closer.o): in function `_close_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/closer.c:47: undefined reference to `_close'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-lseekr.o): in function `_lseek_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/lseekr.c:49: undefined reference to `_lseek'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-readr.o): in function `_read_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/readr.c:49: undefined reference to `_read'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-writer.o): in function `_write_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/writer.c:49: undefined reference to `_write'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-sbrkr.o): in function `_sbrk_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/sbrkr.c:51: undefined reference to `_sbrk'
+collect2.exe: error: ld returned 1 exit status
 
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
-Compiler: /usr/bin/arm-none-eabi-g++ 
-Build flags: 
+Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/11.3 rel1/bin/arm-none-eabi-g++.exe 
+Build flags: ;-mcpu=cortex-m0plus;-mthumb
 Id flags:  
 
 The output was:
 1
-/usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/bin/ld: /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
-/build/newlib-CVVEyx/newlib-3.3.0/build/arm-none-eabi/newlib/libc/stdlib/../../../../../newlib/libc/stdlib/exit.c:64: undefined reference to `_exit'
-collect2: error: ld returned 1 exit status
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-exit.o): in function `exit':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/stdlib/exit.c:65: undefined reference to `_exit'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-closer.o): in function `_close_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/closer.c:47: undefined reference to `_close'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-lseekr.o): in function `_lseek_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/lseekr.c:49: undefined reference to `_lseek'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-readr.o): in function `_read_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/readr.c:49: undefined reference to `_read'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-writer.o): in function `_write_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/writer.c:49: undefined reference to `_write'
+c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/bin/ld.exe: c:/program files (x86)/arm gnu toolchain arm-none-eabi/11.3 rel1/bin/../lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp\libc.a(libc_a-sbrkr.o): in function `_sbrk_r':
+/data/jenkins/workspace/GNU-toolchain/arm-11/src/newlib-cygwin/newlib/libc/reent/sbrkr.c:51: undefined reference to `_sbrk'
+collect2.exe: error: ld returned 1 exit status
 
 

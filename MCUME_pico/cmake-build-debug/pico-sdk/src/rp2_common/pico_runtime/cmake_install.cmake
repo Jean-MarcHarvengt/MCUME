@@ -1,8 +1,8 @@
-# Install script for directory: /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/src/rp2_common/pico_runtime
+# Install script for directory: C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_runtime
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/mcume")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,6 +34,6 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/arm-none-eabi-objdump")
+  set(CMAKE_OBJDUMP "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/11.3 rel1/bin/arm-none-eabi-objdump.exe")
 endif()
 

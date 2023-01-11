@@ -1,4 +1,4 @@
-// Padded and checksummed version of: /afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin
+// Padded and checksummed version of: C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin
 
 .cpu cortex-m0plus
 .thumb

@@ -17,7 +17,7 @@
 rule ASM_COMPILER__mcume_Debug
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/arm-none-eabi-gcc $DEFINES $INCLUDES $FLAGS -o $out   -c $in
+  command = C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR19DD~1.EXE $DEFINES $INCLUDES $FLAGS -o $out   -c $in
   description = Building ASM object $out
 
 
@@ -27,7 +27,7 @@ rule ASM_COMPILER__mcume_Debug
 rule C_COMPILER__mcume_Debug
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/arm-none-eabi-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR19DD~1.EXE $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building C object $out
 
 
@@ -37,7 +37,7 @@ rule C_COMPILER__mcume_Debug
 rule CXX_COMPILER__mcume_Debug
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/arm-none-eabi-g++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR10B2~1.EXE $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -45,8 +45,10 @@ rule CXX_COMPILER__mcume_Debug
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__mcume_Debug
-  command = $PRE_LINK && /usr/bin/arm-none-eabi-g++ $FLAGS -Wl,--build-id=none $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = cmd.exe /C "$PRE_LINK && C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR10B2~1.EXE $FLAGS -Wl,--build-id=none $LINK_FLAGS @$RSP_FILE -o $TARGET_FILE  && $POST_BUILD"
   description = Linking CXX executable $TARGET_FILE
+  rspfile = $RSP_FILE
+  rspfile_content = $in $LINK_PATH $LINK_LIBRARIES
   restat = $RESTAT
 
 
@@ -64,7 +66,7 @@ rule CUSTOM_COMMAND
 rule ASM_COMPILER__bs2_default_Debug
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/arm-none-eabi-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out   -c $in
+  command = C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR19DD~1.EXE $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out   -c $in
   description = Building ASM object $out
 
 
@@ -72,7 +74,7 @@ rule ASM_COMPILER__bs2_default_Debug
 # Rule for linking ASM executable.
 
 rule ASM_EXECUTABLE_LINKER__bs2_default_Debug
-  command = $PRE_LINK && /usr/bin/arm-none-eabi-gcc $FLAGS -Wl,--build-id=none $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = cmd.exe /C "$PRE_LINK && C:\PROGRA~2\ARMGNU~1\1142DA~1.3RE\bin\AR19DD~1.EXE $FLAGS -Wl,--build-id=none $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking ASM executable $TARGET_FILE
   restat = $RESTAT
 
@@ -81,7 +83,7 @@ rule ASM_EXECUTABLE_LINKER__bs2_default_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/cmake/linux/bin/cmake --regenerate-during-build -S/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico -B/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug
+  command = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -SC:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico -BC:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\cmake-build-debug
   description = Re-running CMake...
   generator = 1
 
@@ -90,7 +92,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = /afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/ninja/linux/ninja $FILE_ARG -t clean $TARGETS
+  command = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\ninja\win\ninja.exe" $FILE_ARG -t clean $TARGETS
   description = Cleaning all built files...
 
 
@@ -98,6 +100,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = /afs/inf.ed.ac.uk/user/s19/s1970742/clion-2022.2.3/bin/ninja/linux/ninja -t targets
+  command = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\ninja\win\ninja.exe" -t targets
   description = All primary targets available:
 

@@ -4,8 +4,8 @@
 
 // based on PICO_CONFIG_HEADER_FILES:
 
-#include "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/src/boards/include/boards/pico.h"
+#include "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/boards/include/boards/pico.h"
 
 // based on PICO_RP2040_CONFIG_HEADER_FILES:
 
-#include "/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/pico-sdk/src/rp2_common/cmsis/include/cmsis/rename_exceptions.h"
+#include "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/cmsis/include/cmsis/rename_exceptions.h"

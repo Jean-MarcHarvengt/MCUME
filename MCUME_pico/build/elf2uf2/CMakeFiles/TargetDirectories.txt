@@ -1,5 +1,5 @@
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/rebuild_cache.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/edit_cache.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/elf2uf2.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/elf2uf2/boot_uf2_headers/CMakeFiles/rebuild_cache.dir
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/build/elf2uf2/boot_uf2_headers/CMakeFiles/edit_cache.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/elf2uf2.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/edit_cache.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/elf2uf2/CMakeFiles/rebuild_cache.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/elf2uf2/boot_uf2_headers/CMakeFiles/edit_cache.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/elf2uf2/boot_uf2_headers/CMakeFiles/rebuild_cache.dir

@@ -366,7 +366,7 @@ target_link_libraries(mcume pico_multicore
 	)
 
 
-#target_compile_options(mcume PUBLIC -O3)
+target_compile_options(mcume PUBLIC -O3)
 #target_compile_options(mcume PUBLIC -Wall -Wextra -Wno-unused-function -Wno-unused-parameter)
 IF (NOT DEFINED N_SD_CARDS)
     SET(N_SD_CARDS 1)

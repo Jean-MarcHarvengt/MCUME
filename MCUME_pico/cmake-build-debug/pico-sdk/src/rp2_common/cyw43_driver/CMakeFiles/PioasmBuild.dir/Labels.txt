@@ -1,13 +1,13 @@
 # Target labels
  PioasmBuild
 # Source files and their labels
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild-complete.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-build.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-configure.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-download.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-install.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch.rule
-/afs/inf.ed.ac.uk/user/s19/s1970742/Desktop/hons/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-update.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild-complete.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-build.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-configure.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-download.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-install.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch.rule
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/cmake-build-debug/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-update.rule
