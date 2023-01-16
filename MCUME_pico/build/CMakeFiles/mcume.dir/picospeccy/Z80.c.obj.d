@@ -1,0 +1,31 @@
+CMakeFiles\mcume.dir\picospeccy\Z80.c.obj: \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\Z80.c \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/platform_config.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\Z80.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\lib\gcc\arm-none-eabi\11.3.1\include\stdint.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\stdint.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\machine\_default_types.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\features.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\_newlib_version.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\_intsup.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\_stdint.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\Tables.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\stdio.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\_ansi.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\newlib.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\config.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\machine\ieeefp.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\cdefs.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\lib\gcc\arm-none-eabi\11.3.1\include\stddef.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\lib\gcc\arm-none-eabi\11.3.1\include\stdarg.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\reent.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\_ansi.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\_types.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\machine\_types.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\lock.h \
+ c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\stdio.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\CodesCB.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\CodesXCB.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\CodesED.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\CodesXX.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picospeccy\Codes.h

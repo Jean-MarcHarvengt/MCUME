@@ -65,9 +65,7 @@ preinstall: build\preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles\mcume.dir\clean
-clean: CMakeFiles\mcume_hello_pio_h.dir\clean
-clean: CMakeFiles\mcume_timing_pio_h.dir\clean
-clean: CMakeFiles\mcume_scanvideo_pio_h.dir\clean
+clean: CMakeFiles\mcume_picovga_pio_h.dir\clean
 clean: CMakeFiles\ELF2UF2Build.dir\clean
 clean: pico-sdk\clean
 clean: build\clean
@@ -1389,19 +1387,17 @@ pico-sdk\tools\clean:
 # Target rules for target CMakeFiles/mcume.dir
 
 # All Build rule for target.
-CMakeFiles\mcume.dir\all: CMakeFiles\mcume_hello_pio_h.dir\all
-CMakeFiles\mcume.dir\all: CMakeFiles\mcume_timing_pio_h.dir\all
-CMakeFiles\mcume.dir\all: CMakeFiles\mcume_scanvideo_pio_h.dir\all
+CMakeFiles\mcume.dir\all: CMakeFiles\mcume_picovga_pio_h.dir\all
 CMakeFiles\mcume.dir\all: CMakeFiles\ELF2UF2Build.dir\all
 CMakeFiles\mcume.dir\all: pico-sdk\src\rp2_common\boot_stage2\CMakeFiles\bs2_default_padded_checksummed_asm.dir\all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94 "Built target mcume"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97 "Built target mcume"
 .PHONY : CMakeFiles\mcume.dir\all
 
 # Build rule for subdir invocation for target.
 CMakeFiles\mcume.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 94
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 95
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 0
 .PHONY : CMakeFiles\mcume.dir\rule
@@ -1416,82 +1412,30 @@ CMakeFiles\mcume.dir\clean:
 .PHONY : CMakeFiles\mcume.dir\clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/mcume_hello_pio_h.dir
+# Target rules for target CMakeFiles/mcume_picovga_pio_h.dir
 
 # All Build rule for target.
-CMakeFiles\mcume_hello_pio_h.dir\all: pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\PioasmBuild.dir\all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_hello_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_hello_pio_h.dir\depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_hello_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_hello_pio_h.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=95 "Built target mcume_hello_pio_h"
-.PHONY : CMakeFiles\mcume_hello_pio_h.dir\all
+CMakeFiles\mcume_picovga_pio_h.dir\all: pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\PioasmBuild.dir\all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_picovga_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_picovga_pio_h.dir\depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_picovga_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_picovga_pio_h.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=98 "Built target mcume_picovga_pio_h"
+.PHONY : CMakeFiles\mcume_picovga_pio_h.dir\all
 
 # Build rule for subdir invocation for target.
-CMakeFiles\mcume_hello_pio_h.dir\rule: cmake_check_build_system
+CMakeFiles\mcume_picovga_pio_h.dir\rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\mcume_hello_pio_h.dir\all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\mcume_picovga_pio_h.dir\all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 0
-.PHONY : CMakeFiles\mcume_hello_pio_h.dir\rule
+.PHONY : CMakeFiles\mcume_picovga_pio_h.dir\rule
 
 # Convenience name for target.
-mcume_hello_pio_h: CMakeFiles\mcume_hello_pio_h.dir\rule
-.PHONY : mcume_hello_pio_h
+mcume_picovga_pio_h: CMakeFiles\mcume_picovga_pio_h.dir\rule
+.PHONY : mcume_picovga_pio_h
 
 # clean rule for target.
-CMakeFiles\mcume_hello_pio_h.dir\clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_hello_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_hello_pio_h.dir\clean
-.PHONY : CMakeFiles\mcume_hello_pio_h.dir\clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/mcume_timing_pio_h.dir
-
-# All Build rule for target.
-CMakeFiles\mcume_timing_pio_h.dir\all: pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\PioasmBuild.dir\all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_timing_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_timing_pio_h.dir\depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_timing_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_timing_pio_h.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=97 "Built target mcume_timing_pio_h"
-.PHONY : CMakeFiles\mcume_timing_pio_h.dir\all
-
-# Build rule for subdir invocation for target.
-CMakeFiles\mcume_timing_pio_h.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\mcume_timing_pio_h.dir\all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 0
-.PHONY : CMakeFiles\mcume_timing_pio_h.dir\rule
-
-# Convenience name for target.
-mcume_timing_pio_h: CMakeFiles\mcume_timing_pio_h.dir\rule
-.PHONY : mcume_timing_pio_h
-
-# clean rule for target.
-CMakeFiles\mcume_timing_pio_h.dir\clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_timing_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_timing_pio_h.dir\clean
-.PHONY : CMakeFiles\mcume_timing_pio_h.dir\clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/mcume_scanvideo_pio_h.dir
-
-# All Build rule for target.
-CMakeFiles\mcume_scanvideo_pio_h.dir\all: pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\PioasmBuild.dir\all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_scanvideo_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_scanvideo_pio_h.dir\depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_scanvideo_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_scanvideo_pio_h.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles --progress-num=96 "Built target mcume_scanvideo_pio_h"
-.PHONY : CMakeFiles\mcume_scanvideo_pio_h.dir\all
-
-# Build rule for subdir invocation for target.
-CMakeFiles\mcume_scanvideo_pio_h.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\mcume_scanvideo_pio_h.dir\all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\build\CMakeFiles 0
-.PHONY : CMakeFiles\mcume_scanvideo_pio_h.dir\rule
-
-# Convenience name for target.
-mcume_scanvideo_pio_h: CMakeFiles\mcume_scanvideo_pio_h.dir\rule
-.PHONY : mcume_scanvideo_pio_h
-
-# clean rule for target.
-CMakeFiles\mcume_scanvideo_pio_h.dir\clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_scanvideo_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_scanvideo_pio_h.dir\clean
-.PHONY : CMakeFiles\mcume_scanvideo_pio_h.dir\clean
+CMakeFiles\mcume_picovga_pio_h.dir\clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_picovga_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_picovga_pio_h.dir\clean
+.PHONY : CMakeFiles\mcume_picovga_pio_h.dir\clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/ELF2UF2Build.dir

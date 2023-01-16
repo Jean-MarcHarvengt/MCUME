@@ -113,18 +113,11 @@ set(PICOCOLEM_SOURCES
 	)
 
 set(PICOCPC_SOURCES
-#		picocpc/Codes.h
-#		picocpc/CodesCB.h
-#		picocpc/CodesED.h
-#		picocpc/CodesXCB.h
-#		picocpc/CodesXX.h
-#		picocpc/rom464.h
-#		picocpc/Tables.h
-#		picocpc/Z80.c
-#		picocpc/Z80.h
-        picocpc/hello.c
-		picocpc/hello.pio
-	)
+		picocpc/processor/Z80.c
+		picocpc/cpc.cpp
+		picocpc/emuapi.cpp
+		picocpc/picocpc.cpp
+)
 
 set(PICOO2EM_SOURCES 
 		picoo2em/audio.c 
@@ -338,28 +331,28 @@ add_executable(mcume
 #		${PICONOFRENDO_SOURCES}
 #		${PICOSND_SOURCES}
 #		${TESTIO_SOURCES}
-#		${TESTVGA_SOURCES}
+#       ${TESTVGA_SOURCES}
 #		${TESTKEYMAX_SOURCES}
 #		${TESTPSRAM_SOURCES}
 #		${PICOVALIDATION_SOURCES}
 #		${PSRAM_SOURCES}
-		${VGA_T4_SOURCES}
-#		${PICOVGA_T4_SOURCES}
-		${TFT_T_SOURCES}
+#		${VGA_T4_SOURCES}
+        ${PICOVGA_T4_SOURCES}
+#       ${TFT_T_SOURCES}
 	)
 
 # Added for testing the pio
-pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picocpc/hello.pio)
+# pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picocpc/hello.pio)
 
-pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
-pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
-#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picovga_t4/picovga.pio)
+#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
+#pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
+pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picovga_t4/picovga.pio)
 
 
 target_link_libraries(mcume pico_multicore
 	    pico_stdlib
 	    FatFs_SPI
-#	    pico_scanvideo_dpi
+	    # pico_scanvideo_dpi
 	    hardware_adc
 	    hardware_pio
         hardware_pwm	    

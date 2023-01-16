@@ -1,7 +1,5 @@
 C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/mcume.dir
-C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/mcume_hello_pio_h.dir
-C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/mcume_timing_pio_h.dir
-C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/mcume_scanvideo_pio_h.dir
+C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/mcume_picovga_pio_h.dir
 C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/ELF2UF2Build.dir
 C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/edit_cache.dir
 C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/build/CMakeFiles/rebuild_cache.dir

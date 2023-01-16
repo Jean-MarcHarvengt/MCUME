@@ -153,24 +153,6 @@
 		},
 		{
 			"isExternal" : true,
-			"path" : "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/tools/FindPioasm.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/CMake/share/cmake-3.24/Modules/ExternalProject.cmake"
-		},
-		{
-			"isExternal" : true,
-			"path" : "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/tools/FindPioasm.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/CMake/share/cmake-3.24/Modules/ExternalProject.cmake"
-		},
-		{
-			"isExternal" : true,
 			"path" : "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/tools/FindELF2UF2.cmake"
 		},
 		{

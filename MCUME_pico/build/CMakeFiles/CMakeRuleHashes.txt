@@ -1,9 +1,7 @@
 # Hashes of file build rules.
 cb2f32985011a2247084288e2cdf0f8c CMakeFiles/ELF2UF2Build
 51637869e417688f3d458a337f3f1f3e CMakeFiles/ELF2UF2Build-complete
-cb2f32985011a2247084288e2cdf0f8c CMakeFiles/mcume_hello_pio_h
-cb2f32985011a2247084288e2cdf0f8c CMakeFiles/mcume_scanvideo_pio_h
-cb2f32985011a2247084288e2cdf0f8c CMakeFiles/mcume_timing_pio_h
+cb2f32985011a2247084288e2cdf0f8c CMakeFiles/mcume_picovga_pio_h
 9c9e78b476e3f5cc5a4991f68c5457bb elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-build
 8e633ab2fda8353d856991e0dba88885 elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-configure
 4567dd3d3e082eaddf490bb4d7f94397 elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-download
@@ -29,5 +27,6 @@ c654bb12360c983998e9e08ad1bfff54 pico-sdk/src/rp2_common/cyw43_driver/pioasm/src
 a12589fb57e78215f15232f18fde7b31 pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir
 1f85e06f8d74497ca24cc84c27c0b017 pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch
 f09e4994e8d19cf957d14d550e8a2e26 pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-update
+6f2b7a0b951e1a4638375d5d7edf5d2d picovga.pio.h
 c014e3407e642a8ccce6da746563c81f scanvideo.pio.h
 39965a8d75eedb3ade097c35a182fa21 timing.pio.h

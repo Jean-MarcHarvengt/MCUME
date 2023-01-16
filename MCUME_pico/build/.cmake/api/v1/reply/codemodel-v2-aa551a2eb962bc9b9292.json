@@ -22,9 +22,7 @@
 					[
 						0,
 						7,
-						8,
-						9,
-						10
+						8
 					]
 				},
 				{
@@ -962,9 +960,7 @@
 					[
 						0,
 						7,
-						8,
-						9,
-						10
+						8
 					]
 				},
 				{
@@ -1062,7 +1058,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ELF2UF2Build::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ELF2UF2Build-Debug-d9833f9f76ed29020700.json",
+					"jsonFile" : "target-ELF2UF2Build-Debug-d29ebadad58281dccf46.json",
 					"name" : "ELF2UF2Build",
 					"projectIndex" : 0
 				},
@@ -1111,29 +1107,15 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "mcume::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume-Debug-716de692b44665280fd6.json",
+					"jsonFile" : "target-mcume-Debug-40363cdc2bc8a007d553.json",
 					"name" : "mcume",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
-					"id" : "mcume_hello_pio_h::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume_hello_pio_h-Debug-aac0b768c18f6b1c0592.json",
-					"name" : "mcume_hello_pio_h",
-					"projectIndex" : 0
-				},
-				{
-					"directoryIndex" : 0,
-					"id" : "mcume_scanvideo_pio_h::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume_scanvideo_pio_h-Debug-0d34eec1e6ed41f387f4.json",
-					"name" : "mcume_scanvideo_pio_h",
-					"projectIndex" : 0
-				},
-				{
-					"directoryIndex" : 0,
-					"id" : "mcume_timing_pio_h::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume_timing_pio_h-Debug-ccc457c0c191a563af57.json",
-					"name" : "mcume_timing_pio_h",
+					"id" : "mcume_picovga_pio_h::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-mcume_picovga_pio_h-Debug-a95a4c735bfbd7751e05.json",
+					"name" : "mcume_picovga_pio_h",
 					"projectIndex" : 0
 				}
 			]

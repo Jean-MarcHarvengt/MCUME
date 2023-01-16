@@ -9,8 +9,8 @@
 //#define PICOMPUTER     1
 //#define PICOMPUTERMAX  1
 //#define PICORETROVGA   1
-//#define MCUME_REV1      1
-#define MCUME_REV2      1
+#define MCUME_REV1      1
+//#define MCUME_REV2      1
 
 #ifdef PICOMPUTER
 //#define SWAP_ALT_DEL   1

@@ -119,43 +119,17 @@ mcume\fast:
 .PHONY : mcume\fast
 
 #=============================================================================
-# Target rules for targets named mcume_hello_pio_h
+# Target rules for targets named mcume_picovga_pio_h
 
 # Build rule for target.
-mcume_hello_pio_h: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) mcume_hello_pio_h
-.PHONY : mcume_hello_pio_h
+mcume_picovga_pio_h: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) mcume_picovga_pio_h
+.PHONY : mcume_picovga_pio_h
 
 # fast build rule for target.
-mcume_hello_pio_h\fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_hello_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_hello_pio_h.dir\build
-.PHONY : mcume_hello_pio_h\fast
-
-#=============================================================================
-# Target rules for targets named mcume_timing_pio_h
-
-# Build rule for target.
-mcume_timing_pio_h: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) mcume_timing_pio_h
-.PHONY : mcume_timing_pio_h
-
-# fast build rule for target.
-mcume_timing_pio_h\fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_timing_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_timing_pio_h.dir\build
-.PHONY : mcume_timing_pio_h\fast
-
-#=============================================================================
-# Target rules for targets named mcume_scanvideo_pio_h
-
-# Build rule for target.
-mcume_scanvideo_pio_h: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) mcume_scanvideo_pio_h
-.PHONY : mcume_scanvideo_pio_h
-
-# fast build rule for target.
-mcume_scanvideo_pio_h\fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_scanvideo_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_scanvideo_pio_h.dir\build
-.PHONY : mcume_scanvideo_pio_h\fast
+mcume_picovga_pio_h\fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume_picovga_pio_h.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume_picovga_pio_h.dir\build
+.PHONY : mcume_picovga_pio_h\fast
 
 #=============================================================================
 # Target rules for targets named ELF2UF2Build
@@ -1656,101 +1630,173 @@ FatFs_SPI\src\rtc.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\FatFs_SPI\src\rtc.c.s
 .PHONY : FatFs_SPI\src\rtc.c.s
 
-picocpc\hello.obj: picocpc\hello.c.obj
-.PHONY : picocpc\hello.obj
+picocpc\cpc.obj: picocpc\cpc.cpp.obj
+.PHONY : picocpc\cpc.obj
 
 # target to build an object file
-picocpc\hello.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\hello.c.obj
-.PHONY : picocpc\hello.c.obj
+picocpc\cpc.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.obj
+.PHONY : picocpc\cpc.cpp.obj
 
-picocpc\hello.i: picocpc\hello.c.i
-.PHONY : picocpc\hello.i
+picocpc\cpc.i: picocpc\cpc.cpp.i
+.PHONY : picocpc\cpc.i
 
 # target to preprocess a source file
-picocpc\hello.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\hello.c.i
-.PHONY : picocpc\hello.c.i
+picocpc\cpc.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.i
+.PHONY : picocpc\cpc.cpp.i
 
-picocpc\hello.s: picocpc\hello.c.s
-.PHONY : picocpc\hello.s
+picocpc\cpc.s: picocpc\cpc.cpp.s
+.PHONY : picocpc\cpc.s
 
 # target to generate assembly for a file
-picocpc\hello.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\hello.c.s
-.PHONY : picocpc\hello.c.s
+picocpc\cpc.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.s
+.PHONY : picocpc\cpc.cpp.s
 
-tft_t\tft_t_dma.obj: tft_t\tft_t_dma.cpp.obj
-.PHONY : tft_t\tft_t_dma.obj
+picocpc\emuapi.obj: picocpc\emuapi.cpp.obj
+.PHONY : picocpc\emuapi.obj
 
 # target to build an object file
-tft_t\tft_t_dma.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\tft_t\tft_t_dma.cpp.obj
-.PHONY : tft_t\tft_t_dma.cpp.obj
+picocpc\emuapi.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.obj
+.PHONY : picocpc\emuapi.cpp.obj
 
-tft_t\tft_t_dma.i: tft_t\tft_t_dma.cpp.i
-.PHONY : tft_t\tft_t_dma.i
+picocpc\emuapi.i: picocpc\emuapi.cpp.i
+.PHONY : picocpc\emuapi.i
 
 # target to preprocess a source file
-tft_t\tft_t_dma.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\tft_t\tft_t_dma.cpp.i
-.PHONY : tft_t\tft_t_dma.cpp.i
+picocpc\emuapi.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.i
+.PHONY : picocpc\emuapi.cpp.i
 
-tft_t\tft_t_dma.s: tft_t\tft_t_dma.cpp.s
-.PHONY : tft_t\tft_t_dma.s
+picocpc\emuapi.s: picocpc\emuapi.cpp.s
+.PHONY : picocpc\emuapi.s
 
 # target to generate assembly for a file
-tft_t\tft_t_dma.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\tft_t\tft_t_dma.cpp.s
-.PHONY : tft_t\tft_t_dma.cpp.s
+picocpc\emuapi.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.s
+.PHONY : picocpc\emuapi.cpp.s
 
-vga_t4\VGA_t4.obj: vga_t4\VGA_t4.cpp.obj
-.PHONY : vga_t4\VGA_t4.obj
+picocpc\picocpc.obj: picocpc\picocpc.cpp.obj
+.PHONY : picocpc\picocpc.obj
 
 # target to build an object file
-vga_t4\VGA_t4.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\VGA_t4.cpp.obj
-.PHONY : vga_t4\VGA_t4.cpp.obj
+picocpc\picocpc.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj
+.PHONY : picocpc\picocpc.cpp.obj
 
-vga_t4\VGA_t4.i: vga_t4\VGA_t4.cpp.i
-.PHONY : vga_t4\VGA_t4.i
+picocpc\picocpc.i: picocpc\picocpc.cpp.i
+.PHONY : picocpc\picocpc.i
 
 # target to preprocess a source file
-vga_t4\VGA_t4.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\VGA_t4.cpp.i
-.PHONY : vga_t4\VGA_t4.cpp.i
+picocpc\picocpc.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.i
+.PHONY : picocpc\picocpc.cpp.i
 
-vga_t4\VGA_t4.s: vga_t4\VGA_t4.cpp.s
-.PHONY : vga_t4\VGA_t4.s
+picocpc\picocpc.s: picocpc\picocpc.cpp.s
+.PHONY : picocpc\picocpc.s
 
 # target to generate assembly for a file
-vga_t4\VGA_t4.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\VGA_t4.cpp.s
-.PHONY : vga_t4\VGA_t4.cpp.s
+picocpc\picocpc.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.s
+.PHONY : picocpc\picocpc.cpp.s
 
-vga_t4\scanvideo.obj: vga_t4\scanvideo.c.obj
-.PHONY : vga_t4\scanvideo.obj
+picocpc\processor\Z80.obj: picocpc\processor\Z80.c.obj
+.PHONY : picocpc\processor\Z80.obj
 
 # target to build an object file
-vga_t4\scanvideo.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\scanvideo.c.obj
-.PHONY : vga_t4\scanvideo.c.obj
+picocpc\processor\Z80.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.obj
+.PHONY : picocpc\processor\Z80.c.obj
 
-vga_t4\scanvideo.i: vga_t4\scanvideo.c.i
-.PHONY : vga_t4\scanvideo.i
+picocpc\processor\Z80.i: picocpc\processor\Z80.c.i
+.PHONY : picocpc\processor\Z80.i
 
 # target to preprocess a source file
-vga_t4\scanvideo.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\scanvideo.c.i
-.PHONY : vga_t4\scanvideo.c.i
+picocpc\processor\Z80.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.i
+.PHONY : picocpc\processor\Z80.c.i
 
-vga_t4\scanvideo.s: vga_t4\scanvideo.c.s
-.PHONY : vga_t4\scanvideo.s
+picocpc\processor\Z80.s: picocpc\processor\Z80.c.s
+.PHONY : picocpc\processor\Z80.s
 
 # target to generate assembly for a file
-vga_t4\scanvideo.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\vga_t4\scanvideo.c.s
-.PHONY : vga_t4\scanvideo.c.s
+picocpc\processor\Z80.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.s
+.PHONY : picocpc\processor\Z80.c.s
+
+picovga_t4\VGA_t4.obj: picovga_t4\VGA_t4.cpp.obj
+.PHONY : picovga_t4\VGA_t4.obj
+
+# target to build an object file
+picovga_t4\VGA_t4.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\VGA_t4.cpp.obj
+.PHONY : picovga_t4\VGA_t4.cpp.obj
+
+picovga_t4\VGA_t4.i: picovga_t4\VGA_t4.cpp.i
+.PHONY : picovga_t4\VGA_t4.i
+
+# target to preprocess a source file
+picovga_t4\VGA_t4.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\VGA_t4.cpp.i
+.PHONY : picovga_t4\VGA_t4.cpp.i
+
+picovga_t4\VGA_t4.s: picovga_t4\VGA_t4.cpp.s
+.PHONY : picovga_t4\VGA_t4.s
+
+# target to generate assembly for a file
+picovga_t4\VGA_t4.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\VGA_t4.cpp.s
+.PHONY : picovga_t4\VGA_t4.cpp.s
+
+picovga_t4\vga.obj: picovga_t4\vga.cpp.obj
+.PHONY : picovga_t4\vga.obj
+
+# target to build an object file
+picovga_t4\vga.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga.cpp.obj
+.PHONY : picovga_t4\vga.cpp.obj
+
+picovga_t4\vga.i: picovga_t4\vga.cpp.i
+.PHONY : picovga_t4\vga.i
+
+# target to preprocess a source file
+picovga_t4\vga.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga.cpp.i
+.PHONY : picovga_t4\vga.cpp.i
+
+picovga_t4\vga.s: picovga_t4\vga.cpp.s
+.PHONY : picovga_t4\vga.s
+
+# target to generate assembly for a file
+picovga_t4\vga.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga.cpp.s
+.PHONY : picovga_t4\vga.cpp.s
+
+picovga_t4\vga_vmode.obj: picovga_t4\vga_vmode.cpp.obj
+.PHONY : picovga_t4\vga_vmode.obj
+
+# target to build an object file
+picovga_t4\vga_vmode.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga_vmode.cpp.obj
+.PHONY : picovga_t4\vga_vmode.cpp.obj
+
+picovga_t4\vga_vmode.i: picovga_t4\vga_vmode.cpp.i
+.PHONY : picovga_t4\vga_vmode.i
+
+# target to preprocess a source file
+picovga_t4\vga_vmode.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga_vmode.cpp.i
+.PHONY : picovga_t4\vga_vmode.cpp.i
+
+picovga_t4\vga_vmode.s: picovga_t4\vga_vmode.cpp.s
+.PHONY : picovga_t4\vga_vmode.s
+
+# target to generate assembly for a file
+picovga_t4\vga_vmode.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picovga_t4\vga_vmode.cpp.s
+.PHONY : picovga_t4\vga_vmode.cpp.s
 
 # Help Target
 help:
@@ -1766,9 +1812,7 @@ help:
 	@echo ... bs2_default_padded_checksummed_asm
 	@echo ... cyw43_driver_picow_cyw43_bus_pio_spi_pio_h
 	@echo ... cyw43_firmware_package
-	@echo ... mcume_hello_pio_h
-	@echo ... mcume_scanvideo_pio_h
-	@echo ... mcume_timing_pio_h
+	@echo ... mcume_picovga_pio_h
 	@echo ... bs2_default
 	@echo ... mcume
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/common/pico_sync/critical_section.obj
@@ -1947,18 +1991,27 @@ help:
 	@echo ... FatFs_SPI/src/rtc.obj
 	@echo ... FatFs_SPI/src/rtc.i
 	@echo ... FatFs_SPI/src/rtc.s
-	@echo ... picocpc/hello.obj
-	@echo ... picocpc/hello.i
-	@echo ... picocpc/hello.s
-	@echo ... tft_t/tft_t_dma.obj
-	@echo ... tft_t/tft_t_dma.i
-	@echo ... tft_t/tft_t_dma.s
-	@echo ... vga_t4/VGA_t4.obj
-	@echo ... vga_t4/VGA_t4.i
-	@echo ... vga_t4/VGA_t4.s
-	@echo ... vga_t4/scanvideo.obj
-	@echo ... vga_t4/scanvideo.i
-	@echo ... vga_t4/scanvideo.s
+	@echo ... picocpc/cpc.obj
+	@echo ... picocpc/cpc.i
+	@echo ... picocpc/cpc.s
+	@echo ... picocpc/emuapi.obj
+	@echo ... picocpc/emuapi.i
+	@echo ... picocpc/emuapi.s
+	@echo ... picocpc/picocpc.obj
+	@echo ... picocpc/picocpc.i
+	@echo ... picocpc/picocpc.s
+	@echo ... picocpc/processor/Z80.obj
+	@echo ... picocpc/processor/Z80.i
+	@echo ... picocpc/processor/Z80.s
+	@echo ... picovga_t4/VGA_t4.obj
+	@echo ... picovga_t4/VGA_t4.i
+	@echo ... picovga_t4/VGA_t4.s
+	@echo ... picovga_t4/vga.obj
+	@echo ... picovga_t4/vga.i
+	@echo ... picovga_t4/vga.s
+	@echo ... picovga_t4/vga_vmode.obj
+	@echo ... picovga_t4/vga_vmode.i
+	@echo ... picovga_t4/vga_vmode.s
 .PHONY : help
 
 

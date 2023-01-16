@@ -180,11 +180,14 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/FatFs_SPI/src/glue.c" "CMakeFiles/mcume.dir/FatFs_SPI/src/glue.c.obj" "gcc" "CMakeFiles/mcume.dir/FatFs_SPI/src/glue.c.obj.d"
   "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/FatFs_SPI/src/my_debug.c" "CMakeFiles/mcume.dir/FatFs_SPI/src/my_debug.c.obj" "gcc" "CMakeFiles/mcume.dir/FatFs_SPI/src/my_debug.c.obj.d"
   "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/FatFs_SPI/src/rtc.c" "CMakeFiles/mcume.dir/FatFs_SPI/src/rtc.c.obj" "gcc" "CMakeFiles/mcume.dir/FatFs_SPI/src/rtc.c.obj.d"
-  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picocpc/hello.c" "CMakeFiles/mcume.dir/picocpc/hello.c.obj" "gcc" "CMakeFiles/mcume.dir/picocpc/hello.c.obj.d"
-  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/vga_t4/scanvideo.c" "CMakeFiles/mcume.dir/vga_t4/scanvideo.c.obj" "gcc" "CMakeFiles/mcume.dir/vga_t4/scanvideo.c.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picocpc/processor/Z80.c" "CMakeFiles/mcume.dir/picocpc/processor/Z80.c.obj" "gcc" "CMakeFiles/mcume.dir/picocpc/processor/Z80.c.obj.d"
   "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp" "CMakeFiles/mcume.dir/C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj" "gcc" "CMakeFiles/mcume.dir/C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj.d"
-  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/tft_t/tft_t_dma.cpp" "CMakeFiles/mcume.dir/tft_t/tft_t_dma.cpp.obj" "gcc" "CMakeFiles/mcume.dir/tft_t/tft_t_dma.cpp.obj.d"
-  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/vga_t4/VGA_t4.cpp" "CMakeFiles/mcume.dir/vga_t4/VGA_t4.cpp.obj" "gcc" "CMakeFiles/mcume.dir/vga_t4/VGA_t4.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picocpc/cpc.cpp" "CMakeFiles/mcume.dir/picocpc/cpc.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picocpc/cpc.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picocpc/emuapi.cpp" "CMakeFiles/mcume.dir/picocpc/emuapi.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picocpc/emuapi.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picocpc/picocpc.cpp" "CMakeFiles/mcume.dir/picocpc/picocpc.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picocpc/picocpc.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picovga_t4/VGA_t4.cpp" "CMakeFiles/mcume.dir/picovga_t4/VGA_t4.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picovga_t4/VGA_t4.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picovga_t4/vga.cpp" "CMakeFiles/mcume.dir/picovga_t4/vga.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picovga_t4/vga.cpp.obj.d"
+  "C:/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/MCUME_pico/picovga_t4/vga_vmode.cpp" "CMakeFiles/mcume.dir/picovga_t4/vga_vmode.cpp.obj" "gcc" "CMakeFiles/mcume.dir/picovga_t4/vga_vmode.cpp.obj.d"
   )
 
 # Targets to which this target links.
