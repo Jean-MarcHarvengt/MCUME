@@ -9,6 +9,7 @@
 //#define PICOMPUTER     1
 //#define PICOMPUTERMAX  1
 //#define PICORETROVGA   1
+//#define PIMORONI       1
 #define MCUME_REV1      1
 //#define MCUME_REV2      1
 
@@ -39,6 +40,11 @@
 #define INVX           1
 #define HAS_SND        1
 #define PICOMPUTER     1
+#endif
+
+#ifdef PIMORONI
+#define USE_VGA        1
+#define HAS_SND        1
 #endif
 
 #ifdef MCUME_REV1

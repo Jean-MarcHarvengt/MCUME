@@ -4,8 +4,13 @@
 #include "vga_t_dma.h"
 
 #include <stdio.h>
+#include <string>
+#include <cstring>  
 
 TFT_T_DMA vga;
+
+#define BLACK       VGA_RGB(0,0,0)
+
 
 #define BLUE        VGA_RGB(0, 0, 170)
 #define LIGHT_BLUE  VGA_RGB(0, 136, 255)
@@ -26,13 +31,19 @@ int main(void) {
 
     vga.drawRect((fb_width-320)/2, (fb_height-200), 320, 200, BLUE);
 
+    auto w = std::to_string(fb_width);
+    auto h = std::to_string(fb_height);
+    char* width = new char[w.length() + 1];
+    char* height = new char[h.length() + 1];
+    strcpy(width,w.c_str());
+    strcpy(height,h.c_str());
+
     while (true) {
         vga.waitSync();
-        sleep_ms(1000);
-        vga.clear(LIGHT_GREEN);
-        vga.drawRect((fb_width-320)/2, (fb_height-200), 320, 200, GREEN);
-        sleep_ms(1000);
-        vga.clear(LIGHT_BLUE);
-        vga.drawRect((fb_width-320)/2, (fb_height-200), 320, 200, BLUE);
+        vga.clear(BLUE);
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+1*8,"fb_width: ",LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+1*8,width,LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+3*8,"fb_height: ",LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+3*8,height,LIGHT_BLUE,BLUE,false);
     }
 }
