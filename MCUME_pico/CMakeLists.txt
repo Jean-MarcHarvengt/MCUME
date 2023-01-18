@@ -117,6 +117,7 @@ set(PICOCPC_SOURCES
 		picocpc/cpc.cpp
 		picocpc/emuapi.cpp
 		picocpc/picocpc.cpp
+		# picocpc/vga-test.cpp
 )
 
 set(PICOO2EM_SOURCES 
@@ -340,9 +341,6 @@ add_executable(mcume
         ${PICOVGA_T4_SOURCES}
 #       ${TFT_T_SOURCES}
 	)
-
-# Added for testing the pio
-# pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/picocpc/hello.pio)
 
 #pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/timing.pio)
 #pico_generate_pio_header(mcume ${CMAKE_CURRENT_LIST_DIR}/vga_t4/scanvideo.pio)
