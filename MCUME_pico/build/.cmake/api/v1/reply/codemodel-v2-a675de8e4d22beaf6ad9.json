@@ -1058,7 +1058,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ELF2UF2Build::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ELF2UF2Build-Debug-d29ebadad58281dccf46.json",
+					"jsonFile" : "target-ELF2UF2Build-Debug-e3b5e6517c7e9be2a863.json",
 					"name" : "ELF2UF2Build",
 					"projectIndex" : 0
 				},
@@ -1107,14 +1107,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "mcume::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume-Debug-40363cdc2bc8a007d553.json",
+					"jsonFile" : "target-mcume-Debug-4749c89eddb72e6c3f67.json",
 					"name" : "mcume",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "mcume_picovga_pio_h::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mcume_picovga_pio_h-Debug-a95a4c735bfbd7751e05.json",
+					"jsonFile" : "target-mcume_picovga_pio_h-Debug-54af119ea9bc7f551199.json",
 					"name" : "mcume_picovga_pio_h",
 					"projectIndex" : 0
 				}

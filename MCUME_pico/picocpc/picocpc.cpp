@@ -41,9 +41,10 @@ int main(void) {
     while (true) {
         vga.waitSync();
         vga.clear(BLUE);
-        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+1*8,"fb_width: ",LIGHT_BLUE,BLUE,false);
-        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+1*8,width,LIGHT_BLUE,BLUE,false);
-        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+3*8,"fb_height: ",LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+1*8,"Soon to be CPC emulator",LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+3*8,"fb_width: ",LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+3*8,width,LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+5*8,"fb_height: ",LIGHT_BLUE,BLUE,false);
         vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+3*8,height,LIGHT_BLUE,BLUE,false);
     }
 }
