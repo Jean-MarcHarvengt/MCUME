@@ -3,16 +3,19 @@
 
 #include "platform_config.h"
 
+#define EXTRA_HEAP  0x10
+
 /* Title */
 #define TITLE "    Amstrad CPC Emulator"
 #define ROMSDIR "cpc"
 
-#define emu_Init(ROM) {cpc_Init(); cpc_Start();}
+#define emu_Init(ROM) {cpc_Init(); cpc_Start(ROM);}
 #define emu_Step(x) {cpc_Step();}
 #define emu_Input(x) {cpc_Input(x);}
 
 #define PALETTE_SIZE        27
 #define VID_FRAME_SKIP      0x0
+#define TFT_VBUFFER_YCROP    0
 #define TFT_VUBFFER_YCROP   0
 
 #define ACTION_NONE         0
@@ -26,6 +29,22 @@
 #endif
 
 // here are joystick mask mappings in emuapi.h for picospeccy
+
+#define MASK_JOY2_RIGHT 0x0001
+#define MASK_JOY2_LEFT  0x0002
+#define MASK_JOY2_UP    0x0004
+#define MASK_JOY2_DOWN  0x0008
+#define MASK_JOY2_BTN   0x0010
+#define MASK_KEY_USER1  0x0020
+#define MASK_KEY_USER2  0x0040
+#define MASK_KEY_USER3  0x0080
+#define MASK_JOY1_RIGHT 0x0100
+#define MASK_JOY1_LEFT  0x0200
+#define MASK_JOY1_UP    0x0400
+#define MASK_JOY1_DOWN  0x0800
+#define MASK_JOY1_BTN   0x1000
+#define MASK_KEY_USER4  0x2000
+#define MASK_OSKB       0x8000
 
 extern void emu_init(void);
 extern void emu_start(void);
