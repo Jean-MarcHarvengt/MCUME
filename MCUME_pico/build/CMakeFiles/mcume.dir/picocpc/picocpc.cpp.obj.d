@@ -56,8 +56,12 @@ CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj: \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/uart.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/dreq.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_uart\include/pico/stdio_uart.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\vga_t4/vga_t_dma.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\vga_t4/VGA_t4.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/iopins.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/platform_config.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picocpc\emuapi.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/platform_config.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picocpc\keyboard_osd.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picocpc\cpc.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\stdio.h \
  c:\progra~2\armgnu~1\1142da~1.3re\lib\gcc\arm-none-eabi\11.3.1\include\stdarg.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\reent.h \
@@ -66,6 +70,8 @@ CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj: \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\machine\_types.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\lock.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\stdio.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\vga_t4/vga_t_dma.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\vga_t4/VGA_t4.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\math.h \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cmath \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\cpp_type_traits.h \
@@ -104,54 +110,12 @@ CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj: \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\tr1\poly_hermite.tcc \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\tr1\poly_laguerre.tcc \
  c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\tr1\riemann_zeta.tcc \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\string \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\stringfwd.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\memoryfwd.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\char_traits.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\postypes.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cwchar \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\wchar.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\_locale.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cstdint \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\allocator.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\arm-none-eabi\thumb\v6-m\nofp\bits\c++allocator.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\ext\new_allocator.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\new \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\exception.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\localefwd.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\arm-none-eabi\thumb\v6-m\nofp\bits\c++locale.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\clocale \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\locale.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\iosfwd \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cctype \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\ctype.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\ostream_insert.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\cxxabi_forced.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\stl_function.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\backward\binders.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\range_access.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\initializer_list \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\basic_string.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\ext\atomicity.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\arm-none-eabi\thumb\v6-m\nofp\bits\gthr.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\arm-none-eabi\thumb\v6-m\nofp\bits\gthr-default.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\arm-none-eabi\thumb\v6-m\nofp\bits\atomic_word.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\ext\alloc_traits.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\alloc_traits.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\stl_construct.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\string_view \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\functional_hash.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\hash_bytes.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\string_view.tcc \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\ext\string_conversions.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cstdlib \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cstdio \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cerrno \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\errno.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\errno.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\charconv.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\bits\basic_string.tcc \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\c++\11.3.1\cstring \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\string.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\strings.h \
- c:\progra~2\armgnu~1\1142da~1.3re\arm-none-eabi\include\sys\string.h
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_clocks\include/hardware/clocks.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_structs\include/hardware/structs/clocks.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/clocks.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_vreg\include/hardware/vreg.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_structs\include/hardware/structs/vreg_and_chip_reset.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/vreg_and_chip_reset.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_pwm\include/hardware/pwm.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_structs\include/hardware/structs/pwm.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/pwm.h

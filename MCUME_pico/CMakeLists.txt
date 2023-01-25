@@ -113,11 +113,11 @@ set(PICOCOLEM_SOURCES
 	)
 
 set(PICOCPC_SOURCES
-		picocpc/processor/Z80.c
-		picocpc/cpc.cpp
-		picocpc/emuapi.cpp
-		picocpc/picocpc.cpp
-		# picocpc/vga-test.cpp
+		# picocpc/processor/Z80.c
+		# picocpc/cpc.cpp
+		# picocpc/emuapi.cpp
+		# picocpc/picocpc.cpp
+		picocpc/vga-test.cpp
 )
 
 set(PICOO2EM_SOURCES 
@@ -366,7 +366,7 @@ target_compile_definitions(mcume PUBLIC N_SD_CARDS=${N_SD_CARDS})
 
 
 #pico_enable_stdio_uart(mcume 0)
-pico_enable_stdio_usb(mcume 0)
+pico_enable_stdio_usb(mcume 1)
 
 pico_add_extra_outputs(mcume)
 

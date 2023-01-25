@@ -115,6 +115,8 @@ typedef unsigned char Bool;
 #include "pico/sync.h"
 #include "pico/platform.h"
 #include "pico/sem.h"
+#include "pico/stdio.h"
+
 #include "hardware/clocks.h"
 #include "hardware/dma.h"
 #include "hardware/gpio.h"

@@ -170,6 +170,11 @@ bool vcocalc(u32 reqkhz, u32 input, u32 vcomin, u32 vcomax, bool lowvco,
 		}
 	}
 
+	// For debugging, make sure to remove/comment out!
+	for(int i = 0; i < 1000; i++) {
+		printf("The frequency is %d \n", *outkhz);
+	}
+	
 	// check precise frequency
 	return (*outkhz == reqkhz) && (*outvco == *outkhz * *outpd1 * *outpd2);
 }

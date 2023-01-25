@@ -34,6 +34,7 @@ typedef enum vga_mode_t
   VGA_MODE_320x240 = 0,
   VGA_MODE_352x240 = 1,
   VGA_MODE_400x240 = 2,
+  VGA_MODE_320x200 = 3
 } vga_mode_t;
 
 

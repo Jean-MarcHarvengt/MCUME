@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <string>
-#include <cstring>  
+#include <cstring>
 
 TFT_T_DMA vga;
 
@@ -16,6 +16,7 @@ TFT_T_DMA vga;
 #define LIGHT_BLUE  VGA_RGB(0, 136, 255)
 #define GREEN       VGA_RGB(0, 170, 0)
 #define LIGHT_GREEN VGA_RGB(144, 238, 144)
+#define WHITE       VGA_RGB(255, 255, 255)
 
 static int fb_width, fb_height;
 
@@ -24,8 +25,8 @@ static char * digits = "0123456789";
 int main(void) {
     set_sys_clock_khz(230000, true);
     stdio_init_all();
-    
-    vga.begin(VGA_MODE_320x240);
+
+    vga.begin(VGA_MODE_320x200);
     vga.clear(LIGHT_BLUE);
     vga.get_frame_buffer_size(&fb_width, &fb_height);
 
@@ -45,6 +46,13 @@ int main(void) {
         vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+3*8,"fb_width: ",LIGHT_BLUE,BLUE,false);
         vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+3*8,width,LIGHT_BLUE,BLUE,false);
         vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+5*8,"fb_height: ",LIGHT_BLUE,BLUE,false);
-        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+3*8,height,LIGHT_BLUE,BLUE,false);
+        vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+5*8,height,LIGHT_BLUE,BLUE,false);
+
+        for(int i = 0; i < 320; i++) {
+            vga.drawPixel(i, 0, WHITE);
+        }
+        for(int j = 0; j < 200; j++) {
+            vga.drawPixel(319, j, WHITE);
+        }
     }
 }

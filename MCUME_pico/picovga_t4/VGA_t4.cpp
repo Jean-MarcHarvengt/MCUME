@@ -115,6 +115,11 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
       break;   
     case VGA_MODE_400x240:
       break;
+    case VGA_MODE_320x200:
+      fb_width = 320;
+      fb_height = 200;
+      fb_stride = fb_width;
+      break;
   }	
 
   /* initialize gfx buffer */
@@ -133,7 +138,7 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
   sem_init(&core1_initted, 0, 1);
 
   multicore_launch_core1(core1_func);
-  vmode = Video(DEV_VGA, RES_QVGA);
+  vmode = Video(DEV_VGA, RES_CGA);
   VgaInitReql(vmode);
 
   // wait for initialization of audio to be complete

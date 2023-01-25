@@ -222,6 +222,438 @@ cyw43_driver_picow_cyw43_bus_pio_spi_pio_h\fast:
 	$(MAKE) $(MAKESILENT) -f pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\cyw43_driver_picow_cyw43_bus_pio_spi_pio_h.dir\build.make /nologo -$(MAKEFLAGS) pico-sdk\src\rp2_common\cyw43_driver\CMakeFiles\cyw43_driver_picow_cyw43_bus_pio_spi_pio_h.dir\build
 .PHONY : cyw43_driver_picow_cyw43_bus_pio_spi_pio_h\fast
 
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\audio\audio_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\cdc\cdc_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\dfu\dfu_rt_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\hid\hid_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\midi\midi_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\msc\msc_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ecm_rndis_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\net\ncm_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\usbtmc\usbtmc_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\vendor\vendor_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\class\video\video_device.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\common\tusb_fifo.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\device\usbd_control.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\dcd_rp2040.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\portable\raspberrypi\rp2040\rp2040_usb.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\lib\tinyusb\src\tusb.c.s
+
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\common\pico_sync\critical_section.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\common\pico_sync\critical_section.c.obj
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\common\pico_sync\critical_section.obj
 
@@ -541,6 +973,30 @@ C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\ha
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_dma\dma.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_dma\dma.c.s
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_dma\dma.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_flash\flash.c.s
 
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_gpio\gpio.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_gpio\gpio.c.obj
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_gpio\gpio.obj
@@ -942,6 +1398,30 @@ C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pi
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_double\double_v1_rom_shim.S.obj
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_double\double_v1_rom_shim.S.obj
 
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_fix\rp2040_usb_device_enumeration\rp2040_usb_device_enumeration.c.s
+
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_float\float_aeabi.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_float\float_aeabi.S.obj
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_float\float_aeabi.obj
 
@@ -1246,6 +1726,78 @@ C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pi
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_uart\stdio_uart.c.s
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_uart\stdio_uart.c.s
 
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\reset_interface.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\stdio_usb_descriptors.c.s
+
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.c.obj
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.obj
 
@@ -1269,6 +1821,30 @@ C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pi
 C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.c.s
 .PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdlib\stdlib.c.s
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.obj: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.obj
+
+# target to build an object file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.obj
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.obj
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.i: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.i
+
+# target to preprocess a source file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.i
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.i
+
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.s: C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.s
+
+# target to generate assembly for a file
+C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.s
+.PHONY : C_\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_unique_id\unique_id.c.s
 
 FatFs_SPI\ff14a\source\ff.obj: FatFs_SPI\ff14a\source\ff.c.obj
 .PHONY : FatFs_SPI\ff14a\source\ff.obj
@@ -1630,101 +2206,29 @@ FatFs_SPI\src\rtc.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\FatFs_SPI\src\rtc.c.s
 .PHONY : FatFs_SPI\src\rtc.c.s
 
-picocpc\cpc.obj: picocpc\cpc.cpp.obj
-.PHONY : picocpc\cpc.obj
+picocpc\vga-test.obj: picocpc\vga-test.cpp.obj
+.PHONY : picocpc\vga-test.obj
 
 # target to build an object file
-picocpc\cpc.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.obj
-.PHONY : picocpc\cpc.cpp.obj
+picocpc\vga-test.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\vga-test.cpp.obj
+.PHONY : picocpc\vga-test.cpp.obj
 
-picocpc\cpc.i: picocpc\cpc.cpp.i
-.PHONY : picocpc\cpc.i
-
-# target to preprocess a source file
-picocpc\cpc.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.i
-.PHONY : picocpc\cpc.cpp.i
-
-picocpc\cpc.s: picocpc\cpc.cpp.s
-.PHONY : picocpc\cpc.s
-
-# target to generate assembly for a file
-picocpc\cpc.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\cpc.cpp.s
-.PHONY : picocpc\cpc.cpp.s
-
-picocpc\emuapi.obj: picocpc\emuapi.cpp.obj
-.PHONY : picocpc\emuapi.obj
-
-# target to build an object file
-picocpc\emuapi.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.obj
-.PHONY : picocpc\emuapi.cpp.obj
-
-picocpc\emuapi.i: picocpc\emuapi.cpp.i
-.PHONY : picocpc\emuapi.i
+picocpc\vga-test.i: picocpc\vga-test.cpp.i
+.PHONY : picocpc\vga-test.i
 
 # target to preprocess a source file
-picocpc\emuapi.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.i
-.PHONY : picocpc\emuapi.cpp.i
+picocpc\vga-test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\vga-test.cpp.i
+.PHONY : picocpc\vga-test.cpp.i
 
-picocpc\emuapi.s: picocpc\emuapi.cpp.s
-.PHONY : picocpc\emuapi.s
-
-# target to generate assembly for a file
-picocpc\emuapi.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\emuapi.cpp.s
-.PHONY : picocpc\emuapi.cpp.s
-
-picocpc\picocpc.obj: picocpc\picocpc.cpp.obj
-.PHONY : picocpc\picocpc.obj
-
-# target to build an object file
-picocpc\picocpc.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj
-.PHONY : picocpc\picocpc.cpp.obj
-
-picocpc\picocpc.i: picocpc\picocpc.cpp.i
-.PHONY : picocpc\picocpc.i
-
-# target to preprocess a source file
-picocpc\picocpc.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.i
-.PHONY : picocpc\picocpc.cpp.i
-
-picocpc\picocpc.s: picocpc\picocpc.cpp.s
-.PHONY : picocpc\picocpc.s
+picocpc\vga-test.s: picocpc\vga-test.cpp.s
+.PHONY : picocpc\vga-test.s
 
 # target to generate assembly for a file
-picocpc\picocpc.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\picocpc.cpp.s
-.PHONY : picocpc\picocpc.cpp.s
-
-picocpc\processor\Z80.obj: picocpc\processor\Z80.c.obj
-.PHONY : picocpc\processor\Z80.obj
-
-# target to build an object file
-picocpc\processor\Z80.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.obj
-.PHONY : picocpc\processor\Z80.c.obj
-
-picocpc\processor\Z80.i: picocpc\processor\Z80.c.i
-.PHONY : picocpc\processor\Z80.i
-
-# target to preprocess a source file
-picocpc\processor\Z80.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.i
-.PHONY : picocpc\processor\Z80.c.i
-
-picocpc\processor\Z80.s: picocpc\processor\Z80.c.s
-.PHONY : picocpc\processor\Z80.s
-
-# target to generate assembly for a file
-picocpc\processor\Z80.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\processor\Z80.c.s
-.PHONY : picocpc\processor\Z80.c.s
+picocpc\vga-test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\picocpc\vga-test.cpp.s
+.PHONY : picocpc\vga-test.cpp.s
 
 picovga_t4\VGA_t4.obj: picovga_t4\VGA_t4.cpp.obj
 .PHONY : picovga_t4\VGA_t4.obj
@@ -1815,6 +2319,60 @@ help:
 	@echo ... mcume_picovga_pio_h
 	@echo ... bs2_default
 	@echo ... mcume
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/audio/audio_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/audio/audio_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/audio/audio_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/hid/hid_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/hid/hid_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/hid/hid_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/midi/midi_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/midi/midi_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/midi/midi_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/msc/msc_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/msc/msc_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/msc/msc_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ncm_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ncm_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/net/ncm_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/video/video_device.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/video/video_device.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/class/video/video_device.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/common/tusb_fifo.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/common/tusb_fifo.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/common/tusb_fifo.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd_control.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd_control.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/device/usbd_control.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/tusb.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/tusb.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/lib/tinyusb/src/tusb.s
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/common/pico_sync/critical_section.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/common/pico_sync/critical_section.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/common/pico_sync/critical_section.s
@@ -1855,6 +2413,9 @@ help:
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_dma/dma.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_dma/dma.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_dma/dma.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_flash/flash.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_flash/flash.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_flash/flash.s
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_gpio/gpio.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_gpio/gpio.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/hardware_gpio/gpio.s
@@ -1905,6 +2466,9 @@ help:
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_double/double_math.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_double/double_math.s
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_double/double_v1_rom_shim.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.s
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_float/float_aeabi.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_float/float_init_rom.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_float/float_init_rom.i
@@ -1943,9 +2507,21 @@ help:
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.s
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdlib/stdlib.obj
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdlib/stdlib.i
 	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_stdlib/stdlib.s
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_unique_id/unique_id.obj
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_unique_id/unique_id.i
+	@echo ... C_/Users/alint/Desktop/eu/uni/_year4/Dizertatie/MCUME/pico-sdk/src/rp2_common/pico_unique_id/unique_id.s
 	@echo ... FatFs_SPI/ff14a/source/ff.obj
 	@echo ... FatFs_SPI/ff14a/source/ff.i
 	@echo ... FatFs_SPI/ff14a/source/ff.s
@@ -1991,18 +2567,9 @@ help:
 	@echo ... FatFs_SPI/src/rtc.obj
 	@echo ... FatFs_SPI/src/rtc.i
 	@echo ... FatFs_SPI/src/rtc.s
-	@echo ... picocpc/cpc.obj
-	@echo ... picocpc/cpc.i
-	@echo ... picocpc/cpc.s
-	@echo ... picocpc/emuapi.obj
-	@echo ... picocpc/emuapi.i
-	@echo ... picocpc/emuapi.s
-	@echo ... picocpc/picocpc.obj
-	@echo ... picocpc/picocpc.i
-	@echo ... picocpc/picocpc.s
-	@echo ... picocpc/processor/Z80.obj
-	@echo ... picocpc/processor/Z80.i
-	@echo ... picocpc/processor/Z80.s
+	@echo ... picocpc/vga-test.obj
+	@echo ... picocpc/vga-test.i
+	@echo ... picocpc/vga-test.s
 	@echo ... picovga_t4/VGA_t4.obj
 	@echo ... picovga_t4/VGA_t4.i
 	@echo ... picovga_t4/VGA_t4.s

@@ -59,6 +59,7 @@ CMakeFiles\mcume.dir\FatFs_SPI\src\rtc.c.obj: \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/uart.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/dreq.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_uart\include/pico/stdio_uart.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\include/pico/stdio_usb.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\FatFs_SPI\ff14a\source/ff.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\FatFs_SPI\ff14a\source/ffconf.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\FatFs_SPI\include/util.h \

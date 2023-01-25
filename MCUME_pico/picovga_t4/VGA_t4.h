@@ -23,7 +23,7 @@
 
 
 // Enable debug info (requires serial initialization)
-//#define DEBUG
+// #define DEBUG
 
 typedef uint8_t vga_pixel;
 #define VGA_RGB(r,g,b)   ( (((r>>5)&0x07)<<5) | (((g>>5)&0x07)<<2) | (((b>>6)&0x3)<<0) )
@@ -34,6 +34,7 @@ typedef enum vga_mode_t
   VGA_MODE_320x240 = 0,
   VGA_MODE_352x240 = 1,
   VGA_MODE_400x240 = 2,
+  VGA_MODE_320x200 = 3
 } vga_mode_t;
 
 
