@@ -3,6 +3,7 @@
 
 #include "vga_t_dma.h"
 
+#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <cstring>
@@ -26,7 +27,7 @@ int main(void) {
     set_sys_clock_khz(230000, true);
     stdio_init_all();
 
-    vga.begin(VGA_MODE_320x200);
+    vga.begin(VGA_MODE_320x240);
     vga.clear(LIGHT_BLUE);
     vga.get_frame_buffer_size(&fb_width, &fb_height);
 
@@ -39,6 +40,7 @@ int main(void) {
     strcpy(width,w.c_str());
     strcpy(height,h.c_str());
 
+    int c = 0;
     while (true) {
         vga.waitSync();
         vga.clear(BLUE);
@@ -48,10 +50,17 @@ int main(void) {
         vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+5*8,"fb_height: ",LIGHT_BLUE,BLUE,false);
         vga.drawText((fb_width-320)/2 + 1*8 + 10*8,(fb_height-200)/2+5*8,height,LIGHT_BLUE,BLUE,false);
 
-        for(int i = 0; i < 320; i++) {
+        std::string t = std::to_string(c);
+        char const *n_char = t.c_str();
+
+        vga.drawText((fb_width-320)/2 + 1*8,(fb_height-200)/2+7*8,n_char,LIGHT_BLUE,BLUE,false);
+        c++;
+        c = c % 1000;
+
+        for(int i = 0; i < fb_width; i++) {
             vga.drawPixel(i, 0, WHITE);
         }
-        for(int j = 0; j < 200; j++) {
+        for(int j = 0; j < fb_height; j++) {
             vga.drawPixel(319, j, WHITE);
         }
     }

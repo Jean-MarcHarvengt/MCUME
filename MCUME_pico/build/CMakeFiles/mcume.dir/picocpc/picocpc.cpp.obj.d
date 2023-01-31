@@ -56,6 +56,7 @@ CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj: \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/uart.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/dreq.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_uart\include/pico/stdio_uart.h \
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\pico_stdio_usb\include/pico/stdio_usb.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/iopins.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\config/platform_config.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\MCUME_pico\picocpc\emuapi.h \
@@ -115,7 +116,4 @@ CMakeFiles\mcume.dir\picocpc\picocpc.cpp.obj: \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/clocks.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_vreg\include/hardware/vreg.h \
  C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_structs\include/hardware/structs/vreg_and_chip_reset.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/vreg_and_chip_reset.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2_common\hardware_pwm\include/hardware/pwm.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_structs\include/hardware/structs/pwm.h \
- C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/pwm.h
+ C:\Users\alint\Desktop\eu\uni\_year4\Dizertatie\MCUME\pico-sdk\src\rp2040\hardware_regs\include/hardware/regs/vreg_and_chip_reset.h

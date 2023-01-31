@@ -116,7 +116,7 @@ void emu_DrawLine(unsigned char * VBuf, int width, int height, int line)
 #else
          tft.writeLine(width,height,line, VBuf, palette16);
 #endif      
-    }  
+    }
 }  
 
 void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line) 
@@ -155,33 +155,3 @@ void * emu_LineBuffer(int line)
 {
     return (void*)tft.getLineBuffer(line);    
 }
-
-
-#ifdef HAS_SND
-//#include "AudioPlaySystem.h"
-//AudioPlaySystem mymixer;
-#include "hardware/pwm.h"
-void emu_sndInit() {  
-  tft.begin_audio(256, mymixer.snd_Mixer);
-  mymixer.start();
-  //gpio_init(AUDIO_PIN);
-  //gpio_set_dir(AUDIO_PIN, GPIO_OUT);     
-}
-
-void emu_sndPlaySound(int chan, int volume, int freq)
-{
-  if (chan < 6) {
-    mymixer.sound(chan, freq, volume); 
-  }
-}
-
-void emu_sndPlayBuzz(int size, int val) {
-#ifndef CUSTOM_SND 
-  //gpio_put(AUDIO_PIN, (val?1:0));
-  pwm_set_gpio_level(AUDIO_PIN, (val?255:128));
-#endif    
-}
-
-#endif
-
-

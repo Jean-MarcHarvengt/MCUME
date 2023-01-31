@@ -1387,8 +1387,8 @@ pico-sdk\tools\clean:
 # Target rules for target CMakeFiles/mcume.dir
 
 # All Build rule for target.
-CMakeFiles\mcume.dir\all: CMakeFiles\ELF2UF2Build.dir\all
 CMakeFiles\mcume.dir\all: CMakeFiles\mcume_picovga_pio_h.dir\all
+CMakeFiles\mcume.dir\all: CMakeFiles\ELF2UF2Build.dir\all
 CMakeFiles\mcume.dir\all: pico-sdk\src\rp2_common\boot_stage2\CMakeFiles\bs2_default_padded_checksummed_asm.dir\all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mcume.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\mcume.dir\build

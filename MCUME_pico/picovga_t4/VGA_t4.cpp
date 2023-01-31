@@ -138,7 +138,7 @@ vga_error_t VGA_T4::begin(vga_mode_t mode)
   sem_init(&core1_initted, 0, 1);
 
   multicore_launch_core1(core1_func);
-  vmode = Video(DEV_VGA, RES_CGA);
+  vmode = Video(DEV_VGA, RES_QVGA);
   VgaInitReql(vmode);
 
   // wait for initialization of audio to be complete
