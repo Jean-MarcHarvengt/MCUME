@@ -1,0 +1,1 @@
+void write_ga(unsigned short address, unsigned short value);
