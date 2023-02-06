@@ -5,6 +5,38 @@
 #include "ga.h"
 
 /*
+ * Declarations of the RAM, VRAM, processor instances.
+*/
+static byte z80RAM[0x10000];   // 64k
+static byte screenRAM[0x4000]; // 16k
+static Z80 cpu;
+
+
+/*
+ * Implementation of cpc.h which is used by emuapi.h to define emu_Init() etc.
+*/
+
+void cpc_Init(void)
+{
+    return;
+}
+
+void cpc_Step()
+{
+    return;
+}
+
+void cpc_Start(char* filename)
+{
+    return;
+}
+
+void cpc_Input(int bClick)
+{
+    return;
+}
+
+/*
  * The implementations of the Z80 instructions required by the portable Z80 emulator.
  * These implementations are system-specific.
 */
@@ -12,6 +44,7 @@ void OutZ80(register word Port, register byte Value)
 {
     if(!(Port & 0x8000)) write_ga(Port, Value); // The Gate Array is selected when bit 15 is set to 0.
     if(!(Port & 0x4000)) write_crtc(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
+    if(!(Port & 0x2000)) ; // upper rom bank number
     return;
 }
 
@@ -21,31 +54,39 @@ byte InZ80(register word Port)
     return 0xFF;
 }
 
+#define RAM_BASE 0x4000 // The ROM takes up 0x0000-0x4000. From 0x4000-0x10000 is the RAM.
+
 void WrZ80(register word Addr,register byte Value)
 {
-    return;
+    if(Addr >= RAM_BASE)
+    {
+        z80RAM[Addr - RAM_BASE] = Value;
+    }
 }
 
 byte RdZ80(register word Addr)
 {
-    return 0xFF;
+    if(Addr < RAM_BASE)
+    {
+        return gb_rom_464_0[Addr];
+    }
+    else
+    {
+        return z80RAM[Addr - RAM_BASE];
+    }
 }
 
-void PatchZ80(register Z80 *R)
-{
-    return;
-}
+// void PatchZ80(register Z80 *R)
+// {
+//     return;
+// }
 
-word LoopZ80(register Z80 *R)
-{
-    return 0xFFFF;
-}
+// word LoopZ80(register Z80 *R)
+// {
+//     return 0xFFFF;
+// }
 
 // void JumpZ80(word PC)
 // {
 //     return;
 // }
-
-/*
- * Non-Z80 stuff.
-*/
