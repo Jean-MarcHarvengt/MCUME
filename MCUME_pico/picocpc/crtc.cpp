@@ -26,11 +26,10 @@ struct Registers {
     uint8_t CursorAddressLow = 0;
     uint8_t LightPenAddressHigh = 0; // Read only
     uint8_t LightPenAddressLow = 0; // Read only 
-};
+} Registers;
 
 void write_crtc(unsigned short address, unsigned short value)
 {
-
     return;
 }
 

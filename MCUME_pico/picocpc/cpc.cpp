@@ -11,7 +11,6 @@ static byte z80RAM[0x10000];   // 64k
 static byte screenRAM[0x4000]; // 16k
 static Z80 cpu;
 
-
 /*
  * Implementation of cpc.h which is used by emuapi.h to define emu_Init() etc.
 */
@@ -42,10 +41,9 @@ void cpc_Input(int bClick)
 */
 void OutZ80(register word Port, register byte Value)
 {
-    if(!(Port & 0x8000)) write_ga(Port, Value); // The Gate Array is selected when bit 15 is set to 0.
+    if(!(Port & 0x8000)) write_ga(Port, Value);   // The Gate Array is selected when bit 15 is set to 0.
     if(!(Port & 0x4000)) write_crtc(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
-    if(!(Port & 0x2000)) ; // upper rom bank number
-    return;
+    if(!(Port & 0x2000)) ;                        // upper rom bank number. ROM banking needs to be done regardless of CPC model
 }
 
 byte InZ80(register word Port)
@@ -56,7 +54,11 @@ byte InZ80(register word Port)
 
 #define RAM_BASE 0x4000 // The ROM takes up 0x0000-0x4000. From 0x4000-0x10000 is the RAM.
 
-void WrZ80(register word Addr,register byte Value)
+/**
+ * Write the byte Value into the address Addr. If Addr is less than RAM_BASE,
+ * then we do not write anything as it would be written into the ROM.
+*/
+void WrZ80(register word Addr, register byte Value)
 {
     if(Addr >= RAM_BASE)
     {
@@ -75,18 +77,3 @@ byte RdZ80(register word Addr)
         return z80RAM[Addr - RAM_BASE];
     }
 }
-
-// void PatchZ80(register Z80 *R)
-// {
-//     return;
-// }
-
-// word LoopZ80(register Z80 *R)
-// {
-//     return 0xFFFF;
-// }
-
-// void JumpZ80(word PC)
-// {
-//     return;
-// }

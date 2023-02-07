@@ -3,33 +3,61 @@
  * Gate Array's READY signal is connected to Z80's WAIT input for "memory contention". 
  * This means CPU execution is halted every time Gate Array and CPU accesses the memory at the same time. 
  * The reason for this is that both GA and the CPU share the same address/data bus for memory access.
+ * 
+ * The Gate Array is responsible for the display (colour palette, resolution, horizontal and vertical sync), interrupt generation 
+ * and memory arrangement.
 */
-struct { unsigned char R,G,B;} Palette[27] = {
-    { 0, 0, 0},       // Black
-    { 0, 0, 128},     // Blue
-    { 0, 0, 255},     // Bright blue
-    { 128, 0, 0},     // Red
-    { 128, 0, 128},   // Magenta
-    { 128, 0, 255},   // Mauve
-    { 255, 0, 0},     // Bright Red
-    { 255, 0, 128},   // Purple
-    { 255, 0, 255},   // Bright Magenta
-    { 0, 128, 0},     // Green
-    { 0, 128, 128},   // Cyan
-    { 0, 128, 255},   // Sky Blue
-    { 128, 128, 0},   // Yellow
-    { 128, 128, 128}, // White
-    { 128, 128, 255}, // Pastel Blue
-    { 255, 128, 0},   // Orange
-    { 255, 128, 128}, // Pink
-    { 255, 128, 255}, // Pastel Magenta
-    { 0, 255, 0},     // Bright Green
-    { 0, 255, 128},   // Sea Green
-    { 0, 255, 255},   // Bright Cyan
-    { 128, 255, 0},   // Lime
-    { 128, 255, 128}, // Pastel Green 
-    { 128, 255, 255}, // Pastel Cyan
-    { 255, 255, 0},   // Bright Yellow
-    { 255, 255, 128}, // Pastel Yellow
-    { 255, 255, 255}, // Bright White
-};
+#include "pico.h"
+#include "pico/stdlib.h"
+#include "ga.h"
+
+extern struct Registers regs;
+
+/** Bit 7   Bit 6    Function
+ *  --0--   --0--    Select pen
+ *  --0--   --1--    Select colour of the selected pen
+ *  --1--   --0--    Select screen mode, ROM configuration and interrupt control
+ *  --1--   --1--    RAM memory management (Note: This is not available on the CPC 464)
+*/
+void write_ga(register uint16_t address, register uint8_t value)
+{
+    switch(address >> 6)
+    {
+        case 0x00:
+            select_pen(address, value);
+            break;
+        case 0x01:
+            select_pen_colour(address, value);
+            break;
+        case 0x10:
+            rom_banking(address, value);
+            break;
+        case 0x11:
+            // This would be RAM banking but we are not concerned with that yet.
+            break;
+    }
+}
+
+// TODO delete address argument? 
+void select_pen(register uint16_t address, register uint8_t value)
+{
+    switch(value >> 4)
+    {
+        case 0x01:
+            // Select border. TODO implement
+            break;
+        case 0x00:
+            // Bits 0-3 dictate the pen number
+            regs.PaletteIndex = value >> 4;
+    }
+}
+void select_pen_colour(register uint16_t address, register uint8_t value)
+{
+    // Bits 4 to 0 specify the hardware colour number from the hardware colour palette.
+    regs.PaletteData[regs.PaletteIndex] = value & 0x000FFFFF;
+}
+
+void rom_banking(register uint16_t address, register uint8_t value)
+{
+    return;
+}
