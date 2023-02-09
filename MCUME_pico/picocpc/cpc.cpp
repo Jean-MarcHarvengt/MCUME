@@ -1,49 +1,67 @@
+#include "pico.h"
+#include "pico/stdlib.h"
 #include "processor/Z80.h"
 #include "roms/rom464.h"
+
+extern "C" {
 #include "emuapi.h"
+#include "platform_config.h"
+}
+
 #include "crtc.h"
 #include "ga.h"
 
 /*
- * Declarations of the RAM, VRAM, processor instances.
+ * Declarations of instances of the RAM, VRAM, processor and other required components.
 */
-static byte z80RAM[0x10000];   // 64k
-static byte screenRAM[0x4000]; // 16k
+
+static byte ram[0x10000];   // 64k
+static byte bitstream[0x4000]; // 16k video ram to be used by PIO.
 static Z80 cpu;
+extern struct GA_Config ga_config;
 
 /*
- * Implementation of cpc.h which is used by emuapi.h to define emu_Init() etc.
+ * Implementations of system-specific emuapi Init, Step etc. functions.
 */
 
 void cpc_Init(void)
 {
-    return;
+
 }
 
-void cpc_Step()
+void cpc_Step(void)
 {
-    return;
+
 }
 
 void cpc_Start(char* filename)
 {
-    return;
+
 }
 
 void cpc_Input(int bClick)
 {
-    return;
+
 }
 
 /*
- * The implementations of the Z80 instructions required by the portable Z80 emulator.
- * These implementations are system-specific.
+ * System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
 */
+
 void OutZ80(register word Port, register byte Value)
 {
-    if(!(Port & 0x8000)) write_ga(Port, Value);   // The Gate Array is selected when bit 15 is set to 0.
+    if(!(Port & 0x8000)) write_ga(Value);         // The Gate Array is selected when bit 15 is set to 0.
     if(!(Port & 0x4000)) write_crtc(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
-    if(!(Port & 0x2000)) ;                        // upper rom bank number. ROM banking needs to be done regardless of CPC model
+    if(!(Port & 0x2000)) 
+    {
+        // upper rom bank number. ROM banking needs to be done regardless of CPC model
+        // The Upper ROM Bank Number (in range of 0x00..0xFF) to be mapped to memory at 0xC000..0xFFFF
+
+        // byte req_bank_number = Value & 15;
+        // if(ga_config.upper_rom_enable)
+        // {
+        // }
+    }                        
 }
 
 byte InZ80(register word Port)
@@ -52,28 +70,26 @@ byte InZ80(register word Port)
     return 0xFF;
 }
 
-#define RAM_BASE 0x4000 // The ROM takes up 0x0000-0x4000. From 0x4000-0x10000 is the RAM.
+#define LOWER_ROM_END   0x4000
+#define UPPER_ROM_BEGIN 0xC000
 
-/**
- * Write the byte Value into the address Addr. If Addr is less than RAM_BASE,
- * then we do not write anything as it would be written into the ROM.
-*/
 void WrZ80(register word Addr, register byte Value)
 {
-    if(Addr >= RAM_BASE)
-    {
-        z80RAM[Addr - RAM_BASE] = Value;
-    }
+    ram[Addr] = Value;
 }
 
 byte RdZ80(register word Addr)
 {
-    if(Addr < RAM_BASE)
+    if(Addr <= LOWER_ROM_END && ga_config.lower_rom_enable)
     {
         return gb_rom_464_0[Addr];
     }
+    else if(Addr >= UPPER_ROM_BEGIN && ga_config.upper_rom_enable)
+    {
+        return gb_rom_464_1[Addr];
+    }
     else
     {
-        return z80RAM[Addr - RAM_BASE];
+        return ram[Addr];
     }
 }

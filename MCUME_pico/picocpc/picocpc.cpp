@@ -7,9 +7,8 @@ extern "C" {
 }
 #include "keyboard_osd.h"
 
-extern "C" {
+
 #include "cpc.h"
-}
 #include <stdio.h>
 
 #ifdef USE_VGA
