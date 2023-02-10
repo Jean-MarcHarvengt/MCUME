@@ -1,13 +1,14 @@
+#include "cpc.h"
+
 #include "pico.h"
 #include "pico/stdlib.h"
-#include "processor/Z80.h"
-#include "roms/rom464.h"
 
 extern "C" {
 #include "emuapi.h"
 #include "platform_config.h"
 }
-
+#include "processor/Z80.h"
+#include "roms/rom464.h"
 #include "crtc.h"
 #include "ga.h"
 
@@ -15,10 +16,10 @@ extern "C" {
  * Declarations of instances of the RAM, VRAM, processor and other required components.
 */
 
-static byte ram[0x10000];   // 64k
+static byte RAM[0x10000];   // 64k
 static byte bitstream[0x4000]; // 16k video ram to be used by PIO.
-static Z80 cpu;
-extern struct GA_Config ga_config;
+static Z80 CPU;
+extern struct GAConfig gateArray;
 
 /*
  * Implementations of system-specific emuapi Init, Step etc. functions.
@@ -48,10 +49,10 @@ void cpc_Input(int bClick)
  * System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
 */
 
-void OutZ80(register word Port, register byte Value)
+void OutZ80(word Port, byte Value)
 {
-    if(!(Port & 0x8000)) write_ga(Value);         // The Gate Array is selected when bit 15 is set to 0.
-    if(!(Port & 0x4000)) write_crtc(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
+    if(!(Port & 0x8000)) writeGA(Value);         // The Gate Array is selected when bit 15 is set to 0.
+    if(!(Port & 0x4000)) writeCRTC(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
     if(!(Port & 0x2000)) 
     {
         // upper rom bank number. ROM banking needs to be done regardless of CPC model
@@ -64,32 +65,31 @@ void OutZ80(register word Port, register byte Value)
     }                        
 }
 
-byte InZ80(register word Port)
+byte InZ80(word Port)
 {
-    if(!(Port & 0x4000)) read_crtc(Port); // The CRTC is selected when bit 14 is set to 0. 
-    return 0xFF;
+    if(!(Port & 0x4000)) return readCRTC(Port); // The CRTC is selected when bit 14 is set to 0. 
 }
 
 #define LOWER_ROM_END   0x4000
 #define UPPER_ROM_BEGIN 0xC000
 
-void WrZ80(register word Addr, register byte Value)
+void WrZ80(word Addr, byte Value)
 {
-    ram[Addr] = Value;
+    RAM[Addr] = Value;
 }
 
-byte RdZ80(register word Addr)
+byte RdZ80(word Addr)
 {
-    if(Addr <= LOWER_ROM_END && ga_config.lower_rom_enable)
+    if(Addr <= LOWER_ROM_END && gateArray.lowerROMEnable)
     {
         return gb_rom_464_0[Addr];
     }
-    else if(Addr >= UPPER_ROM_BEGIN && ga_config.upper_rom_enable)
+    else if(Addr >= UPPER_ROM_BEGIN && gateArray.upperROMEnable)
     {
         return gb_rom_464_1[Addr];
     }
     else
     {
-        return ram[Addr];
+        return RAM[Addr];
     }
 }
