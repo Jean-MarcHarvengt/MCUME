@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 
 #include "ga.h"
+#include "crtc.h"
 
 struct GAConfig gaConfig;
 /**
@@ -46,7 +47,7 @@ struct RGB palette[32] = {
 
 // TODO: Add a step() function, or something, that reads from the crtc's hsync and vsync and generates the actual
 // pixel data based on its config data.
-void step()
+void ga_step()
 {
     return;
 }

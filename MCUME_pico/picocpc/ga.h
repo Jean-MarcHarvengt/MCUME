@@ -7,6 +7,7 @@
 #endif
 
 extern void writeGA(uint8_t value);
+void ga_step();
 void selectPen(uint8_t value);
 void selectPenColour(uint8_t value);
 void romBanking(uint8_t value);

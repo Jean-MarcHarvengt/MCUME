@@ -68,6 +68,7 @@ void OutZ80(word Port, byte Value)
 byte InZ80(word Port)
 {
     if(!(Port & 0x4000)) return readCRTC(Port); // The CRTC is selected when bit 14 is set to 0. 
+    return 0xFF;
 }
 
 #define LOWER_ROM_END   0x4000
