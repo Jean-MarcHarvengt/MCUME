@@ -3,6 +3,7 @@
 
 #include "ga.h"
 #include "crtc.h"
+#include "cpc.h"
 
 struct GAConfig gaConfig;
 /**
@@ -45,11 +46,56 @@ struct RGB palette[32] = {
     {50, 50, 100}      // Pastel Blue
 };
 
-// TODO: Add a step() function, or something, that reads from the crtc's hsync and vsync and generates the actual
-// pixel data based on its config data.
 void ga_step()
 {
-    return;
+    // TODO add responses to hsync and vsync signals.
+
+    for(int i = 0; i < 2; i++) 
+    {
+        uint16_t address = crtc_generateAddress() + i;
+        uint8_t encodedByte = RAM[address];
+        switch(gaConfig.screenMode)
+        {
+            case 0:
+                uint8_t pixel0 = (encodedByte & 0x80) >> 7 |
+                                 (encodedByte & 0x08) >> 2 |
+                                 (encodedByte & 0x20) >> 3 |
+                                 (encodedByte & 0x02) << 2;
+
+                uint8_t pixel1 = (encodedByte & 0x40) >> 6 |
+                                 (encodedByte & 0x04) >> 1 |
+                                 (encodedByte & 0x10) >> 2 |
+                                 (encodedByte & 0x01) << 3;
+
+                // TODO may not be correct, needs testing.
+
+                bitstream[0xC000 - address] = pixel0;
+                bitstream[0xC000 - address + 1] = pixel1;
+                
+                break;
+            case 1:
+                uint8_t pixel0 = (encodedByte & 0x80) >> 7 |
+                                 (encodedByte & 0x08) >> 2;
+                uint8_t pixel1 = (encodedByte & 0x40) >> 6 |
+                                 (encodedByte & 0x04) >> 1;
+                uint8_t pixel2 = (encodedByte & 0x02) |
+                                 (encodedByte & 0x20) >> 5;
+                uint8_t pixel3 = (encodedByte & 0x10) >> 4 |
+                                 (encodedByte & 0x01) << 1;
+
+                bitstream[0xC000 - address] = pixel0;
+                bitstream[0xC000 - address + 1] = pixel1;
+                bitstream[0xC000 - address + 2] = pixel2;
+                bitstream[0xC000 - address + 3] = pixel3;
+                break;
+            case 2:
+                for (int j = 0; j < 8; j++)
+                {
+                    bitstream[0xC000 - address + j] = (encodedByte >> 7 - j) & 1;
+                }
+                break;
+        }
+    }
 }
  
 void select_pen(uint8_t value)
@@ -81,7 +127,7 @@ void do_rom_bank_screen_cfg(uint8_t value)
     {
         case 0b00:
             // mode 0
-            // ga_config.screen_mode = 0;
+            gaConfig.screenMode = 0;
             break;
         case 0b01:
             // mode 1
@@ -89,7 +135,7 @@ void do_rom_bank_screen_cfg(uint8_t value)
             break;
         case 0b10:
             // mode 2
-            // ga_config.screen_mode = 2;
+            gaConfig.screenMode = 2;
             break;
         case 0b11:
             // mode 3, unused.

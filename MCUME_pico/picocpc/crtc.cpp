@@ -22,9 +22,9 @@ uint8_t registers[16] = {
     0                   // cursor_addr_low
 };
 uint8_t selectedRegister = 0;
-uint8_t horizontalCount = 0;     // C0
-uint8_t characterLineCount = 0;  // C4
-uint8_t scanlineCount = 0;       // C9
+uint8_t horizontalCount = 0;
+uint8_t characterLineCount = 0;
+uint8_t scanlineCount = 0;
 uint8_t verticalAdjustCount = 0;
 uint16_t memoryAddr = 0;
 
@@ -59,7 +59,7 @@ void crtc_step()
     }
 }
 
-uint16_t generateAddress()
+uint16_t crtc_generateAddress()
 {
     // Video address is created as follows:
     // Bit 0: Always 0

@@ -1,7 +1,7 @@
-#include "cpc.h"
-
 #include "pico.h"
 #include "pico/stdlib.h"
+
+#include "cpc.h"
 
 extern "C" {
 #include "emuapi.h"
@@ -16,8 +16,8 @@ extern "C" {
  * Declarations of instances of the RAM, VRAM, processor and other required components.
 */
 
-static byte RAM[0x10000];   // 64k
-static byte bitstream[0x4000]; // 16k video ram to be used by PIO.
+uint8_t RAM[0x10000];   // 64k
+uint8_t bitstream[0x4000]; // 16k video ram to be used by PIO.
 static Z80 CPU;
 extern struct GAConfig gateArray;
 
@@ -32,7 +32,7 @@ void cpc_Init(void)
 
 void cpc_Step(void)
 {
-
+    // probably where i will call crtc_step() and ga_step()
 }
 
 void cpc_Start(char* filename)
