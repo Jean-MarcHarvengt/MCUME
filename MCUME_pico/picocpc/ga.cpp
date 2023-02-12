@@ -69,8 +69,8 @@ void ga_step()
 
                 // TODO may not be correct, needs testing.
 
-                bitstream[0xC000 - address] = pixel0;
-                bitstream[0xC000 - address + 1] = pixel1;
+                bitstream[address - 0xC000] = pixel0;
+                bitstream[address + 1 - 0xC000] = pixel1;
                 
                 break;
             case 1:
@@ -83,15 +83,15 @@ void ga_step()
                 uint8_t pixel3 = (encodedByte & 0x10) >> 4 |
                                  (encodedByte & 0x01) << 1;
 
-                bitstream[0xC000 - address] = pixel0;
-                bitstream[0xC000 - address + 1] = pixel1;
-                bitstream[0xC000 - address + 2] = pixel2;
-                bitstream[0xC000 - address + 3] = pixel3;
+                bitstream[address - 0xC000] = pixel0;
+                bitstream[address + 1 - 0xC000] = pixel1;
+                bitstream[address + 2 - 0xC000] = pixel2;
+                bitstream[address + 3 - 0xC000] = pixel3;
                 break;
             case 2:
                 for (int j = 0; j < 8; j++)
                 {
-                    bitstream[0xC000 - address + j] = (encodedByte >> 7 - j) & 1;
+                    bitstream[address + j - 0xC000] = (encodedByte >> 7 - j) & 1;
                 }
                 break;
         }
