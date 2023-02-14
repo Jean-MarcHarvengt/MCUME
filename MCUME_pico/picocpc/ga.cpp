@@ -1,16 +1,17 @@
 #include "pico.h"
 #include "pico/stdlib.h"
 
+#include <stdio.h>
 #include "ga.h"
 #include "crtc.h"
 #include "cpc.h"
 
 struct GAConfig gaConfig;
+
 /**
- *  Some of these colours are duplicates, because select_pen_colour() uses the least significant
+ *  Some of the colours are duplicates, because select_pen_colour() uses the least significant
  *  5 bits to index into this array, so the duplicates prevent out-of-bounds read.
 */
-
 struct RGB palette[32] = {
     {50, 50, 50},      // White
     {50, 50, 50},      // White
@@ -46,59 +47,102 @@ struct RGB palette[32] = {
     {50, 50, 100}      // Pastel Blue
 };
 
-void ga_step()
+bool updateInterrupts()
 {
-    // TODO add responses to hsync and vsync signals.
+    bool interrupt_generated = false;
 
+    if(gaConfig.hsyncActive && !isHSyncActive())
+    {
+        // falling edge of CRTC hsync signal.
+        gaConfig.interruptCounter++;
+        gaConfig.vsyncDelayCount++;
+
+        if(gaConfig.interruptCounter == 52)
+        {
+            gaConfig.interruptCounter = 0;
+            interrupt_generated = true;
+        }
+    }
+
+    if(!gaConfig.vsyncActive && isVSyncActive())
+    {
+        // A VSYNC triggers a delay action of 2 HSYNCs in the GA, at the 
+        // completion of which the scan line count in the GA is compared to 32. 
+        gaConfig.vsyncDelayCount = 0;
+    }
+    
+    //printf("vsyncDelayCount: %d \n", gaConfig.vsyncDelayCount);
+
+    if(gaConfig.vsyncDelayCount == 2)
+    {
+        if(gaConfig.interruptCounter >= 32)
+        {
+            interrupt_generated = true;
+        }
+        gaConfig.interruptCounter = 0;
+    }
+
+    return interrupt_generated;
+}
+
+void addressToPixels()
+{
     for(int i = 0; i < 2; i++) 
     {
         uint16_t address = crtc_generateAddress() + i;
         uint8_t encodedByte = RAM[address];
-        switch(gaConfig.screenMode)
+        if(RAM[address] != 0 && address >= 0xC000)
         {
-            case 0:
-                uint8_t pixel0 = (encodedByte & 0x80) >> 7 |
-                                 (encodedByte & 0x08) >> 2 |
-                                 (encodedByte & 0x20) >> 3 |
-                                 (encodedByte & 0x02) << 2;
+            printf("CRTC generated addr: %x \nRAM[address]: %x \n", address, encodedByte);
+            switch(gaConfig.screenMode)
+            {
+                case 0:
+                    bitstream[address - 0xC000] = (encodedByte & 0x80) >> 7 |
+                                                (encodedByte & 0x08) >> 2 |
+                                                (encodedByte & 0x20) >> 3 |
+                                                (encodedByte & 0x02) << 2;
+                    bitstream[address + 1 - 0xC000] = (encodedByte & 0x40) >> 6 |
+                                                    (encodedByte & 0x04) >> 1 |
+                                                    (encodedByte & 0x10) >> 2 |
+                                                    (encodedByte & 0x01) << 3;
 
-                uint8_t pixel1 = (encodedByte & 0x40) >> 6 |
-                                 (encodedByte & 0x04) >> 1 |
-                                 (encodedByte & 0x10) >> 2 |
-                                 (encodedByte & 0x01) << 3;
-
-                // TODO may not be correct, needs testing.
-
-                bitstream[address - 0xC000] = pixel0;
-                bitstream[address + 1 - 0xC000] = pixel1;
-                
-                break;
-            case 1:
-                uint8_t pixel0 = (encodedByte & 0x80) >> 7 |
-                                 (encodedByte & 0x08) >> 2;
-                uint8_t pixel1 = (encodedByte & 0x40) >> 6 |
-                                 (encodedByte & 0x04) >> 1;
-                uint8_t pixel2 = (encodedByte & 0x02) |
-                                 (encodedByte & 0x20) >> 5;
-                uint8_t pixel3 = (encodedByte & 0x10) >> 4 |
-                                 (encodedByte & 0x01) << 1;
-
-                bitstream[address - 0xC000] = pixel0;
-                bitstream[address + 1 - 0xC000] = pixel1;
-                bitstream[address + 2 - 0xC000] = pixel2;
-                bitstream[address + 3 - 0xC000] = pixel3;
-                break;
-            case 2:
-                for (int j = 0; j < 8; j++)
-                {
-                    bitstream[address + j - 0xC000] = (encodedByte >> 7 - j) & 1;
-                }
-                break;
+                    // TODO may not be correct, needs testing.
+                    break;
+                case 1:
+                    bitstream[address - 0xC000] = (encodedByte & 0x80) >> 7 |
+                                                (encodedByte & 0x08) >> 2;
+                    bitstream[address + 1 - 0xC000] = (encodedByte & 0x40) >> 6 |
+                                                    (encodedByte & 0x04) >> 1;
+                    bitstream[address + 2 - 0xC000] = (encodedByte & 0x02) |
+                                                    (encodedByte & 0x20) >> 5;
+                    bitstream[address + 3 - 0xC000] = (encodedByte & 0x10) >> 4 |
+                                                    (encodedByte & 0x01) << 1;
+                    break;
+                case 2:
+                    for (int j = 0; j < 8; j++)
+                    {
+                        bitstream[address + j - 0xC000] = (encodedByte >> 7 - j) & 1;
+                    }
+                    break;
+            }
         }
+        
     }
 }
+
+bool ga_step()
+{
+    // TODO add proper GA responses to hsync and vsync signals.
+    bool interruptGenerated = updateInterrupts();
+    addressToPixels();
+    
+    gaConfig.hsyncActive = isHSyncActive();
+    gaConfig.vsyncActive = isVSyncActive();
+
+    return interruptGenerated;
+}
  
-void select_pen(uint8_t value)
+void selectPen(uint8_t value)
 {
     switch(value >> 4)
     {
@@ -113,41 +157,47 @@ void select_pen(uint8_t value)
     }
 }
 
-void select_pen_colour(uint8_t value)
+void selectPenColour(uint8_t value)
 {
     // Bits 0-4 of "value" specify the hardware colour number from the hardware colour palette.
     // (i.e. which index into the Palette array of structs.)
     gaConfig.penColours[gaConfig.penSelected] = palette[value & 31];
 }
 
-void do_rom_bank_screen_cfg(uint8_t value)
+void ROMMgmtAndScreenCfg(uint8_t value)
 {
     // Screen mode config, dictated by the least significant 2 bits.
-    switch(value & 3)
+    if(!gaConfig.hsyncActive)
     {
-        case 0b00:
-            // mode 0
-            gaConfig.screenMode = 0;
-            break;
-        case 0b01:
-            // mode 1
-            gaConfig.screenMode = 1;
-            break;
-        case 0b10:
-            // mode 2
-            gaConfig.screenMode = 2;
-            break;
-        case 0b11:
-            // mode 3, unused.
-            break;
+        switch(value & 3)
+        {
+            case 0b00:
+                // mode 0
+                gaConfig.screenMode = 0;
+                break;
+            case 0b01:
+                // mode 1
+                gaConfig.screenMode = 1;
+                break;
+            case 0b10:
+                // mode 2
+                gaConfig.screenMode = 2;
+                break;
+            case 0b11:
+                // mode 3, unused.
+                break;
+        }
     }
-
+    
     // ROM enable flags.
     if ((value >> 2) & 0b1) gaConfig.lowerROMEnable = false; else gaConfig.lowerROMEnable = true;
     if ((value >> 3) & 0b1) gaConfig.upperROMEnable = false; else gaConfig.upperROMEnable = true;
 
-    // Interrupt generation control.
-    if ((value >> 4) & 0b1) gaConfig.interruptDelay = true; else gaConfig.interruptDelay = false;
+    // Interrupt delay control.
+    
+    if ((value >> 4) & 0b1) {
+        gaConfig.interruptCounter = 0;
+    }
 }
 
 /** Bit 7   Bit 6    Function
@@ -156,18 +206,18 @@ void do_rom_bank_screen_cfg(uint8_t value)
  *  --1--   --0--    Select screen mode, ROM configuration and interrupt control
  *  --1--   --1--    RAM memory management
 */
-void write_ga(uint8_t value)
+void writeGA(uint8_t value)
 {
     switch(value >> 6)
     {
         case 0b00:
-            select_pen(value);
+            selectPen(value);
             break;
         case 0b01:
-            select_pen_colour(value);
+            selectPenColour(value);
             break;
         case 0b10:
-            do_rom_bank_screen_cfg(value);
+            ROMMgmtAndScreenCfg(value);
             break;
         case 0b11:
             // This would be RAM banking but it is not available on the CPC464.

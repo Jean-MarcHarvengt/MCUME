@@ -7,7 +7,7 @@
 #endif
 
 extern void writeGA(uint8_t value);
-void ga_step();
+bool ga_step();
 void selectPen(uint8_t value);
 void selectPenColour(uint8_t value);
 void romBanking(uint8_t value);
@@ -22,10 +22,15 @@ struct GAConfig {
     uint8_t penSelected = 0;
     RGB penColours[PEN_NUMBER];
     uint8_t screenMode = 1; // 0 -> 160x200 16c; 1 -> 320x200 4c; 2 -> 640x200 2c; 3 (undocumented) -> 160x200 4c.
-    bool upperROMEnable = false;
-    bool lowerROMEnable = false;
-    bool interruptDelay = false;
+    bool upperROMEnable = true;
+    bool lowerROMEnable = true;
+    uint8_t interruptCounter = 0;
+    uint8_t vsyncDelayCount = 0;
+    bool hsyncActive = false;
+    bool vsyncActive = false;
     uint8_t ramBanking = 0; // unused in CPC 464
 };
+
+extern struct RGB palette[32];
 
 #endif

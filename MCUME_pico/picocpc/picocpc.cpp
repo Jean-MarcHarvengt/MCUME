@@ -53,6 +53,7 @@ int main(void) {
     tft.begin();
 #endif
     emu_init();
+    toggleMenu(false); // ####################################
     while (true) {
         if (menuActive()) {
             uint16_t bClick = emu_DebounceLocalKeys();
@@ -69,8 +70,12 @@ int main(void) {
             }  
             tft.waitSync();
         }
-        else {      
-            emu_Step(); 
+        else {
+            // tft.clear(VGA_RGB(200,0,0));  
+            emu_Step();
+            emu_DrawScreen(bitstream, 320, 200, 1);
+            tft.waitSync();
+            // tft.clear(VGA_RGB(250,0,0));
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {

@@ -1,5 +1,6 @@
 #include "pico.h"
 #include "pico/stdlib.h"
+#include <stdio.h>
 
 #include "crtc.h"
 
@@ -31,31 +32,37 @@ uint16_t memoryAddr = 0;
 
 void crtc_step()
 {
+    // printf("Horizontal count: %d \n", horizontalCount);
     horizontalCount++;
-    if(horizontalCount == registers[0])
+    
+    if(horizontalCount > registers[0])
     {
         // horizontal counter is equal to the Horizontal Total Register.
         horizontalCount = 0;
         scanlineCount++;
+        // printf("Resetting horizontal counter!\n");
     }
 
-    if(scanlineCount == registers[9])
+    if(scanlineCount > registers[9])
     {
         // The counter for Maximum Raster Address is equal to it.
         // The height of a character is 8 rasters, so when we reach 8 rasters we increment the char line count.
         scanlineCount = 0;
         characterLineCount++;
+        //printf("characterLineCount: %d \n", characterLineCount);
+        // printf("Resetting scanline counter!\n");
     }
 
-    if(characterLineCount == registers[4])
+    if(characterLineCount > registers[4])
     {
         // The vertical counter reaches the Vertical Total register.
-        if(verticalAdjustCount == registers[5])
-        {
-            verticalAdjustCount = 0;
-            characterLineCount = 0;
-            memoryAddr = ((uint16_t) registers[12] << 8) | registers[13];
-        }
+        characterLineCount = 0;
+    }
+
+    if(horizontalCount == 0 && characterLineCount == 0)
+    {
+        memoryAddr = ((uint16_t) registers[12] << 8) | registers[13];
+        // printf("memoryAddr update! New value: %x \n", memoryAddr);
     }
 }
 
@@ -69,11 +76,12 @@ uint16_t crtc_generateAddress()
     uint16_t firstTenBits = (memoryAddr & 0b0000001111111111) << 1;
     uint16_t elevenToThirteenBits = (scanlineCount & 0b0000000000000111) << 11;
     uint16_t fourteenFifteenBits = (memoryAddr & 0b0011000000000000) << 2;
+    //printf("memoryAddr: %x \n calculatedAddr: %x \n", memoryAddr, fourteenFifteenBits | elevenToThirteenBits | firstTenBits);
 
     return fourteenFifteenBits | elevenToThirteenBits | firstTenBits;
 }
 
-bool isHsyncActive()
+bool isHSyncActive()
 {
     // HSYNC is active if the horizontal counter is in the 
     // "horizontal_and_vertical_sync_widths"-defined width starting from the horizontal_total register.
@@ -81,12 +89,14 @@ bool isHsyncActive()
         && horizontalCount < registers[0] + (registers[3] & 0b1111);
 }
 
-bool isVsyncActive()
+bool isVSyncActive()
 {
-    uint8_t characterHeight = registers[9] + 1;
-    uint8_t characterLinesCounted = characterLineCount - registers[7];
-
-    return characterHeight * characterLinesCounted + scanlineCount <= 128;
+    int8_t characterHeight = (int8_t) registers[9] + 1;
+    int8_t characterLinesCounted = (int8_t) characterLineCount - registers[7];
+    // printf("characterHeight: %d \ncharacterLineCount: %d \nscanlineCount: %d \n", characterHeight, characterLineCount, scanlineCount);
+    // printf("isVSyncActive value calculated: %d \n", characterHeight * characterLinesCounted + scanlineCount);
+    return  characterHeight * characterLineCount + (int8_t) scanlineCount >= 0 &&
+            characterHeight * characterLineCount + (int8_t) scanlineCount <= 128;
 }
 
 

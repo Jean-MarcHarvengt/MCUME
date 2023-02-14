@@ -13,6 +13,8 @@ extern uint8_t characterLineCount;
 extern uint8_t scanlineCount;
 extern uint8_t verticalAdjustCount;
 
+bool isHSyncActive();
+bool isVSyncActive();
 uint16_t crtc_generateAddress();
 void crtc_step();
 void writeCRTC(unsigned short address, uint8_t value);
