@@ -15,6 +15,7 @@ extern uint8_t verticalAdjustCount;
 
 bool isHSyncActive();
 bool isVSyncActive();
+bool isWithinDisplay();
 uint16_t crtc_generateAddress();
 void crtc_step();
 void writeCRTC(unsigned short address, uint8_t value);

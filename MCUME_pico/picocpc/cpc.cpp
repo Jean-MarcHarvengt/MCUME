@@ -11,16 +11,25 @@ extern "C" {
 #include "platform_config.h"
 }
 #include "processor/Z80.h"
-#include "roms/rom464.h"
 #include "crtc.h"
 #include "ga.h"
+#include "roms/rom464.h"
+
+#define WIDTH            320
+#define HEIGHT           200
+
+#define CYCLES_PER_FRAME 19968
+#define NBLINES          312
+#define CYCLES_PER_STEP  CYCLES_PER_FRAME/NBLINES
 
 /*
  * Declarations of instances of the RAM, VRAM, processor and other required components.
 */
 
+char osROM[0x4000];
+char basicROM[0x4000];
 uint8_t RAM[0x10000];      // 64k
-uint8_t bitstream[0x4000]; // 16k video ram to be used by PIO.
+unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static Z80 CPU;
 bool interruptGenerated = false;
 
@@ -28,61 +37,62 @@ bool interruptGenerated = false;
 /*
  * Implementations of system-specific emuapi Init, Step etc. functions.
 */
-#define CYCLES_PER_FRAME 80000
-
-#define NBLINES (1) //(48+192+56+16) //(32+256+32)
-#define CYCLES_PER_STEP (CYCLES_PER_FRAME/NBLINES)
 
 void cpc_Init(void)
 {
+
     for(int i = 0; i < PALETTE_SIZE; i++)
     {
-        // R, G and B are not absolute RGB, they are percentegaes. TODO change that.
         emu_SetPaletteEntry(palette[i].R, palette[i].G, palette[i].B, i);
     }
+    if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT);
 
-    //memset(RAM, 0, sizeof(RAM));
+    ResetZ80(&CPU, CYCLES_PER_FRAME);
+    memset(RAM, 0, sizeof(RAM));
+}
 
-    //ResetZ80(&CPU, CYCLES_PER_FRAME);
+void cpc_Start(char* filename)
+{
+    
+    // Interrupts disabled, PC=0, enable low rom, disable high rom, gate array scanline counter = 0, write 0xC0 into GA.
+    // set memory to 0.
+
+    CPU.IFF = 0;
+    CPU.PC.W = 0x0000;
+    CPU.IRequest = INT_NONE;
+    gaConfig.lowerROMEnable = true;
+    gaConfig.upperROMEnable = false;
+    gaConfig.interruptCounter = 0;
+    writeGA(0xC0);
+    // writeGA(0x89);
+    // CPU.PC.W = 0x580;
 }
 
 void cpc_Step(void)
 {
     // printf("Enter step\n");
-
-    // TODO I don't think I am actually loading the ROM and having the CPU start executing w/e's there.
-    
-    for(int i = 0; i<CYCLES_PER_FRAME; i++)
-    {
-        ExecZ80(&CPU, 1);
-
-        crtc_step();
-        interruptGenerated = ga_step();
-        if(interruptGenerated)
-        {
-            CPU.IRequest = INT_RST38; 
-            gaConfig.interruptCounter &= 0x1F;
+    // RunZ80(&CPU);
+    //printf("Current program counter: %d \n", CPU.PC.W);
+    for(int i = 0; i < NBLINES; i++)
+        {   
+            ExecZ80(&CPU, CYCLES_PER_STEP);
+            for(int j = 0; j < CYCLES_PER_STEP; j++)
+            {    
+                crtc_step();
+                interruptGenerated = ga_step();
+                if(interruptGenerated)
+                {
+                    printf("Interrupting! Jumping to \n");
+                    IntZ80(&CPU, INT_IRQ); 
+                    gaConfig.interruptCounter &= 0x1F;
+                }
+            }    
+            emu_DrawLine8(bitstream, WIDTH, HEIGHT, i);
+            //printf("index %d: %c \n", i, bitstream + i);
         }
-        else
-        {
-            CPU.IRequest = INT_NONE;
-        }
-        // printf("Executed %d steps in hardware\n", 256);
-    }
-
-}
-
-void cpc_Start(char* filename)
-{
-
 }
 
 void cpc_Input(int bClick)
-{
-
-}
-
-void displayScreen()
 {
 
 }
@@ -107,6 +117,19 @@ void OutZ80(word Port, byte Value)
     }                        
 }
 
+// word LoopZ80(Z80 *R)
+// {
+
+//     if(interruptGenerated)
+//     {
+//         return INT_IRQ;
+//     }
+//     else
+//     {
+//         return INT_NONE;
+//     }
+// }
+
 byte InZ80(word Port)
 {
     if(!(Port & 0x4000)) return readCRTC(Port); // The CRTC is selected when bit 14 is set to 0. 
@@ -119,6 +142,8 @@ byte InZ80(word Port)
 void WrZ80(word Addr, byte Value)
 {
     RAM[Addr] = Value;
+    
+    //printf("Write %x at %x \n", Value, Addr);
 }
 
 void PatchZ80(Z80 *R)
@@ -130,17 +155,17 @@ byte RdZ80(word Addr)
 {
     if(Addr <= LOWER_ROM_END && gaConfig.lowerROMEnable)
     {
-        // printf("Reading from the OS ROM.\n");
+        // printf("At program counter %x, Z80 read from address %x in OS ROM\n", CPU.PC.W, Addr);
         return gb_rom_464_0[Addr];
     }
     else if(Addr >= UPPER_ROM_BEGIN && gaConfig.upperROMEnable)
     {
-        // printf("Reading from BASIC's ROM.\n");
+        // printf("At program counter %x, Z80 read from address %x in BASIC ROM\n", CPU.PC.W, Addr);
         return gb_rom_464_1[Addr - 0xC000];
     }
     else
     {
-        // printf("Reading from RAM.\n");
+        // printf("At program counter %x, Z80 read from address %x in RAM\n", CPU.PC.W, Addr);
         return RAM[Addr];
     }
 }

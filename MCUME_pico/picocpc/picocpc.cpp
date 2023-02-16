@@ -53,16 +53,15 @@ int main(void) {
     tft.begin();
 #endif
     emu_init();
-    toggleMenu(false); // ####################################
     while (true) {
         if (menuActive()) {
             uint16_t bClick = emu_DebounceLocalKeys();
-            int action = handleMenu(bClick);
+            int action = ACTION_RUNTFT;  //handleMenu(bClick);
             char * filename = menuSelection();   
             if (action == ACTION_RUNTFT) {
               toggleMenu(false);
+              emu_Init(filename);   
               emu_start();        
-              emu_Init(filename);      
               tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
               tft.startDMA(); 
               struct repeating_timer timer;
@@ -71,11 +70,8 @@ int main(void) {
             tft.waitSync();
         }
         else {
-            // tft.clear(VGA_RGB(200,0,0));  
-            emu_Step();
-            emu_DrawScreen(bitstream, 320, 200, 1);
+            emu_Step();   
             tft.waitSync();
-            // tft.clear(VGA_RGB(250,0,0));
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {

@@ -7,7 +7,7 @@
 
 /* Title */
 #define TITLE "    Amstrad CPC Emulator"
-#define ROMSDIR "cpc"
+#define ROMSDIR "roms"
 
 #define emu_Init(ROM) {cpc_Init(); cpc_Start(ROM);}
 #define emu_Step(x) {cpc_Step();}

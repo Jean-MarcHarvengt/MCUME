@@ -699,7 +699,9 @@ word RunZ80(Z80 *R)
       if(!DebugZ80(R)) return(R->PC.W);
 #endif
 
+    
     I=OpZ80(R->PC.W++);
+    
     R->ICount-=Cycles[I];
 
     switch(I)
