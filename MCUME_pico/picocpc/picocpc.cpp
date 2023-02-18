@@ -71,7 +71,7 @@ int main(void) {
         }
         else {
             emu_Step();   
-            tft.waitSync();
+            //tft.waitSync();
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {

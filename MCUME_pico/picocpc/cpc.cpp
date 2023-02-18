@@ -14,13 +14,14 @@ extern "C" {
 #include "crtc.h"
 #include "ga.h"
 #include "roms/rom464.h"
+#include "processor/Tables.h"
 
 #define WIDTH            320
 #define HEIGHT           200
 
-#define CYCLES_PER_FRAME 19968
+#define CYCLES_PER_FRAME 19968 //79872
 #define NBLINES          312
-#define CYCLES_PER_STEP  CYCLES_PER_FRAME/NBLINES
+#define CYCLES_PER_SCANLINE  CYCLES_PER_FRAME/NBLINES
 
 /*
  * Declarations of instances of the RAM, VRAM, processor and other required components.
@@ -32,6 +33,7 @@ uint8_t RAM[0x10000];      // 64k
 unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static Z80 CPU;
 bool interruptGenerated = false;
+uint16_t slineCount = 0;
 
 
 /*
@@ -70,26 +72,43 @@ void cpc_Start(char* filename)
 
 void cpc_Step(void)
 {
+    int totalCycles = 0;
+    int cyclesLeft = 0;
+    int cyclesTaken = 0;
     // printf("Enter step\n");
     // RunZ80(&CPU);
-    //printf("Current program counter: %d \n", CPU.PC.W);
+    
+
     for(int i = 0; i < NBLINES; i++)
-        {   
-            ExecZ80(&CPU, CYCLES_PER_STEP);
-            for(int j = 0; j < CYCLES_PER_STEP; j++)
-            {    
-                crtc_step();
-                interruptGenerated = ga_step();
-                if(interruptGenerated)
-                {
-                    printf("Interrupting! Jumping to \n");
-                    IntZ80(&CPU, INT_IRQ); 
-                    gaConfig.interruptCounter &= 0x1F;
-                }
-            }    
-            emu_DrawLine8(bitstream, WIDTH, HEIGHT, i);
-            //printf("index %d: %c \n", i, bitstream + i);
+    {   // TODO find a way to call crtc and ga step after each instruction, not after
+        // executing everything in the scanline (not guaranteed to be 80000 cycles anyway).
+        
+        //printf("The amount of cycles for instruction at PC %d: %d \n", CPU.PC.W, currentInstCycles);
+        
+        cyclesLeft = ExecZ80(&CPU, 1);
+        cyclesTaken += 1;
+        while(cyclesLeft < 0)
+        {
+            cyclesLeft -= ExecZ80(&CPU, 1);
+            //printf("cyclesLeft: %d \n", cyclesLeft);
+            cyclesTaken += 1;
         }
+
+        for(int j = 0; j < cyclesLeft; j++)
+        {
+            crtc_step();
+            interruptGenerated = ga_step();
+            if(interruptGenerated)
+            {
+                //printf("Interrupting! Jumping to \n");
+                IntZ80(&CPU, INT_IRQ);
+                gaConfig.interruptCounter &= 0x1F;
+            }
+        }
+        
+        emu_DrawLine8(bitstream, WIDTH, HEIGHT, i);
+        cyclesTaken = 0;
+    }
 }
 
 void cpc_Input(int bClick)
@@ -119,6 +138,16 @@ void OutZ80(word Port, byte Value)
 
 // word LoopZ80(Z80 *R)
 // {
+//     crtc_step();
+//     interruptGenerated = ga_step();
+//     if(interruptGenerated)
+//     {
+//         printf("Interrupting! Jumping to \n");
+//         IntZ80(&CPU, INT_IRQ); 
+//         gaConfig.interruptCounter &= 0x1F;
+//     }
+//     emu_DrawLine8(bitstream, WIDTH, HEIGHT, slineCount);
+//     slineCount = (slineCount + 1) % NBLINES;
 
 //     if(interruptGenerated)
 //     {

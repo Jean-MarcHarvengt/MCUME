@@ -6,6 +6,7 @@
 #include "pico/stdlib.h"
 #endif
 
+extern uint8_t registers[16];
 extern uint16_t memoryAddr;
 extern uint8_t selectedRegister;
 extern uint8_t horizontalCount;

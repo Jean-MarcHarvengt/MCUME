@@ -97,17 +97,33 @@ void addressToPixels()
     // When HSYNC is active Gate-Array outputs the palette colour black
     if(gaConfig.hsyncActive)
     {
-        *bitstream = convertPixelToVGA(gaConfig.penColours[19].R,
-                                       gaConfig.penColours[19].G,
-                                       gaConfig.penColours[19].B);
-        *bitstream++;
+        // for(int j = 0; j < registers[3] & 0b1111; j++)
+        // {
+        //     *bitstream = convertPixelToVGA(gaConfig.penColours[19].R,
+        //                                gaConfig.penColours[19].G,
+        //                                gaConfig.penColours[19].B);
+        //     *bitstream++;
+        // }
+        return;
+    }
+
+    // border
+    if(gaConfig.vsyncActive || gaConfig.hsyncActive)
+    {
+        // for(int j = 0; j < 16; j++)
+        // {
+        //     *bitstream = convertPixelToVGA(gaConfig.penColours[0x10].R,
+        //                                 gaConfig.penColours[0x10].G,
+        //                                 gaConfig.penColours[0x10].B);
+        //     *bitstream++;
+        // }
         return;
     }
 
     for(int i = 0; i < 2; i++) 
     {
         uint16_t address = crtc_generateAddress() + i;
-        //printf(" address from CRTC: %x \nRAM data: %x \n", address, RAM[address]);
+        printf("address from CRTC: %x \nRAM data: %x \n", address, RAM[address]);
         uint8_t encodedByte = RAM[address];
         uint8_t pixel0, pixel1, pixel2, pixel3;
         uint8_t* pixels = (uint8_t*) calloc(4, 8*sizeof(uint8_t));
@@ -184,11 +200,10 @@ void addressToPixels()
 
 bool ga_step()
 {
-    // TODO add proper GA responses to hsync and vsync signals.
     bool interruptGenerated = updateInterrupts();
     // printf("Did the GA generate an interrupt? %d \n Interrupt counter: %d", interruptGenerated, gaConfig.interruptCounter);
-    if(memoryAddr != 0)
-        addressToPixels();
+    // if(memoryAddr != 0)
+    addressToPixels();
     
     gaConfig.hsyncActive = isHSyncActive();
     gaConfig.vsyncActive = isVSyncActive();
