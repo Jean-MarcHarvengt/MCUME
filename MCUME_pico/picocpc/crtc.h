@@ -7,19 +7,19 @@
 #endif
 
 extern uint8_t registers[16];
-extern uint16_t memoryAddr;
-extern uint8_t selectedRegister;
-extern uint8_t horizontalCount;
-extern uint8_t characterLineCount;
-extern uint8_t scanlineCount;
-extern uint8_t verticalAdjustCount;
+extern uint16_t memory_start_addr;
+extern uint8_t selected_register;
+extern uint8_t horizontal_count;
+extern uint8_t char_line_count;
+extern uint8_t scanline_count;
+extern uint8_t vertical_adjust_count;
 
-bool isHSyncActive();
-bool isVSyncActive();
-bool isWithinDisplay();
-uint16_t crtc_generateAddress();
+bool is_hsync_active();
+bool is_vsync_active();
+bool is_within_display();
+uint16_t crtc_generate_addr();
 void crtc_step();
-void writeCRTC(unsigned short address, uint8_t value);
-uint8_t readCRTC(unsigned short address);
+void write_crt_controller(unsigned short address, uint8_t value);
+uint8_t read_crt_controller(unsigned short address);
 
 #endif

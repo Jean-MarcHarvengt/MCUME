@@ -8,7 +8,7 @@
 
 extern uint8_t RAM[0x10000];
 extern unsigned char* bitstream;
-extern struct GAConfig gaConfig;
+extern struct GAConfig ga_config;
 
 extern void cpc_Init(void);
 extern void cpc_Step(void);

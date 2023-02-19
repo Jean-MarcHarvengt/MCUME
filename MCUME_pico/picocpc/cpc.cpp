@@ -14,32 +14,27 @@ extern "C" {
 #include "crtc.h"
 #include "ga.h"
 #include "roms/rom464.h"
-#include "processor/Tables.h"
 
 #define WIDTH            320
 #define HEIGHT           200
-
 #define CYCLES_PER_FRAME 19968 //79872
 #define NBLINES          312
 #define CYCLES_PER_SCANLINE  CYCLES_PER_FRAME/NBLINES
+#define LOWER_ROM_END   0x4000
+#define UPPER_ROM_BEGIN 0xC000
 
-/*
- * Declarations of instances of the RAM, VRAM, processor and other required components.
-*/
+// Declarations of instances of the RAM, VRAM, processor and other required components.
 
-char osROM[0x4000];
-char basicROM[0x4000];
 uint8_t RAM[0x10000];      // 64k
 unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static Z80 CPU;
-bool interruptGenerated = false;
-uint16_t slineCount = 0;
+bool interrupt_generated = false;
 
+// Implementations of system-specific emuapi Init, Step etc. functions. 
 
-/*
- * Implementations of system-specific emuapi Init, Step etc. functions.
+/**
+ * Creates initial emulation state (i.e. sets up color palette, clears memory etc.)
 */
-
 void cpc_Init(void)
 {
 
@@ -53,77 +48,71 @@ void cpc_Init(void)
     memset(RAM, 0, sizeof(RAM));
 }
 
+/**
+ * Starts the emulator by setting the initial program counter and emulates initial hardware state.
+*/
 void cpc_Start(char* filename)
 {
-    
-    // Interrupts disabled, PC=0, enable low rom, disable high rom, gate array scanline counter = 0, write 0xC0 into GA.
-    // set memory to 0.
-
-    CPU.IFF = 0;
     CPU.PC.W = 0x0000;
-    CPU.IRequest = INT_NONE;
-    gaConfig.lowerROMEnable = true;
-    gaConfig.upperROMEnable = false;
-    gaConfig.interruptCounter = 0;
-    writeGA(0xC0);
-    // writeGA(0x89);
-    // CPU.PC.W = 0x580;
+    ga_config.lower_rom_enable = true;
+    ga_config.upper_rom_enable = false;
+    ga_config.interrupt_counter = 0;
+    // write_gate_array(0xC0);
 }
 
+/**
+ * Steps through emulation and renders the screen.
+*/
 void cpc_Step(void)
 {
-    int totalCycles = 0;
-    int cyclesLeft = 0;
-    int cyclesTaken = 0;
-    // printf("Enter step\n");
-    // RunZ80(&CPU);
-    
+    int total_cycles = 0;
+    int cycles_left = 0;
+    int cycles_taken = 0;
 
     for(int i = 0; i < NBLINES; i++)
     {   // TODO find a way to call crtc and ga step after each instruction, not after
         // executing everything in the scanline (not guaranteed to be 80000 cycles anyway).
         
-        //printf("The amount of cycles for instruction at PC %d: %d \n", CPU.PC.W, currentInstCycles);
-        
-        cyclesLeft = ExecZ80(&CPU, 1);
-        cyclesTaken += 1;
-        while(cyclesLeft < 0)
+        cycles_left = ExecZ80(&CPU, 1);
+        cycles_taken += 1;
+        while(cycles_left < 0)
         {
-            cyclesLeft -= ExecZ80(&CPU, 1);
-            //printf("cyclesLeft: %d \n", cyclesLeft);
-            cyclesTaken += 1;
+            cycles_left -= ExecZ80(&CPU, 1);
+            cycles_taken += 1;
         }
 
-        for(int j = 0; j < cyclesLeft; j++)
+        for(int j = 0; j < cycles_taken; j++)
         {
             crtc_step();
-            interruptGenerated = ga_step();
-            if(interruptGenerated)
+            interrupt_generated = ga_step();
+            if(interrupt_generated)
             {
                 //printf("Interrupting! Jumping to \n");
                 IntZ80(&CPU, INT_IRQ);
-                gaConfig.interruptCounter &= 0x1F;
+                ga_config.interrupt_counter &= 0x1F;
             }
         }
         
         emu_DrawLine8(bitstream, WIDTH, HEIGHT, i);
-        cyclesTaken = 0;
+        cycles_taken = 0;
     }
 }
 
+/**
+ * Input handler.
+*/
 void cpc_Input(int bClick)
 {
 
 }
 
-/*
- * System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
-*/
+
+// System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
 
 void OutZ80(word Port, byte Value)
 {
-    if(!(Port & 0x8000)) writeGA(Value);         // The Gate Array is selected when bit 15 is set to 0.
-    if(!(Port & 0x4000)) writeCRTC(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
+    if(!(Port & 0x8000)) write_gate_array(Value);           // The Gate Array is selected when bit 15 is set to 0.
+    if(!(Port & 0x4000)) write_crt_controller(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
     if(!(Port & 0x2000)) 
     {
         // upper rom bank number. ROM banking needs to be done regardless of CPC model
@@ -136,43 +125,15 @@ void OutZ80(word Port, byte Value)
     }                        
 }
 
-// word LoopZ80(Z80 *R)
-// {
-//     crtc_step();
-//     interruptGenerated = ga_step();
-//     if(interruptGenerated)
-//     {
-//         printf("Interrupting! Jumping to \n");
-//         IntZ80(&CPU, INT_IRQ); 
-//         gaConfig.interruptCounter &= 0x1F;
-//     }
-//     emu_DrawLine8(bitstream, WIDTH, HEIGHT, slineCount);
-//     slineCount = (slineCount + 1) % NBLINES;
-
-//     if(interruptGenerated)
-//     {
-//         return INT_IRQ;
-//     }
-//     else
-//     {
-//         return INT_NONE;
-//     }
-// }
-
 byte InZ80(word Port)
 {
-    if(!(Port & 0x4000)) return readCRTC(Port); // The CRTC is selected when bit 14 is set to 0. 
+    if(!(Port & 0x4000)) return read_crt_controller(Port); // The CRTC is selected when bit 14 is set to 0. 
     return 0xFF;
 }
-
-#define LOWER_ROM_END   0x4000
-#define UPPER_ROM_BEGIN 0xC000
 
 void WrZ80(word Addr, byte Value)
 {
     RAM[Addr] = Value;
-    
-    //printf("Write %x at %x \n", Value, Addr);
 }
 
 void PatchZ80(Z80 *R)
@@ -182,12 +143,12 @@ void PatchZ80(Z80 *R)
 
 byte RdZ80(word Addr)
 {
-    if(Addr <= LOWER_ROM_END && gaConfig.lowerROMEnable)
+    if(Addr <= LOWER_ROM_END && ga_config.lower_rom_enable)
     {
         // printf("At program counter %x, Z80 read from address %x in OS ROM\n", CPU.PC.W, Addr);
         return gb_rom_464_0[Addr];
     }
-    else if(Addr >= UPPER_ROM_BEGIN && gaConfig.upperROMEnable)
+    else if(Addr >= UPPER_ROM_BEGIN && ga_config.upper_rom_enable)
     {
         // printf("At program counter %x, Z80 read from address %x in BASIC ROM\n", CPU.PC.W, Addr);
         return gb_rom_464_1[Addr - 0xC000];
