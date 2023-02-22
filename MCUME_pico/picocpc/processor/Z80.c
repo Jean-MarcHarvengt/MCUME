@@ -505,15 +505,15 @@ void ResetZ80(Z80 *R, register int Cycles)
 /** negative, and current register values in R.             **/
 /*************************************************************/
 #ifdef EXECZ80
-int ExecZ80(register Z80 *R,register int RunCycles)
+int ExecZ80(register Z80 *R) // , register int RunCycles
 {
   register byte I;
   register pair J;
 
-  for(R->ICount=RunCycles;;)
-  {
-    while(R->ICount>0)
-    {
+  // for(R->ICount=RunCycles;;)
+  // {
+  //   while(R->ICount>0)
+  //   {
 #ifdef DEBUG
       /* Turn tracing on when reached trap address */
       if(R->PC.W==R->Trap) R->Trace=1;
@@ -526,68 +526,6 @@ int ExecZ80(register Z80 *R,register int RunCycles)
       I=OpZ80(R->PC.W++);
       /* Count cycles */
       R->ICount-=Cycles[I];
-
-      for (int l=0; l< Cycles[I] ;l++) {
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop"); 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop"); 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop"); 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");       
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop"); 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");      
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop"); 
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");   
-
-#ifndef USE_VGA
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-#endif        
-      }
       /* Interpret opcode */
       switch(I)
       {
@@ -597,7 +535,6 @@ int ExecZ80(register Z80 *R,register int RunCycles)
         case PFX_FD: CodesFD(R);break;
         case PFX_DD: CodesDD(R);break;
       }
-    }
 
     /* Unless we have come here after EI, exit */
     if(!(R->IFF&IFF_EI)) return(R->ICount);
@@ -609,8 +546,9 @@ int ExecZ80(register Z80 *R,register int RunCycles)
       R->ICount+=R->IBackup-1;
       /* Interrupt CPU if needed */
       if((R->IRequest!=INT_NONE)&&(R->IRequest!=INT_QUIT)) IntZ80(R,R->IRequest);
-    }
-  }
+  //   }
+  //  }
+ }
 }
 #endif /* EXECZ80 */
 
@@ -673,7 +611,7 @@ void IntZ80(Z80 *R,word Vector)
       case INT_RST20: R->PC.W=0x0020;JumpZ80(0x0020);break;
       case INT_RST28: R->PC.W=0x0028;JumpZ80(0x0028);break;
       case INT_RST30: R->PC.W=0x0030;JumpZ80(0x0030);break;
-      case INT_RST38: R->PC.W=0x0038;JumpZ80(0x0038);break;
+      case INT_RST38: R->PC.W=0x0038;JumpZ80(0x0038);break; 
     }
   }
 }

@@ -116,7 +116,7 @@ void ResetZ80(register Z80 *R, register int Cycles);
 /** negative, and current register values in R.             **/
 /*************************************************************/
 #ifdef EXECZ80
-int ExecZ80(register Z80 *R,register int RunCycles);
+int ExecZ80(register Z80 *R); // ,register int RunCycles
 #endif
 
 /** IntZ80() *************************************************/

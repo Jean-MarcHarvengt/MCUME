@@ -32,7 +32,6 @@ uint16_t memory_start_addr = 0;
 
 void crtc_step()
 {
-    // printf("Horizontal count: %d \n", horizontal_count);
     horizontal_count++;
     
     if(horizontal_count > registers[0])
@@ -40,7 +39,6 @@ void crtc_step()
         // horizontal counter is equal to the Horizontal Total Register.
         horizontal_count = 0;
         scanline_count++;
-        // printf("Resetting horizontal counter!\n"); 
     }
 
     if(scanline_count > registers[9])
@@ -50,7 +48,6 @@ void crtc_step()
     
         scanline_count = 0;
         char_line_count++;
-        //printf("char_line_count: %d \n", char_line_count);
         
     }
 
@@ -64,13 +61,6 @@ void crtc_step()
     {
         memory_start_addr = ((uint16_t) registers[12] << 8) | registers[13];
     }
-
-    // if(is_within_display() && (memory_start_addr & 0b0011100000000000 == scanline_count))
-    // {
-    //     memory_start_addr += 2;
-    // }
-
-    // printf("Scanline count: %d \n", scanline_count);
 
 }
 
@@ -98,17 +88,17 @@ bool is_within_display()
 bool is_hsync_active()
 {
     // HSYNC is active if the horizontal counter is in the 
-    // "horizontal_and_vertical_sync_widths"-defined width starting from the horizontal_total register.
-    return horizontal_count >= registers[0]
-        && horizontal_count < registers[0] + (registers[3] & 0b1111);
+    // "horizontal_and_vertical_sync_widths"-defined width starting from the horizontal_sync_position register.
+    return horizontal_count >= registers[2] &&
+           horizontal_count <= registers[2] + (registers[3] & 0b1111);
 }
 
 bool is_vsync_active()
 {
     int8_t char_height = (int8_t) registers[9] + 1;
     int8_t char_lines_counted = (int8_t) char_line_count - registers[7];
-    return char_height * char_line_count + (int8_t) scanline_count >= 0 &&
-           char_height * char_line_count + (int8_t) scanline_count <= 16;
+    return char_height * char_lines_counted + (int8_t) scanline_count >= 0 &&
+           char_height * char_lines_counted + (int8_t) scanline_count <= 16*8;
 }
 
 

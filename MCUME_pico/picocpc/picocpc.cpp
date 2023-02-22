@@ -71,7 +71,7 @@ int main(void) {
         }
         else {
             emu_Step();   
-            //tft.waitSync();
+            tft.waitSync();
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {
@@ -107,10 +107,10 @@ void emu_DrawVsync(void)
 #endif
 }
 
-// void emu_DrawPixel(unsigned char * VBuf, int x, int y)
-// {
-//     tft.drawPixel(x, y, (uint8_t) VBuf++);
-// }
+void emu_DrawPixel(unsigned char * VBuf, int x, int y)
+{
+    tft.drawPixel(x, y, (uint8_t) *VBuf++);
+}
 
 
 void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 

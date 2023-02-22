@@ -51,15 +51,16 @@ struct RGB palette[32] = {
 bool update_interrupts()
 {
     bool interrupt_generated = false;
-
     if(ga_config.hsync_active && !is_hsync_active())
     {
         // falling edge of CRTC hsync signal.
         ga_config.interrupt_counter++;
         ga_config.vsync_delay_count++;
 
+        
         if(ga_config.interrupt_counter == 52)
         {
+            //printf("Interrupt generated! \n");
             ga_config.interrupt_counter = 0;
             interrupt_generated = true;
         }
@@ -78,6 +79,7 @@ bool update_interrupts()
     {
         if(ga_config.interrupt_counter >= 32)
         {
+            //printf("Interrupt generated! \n");
             interrupt_generated = true;
         }
         ga_config.interrupt_counter = 0;
@@ -94,30 +96,22 @@ char ga_rgb_to_vga(uint8_t r, uint8_t g, uint8_t b)
 void address_to_pixels()
 {
     // When HSYNC is active Gate-Array outputs the palette colour black
-    if(ga_config.hsync_active)
-    {
-        // for(int j = 0; j < registers[3] & 0b1111; j++)
-        // {
-        //     *bitstream = ga_rgb_to_vga(ga_config.pen_colours[19].R,
-        //                                ga_config.pen_colours[19].G,
-        //                                ga_config.pen_colours[19].B);
-        //     *bitstream++;
-        // }
-        return;
-    }
+    // if(ga_config.hsync_active)
+    // {
+    //     *(bitstream) = ga_rgb_to_vga(ga_config.pen_colours[19].R,
+    //                                 ga_config.pen_colours[19].G,
+    //                                 ga_config.pen_colours[19].B);
+    //     return;
+    // }
 
-    // border
-    if(ga_config.vsync_active || ga_config.hsync_active)
-    {
-        // for(int j = 0; j < 16; j++)
-        // {
-        //     *bitstream = ga_rgb_to_vga(ga_config.pen_colours[0x10].R,
-        //                                 ga_config.pen_colours[0x10].G,
-        //                                 ga_config.pen_colours[0x10].B);
-        //     *bitstream++;
-        // }
-        return;
-    }
+    // // border
+    // if(ga_config.vsync_active || ga_config.hsync_active)
+    // {
+    //     *(bitstream) = ga_rgb_to_vga(ga_config.pen_colours[0x10].R,
+    //                                 ga_config.pen_colours[0x10].G,
+    //                                 ga_config.pen_colours[0x10].B);
+    //     return;
+    // }
 
     for(int i = 0; i < 2; i++) 
     {
@@ -126,73 +120,79 @@ void address_to_pixels()
         uint8_t encodedByte = RAM[address];
         uint8_t pixel0, pixel1, pixel2, pixel3;
         uint8_t* pixels = (uint8_t*) calloc(4, 8*sizeof(uint8_t));
-
-        switch(ga_config.screen_mode)
+        if(address >= 0xC000)
         {
-            case 0:
-                pixel0 = (encodedByte & 0x80) >> 7 |
-                         (encodedByte & 0x08) >> 2 |
-                         (encodedByte & 0x20) >> 3 |
-                         (encodedByte & 0x02) << 2;
-                pixel1 = (encodedByte & 0x40) >> 6 |
-                         (encodedByte & 0x04) >> 1 |
-                         (encodedByte & 0x10) >> 2 |
-                         (encodedByte & 0x01) << 3;
-                pixels[0] = pixel0;
-                pixels[1] = pixel1;
-                for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
-                {
-                    for(int color = 0; color < 4; color++)
+            switch(ga_config.screen_mode)
+            {
+                case 0:
+                    pixel0 = (encodedByte & 0x80) >> 7 |
+                            (encodedByte & 0x08) >> 2 |
+                            (encodedByte & 0x20) >> 3 |
+                            (encodedByte & 0x02) << 2;
+                    pixel1 = (encodedByte & 0x40) >> 6 |
+                            (encodedByte & 0x04) >> 1 |
+                            (encodedByte & 0x10) >> 2 |
+                            (encodedByte & 0x01) << 3;
+                    pixels[0] = pixel0;
+                    pixels[1] = pixel1;
+                    for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
                     {
-                        bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
-                                                                            ga_config.pen_colours[pixels[pixelIdx]].G,
-                                                                            ga_config.pen_colours[pixels[pixelIdx]].B);
+                        for(int color = 0; color < 4; color++)
+                        {
+                            bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
+                                                                                ga_config.pen_colours[pixels[pixelIdx]].G,
+                                                                                ga_config.pen_colours[pixels[pixelIdx]].B);
+                        }
                     }
-                }
-                break;
-            case 1:
-                pixel0 = (encodedByte & 0x80) >> 7 |
-                         (encodedByte & 0x08) >> 2;
-                pixel1 = (encodedByte & 0x40) >> 6 |
-                         (encodedByte & 0x04) >> 1;
-                pixel2 = (encodedByte & 0x02) |
-                         (encodedByte & 0x20) >> 5;
-                pixel3 = (encodedByte & 0x10) >> 4 |
-                         (encodedByte & 0x01) << 1;
-                pixels[0] = pixel0;
-                pixels[1] = pixel1;
-                pixels[2] = pixel2;
-                pixels[3] = pixel3;
+                    break;
+                case 1:
+                    pixel0 = (encodedByte & 0x80) >> 7 |
+                            (encodedByte & 0x08) >> 2;
+                    pixel1 = (encodedByte & 0x40) >> 6 |
+                            (encodedByte & 0x04) >> 1;
+                    pixel2 = (encodedByte & 0x02) |
+                            (encodedByte & 0x20) >> 5;
+                    pixel3 = (encodedByte & 0x10) >> 4 |
+                            (encodedByte & 0x01) << 1;
+                    pixels[0] = pixel0;
+                    pixels[1] = pixel1;
+                    pixels[2] = pixel2;
+                    pixels[3] = pixel3;
 
-                for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
-                {
-                    for(int color = 0; color < 2; color++)
+                    for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
                     {
-                        bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
-                                                                            ga_config.pen_colours[pixels[pixelIdx]].G,
-                                                                            ga_config.pen_colours[pixels[pixelIdx]].B);
+                        for(int color = 0; color < 2; color++)
+                        {
+                            bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
+                                                                                ga_config.pen_colours[pixels[pixelIdx]].G,
+                                                                                ga_config.pen_colours[pixels[pixelIdx]].B);
+                        }
                     }
-                }
-                break;
-            case 2:
-                uint8_t pixel;
-                for (int color = 0; color < 8; color++)
-                {
-                    pixel = (encodedByte >> 7 - color) & 1;
-                    bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixel].R,
-                                                                        ga_config.pen_colours[pixel].G,
-                                                                        ga_config.pen_colours[pixel].B);
-                }
-                break;
+                    break;
+                case 2:
+                    uint8_t pixel;
+                    for (int color = 0; color < 8; color++)
+                    {
+                        pixel = (encodedByte >> 7 - color) & 1;
+                        bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixel].R,
+                                                                            ga_config.pen_colours[pixel].G,
+                                                                            ga_config.pen_colours[pixel].B);
+                    }
+                    break;
+            }
+            free(pixels);
         }
-        free(pixels);
+        
     }
 }
 
 bool ga_step()
 {
     bool interrupt_generated = update_interrupts();
-    address_to_pixels();
+    //if(is_within_display())
+    //{
+        address_to_pixels();
+    //}
     
     ga_config.hsync_active = is_hsync_active();
     ga_config.vsync_active = is_vsync_active();
@@ -247,7 +247,6 @@ void rom_and_screen_mgmt(uint8_t value)
                 // mode 3, unused.
                 break;
         }
-        printf("Updated screen mode to mode %d", ga_config.screen_mode);
     }
     
     // ROM enable flags.

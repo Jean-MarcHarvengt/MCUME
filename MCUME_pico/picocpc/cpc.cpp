@@ -5,19 +5,21 @@
 #include "cpc.h"
 
 #include <cstring>
+#include <stdlib.h>
 
 extern "C" {
 #include "emuapi.h"
 #include "platform_config.h"
 }
 #include "processor/Z80.h"
+#include "processor/Tables.h"
 #include "crtc.h"
 #include "ga.h"
 #include "roms/rom464.h"
 
-#define WIDTH            320
-#define HEIGHT           200
-#define CYCLES_PER_FRAME 19968 //79872
+#define WIDTH            320 
+#define HEIGHT           200 
+#define CYCLES_PER_FRAME 79872 //79872 //19968
 #define NBLINES          312
 #define CYCLES_PER_SCANLINE  CYCLES_PER_FRAME/NBLINES
 #define LOWER_ROM_END   0x4000
@@ -29,6 +31,7 @@ uint8_t RAM[0x10000];      // 64k
 unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static Z80 CPU;
 bool interrupt_generated = false;
+int sline = 0;
 
 // Implementations of system-specific emuapi Init, Step etc. functions. 
 
@@ -42,9 +45,9 @@ void cpc_Init(void)
     {
         emu_SetPaletteEntry(palette[i].R, palette[i].G, palette[i].B, i);
     }
-    if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT);
+    if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH); //*HEIGHT
 
-    ResetZ80(&CPU, CYCLES_PER_FRAME);
+    //ResetZ80(&CPU, CYCLES_PER_FRAME);
     memset(RAM, 0, sizeof(RAM));
 }
 
@@ -54,6 +57,7 @@ void cpc_Init(void)
 void cpc_Start(char* filename)
 {
     CPU.PC.W = 0x0000;
+    CPU.IFF = IFF_IM1;
     ga_config.lower_rom_enable = true;
     ga_config.upper_rom_enable = false;
     ga_config.interrupt_counter = 0;
@@ -65,37 +69,40 @@ void cpc_Start(char* filename)
 */
 void cpc_Step(void)
 {
-    int total_cycles = 0;
-    int cycles_left = 0;
     int cycles_taken = 0;
+    int cycles_total = 0;
+    while(cycles_total < CYCLES_PER_FRAME)
+    {   
+        cycles_taken = Cycles[RdZ80(CPU.PC.W)]; 
+        ExecZ80(&CPU);    
+        cycles_total += cycles_taken;
 
-    for(int i = 0; i < NBLINES; i++)
-    {   // TODO find a way to call crtc and ga step after each instruction, not after
-        // executing everything in the scanline (not guaranteed to be 80000 cycles anyway).
-        
-        cycles_left = ExecZ80(&CPU, 1);
-        cycles_taken += 1;
-        while(cycles_left < 0)
-        {
-            cycles_left -= ExecZ80(&CPU, 1);
-            cycles_taken += 1;
-        }
-
-        for(int j = 0; j < cycles_taken; j++)
+        for(int i = 0; i < cycles_taken / 4; i++)
         {
             crtc_step();
             interrupt_generated = ga_step();
+
             if(interrupt_generated)
             {
-                //printf("Interrupting! Jumping to \n");
+                printf("Interrupting!\n");
+                
                 IntZ80(&CPU, INT_IRQ);
-                ga_config.interrupt_counter &= 0x1F;
             }
+            
         }
         
-        emu_DrawLine8(bitstream, WIDTH, HEIGHT, i);
-        cycles_taken = 0;
+        emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
+        if(is_hsync_active())
+        {
+            //printf("HSYNC at scanline %d \n", sline);
+            sline = (sline + 1) % NBLINES;
+        }     
     }
+    // printf("HSYNC at scanline %d \n", sline);
+    
+    
+        
+    //}   
 }
 
 /**
