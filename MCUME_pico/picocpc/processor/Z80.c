@@ -505,15 +505,15 @@ void ResetZ80(Z80 *R, register int Cycles)
 /** negative, and current register values in R.             **/
 /*************************************************************/
 #ifdef EXECZ80
-int ExecZ80(register Z80 *R) // , register int RunCycles
+int ExecZ80(register Z80 *R, register int RunCycles) // 
 {
   register byte I;
   register pair J;
 
-  // for(R->ICount=RunCycles;;)
-  // {
-  //   while(R->ICount>0)
-  //   {
+  for(R->ICount=RunCycles;;)
+  {
+    while(R->ICount>0)
+    {
 #ifdef DEBUG
       /* Turn tracing on when reached trap address */
       if(R->PC.W==R->Trap) R->Trace=1;
@@ -546,8 +546,8 @@ int ExecZ80(register Z80 *R) // , register int RunCycles
       R->ICount+=R->IBackup-1;
       /* Interrupt CPU if needed */
       if((R->IRequest!=INT_NONE)&&(R->IRequest!=INT_QUIT)) IntZ80(R,R->IRequest);
-  //   }
-  //  }
+    }
+   }
  }
 }
 #endif /* EXECZ80 */

@@ -116,12 +116,12 @@ void address_to_pixels()
     for(int i = 0; i < 2; i++) 
     {
         uint16_t address = crtc_generate_addr() + i;
-        // printf("address from CRTC: %x \nRAM data: %x \n", address, RAM[address]);
         uint8_t encodedByte = RAM[address];
         uint8_t pixel0, pixel1, pixel2, pixel3;
         uint8_t* pixels = (uint8_t*) calloc(4, 8*sizeof(uint8_t));
         if(address >= 0xC000)
         {
+            //printf("address from CRTC: %x \nRAM data: %x \n", address, RAM[address]);
             switch(ga_config.screen_mode)
             {
                 case 0:

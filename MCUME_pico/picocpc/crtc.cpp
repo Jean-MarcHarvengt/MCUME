@@ -106,8 +106,8 @@ void write_crt_controller(unsigned short address, uint8_t value)
 {
     switch(address & 0xFF00)
     {
-        case 0xBC00: selected_register = value & 0b11111;
-        case 0xBD00: registers[selected_register] = value;
+        case 0xBC00: selected_register = value & 0b11111;break;
+        case 0xBD00: registers[selected_register] = value;break;
     }
 }
 
