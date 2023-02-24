@@ -535,7 +535,7 @@ int ExecZ80(register Z80 *R, register int RunCycles) //
         case PFX_FD: CodesFD(R);break;
         case PFX_DD: CodesDD(R);break;
       }
-
+    
     /* Unless we have come here after EI, exit */
     if(!(R->IFF&IFF_EI)) return(R->ICount);
     else

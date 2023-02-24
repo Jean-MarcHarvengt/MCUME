@@ -13,7 +13,7 @@
 #define emu_Step(x) {cpc_Step();}
 #define emu_Input(x) {cpc_Input(x);}
 
-#define PALETTE_SIZE        32
+#define PALETTE_SIZE        27
 #define VID_FRAME_SKIP      0x0
 #define TFT_VBUFFER_YCROP   0
 

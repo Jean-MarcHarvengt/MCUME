@@ -13,39 +13,69 @@ struct GAConfig ga_config;
  *  Some of the colours are duplicates, because select_pen_colour() uses the least significant
  *  5 bits to index into this array, so the duplicates prevent out-of-bounds read.
 */
-struct RGB palette[32] = {
-    {128, 128, 128},      // White
-    {128, 128, 128},      // White
-    {0, 255, 128},      // Sea Green
-    {255, 255, 128},    // Pastel Yellow
-    {0, 0, 128},        // Blue
-    {255, 0, 128},      // Purple
-    {0, 128, 128},       // Cyan
-    {255, 128, 128},     // Pink
-    {255, 0, 128},      // Purple
-    {255, 255, 128},    // Pastel Yellow
-    {255, 255, 0},     // Bright Yellow
-    {255, 255, 255},   // Bright White
-    {255, 0, 0},       // Bright Red
-    {255, 0, 255},     // Bright Magenta
-    {255, 128, 0},      // Orange
-    {255, 128, 255},    // Pastel Magenta
-    {0, 0, 128},        // Blue
-    {0, 255, 128},      // Sea Green
-    {0, 255, 0},       // Bright Green
-    {0, 255, 255},     // Bright Cyan
-    {0, 0, 0},         // Black
-    {0, 0, 255},       // Bright Blue
-    {0, 128, 0},        // Green
-    {0, 128, 255},      // Sky Blue
-    {128, 0, 128},       // Magenta
-    {128, 255, 128},     // Pastel Green
-    {128, 255, 0},      // Lime
-    {128, 255, 255},    // Pastel Cyan
-    {128, 0, 0},        // Red
-    {128, 0, 255},      // Mauve
-    {128, 128, 0},       // Yellow
-    {128, 128, 255}      // Pastel Blue
+uint8_t hardware_colours[32] = {
+    13, 
+    13, 
+    19, 
+    25, 
+    1,  
+    7,  
+    10, 
+    16, 
+    7,  
+    25, 
+    24, 
+    26, 
+    6,  
+    8,  
+    15, 
+    17, 
+    1,  
+    19,
+    18, 
+    20, 
+    0,  
+    2,  
+    9,  
+    11,
+    4,
+    22,
+    21,
+    23,
+    3,
+    5,
+    12,
+    14
+};
+
+struct RGB firmware_palette[27] = {
+    {0, 0, 0},
+    {0, 0, 128},
+    {0, 0, 255},
+    {128, 0, 0},
+    {128, 0, 128},
+    {128, 0, 255},
+    {255, 0, 0},
+    {255, 0, 128},
+    {255, 0, 255},
+    {0, 128, 0},
+    {0, 128, 128},
+    {0, 128, 255},
+    {128, 128, 0},
+    {128, 128, 128},
+    {128, 128, 255},
+    {255, 128, 0},
+    {255, 128, 128},
+    {255, 128, 255},
+    {0, 255, 0},
+    {0, 255, 128},
+    {0, 255, 255},
+    {128, 255, 0},
+    {128, 255, 128},
+    {128, 255, 255},
+    {255, 255, 0},
+    {255, 255, 128},
+    {255, 255, 255}
 };
 
 bool update_interrupts()
@@ -96,22 +126,16 @@ char ga_rgb_to_vga(uint8_t r, uint8_t g, uint8_t b)
 void address_to_pixels()
 {
     // When HSYNC is active Gate-Array outputs the palette colour black
-    // if(ga_config.hsync_active)
-    // {
-    //     *(bitstream) = ga_rgb_to_vga(ga_config.pen_colours[19].R,
-    //                                 ga_config.pen_colours[19].G,
-    //                                 ga_config.pen_colours[19].B);
-    //     return;
-    // }
+    if(ga_config.hsync_active)
+    {
+        return;
+    }
 
-    // // border
-    // if(ga_config.vsync_active || ga_config.hsync_active)
-    // {
-    //     *(bitstream) = ga_rgb_to_vga(ga_config.pen_colours[0x10].R,
-    //                                 ga_config.pen_colours[0x10].G,
-    //                                 ga_config.pen_colours[0x10].B);
-    //     return;
-    // }
+    // border
+    if(ga_config.vsync_active || ga_config.hsync_active)
+    {
+        return;
+    }
 
     for(int i = 0; i < 2; i++) 
     {
@@ -135,14 +159,18 @@ void address_to_pixels()
                             (encodedByte & 0x01) << 3;
                     pixels[0] = pixel0;
                     pixels[1] = pixel1;
+
                     for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
                     {
-                        for(int color = 0; color < 4; color++)
-                        {
-                            bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
-                                                                                ga_config.pen_colours[pixels[pixelIdx]].G,
-                                                                                ga_config.pen_colours[pixels[pixelIdx]].B);
-                        }
+                        bitstream[address + pixelIdx - 0xC000] = ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
+                                                                               firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
+                                                                               firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B);
+                        // for(int color = 0; color < 4; color++)
+                        // {
+                        //     bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
+                        //                                                         ga_config.pen_colours[pixels[pixelIdx]].G,
+                        //                                                         ga_config.pen_colours[pixels[pixelIdx]].B);
+                        // }
                     }
                     break;
                 case 1:
@@ -161,12 +189,15 @@ void address_to_pixels()
 
                     for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
                     {
-                        for(int color = 0; color < 2; color++)
-                        {
-                            bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
-                                                                                ga_config.pen_colours[pixels[pixelIdx]].G,
-                                                                                ga_config.pen_colours[pixels[pixelIdx]].B);
-                        }
+                        bitstream[address + pixelIdx - 0xC000] = ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
+                                                                               firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
+                                                                               firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B);
+                        // for(int color = 0; color < 2; color++)
+                        // {
+                        //     bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixels[pixelIdx]].R,
+                        //                                                         ga_config.pen_colours[pixels[pixelIdx]].G,
+                        //                                                         ga_config.pen_colours[pixels[pixelIdx]].B);
+                        // }
                     }
                     break;
                 case 2:
@@ -174,9 +205,9 @@ void address_to_pixels()
                     for (int color = 0; color < 8; color++)
                     {
                         pixel = (encodedByte >> 7 - color) & 1;
-                        bitstream[address + color - 0xC000] = ga_rgb_to_vga(ga_config.pen_colours[pixel].R,
-                                                                            ga_config.pen_colours[pixel].G,
-                                                                            ga_config.pen_colours[pixel].B);
+                        bitstream[address + color - 0xC000] = ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].R,
+                                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].G,
+                                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].B);
                     }
                     break;
             }
@@ -191,7 +222,7 @@ bool ga_step()
     bool interrupt_generated = update_interrupts();
     //if(is_within_display())
     //{
-        address_to_pixels();
+    address_to_pixels();
     //}
     
     ga_config.hsync_active = is_hsync_active();
@@ -219,7 +250,7 @@ void select_pen_colour(uint8_t value)
 {
     // Bits 0-4 of "value" specify the hardware colour number from the hardware colour palette.
     // (i.e. which index into the Palette array of structs.)
-    ga_config.pen_colours[ga_config.pen_selected] = palette[value & 31];
+    ga_config.pen_colours[ga_config.pen_selected] = value & 31;
 }
 
 void rom_and_screen_mgmt(uint8_t value)

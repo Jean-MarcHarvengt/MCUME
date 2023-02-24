@@ -71,7 +71,6 @@ int main(void) {
         }
         else {
             emu_Step();   
-            // tft.waitSync();
         }
         //int c = getchar_timeout_us(0);
         //switch (c) {
@@ -100,7 +99,7 @@ void emu_DrawVsync(void)
     volatile bool vb=vbl; 
     while (vbl==vb) {};
 #ifdef USE_VGA   
-//    tft.waitSync();                   
+   tft.waitSync();                   
 #else                      
 //    volatile bool vb=vbl; 
 //    while (vbl==vb) {};

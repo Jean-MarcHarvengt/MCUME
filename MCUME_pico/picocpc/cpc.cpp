@@ -34,6 +34,7 @@ static Z80 CPU;
 bool interrupt_generated = false;
 int sline = 0;
 int cycles_left = 0;
+bool test_flag = false;
 
 // Implementations of system-specific emuapi Init, Step etc. functions. 
 
@@ -45,7 +46,7 @@ void cpc_Init(void)
 
     for(int i = 0; i < PALETTE_SIZE; i++)
     {
-        emu_SetPaletteEntry(palette[i].R, palette[i].G, palette[i].B, i);
+        emu_SetPaletteEntry(firmware_palette[i].R, firmware_palette[i].G, firmware_palette[i].B, i);
     }
     if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT); //*HEIGHT
     bitstream_init_pos = bitstream;
@@ -72,26 +73,41 @@ void cpc_Start(char* filename)
 */
 void cpc_Step(void)
 {
-    cycles_left = ExecZ80(&CPU, 24); // execute for the duration of 6 NOPs (maximum instruction length)
-    //printf("Executing %d times.\n", cycles_left/4);
-    for(int k = 0; k < (24 - cycles_left) / 4; k++)
+    for(;!is_hsync_active();)
     {
-        
+        cycles_left = ExecZ80(&CPU, 24); // execute for the duration of 6 NOPs (maximum instruction length)
+        for(int k = 0; k < (24 - cycles_left) / 4; k++)
+        {
+            crtc_step();
+            interrupt_generated = ga_step();
+            if(interrupt_generated)
+            {
+                // printf("Interrupting!\n");   
+                IntZ80(&CPU, INT_RST38);
+                ga_config.interrupt_counter &= 0x1f;
+            }
+        }
+    }
+
+    emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
+    sline = (sline + 1) % NBLINES;
+
+    if(is_vsync_active())
+    {
+        emu_DrawVsync();
+    }
+
+    while(is_hsync_active())
+    {
         crtc_step();
-        interrupt_generated = ga_step();
-        if(interrupt_generated)
-        {
-            // printf("Interrupting!\n");   
-            IntZ80(&CPU, INT_RST38);
-            ga_config.interrupt_counter &= 0x1f;
-        }
-        if(is_hsync_active())
-        {
-            sline = (sline + 1) % NBLINES;
-        }
-        emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
-    }          
-    
+        ga_step();
+    }
+
+    while(is_vsync_active())
+    {
+        crtc_step();
+        ga_step();
+    }
 }
 
 /**
@@ -102,6 +118,10 @@ void cpc_Input(int bClick)
 
 }
 
+void draw_vsync()
+{
+    emu_DrawVsync();
+}
 
 // System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
 
