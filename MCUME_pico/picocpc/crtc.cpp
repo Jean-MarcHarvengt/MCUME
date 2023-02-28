@@ -28,40 +28,44 @@ uint8_t char_line_count = 0;
 uint8_t scanline_count = 0;
 uint8_t vertical_adjust_count = 0;
 uint16_t memory_start_addr = 0;
+uint8_t microsec_count_crtc = 0;
 
 
 void crtc_step()
 {
-    horizontal_count++;
-    
-    if(horizontal_count > registers[0])
+    if(microsec_count_crtc == 3)
     {
-        // horizontal counter is equal to the Horizontal Total Register.
-        horizontal_count = 0;
-        scanline_count++;
-    }
-
-    if(scanline_count > registers[9])
-    {
-        // The counter for Maximum Raster Address is equal to it.
-        // The height of a character is 8 rasters, so when we reach 8 rasters we increment the char line count.
-    
-        scanline_count = 0;
-        char_line_count++;
+        horizontal_count++;
         
-    }
+        if(horizontal_count > registers[0])
+        {
+            // horizontal counter is equal to the Horizontal Total Register.
+            horizontal_count = 0;
+            scanline_count++;
+        }
 
-    if(char_line_count > registers[4])
-    {
-        // The vertical counter reaches the Vertical Total register.
-        char_line_count = 0;
-    }
+        if(scanline_count > registers[9])
+        {
+            // The counter for Maximum Raster Address is equal to it.
+            // The height of a character is 8 rasters, so when we reach 8 rasters we increment the char line count.
+        
+            scanline_count = 0;
+            char_line_count++;
+            
+        }
 
-    if(char_line_count == 0 && horizontal_count == 0)
-    {
-        memory_start_addr = ((uint16_t) registers[12] << 8) | registers[13];
-    }
+        if(char_line_count > registers[4])
+        {
+            // The vertical counter reaches the Vertical Total register.
+            char_line_count = 0;
+        }
 
+        if(char_line_count == 0 && horizontal_count == 0)
+        {
+            memory_start_addr = ((uint16_t) registers[12] << 8) | registers[13];
+        }
+    }
+    microsec_count_crtc = (microsec_count_crtc + 1) % 4;
 }
 
 uint16_t crtc_generate_addr()
@@ -98,7 +102,7 @@ bool is_vsync_active()
     int8_t char_height = (int8_t) registers[9] + 1;
     int8_t char_lines_counted = (int8_t) char_line_count - registers[7];
     return char_height * char_lines_counted + (int8_t) scanline_count >= 0 &&
-           char_height * char_lines_counted + (int8_t) scanline_count <= 16*8;
+           char_height * char_lines_counted + (int8_t) scanline_count <= 16;
 }
 
 

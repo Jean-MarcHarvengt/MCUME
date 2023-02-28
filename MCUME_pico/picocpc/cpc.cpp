@@ -11,8 +11,10 @@ extern "C" {
 #include "emuapi.h"
 #include "platform_config.h"
 }
-#include "processor/Z80.h"
-#include "processor/Tables.h"
+#ifndef CHIPS_IMPL
+ #define CHIPS_IMPL
+#endif
+#include "z80.h"
 #include "crtc.h"
 #include "ga.h"
 #include "roms/rom464.h"
@@ -29,14 +31,58 @@ extern "C" {
 
 uint8_t RAM[0x10000];      // 64k
 unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
-unsigned char* bitstream_init_pos = 0;
-static Z80 CPU;
+static z80_t CPU;
+uint64_t pins;
 bool interrupt_generated = false;
 int sline = 0;
-int cycles_left = 0;
-bool test_flag = false;
 
-// Implementations of system-specific emuapi Init, Step etc. functions. 
+// Helper functions
+
+char read_z80(uint16_t Addr)
+{
+    if(Addr <= LOWER_ROM_END && ga_config.lower_rom_enable)
+    {
+        // printf("At program counter %x, Z80 read from address %x in OS ROM\n", CPU.PC.W, Addr);
+        return gb_rom_464_0[Addr];
+    }
+    else if(Addr >= UPPER_ROM_BEGIN && ga_config.upper_rom_enable)
+    {
+        // printf("At program counter %x, Z80 read from address %x in BASIC ROM\n", CPU.PC.W, Addr);
+        return gb_rom_464_1[Addr - 0xC000];
+    }
+    else
+    {
+        // printf("At program counter %x, Z80 read from address %x in RAM\n", CPU.PC.W, Addr);
+        return RAM[Addr];
+    }
+}
+
+void write_z80(uint16_t Addr, uint8_t Value)
+{
+    RAM[Addr] = Value;
+}
+
+void out_z80(uint16_t Port, uint8_t Value)
+{
+    if(!(Port & 0x8000)) write_gate_array(Value);           // The Gate Array is selected when bit 15 is set to 0.
+    if(!(Port & 0x4000)) write_crt_controller(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
+    if(!(Port & 0x2000)) 
+    {
+        // upper rom bank number. ROM banking needs to be done regardless of CPC model
+        // The Upper ROM Bank Number (in range of 0x00..0xFF) to be mapped to memory at 0xC000..0xFFFF
+
+        // byte req_bank_number = Value & 15;
+        // if(ga_config.upper_rom_enable)
+        // {
+        // }
+    }                        
+}
+
+uint8_t in_z80(uint16_t Port)
+{
+    if(!(Port & 0x4000)) return read_crt_controller(Port); // The CRTC is selected when bit 14 is set to 0. 
+    return 0xFF;
+}
 
 /**
  * Creates initial emulation state (i.e. sets up color palette, clears memory etc.)
@@ -49,9 +95,8 @@ void cpc_Init(void)
         emu_SetPaletteEntry(firmware_palette[i].R, firmware_palette[i].G, firmware_palette[i].B, i);
     }
     if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT); //*HEIGHT
-    bitstream_init_pos = bitstream;
 
-    ResetZ80(&CPU, CYCLES_PER_FRAME);
+    pins = z80_init(&CPU);
     memset(RAM, 0, sizeof(RAM));
 }
 
@@ -60,12 +105,9 @@ void cpc_Init(void)
 */
 void cpc_Start(char* filename)
 {
-    CPU.PC.W = 0x0000;
-    //CPU.IFF = IFF_IM1;
     ga_config.lower_rom_enable = true;
     ga_config.upper_rom_enable = false;
     ga_config.interrupt_counter = 0;
-    // write_gate_array(0xC0);
 }
 
 /**
@@ -73,24 +115,77 @@ void cpc_Start(char* filename)
 */
 void cpc_Step(void)
 {
-    for(;!is_hsync_active();)
+    //for(;!is_hsync_active();)
+    //{
+
+    // if not (z80 wait and ga wait) then tick, otherwise stall.
+    // or rather the tick will be a stall if both waits are asserted, i think that's better.
+    bool interrupt_acknowledged = false;
+    if(!(pins&Z80_WAIT && ga_config.wait_signal))
     {
-        cycles_left = ExecZ80(&CPU, 24); // execute for the duration of 6 NOPs (maximum instruction length)
-        for(int k = 0; k < (24 - cycles_left) / 4; k++)
+        pins = z80_tick(&CPU, pins);
+        if (pins & Z80_MREQ) 
         {
-            crtc_step();
-            interrupt_generated = ga_step();
-            if(interrupt_generated)
+            const uint16_t addr = Z80_GET_ADDR(pins);
+            if (pins & Z80_RD) 
             {
-                // printf("Interrupting!\n");   
-                IntZ80(&CPU, INT_RST38);
-                ga_config.interrupt_counter &= 0x1f;
+                uint8_t data = read_z80(addr);
+                Z80_SET_DATA(pins, data);
+            }
+            else if (pins & Z80_WR) 
+            {
+                uint8_t data = Z80_GET_DATA(pins);
+                write_z80(addr, data);
+            }
+        }
+        else if (pins & Z80_IORQ) 
+        {
+            const uint16_t port = Z80_GET_ADDR(pins);
+            if (pins & Z80_M1) 
+            {
+                // an interrupt acknowledge cycle, depending on the emulated system,
+                // put either an instruction byte, or an interrupt vector on the data bus
+                Z80_SET_DATA(pins, 0x0038);
+                interrupt_acknowledged = true;
+            }
+            else if (pins & Z80_RD) 
+            {
+                // handle IO input request at port
+                in_z80(port);
+            }
+            else if (pins & Z80_WR) 
+            {
+                // handle IO output request at port
+                uint8_t data = Z80_GET_DATA(pins);
+                out_z80(port, data);
             }
         }
     }
 
-    emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
-    sline = (sline + 1) % NBLINES;
+    crtc_step();
+    interrupt_generated = ga_step();
+    if(interrupt_generated)
+    {
+        // To request an interrupt, or inject a wait state just set the respective pin
+        // (Z80_INT, Z80_NMI, Z80_WAIT), don't forget to clear the pin again later (the
+        // details on when those pins are set and cleared depend heavily on the
+        // emulated system).
+
+        // request an interrupt from the CPU
+        // TODO how to set the Z80_INT pin?
+
+    }
+
+    if(interrupt_acknowledged)
+    {
+        ga_config.interrupt_counter &= 0x1f;
+    }
+
+    if(is_hsync_active())
+    {
+        sline = (sline + 1) % NBLINES;
+        emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
+    }
 
     if(is_vsync_active())
     {
@@ -108,70 +203,10 @@ void cpc_Step(void)
         crtc_step();
         ga_step();
     }
+   
 }
 
-/**
- * Input handler.
-*/
 void cpc_Input(int bClick)
 {
 
-}
-
-void draw_vsync()
-{
-    emu_DrawVsync();
-}
-
-// System-specific implementations of the Z80 instructions required by the portable Z80 emulator.
-
-void OutZ80(word Port, byte Value)
-{
-    if(!(Port & 0x8000)) write_gate_array(Value);           // The Gate Array is selected when bit 15 is set to 0.
-    if(!(Port & 0x4000)) write_crt_controller(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
-    if(!(Port & 0x2000)) 
-    {
-        // upper rom bank number. ROM banking needs to be done regardless of CPC model
-        // The Upper ROM Bank Number (in range of 0x00..0xFF) to be mapped to memory at 0xC000..0xFFFF
-
-        // byte req_bank_number = Value & 15;
-        // if(ga_config.upper_rom_enable)
-        // {
-        // }
-    }                        
-}
-
-byte InZ80(word Port)
-{
-    if(!(Port & 0x4000)) return read_crt_controller(Port); // The CRTC is selected when bit 14 is set to 0. 
-    return 0xFF;
-}
-
-void WrZ80(word Addr, byte Value)
-{
-    RAM[Addr] = Value;
-}
-
-void PatchZ80(Z80 *R)
-{
-    // do nothing
-}
-
-byte RdZ80(word Addr)
-{
-    if(Addr <= LOWER_ROM_END && ga_config.lower_rom_enable)
-    {
-        // printf("At program counter %x, Z80 read from address %x in OS ROM\n", CPU.PC.W, Addr);
-        return gb_rom_464_0[Addr];
-    }
-    else if(Addr >= UPPER_ROM_BEGIN && ga_config.upper_rom_enable)
-    {
-        // printf("At program counter %x, Z80 read from address %x in BASIC ROM\n", CPU.PC.W, Addr);
-        return gb_rom_464_1[Addr - 0xC000];
-    }
-    else
-    {
-        // printf("At program counter %x, Z80 read from address %x in RAM\n", CPU.PC.W, Addr);
-        return RAM[Addr];
-    }
 }

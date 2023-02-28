@@ -8,6 +8,7 @@
 #include "cpc.h"
 
 struct GAConfig ga_config;
+uint8_t microsecond_count_ga = 0;
 
 /**
  *  Some of the colours are duplicates, because select_pen_colour() uses the least significant
@@ -87,7 +88,6 @@ bool update_interrupts()
         ga_config.interrupt_counter++;
         ga_config.vsync_delay_count++;
 
-        
         if(ga_config.interrupt_counter == 52)
         {
             //printf("Interrupt generated! \n");
@@ -212,23 +212,29 @@ void address_to_pixels()
                     break;
             }
             free(pixels);
-        }
-        
+        }    
     }
 }
 
 bool ga_step()
 {
-    bool interrupt_generated = update_interrupts();
-    //if(is_within_display())
-    //{
-    address_to_pixels();
-    //}
-    
-    ga_config.hsync_active = is_hsync_active();
-    ga_config.vsync_active = is_vsync_active();
+    ga_config.wait_signal = microsecond_count_ga == 2;
 
-    return interrupt_generated;
+    if(microsecond_count_ga == 3)
+    {
+        bool interrupt_generated = update_interrupts();
+        //if(is_within_display())
+        //{
+        address_to_pixels();
+        //}
+        
+        ga_config.hsync_active = is_hsync_active();
+        ga_config.vsync_active = is_vsync_active();
+        microsecond_count_ga = (microsecond_count_ga + 1) % 4;
+        return interrupt_generated;
+    }
+    microsecond_count_ga = (microsecond_count_ga + 1) % 4;
+    return false;
 }
  
 void select_pen(uint8_t value)

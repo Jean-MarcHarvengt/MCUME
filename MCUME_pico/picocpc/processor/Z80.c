@@ -495,6 +495,7 @@ void ResetZ80(Z80 *R, register int Cycles)
   R->ICount   = R->IPeriod;
   R->IRequest = INT_NONE;
   R->IBackup  = 0;
+  R->wait = false;
 
   JumpZ80(R->PC.W);
 }
@@ -507,48 +508,55 @@ void ResetZ80(Z80 *R, register int Cycles)
 #ifdef EXECZ80
 int ExecZ80(register Z80 *R, register int RunCycles) // 
 {
-  register byte I;
-  register pair J;
-
-  for(R->ICount=RunCycles;;)
+  if(!R->wait)
   {
-    while(R->ICount>0)
+    register byte I;
+    register pair J;
+
+    for(R->ICount=RunCycles;;)
     {
+      while(R->ICount>0)
+      {
 #ifdef DEBUG
-      /* Turn tracing on when reached trap address */
-      if(R->PC.W==R->Trap) R->Trace=1;
-      /* Call single-step debugger, exit if requested */
-      if(R->Trace)
-        if(!DebugZ80(R)) return(R->ICount);
+        /* Turn tracing on when reached trap address */
+        if(R->PC.W==R->Trap) R->Trace=1;
+        /* Call single-step debugger, exit if requested */
+        if(R->Trace)
+          if(!DebugZ80(R)) return(R->ICount);
 #endif
 
-      /* Read opcode and count cycles */
-      I=OpZ80(R->PC.W++);
-      /* Count cycles */
-      R->ICount-=Cycles[I];
-      /* Interpret opcode */
-      switch(I)
-      {
+        /* Read opcode and count cycles */
+        I=OpZ80(R->PC.W++);
+        /* Count cycles */
+        R->ICount-=Cycles[I];
+        /* Interpret opcode */
+        switch(I)
+        {
 #include "Codes.h"
-        case PFX_CB: CodesCB(R);break;
-        case PFX_ED: CodesED(R);break;
-        case PFX_FD: CodesFD(R);break;
-        case PFX_DD: CodesDD(R);break;
+          case PFX_CB: CodesCB(R);break;
+          case PFX_ED: CodesED(R);break;
+          case PFX_FD: CodesFD(R);break;
+          case PFX_DD: CodesDD(R);break;
+        }
+      
+      /* Unless we have come here after EI, exit */
+      if(!(R->IFF&IFF_EI)) return(R->ICount);
+      else
+      {
+        /* Done with AfterEI state */
+        R->IFF=(R->IFF&~IFF_EI)|IFF_1;
+        /* Restore the ICount */
+        R->ICount+=R->IBackup-1;
+        /* Interrupt CPU if needed */
+        if((R->IRequest!=INT_NONE)&&(R->IRequest!=INT_QUIT)) IntZ80(R,R->IRequest);
       }
-    
-    /* Unless we have come here after EI, exit */
-    if(!(R->IFF&IFF_EI)) return(R->ICount);
-    else
-    {
-      /* Done with AfterEI state */
-      R->IFF=(R->IFF&~IFF_EI)|IFF_1;
-      /* Restore the ICount */
-      R->ICount+=R->IBackup-1;
-      /* Interrupt CPU if needed */
-      if((R->IRequest!=INT_NONE)&&(R->IRequest!=INT_QUIT)) IntZ80(R,R->IRequest);
     }
    }
- }
+  } 
+  else 
+  {
+    return RunCycles;  
+  }
 }
 #endif /* EXECZ80 */
 

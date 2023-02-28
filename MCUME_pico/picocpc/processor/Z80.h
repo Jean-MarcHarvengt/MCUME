@@ -14,6 +14,7 @@
 #define Z80_H
 
  #include <stdint.h>
+ #include <stdbool.h>
 
 
 #define  EXECZ80 // run a few cycles
@@ -101,6 +102,7 @@ typedef struct
   word Trap;          /* Set Trap to address to trace from   */
   byte Trace;         /* Set Trace=1 to start tracing        */
   void *User;         /* Arbitrary user data (ID,RAM*,etc.)  */
+  bool wait;          
 } Z80;
 
 /** ResetZ80() ***********************************************/
