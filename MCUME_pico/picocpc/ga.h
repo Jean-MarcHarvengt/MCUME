@@ -30,7 +30,7 @@ struct GAConfig {
     bool hsync_active = false;
     bool vsync_active = false;
     uint8_t ram_banking = 0; // unused in CPC 464
-    bool wait_signal = true;
+    bool wait_signal = false;
 };
 
 extern struct RGB firmware_palette[27];

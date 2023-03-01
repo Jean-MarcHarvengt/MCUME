@@ -9,6 +9,7 @@
 extern uint8_t RAM[0x10000];
 extern unsigned char* bitstream;
 extern struct GAConfig ga_config;
+extern bool vsync_wait;
 
 extern void draw_vsync();
 extern void cpc_Init(void);

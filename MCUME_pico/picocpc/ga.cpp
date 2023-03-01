@@ -8,6 +8,7 @@
 #include "cpc.h"
 
 struct GAConfig ga_config;
+bool vsync_wait = true;
 uint8_t microsecond_count_ga = 0;
 
 /**
@@ -125,6 +126,11 @@ char ga_rgb_to_vga(uint8_t r, uint8_t g, uint8_t b)
 
 void address_to_pixels()
 {
+    if(!ga_config.vsync_active && is_vsync_active())
+    {
+        vsync_wait = false;
+    }
+
     // When HSYNC is active Gate-Array outputs the palette colour black
     if(ga_config.hsync_active)
     {
@@ -218,7 +224,7 @@ void address_to_pixels()
 
 bool ga_step()
 {
-    ga_config.wait_signal = microsecond_count_ga == 2;
+    ga_config.wait_signal = microsecond_count_ga == 1;
 
     if(microsecond_count_ga == 3)
     {
@@ -261,7 +267,6 @@ void select_pen_colour(uint8_t value)
 
 void rom_and_screen_mgmt(uint8_t value)
 {
-    
     if(!ga_config.hsync_active && is_hsync_active())
     {
         // Screen mode config, dictated by the least significant 2 bits.

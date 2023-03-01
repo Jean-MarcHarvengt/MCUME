@@ -115,55 +115,59 @@ void cpc_Start(char* filename)
 */
 void cpc_Step(void)
 {
-    //for(;!is_hsync_active();)
-    //{
-
     // if not (z80 wait and ga wait) then tick, otherwise stall.
     // or rather the tick will be a stall if both waits are asserted, i think that's better.
     bool interrupt_acknowledged = false;
-    if(!(pins&Z80_WAIT && ga_config.wait_signal))
+    pins = z80_tick(&CPU, pins);
+
+    if (pins & Z80_MREQ) 
     {
-        pins = z80_tick(&CPU, pins);
-        if (pins & Z80_MREQ) 
+        const uint16_t addr = Z80_GET_ADDR(pins);
+        if (pins & Z80_RD) 
         {
-            const uint16_t addr = Z80_GET_ADDR(pins);
-            if (pins & Z80_RD) 
-            {
-                uint8_t data = read_z80(addr);
-                Z80_SET_DATA(pins, data);
-            }
-            else if (pins & Z80_WR) 
-            {
-                uint8_t data = Z80_GET_DATA(pins);
-                write_z80(addr, data);
-            }
+            uint8_t data = read_z80(addr);
+            Z80_SET_DATA(pins, data);
         }
-        else if (pins & Z80_IORQ) 
+        else if (pins & Z80_WR) 
         {
-            const uint16_t port = Z80_GET_ADDR(pins);
-            if (pins & Z80_M1) 
-            {
-                // an interrupt acknowledge cycle, depending on the emulated system,
-                // put either an instruction byte, or an interrupt vector on the data bus
-                Z80_SET_DATA(pins, 0x0038);
-                interrupt_acknowledged = true;
-            }
-            else if (pins & Z80_RD) 
-            {
-                // handle IO input request at port
-                in_z80(port);
-            }
-            else if (pins & Z80_WR) 
-            {
-                // handle IO output request at port
-                uint8_t data = Z80_GET_DATA(pins);
-                out_z80(port, data);
-            }
+            uint8_t data = Z80_GET_DATA(pins);
+            write_z80(addr, data);
+        }
+    }
+    else if (pins & Z80_IORQ) 
+    {
+        const uint16_t port = Z80_GET_ADDR(pins);
+        if (pins & Z80_M1) 
+        {
+            // an interrupt acknowledge cycle, depending on the emulated system,
+            // put either an instruction byte, or an interrupt vector on the data bus
+            Z80_SET_DATA(pins, 0x0038);
+            interrupt_acknowledged = true;
+        }
+        else if (pins & Z80_RD) 
+        {
+            // handle IO input request at port
+            in_z80(port);
+        }
+        else if (pins & Z80_WR) 
+        {
+            // handle IO output request at port
+            uint8_t data = Z80_GET_DATA(pins);
+            out_z80(port, data);
         }
     }
 
     crtc_step();
     interrupt_generated = ga_step();
+    if(ga_config.wait_signal)
+    {
+        // printf("Waiting in the next cycle.\n");
+        pins = pins | Z80_WAIT;
+    } else
+    {
+        // printf("Not waiting in the next cycle.\n");
+        pins = pins & ~Z80_WAIT;
+    }
     if(interrupt_generated)
     {
         // To request an interrupt, or inject a wait state just set the respective pin
@@ -173,37 +177,25 @@ void cpc_Step(void)
 
         // request an interrupt from the CPU
         // TODO how to set the Z80_INT pin?
-
+        pins = pins | Z80_INT;
     }
 
     if(interrupt_acknowledged)
     {
+        pins = pins & ~Z80_INT;
         ga_config.interrupt_counter &= 0x1f;
     }
 
-    if(is_hsync_active())
+    if(is_hsync_active() && !vsync_wait)
     {
+        if(sline + 1 == NBLINES)
+        {
+            emu_DrawVsync();
+            vsync_wait = true;
+        }
         sline = (sline + 1) % NBLINES;
         emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
     }
-
-    if(is_vsync_active())
-    {
-        emu_DrawVsync();
-    }
-
-    while(is_hsync_active())
-    {
-        crtc_step();
-        ga_step();
-    }
-
-    while(is_vsync_active())
-    {
-        crtc_step();
-        ga_step();
-    }
-   
 }
 
 void cpc_Input(int bClick)

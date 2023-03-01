@@ -99,7 +99,7 @@ void emu_DrawVsync(void)
     volatile bool vb=vbl; 
     while (vbl==vb) {};
 #ifdef USE_VGA   
-   tft.waitSync();                   
+   // tft.waitSync();                   
 #else                      
 //    volatile bool vb=vbl; 
 //    while (vbl==vb) {};
