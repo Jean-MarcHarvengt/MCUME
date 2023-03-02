@@ -90,6 +90,7 @@ void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int 
         palette8[index]  = RGBVAL8(r,g,b);
         palette16[index]  = RGBVAL16(r,g,b);        
     }
+    printf("index: %d palette[8]: %d\n", index, palette8[index]);
 }
 
 void emu_DrawVsync(void)

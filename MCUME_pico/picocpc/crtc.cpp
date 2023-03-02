@@ -86,7 +86,7 @@ uint16_t crtc_generate_addr()
 
 bool is_within_display()
 {
-    return horizontal_count < registers[0] && scanline_count < registers[6];
+    return horizontal_count < registers[2] && scanline_count < registers[6];
 }
 
 bool is_hsync_active()

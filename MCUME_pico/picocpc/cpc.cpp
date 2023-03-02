@@ -21,9 +21,7 @@ extern "C" {
 
 #define WIDTH            320 
 #define HEIGHT           200 
-#define CYCLES_PER_FRAME 79872 //79872 //19968
 #define NBLINES          312
-#define CYCLES_PER_SCANLINE  CYCLES_PER_FRAME/NBLINES
 #define LOWER_ROM_END   0x4000
 #define UPPER_ROM_BEGIN 0xC000
 
@@ -34,9 +32,35 @@ unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static z80_t CPU;
 uint64_t pins;
 bool interrupt_generated = false;
-int sline = 0;
+int position = 0;
+int width_count = 0;
+int x, y = 0;
 
 // Helper functions
+
+void write_to_bitstream(char pixel)
+{
+    // this populates the bitstream.
+    x = position % WIDTH;
+    y = position / WIDTH;
+
+
+    bitstream[x + WIDTH * y] = pixel;
+
+    position++;
+
+    if(position == WIDTH * HEIGHT)
+    {
+        position = 0;
+        vsync_wait = true;
+    }
+}
+
+static void display_screen()
+{
+    emu_DrawScreen(bitstream, WIDTH, HEIGHT, WIDTH);
+    emu_DrawVsync();
+}
 
 char read_z80(uint16_t Addr)
 {
@@ -89,12 +113,11 @@ uint8_t in_z80(uint16_t Port)
 */
 void cpc_Init(void)
 {
-
     for(int i = 0; i < PALETTE_SIZE; i++)
     {
-        emu_SetPaletteEntry(firmware_palette[i].R, firmware_palette[i].G, firmware_palette[i].B, i);
+        emu_SetPaletteEntry(firmware_palette[hardware_colours[i]].R, firmware_palette[hardware_colours[i]].G, firmware_palette[hardware_colours[i]].B, hardware_colours[i]);
     }
-    if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT); //*HEIGHT
+    if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT);
 
     pins = z80_init(&CPU);
     memset(RAM, 0, sizeof(RAM));
@@ -163,11 +186,13 @@ void cpc_Step(void)
     {
         // printf("Waiting in the next cycle.\n");
         pins = pins | Z80_WAIT;
-    } else
+    } 
+    else
     {
         // printf("Not waiting in the next cycle.\n");
         pins = pins & ~Z80_WAIT;
     }
+
     if(interrupt_generated)
     {
         // To request an interrupt, or inject a wait state just set the respective pin
@@ -186,15 +211,10 @@ void cpc_Step(void)
         ga_config.interrupt_counter &= 0x1f;
     }
 
-    if(is_hsync_active() && !vsync_wait)
+    if(!vsync_wait)
     {
-        if(sline + 1 == NBLINES)
-        {
-            emu_DrawVsync();
-            vsync_wait = true;
-        }
-        sline = (sline + 1) % NBLINES;
-        emu_DrawLine8(bitstream, WIDTH, HEIGHT, sline);
+        display_screen();
+        vsync_wait = true;
     }
 }
 
