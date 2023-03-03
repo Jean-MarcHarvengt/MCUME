@@ -8,7 +8,7 @@
 #include "cpc.h"
 
 struct GAConfig ga_config;
-bool vsync_wait = true;
+bool vsync_wait;
 uint8_t microsecond_count_ga = 0;
 
 /**
@@ -130,7 +130,13 @@ void address_to_pixels()
         vsync_wait = false;
     }
 
-    if(ga_config.hsync_active || ga_config.vsync_active)
+    // if(ga_config.hsync_active || ga_config.vsync_active)
+    // {
+    //     // need to output border/black somehow. how to do that considering the 320x200 buffer?
+    //     return;
+    // }
+
+    if(!is_within_display())
     {
         return;
     }
@@ -141,70 +147,60 @@ void address_to_pixels()
         uint8_t encodedByte = RAM[address];
         uint8_t pixel0, pixel1, pixel2, pixel3;
         uint8_t* pixels = (uint8_t*) calloc(4, 8*sizeof(uint8_t));
-        if(address >= 0xC000)
+        switch(ga_config.screen_mode)
         {
-            //printf("address from CRTC: %x \nRAM data: %x \n", address, RAM[address]);
-            switch(ga_config.screen_mode)
-            {
-                case 0:
-                    pixel0 = (encodedByte & 0x80) >> 7 |
-                            (encodedByte & 0x08) >> 2 |
-                            (encodedByte & 0x20) >> 3 |
-                            (encodedByte & 0x02) << 2;
-                    pixel1 = (encodedByte & 0x40) >> 6 |
-                            (encodedByte & 0x04) >> 1 |
-                            (encodedByte & 0x10) >> 2 |
-                            (encodedByte & 0x01) << 3;
-                    pixels[0] = pixel0;
-                    pixels[1] = pixel1;
+            case 0:
+                pixel0 = (encodedByte & 0x80) >> 7 |
+                        (encodedByte & 0x08) >> 2 |
+                        (encodedByte & 0x20) >> 3 |
+                        (encodedByte & 0x02) << 2;
+                pixel1 = (encodedByte & 0x40) >> 6 |
+                        (encodedByte & 0x04) >> 1 |
+                        (encodedByte & 0x10) >> 2 |
+                        (encodedByte & 0x01) << 3;
+                pixels[0] = pixel0;
+                pixels[1] = pixel1;
 
-                    for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
-                    {
-                        for(int color = 0; color < 4; color++)
-                        {
-                            write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
-                                                          firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
-                                                          firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
-                        }
-                    }
-                    break;
-                case 1:
-                    pixel0 = (encodedByte & 0x80) >> 7 |
-                            (encodedByte & 0x08) >> 2;
-                    pixel1 = (encodedByte & 0x40) >> 6 |
-                            (encodedByte & 0x04) >> 1;
-                    pixel2 = (encodedByte & 0x02) |
-                            (encodedByte & 0x20) >> 5;
-                    pixel3 = (encodedByte & 0x10) >> 4 |
-                            (encodedByte & 0x01) << 1;
-                    pixels[0] = pixel0;
-                    pixels[1] = pixel1;
-                    pixels[2] = pixel2;
-                    pixels[3] = pixel3;
+                for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
+                {
+                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
+                }
+                break;
+            case 1:
+                pixel0 = (encodedByte & 0x80) >> 7 |
+                        (encodedByte & 0x08) >> 2;
+                pixel1 = (encodedByte & 0x40) >> 6 |
+                        (encodedByte & 0x04) >> 1;
+                pixel2 = (encodedByte & 0x02) |
+                        (encodedByte & 0x20) >> 5;
+                pixel3 = (encodedByte & 0x10) >> 4 |
+                        (encodedByte & 0x01) << 1;
+                pixels[0] = pixel0;
+                pixels[1] = pixel1;
+                pixels[2] = pixel2;
+                pixels[3] = pixel3;
 
-                    for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
-                    {
-                        for(int color = 0; color < 2; color++)
-                        {
-                            write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
-                                                          firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
-                                                          firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
-                        }
-                    }
-                    break;
-                case 2:
-                    uint8_t pixel;
-                    for (int color = 0; color < 8; color++)
-                    {
-                        pixel = (encodedByte >> 7 - color) & 1;
-                        write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].R,
-                                                      firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].G,
-                                                      firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].B));
-                    }
-                    break;
-            }
-            free(pixels);
-        }    
+                for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
+                {
+                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
+                }
+                break;
+            case 2:
+                uint8_t pixel;
+                for (int color = 0; color < 8; color++)
+                {
+                    pixel = (encodedByte >> 7 - color) & 1;
+                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].R,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].G,
+                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].B));
+                }
+                break;
+        }
+        free(pixels);  
     }
 }
 

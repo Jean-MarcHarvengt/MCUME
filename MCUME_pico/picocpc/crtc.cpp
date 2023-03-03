@@ -5,23 +5,24 @@
 #include "crtc.h"
 
 uint8_t registers[16] = {
-    63,                 // horizontal_total
-    40,                 // horitzontal_displayed
-    46,                 // horizontal_sync_position
-    142,                // horizontal_and_vertical_sync_widths -> VVVVHHHH, so bits 0-3 correspond to hsync width, 4-7 to vsync.
-    38,                 // vertical_total
+    0,                 // horizontal_total
+    0,                 // horitzontal_displayed
+    0,                 // horizontal_sync_position
+    0,                // horizontal_and_vertical_sync_widths -> VVVVHHHH, so bits 0-3 correspond to hsync width, 4-7 to vsync.
+    0,                 // vertical_total
     0,                  // vertical_total_adjust
-    25,                 // vertical_displayed
-    30,                 // vertical_sync_position
+    0,                 // vertical_displayed
+    0,                 // vertical_sync_position
     0,                  // interlace_and_skew
-    7,                  // max_raster_address
+    0,                  // max_raster_address
     0,                  // cursor_start_raster
     0,                  // cursor_end_raster
-    48,                 // display_start_addr_high
+    0,                 // display_start_addr_high
     0,                  // display_start_addr_low
     0,                  // cursor_addr_high
     0                   // cursor_addr_low
 };
+
 uint8_t selected_register = 0;
 uint8_t horizontal_count = 0;
 uint8_t char_line_count = 0;
@@ -51,7 +52,6 @@ void crtc_step()
         
             scanline_count = 0;
             char_line_count++;
-            
         }
 
         if(char_line_count > registers[4])
@@ -86,7 +86,7 @@ uint16_t crtc_generate_addr()
 
 bool is_within_display()
 {
-    return horizontal_count < registers[2] && scanline_count < registers[6];
+    return horizontal_count < registers[1] && scanline_count < registers[6];
 }
 
 bool is_hsync_active()

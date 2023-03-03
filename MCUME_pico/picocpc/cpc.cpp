@@ -115,12 +115,16 @@ void cpc_Init(void)
 {
     for(int i = 0; i < PALETTE_SIZE; i++)
     {
-        emu_SetPaletteEntry(firmware_palette[hardware_colours[i]].R, firmware_palette[hardware_colours[i]].G, firmware_palette[hardware_colours[i]].B, hardware_colours[i]);
+        emu_SetPaletteEntry(firmware_palette[hardware_colours[i]].R, 
+                            firmware_palette[hardware_colours[i]].G, 
+                            firmware_palette[hardware_colours[i]].B, 
+                            hardware_colours[i]);
     }
     if (bitstream == 0) bitstream = (unsigned char *)emu_Malloc(WIDTH*HEIGHT);
 
     pins = z80_init(&CPU);
     memset(RAM, 0, sizeof(RAM));
+    vsync_wait = true;
 }
 
 /**
@@ -128,9 +132,7 @@ void cpc_Init(void)
 */
 void cpc_Start(char* filename)
 {
-    ga_config.lower_rom_enable = true;
-    ga_config.upper_rom_enable = false;
-    ga_config.interrupt_counter = 0;
+
 }
 
 /**
@@ -186,7 +188,7 @@ void cpc_Step(void)
     {
         // printf("Waiting in the next cycle.\n");
         pins = pins | Z80_WAIT;
-    } 
+    }
     else
     {
         // printf("Not waiting in the next cycle.\n");
