@@ -125,16 +125,11 @@ char ga_rgb_to_vga(uint8_t r, uint8_t g, uint8_t b)
 
 void address_to_pixels()
 {
-    if(!ga_config.vsync_active && is_vsync_active())
+    if(ga_config.vsync_active && !is_vsync_active())
     {
         vsync_wait = false;
+        return;
     }
-
-    // if(ga_config.hsync_active || ga_config.vsync_active)
-    // {
-    //     // need to output border/black somehow. how to do that considering the 320x200 buffer?
-    //     return;
-    // }
 
     if(!is_within_display())
     {
@@ -146,7 +141,6 @@ void address_to_pixels()
         uint16_t address = crtc_generate_addr() + i;
         uint8_t encodedByte = RAM[address];
         uint8_t pixel0, pixel1, pixel2, pixel3;
-        uint8_t* pixels = (uint8_t*) calloc(4, 8*sizeof(uint8_t));
         switch(ga_config.screen_mode)
         {
             case 0:
@@ -158,15 +152,8 @@ void address_to_pixels()
                         (encodedByte & 0x04) >> 1 |
                         (encodedByte & 0x10) >> 2 |
                         (encodedByte & 0x01) << 3;
-                pixels[0] = pixel0;
-                pixels[1] = pixel1;
-
-                for(int pixelIdx = 0; pixelIdx < 2; pixelIdx++)
-                {
-                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
-                }
+                write_to_bitstream(ga_config.pen_colours[pixel0]);                
+                write_to_bitstream(ga_config.pen_colours[pixel1]);
                 break;
             case 1:
                 pixel0 = (encodedByte & 0x80) >> 7 |
@@ -177,30 +164,20 @@ void address_to_pixels()
                         (encodedByte & 0x20) >> 5;
                 pixel3 = (encodedByte & 0x10) >> 4 |
                         (encodedByte & 0x01) << 1;
-                pixels[0] = pixel0;
-                pixels[1] = pixel1;
-                pixels[2] = pixel2;
-                pixels[3] = pixel3;
-
-                for(int pixelIdx = 0; pixelIdx < 4; pixelIdx++)
-                {
-                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].R,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].G,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixels[pixelIdx]]]].B));
-                }
+                write_to_bitstream(ga_config.pen_colours[pixel0]);
+                write_to_bitstream(ga_config.pen_colours[pixel1]);
+                write_to_bitstream(ga_config.pen_colours[pixel2]);
+                write_to_bitstream(ga_config.pen_colours[pixel3]);
                 break;
             case 2:
                 uint8_t pixel;
                 for (int color = 0; color < 8; color++)
                 {
                     pixel = (encodedByte >> 7 - color) & 1;
-                    write_to_bitstream(ga_rgb_to_vga(firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].R,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].G,
-                                                    firmware_palette[hardware_colours[ga_config.pen_colours[pixel]]].B));
+                    write_to_bitstream(ga_config.pen_colours[pixel]);
                 }
                 break;
-        }
-        free(pixels);  
+        } 
     }
 }
 
@@ -211,18 +188,18 @@ bool ga_step()
     if(microsecond_count_ga == 3)
     {
         bool interrupt_generated = update_interrupts();
-        //if(is_within_display())
-        //{
         address_to_pixels();
-        //}
         
         ga_config.hsync_active = is_hsync_active();
         ga_config.vsync_active = is_vsync_active();
         microsecond_count_ga = (microsecond_count_ga + 1) % 4;
         return interrupt_generated;
     }
-    microsecond_count_ga = (microsecond_count_ga + 1) % 4;
-    return false;
+    else
+    {
+        microsecond_count_ga = (microsecond_count_ga + 1) % 4;
+        return false;  
+    }
 }
  
 void select_pen(uint8_t value)
@@ -249,7 +226,7 @@ void select_pen_colour(uint8_t value)
 
 void rom_and_screen_mgmt(uint8_t value)
 {
-    if(!ga_config.hsync_active && is_hsync_active())
+    if(ga_config.hsync_active && !is_hsync_active())
     {
         // Screen mode config, dictated by the least significant 2 bits.
         // Effective at next line.
@@ -278,9 +255,7 @@ void rom_and_screen_mgmt(uint8_t value)
     if ((value >> 3) & 0b1) ga_config.upper_rom_enable = false; else ga_config.upper_rom_enable = true;
 
     // Interrupt delay control.
-    if ((value >> 4) & 0b1) {
-        ga_config.interrupt_counter = 0;
-    }
+    if ((value >> 4) & 0b1) ga_config.interrupt_counter = 0;
 }
 
 /** Bit 7   Bit 6    Function

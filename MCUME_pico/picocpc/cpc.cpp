@@ -44,9 +44,9 @@ void write_to_bitstream(char pixel)
     x = position % WIDTH;
     y = position / WIDTH;
 
-
-    bitstream[x + WIDTH * y] = pixel;
-
+    bitstream[x + y * WIDTH] = VGA_RGB(firmware_palette[hardware_colours[pixel]].R,
+                                       firmware_palette[hardware_colours[pixel]].G,
+                                       firmware_palette[hardware_colours[pixel]].B); 
     position++;
 
     if(position == WIDTH * HEIGHT)
@@ -90,16 +90,16 @@ void out_z80(uint16_t Port, uint8_t Value)
 {
     if(!(Port & 0x8000)) write_gate_array(Value);           // The Gate Array is selected when bit 15 is set to 0.
     if(!(Port & 0x4000)) write_crt_controller(Port, Value); // The CRTC is selected when bit 14 is set to 0. 
-    if(!(Port & 0x2000)) 
-    {
-        // upper rom bank number. ROM banking needs to be done regardless of CPC model
-        // The Upper ROM Bank Number (in range of 0x00..0xFF) to be mapped to memory at 0xC000..0xFFFF
+    // if(!(Port & 0x2000)) 
+    // {
+    //     // upper rom bank number. ROM banking needs to be done regardless of CPC model
+    //     // The Upper ROM Bank Number (in range of 0x00..0xFF) to be mapped to memory at 0xC000..0xFFFF
 
-        // byte req_bank_number = Value & 15;
-        // if(ga_config.upper_rom_enable)
-        // {
-        // }
-    }                        
+    //     // byte req_bank_number = Value & 15;
+    //     // if(ga_config.upper_rom_enable)
+    //     // {
+    //     // }
+    // }                        
 }
 
 uint8_t in_z80(uint16_t Port)
@@ -124,7 +124,7 @@ void cpc_Init(void)
 
     pins = z80_init(&CPU);
     memset(RAM, 0, sizeof(RAM));
-    vsync_wait = true;
+    //vsync_wait = true;
 }
 
 /**

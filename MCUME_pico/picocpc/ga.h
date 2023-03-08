@@ -13,7 +13,6 @@ void select_pen_colour(uint8_t value);
 void rom_and_screen_mgmt(uint8_t value);
 
 #define PEN_NUMBER 17  // Mode 0 has 16 pens, mode 1 has 4 pens and mode 2 has 2 pens.
-#define VGA_RGB(r,g,b)   ( (((r>>5)&0x07)<<5) | (((g>>5)&0x07)<<2) | (((b>>6)&0x3)<<0) )
 
 struct RGB {
     uint8_t R, G, B;
