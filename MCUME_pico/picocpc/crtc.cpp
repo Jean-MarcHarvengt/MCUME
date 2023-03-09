@@ -4,20 +4,20 @@
 
 #include "crtc.h"
 
-uint8_t registers[16] = {
-    64,                 // horizontal_total
-    0,                 // horitzontal_displayed
-    0,                 // horizontal_sync_position
-    0,                // horizontal_and_vertical_sync_widths -> VVVVHHHH, so bits 0-3 correspond to hsync width, 4-7 to vsync.
-    0,                 // vertical_total
+int registers[16] = {
+    63,                 // horizontal_total
+    40,                 // horitzontal_displayed
+    46,                 // horizontal_sync_position
+    142,                // horizontal_and_vertical_sync_widths -> VVVVHHHH, so bits 0-3 correspond to hsync width, 4-7 to vsync.
+    38,                 // vertical_total
     0,                  // vertical_total_adjust
-    0,                 // vertical_displayed
-    0,                 // vertical_sync_position
+    25,                 // vertical_displayed
+    30,                 // vertical_sync_position
     0,                  // interlace_and_skew
-    0,                  // max_raster_address
+    7,                  // max_raster_address
     0,                  // cursor_start_raster
     0,                  // cursor_end_raster
-    0,                 // display_start_addr_high
+    48,                 // display_start_addr_high
     0,                  // display_start_addr_low
     0,                  // cursor_addr_high
     0                   // cursor_addr_low
@@ -37,7 +37,7 @@ void crtc_step()
     if(microsec_count_crtc == 3)
     {
         horizontal_count++;
-        
+
         if(horizontal_count > registers[0])
         {
             // horizontal counter is equal to the Horizontal Total Register.
@@ -64,6 +64,7 @@ void crtc_step()
         {
             memory_start_addr = ((uint16_t) registers[12] << 8) | registers[13];
         }
+
     }
     microsec_count_crtc = (microsec_count_crtc + 1) % 4;
 }
@@ -85,7 +86,7 @@ uint16_t crtc_generate_addr()
 
 bool is_within_display()
 {
-    return horizontal_count < registers[1] && scanline_count < registers[6];
+    return horizontal_count < registers[1] && char_line_count < registers[6];
 }
 
 bool is_hsync_active()
@@ -100,8 +101,8 @@ bool is_vsync_active()
 {
     const uint8_t char_height = registers[9] + 1;
     int8_t char_lines_counted = (int8_t) char_line_count - registers[7];
-    return char_height * char_lines_counted + scanline_count >= 0 && 
-           char_height * char_lines_counted + scanline_count < 16 * 8;
+    return char_height * char_lines_counted  >= 0 && 
+           char_height * char_lines_counted  <= 16;
 }
 
 void write_crt_controller(unsigned short address, uint8_t value)

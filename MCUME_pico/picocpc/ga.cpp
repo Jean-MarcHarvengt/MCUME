@@ -103,15 +103,9 @@ bool update_interrupts()
         ga_config.vsync_delay_count = 0;
     }
     
-    //printf("vsync_delay_count: %d \n", ga_config.vsync_delay_count);
-
     if(ga_config.vsync_delay_count == 2)
     {
-        if(ga_config.interrupt_counter >= 32)
-        {
-            //printf("Interrupt generated! \n");
-            interrupt_generated = true;
-        }
+        interrupt_generated = ga_config.interrupt_counter >= 32;
         ga_config.interrupt_counter = 0;
     }
 
@@ -125,11 +119,17 @@ char ga_rgb_to_vga(uint8_t r, uint8_t g, uint8_t b)
 
 void address_to_pixels()
 {
-    if(ga_config.vsync_active && !is_vsync_active())
+    if(!ga_config.vsync_active && is_vsync_active())
     {
         vsync_wait = false;
-        return;
+        // return;
     }
+
+    // this gets rid of the horizontal scrolling, but "locomotive software ltd" doesnt show up.
+    // if(is_hsync_active() || is_vsync_active())
+    // {
+    //     return;
+    // }
 
     if(!is_within_display())
     {

@@ -47,6 +47,7 @@ void write_to_bitstream(char pixel)
     bitstream[x + y * WIDTH] = VGA_RGB(firmware_palette[hardware_colours[pixel]].R,
                                        firmware_palette[hardware_colours[pixel]].G,
                                        firmware_palette[hardware_colours[pixel]].B); 
+    
     position++;
 
     if(position == WIDTH * HEIGHT)
