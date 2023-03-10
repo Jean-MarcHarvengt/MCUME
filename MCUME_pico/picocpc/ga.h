@@ -15,7 +15,7 @@ void rom_and_screen_mgmt(uint8_t value);
 #define PEN_NUMBER 17  // Mode 0 has 16 pens, mode 1 has 4 pens and mode 2 has 2 pens.
 
 struct RGB {
-    uint8_t R, G, B;
+    int R, G, B;
 };
 
 struct GAConfig {

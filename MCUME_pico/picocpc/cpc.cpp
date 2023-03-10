@@ -27,7 +27,7 @@ extern "C" {
 
 // Declarations of instances of the RAM, VRAM, processor and other required components.
 
-uint8_t RAM[0x10000];      // 64k
+uint8_t RAM[0x10000];         // 64k
 unsigned char* bitstream = 0; // 16k video ram to be used by PIO.
 static z80_t CPU;
 uint64_t pins;
@@ -41,6 +41,7 @@ int x, y = 0;
 void write_to_bitstream(char pixel)
 {
     // this populates the bitstream.
+
     x = position % WIDTH;
     y = position / WIDTH;
 
@@ -49,12 +50,13 @@ void write_to_bitstream(char pixel)
                                        firmware_palette[hardware_colours[pixel]].B); 
     
     position++;
-
+    
     if(position == WIDTH * HEIGHT)
     {
         position = 0;
         vsync_wait = true;
     }
+    
 }
 
 static void display_screen()
@@ -114,7 +116,7 @@ uint8_t in_z80(uint16_t Port)
 */
 void cpc_Init(void)
 {
-    for(int i = 0; i < PALETTE_SIZE; i++)
+    for(int i = 0; i < 32; i++)
     {
         emu_SetPaletteEntry(firmware_palette[hardware_colours[i]].R, 
                             firmware_palette[hardware_colours[i]].G, 

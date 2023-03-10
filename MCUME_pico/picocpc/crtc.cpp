@@ -101,8 +101,8 @@ bool is_vsync_active()
 {
     const uint8_t char_height = registers[9] + 1;
     int8_t char_lines_counted = (int8_t) char_line_count - registers[7];
-    return char_height * char_lines_counted  >= 0 && 
-           char_height * char_lines_counted  <= 16;
+    return char_height * char_lines_counted >= 0 && 
+           char_height * char_lines_counted <= 16;
 }
 
 void write_crt_controller(unsigned short address, uint8_t value)
