@@ -197,6 +197,14 @@ void odd_Step(void)
 {
   run();
  
-	emu_DrawScreen((unsigned char *)getGBuf()+BORDERW/2, BMPW-BORDERW, BMPH, BMPW);
+#if SINGLELINE_RENDERING
+  unsigned char * src=(unsigned char *)getGBuf();
+  for (int y=0; y<BMPH; y++) {
+  	emu_DrawLinePal16(&src[y*BMPW], BMPW, BMPH, y);
+  }	
+#else
+	emu_DrawScreenPal16((unsigned char *)getGBuf()+BORDERW/2, BMPW-BORDERW, BMPH, BMPW);
+#endif    
+
   emu_DrawVsync();
 }

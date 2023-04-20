@@ -297,6 +297,7 @@ static char textkey[1];
 
 static bool res=false;
 static bool firsttime=true;
+static int  loadtimeout=100; //100*20ms;
 
 #ifndef PICOMPUTER
 /*
@@ -411,17 +412,22 @@ void c64_Input(int bClick) {
     } 
     else
 */    
-#endif 
+#endif
+    if (loadtimeout > 0) {
+      loadtimeout--; 
+    }
     if ( (bClick & MASK_KEY_USER1) && !(emu_GetPad() & MASK_OSKB) ) {
-      if (firsttime) {
-        firsttime = false;
-        textseq = textload;
-        nbkeys = strlen(textseq);   
-        kcnt=0;
+      if (loadtimeout == 0) {
+        if (firsttime) {
+          firsttime = false;
+          textseq = textload;
+          nbkeys = strlen(textseq);   
+          kcnt=0;
+        }
+        else {
+          cpu.swapJoysticks = !cpu.swapJoysticks;
+        }        
       }
-      else {
-        cpu.swapJoysticks = !cpu.swapJoysticks;
-      }        
     } 
     else  
     {

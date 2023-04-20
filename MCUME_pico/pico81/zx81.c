@@ -29,7 +29,7 @@ int zx80=0;
 int autoload=1;
 
 
-struct { unsigned char R,G,B; } Palette[16] = {
+struct { unsigned char R,G,B; } Palette[2] = {
   {   0,   0,   0},
   { 255, 255, 255}
 };
@@ -235,7 +235,7 @@ void bitbufBlit(unsigned char * buf)
         d <<= 1;
       }       
     }
-    emu_DrawLine(&XBuf[0], WIDTH, HEIGHT, y);   
+    emu_DrawLinePal16(&XBuf[0], WIDTH, HEIGHT, y);   
     buf += (ZX_VID_FULLWIDTH/8);
   }
 }
@@ -250,8 +250,7 @@ static void updateKeyboard (void)
   //else 
   {
     int shift = hk;
-    if (hk >=128) hk -= 128;
-    else if (hk >=64) hk -= 64;    
+    if (hk >=64) hk -= 64;    
     // scan all possibilities
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
@@ -577,8 +576,8 @@ void z81_Start(char * filename)
   //emu_setKeymap(1); 
   
   if ( (endsWith(filename, ".80")) || (endsWith(filename, ".o")) || (endsWith(filename, ".O")))  {
-    zx80=1;
-    ramsize=48;
+    zx80 = 1;
+    ramsize = 48;
     //emu_setKeymap(0);    
   }
   else if (endsWith(filename, ".56") ) {

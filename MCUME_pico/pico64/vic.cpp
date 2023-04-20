@@ -52,6 +52,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b)) 
 
@@ -69,11 +70,7 @@
 #define BORDER_LEFT           (400-320)/2
 #define BORDER_RIGHT          0
 
-#ifdef USE_VGA
-typedef uint8_t tpixel;
-#else
 typedef uint16_t tpixel;
-#endif
 
 #define MAXCYCLESSPRITES0_2       3
 #define MAXCYCLESSPRITES3_7       5
@@ -1275,7 +1272,7 @@ typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint1
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
 
-static tpixel linebuffer[SCREEN_WIDTH];
+static tpixel linebuffer[SCREEN_WIDTH*16];
 
 void vic_do(void) {
 
@@ -1396,11 +1393,7 @@ void vic_do(void) {
   }
 
   //max_x =  (!cpu.vic.CSEL) ? 40:38;
-#ifdef USE_VGA
-  p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE));
-#else
   p = &linebuffer[0];
-#endif
   pe = p + SCREEN_WIDTH;
   //Left Screenborder: Cycle 10
   spl = &cpu.vic.spriteLine[24];
@@ -1563,11 +1556,7 @@ g-Zugriff
   if (!cpu.vic.CSEL) {
     cpu_clock(1);
     uint16_t col = cpu.vic.colors[0];
-#ifdef USE_VGA
-    p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + BORDER_LEFT;
-#else
     p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
-#endif
 #if 0
     // Sprites im Rand
     uint16_t sprite;
@@ -1589,11 +1578,7 @@ g-Zugriff
 #endif
 
     //Rand rechts:
-#ifdef USE_VGA
-    p = (tpixel*)emu_LineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
-#else
     p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
-#endif
     pe = p + 9;
 
 #if 0
@@ -1613,12 +1598,8 @@ g-Zugriff
 
   }
 
-#ifdef USE_VGA
-  //emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
-#else
   emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
-  //memset(&linebuffer[0],0,320*2);
-#endif
+  memset(&linebuffer[0],0,SCREEN_WIDTH*2);
 
 
 

@@ -141,7 +141,7 @@ void displayscanline(int y, int f_flash)
     XBuf[col++] = bordercolor;
   }
   
-  emu_DrawLine(XBuf, WIDTH, HEIGHT, y);
+  emu_DrawLinePal16(XBuf, WIDTH, HEIGHT, y);
 }
 
 #ifdef HAS_SND

@@ -461,6 +461,9 @@ void emu_KeyboardOnDown(int keymodifer, int key) {
 void emu_KeyboardOnUp(int keymodifer, int key) {
 }
 
+#define R32(rgb) ((rgb>>16)&0xff) 
+#define G32(rgb) ((rgb>>8)&0xff) 
+#define B32(rgb) (rgb & 0xff) 
 
 void at5_Init(void)
 {

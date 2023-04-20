@@ -180,7 +180,7 @@ void tv_display (void)
   /* Only display if the frame is a valid one. */
   //if ( (tv_counter % nOptions_SkipFrames) == 0)
   //{
-	  emu_DrawScreen(VBuf, tv_width, tv_height, tv_width);
+	  emu_DrawScreenPal16(VBuf, tv_width, tv_height, tv_width);
     emu_DrawVsync();
   //}
   //tv_counter++;

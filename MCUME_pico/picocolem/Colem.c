@@ -284,7 +284,9 @@ void Joysticks(void)
           JS[N]&=0xBFFF; //Fire 1
   }
 #if (defined(ILI9341) || defined(ST7789)) && defined(USE_VGA)
-#else  
+#else
+#ifdef PICOZX
+#else 
   if (k & MASK_KEY_USER1)
   {
           JS[N]&=0xFFBF; //Fire 2
@@ -293,6 +295,7 @@ void Joysticks(void)
   {
           JS[0]=(JS[0]&0xFFF0)|(2); //1
   }
+#endif 
 #endif  
   //   JS[0]=(JS[0]&0xFFF0)|(12);
   //   JS[0]=(JS[0]&0xFFF0)|(13);
@@ -437,7 +440,7 @@ word LoopZ80(Z80 *R, int * ras)
     if(!UCount) {
       (SCR[ScrMode].Refresh)(CurLine);
 #if SINGLELINE_RENDERING
-      emu_DrawLine(XBuf, WIDTH, HEIGHT, CurLine);
+      emu_DrawLinePal16(XBuf, WIDTH, HEIGHT, CurLine);
 #else
 #endif    
     }

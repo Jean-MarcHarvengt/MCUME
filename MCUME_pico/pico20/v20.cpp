@@ -358,7 +358,7 @@ void v20_Step(void)
 
   int hk=ihk;
 
-#ifdef PICOMPUTER
+#if (defined(PICOMPUTER) || defined(PICOZX) )
   if (hk) {
     int scan = ascii2scan[ihk];
     if (scan & 0x10000) mos6522.setShiftPressed(true);
@@ -373,7 +373,7 @@ void v20_Step(void)
 
 
   int k=ik; 
-#ifdef PICOMPUTER
+#if (defined(PICOMPUTER) || defined(PICOZX) )
   // Ignore joypad if shift is pressed!!!
   if ( !(k & MASK_KEY_USER2) )
 #endif
@@ -410,7 +410,8 @@ void v20_Step(void)
     } 
   }  
 
-#ifndef PICOMPUTER
+#if (defined(PICOMPUTER) || defined(PICOZX) )
+#else
   if ( !(pik & MASK_KEY_USER1) && (k & MASK_KEY_USER1) ) {
     mos6522.setKeyPressed(0xEF7F);
     mos6522.setShiftPressed(true);  

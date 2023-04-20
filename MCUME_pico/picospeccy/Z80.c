@@ -18,6 +18,8 @@
 #include "Tables.h"
 #include <stdio.h>
 
+#include "emuapi.h"
+
 #undef DEBUG
 /** INLINE ***************************************************/
 /** C99 standard has "inline", but older compilers used     **/
@@ -546,6 +548,7 @@ int ExecZ80(register Z80 *R,register int RunCycles)
         asm volatile("nop");
         asm volatile("nop");
         asm volatile("nop");
+if ( !emu_IsVga() ) {
         asm volatile("nop");
         asm volatile("nop");       
         asm volatile("nop");
@@ -568,25 +571,8 @@ int ExecZ80(register Z80 *R,register int RunCycles)
         asm volatile("nop");
         asm volatile("nop");
         asm volatile("nop");   
-
-#ifndef USE_VGA
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-        asm volatile("nop");
-#endif        
+}
+    
       }
       /* Interpret opcode */
       switch(I)

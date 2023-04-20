@@ -33,9 +33,6 @@ typedef struct
 } CONTROLLER;
 
 
-
-
-
 // global variables
 unsigned char mem[MEMORY_SIZE];
 unsigned char * memory=mem;
@@ -246,6 +243,10 @@ static void Initialise(void)
   //}  
   //add_esc(0xe459, ESC_SIOV);  
 }
+
+#define R32(rgb) ((rgb>>16)&0xff) 
+#define G32(rgb) ((rgb>>8)&0xff) 
+#define B32(rgb) (rgb & 0xff) 
 
 void at8_Init(void)
 {

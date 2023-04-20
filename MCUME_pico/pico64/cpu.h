@@ -49,7 +49,7 @@
 #include "Teensy64.h"
 #include "roms.h"
 #include "patches.h"
-#include "util.h"
+#include "timerutil.h"
 #include "pla.h"
 #include "vic.h"
 #include "keyboard.h"

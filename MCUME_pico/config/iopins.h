@@ -8,7 +8,6 @@
 
 // Speaker
 #define AUDIO_PIN       28
-
 // VGA
 /*
 2-9 RRRGGGBB
@@ -48,10 +47,10 @@
 #define I2C_SCL_IO      15? 
 #define I2C_SDA_IO      14?
 */
-
 #else
 
-#if (defined(PICOMPUTER) && defined(USE_VGA) )   
+#if (defined(PICOMPUTER) && defined(USE_VGA) )
+
 // Speaker
 #define AUDIO_PIN       9
 // VGA
@@ -59,6 +58,18 @@
    CSYNC */
 #define VGA_COLORBASE   0
 #define VGA_SYNCBASE    8
+#else
+
+#ifdef PICOZX
+
+// Speaker
+#define AUDIO_PIN       7
+// VGA
+/* RRGGBB
+   CSYNC */
+#define VGA_COLORBASE   0
+#define VGA_SYNCBASE    6
+
 #else
 // Speaker
 #define AUDIO_PIN       0
@@ -68,10 +79,23 @@
 #define VGA_COLORBASE   2
 #define VGA_SYNCBASE    14
 #define VGA_VSYNC       15
+#endif
 
 #endif
 
+#ifdef PICOZX
 
+#define TFT_SPIREG      spi0
+#define TFT_SPIDREQ     DREQ_SPI0_TX
+#define TFT_SCLK        2
+#define TFT_MOSI        3
+#define TFT_MISO        255 // Not required, used for DC... 
+#define TFT_DC          6
+#define TFT_RST         255
+#define TFT_CS          5
+#define TFT_BACKLIGHT   4
+
+#else
 // TFT
 #define TFT_SPIREG      spi0
 #define TFT_SPIDREQ     DREQ_SPI0_TX
@@ -79,11 +103,13 @@
 #define TFT_MOSI        19
 #define TFT_MISO        255 // Not required, used for DC... 
 #define TFT_DC          16
+
 #ifdef PICOMPUTER
 #ifdef PICOMPUTERMAX
 #define TFT_RST         255
 #define TFT_CS          21
 #define TFT_BACKLIGHT   20
+
 #else
 #define TFT_RST         21
 #define TFT_CS          255
@@ -95,7 +121,7 @@
 #define TFT_CS          17
 #define TFT_BACKLIGHT   255 // hardwired to 3.3v
 #endif
-
+#endif
 
 // SD (see SPI0 in code!!!)
 #define SD_SPIREG       spi1
@@ -103,7 +129,7 @@
 #define SD_MOSI         11 //15
 #define SD_MISO         12 
 #define SD_CS           13
-#define SD_DETECT       255 // 22
+#define SD_DETECT       255 //22
 
 // PSRAM (exclusive with TFT)
 #define PSRAM_SPIREG    spi0
@@ -114,7 +140,9 @@
 
 
 #ifdef PICOMPUTER
-#if defined(USE_VGA)  
+
+#if defined(USE_VGA)
+
 // Keyboard matrix 
 //Cols (out)
 #define KCOLOUT1        20
@@ -130,6 +158,7 @@
 #define KROWIN4         17
 #define KROWIN5         18
 #define KROWIN6         19
+
 #else
 // Keyboard matrix 
 //Cols (out)
@@ -146,11 +175,12 @@
 #define KROWIN4         8
 #define KROWIN5         7
 #define KROWIN6         22
+
 #endif
 
 #define KLED            25
-
 #else
+
 #ifdef MCUME_REV1
 
 // Analog joystick (primary) for JOY2 and 2 extra buttons
@@ -159,8 +189,30 @@
 #define PIN_JOY2_BTN    22
 #define PIN_KEY_USER1   20
 #define PIN_KEY_USER2   21 
+
 #else
 
+#ifdef PICOZX
+// Keyboard matrix 
+//Cols (out)
+#define KCOLOUT1        8
+#define KCOLOUT2        9
+#define KCOLOUT3        14
+#define KCOLOUT4        15
+#define KCOLOUT5        16
+#define KCOLOUT6        17
+#define KCOLOUT7        18
+//Rows (in)
+#define KROWIN1         19
+#define KROWIN2         20
+#define KROWIN3         21
+#define KROWIN4         22
+#define KROWIN5         26
+#define KROWIN6         27
+#define KROWIN7         28
+
+
+#else
 // Digital joystick (primary) for JOY2 and 2 extra buttons
 //#define PIN_JOY2_A1X    26
 //#define PIN_JOY2_A2Y    27
@@ -175,7 +227,7 @@
 
 #endif
 #endif
-
+#endif
 #endif
 
 // Second joystick (Not available on PICO)

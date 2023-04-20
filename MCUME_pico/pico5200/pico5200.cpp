@@ -1,5 +1,7 @@
 #include "pico.h"
 #include "pico/stdlib.h"
+#include "hardware/clocks.h"
+#include "hardware/vreg.h"
 
 extern "C" {
   #include "iopins.h"  
@@ -11,72 +13,80 @@ extern "C" {
 #include "atari5200.h"
 }
 #include <stdio.h>
+#include "pico_dsp.h"
 
-#include "hardware/clocks.h"
-#include "hardware/vreg.h"
+volatile bool vbl=true;
 
-#ifdef USE_VGA
-#include "vga_t_dma.h"
-#else
-#include "tft_t_dma.h"
-#endif
-TFT_T_DMA tft;
+bool repeating_timer_callback(struct repeating_timer *t) {
+    //uint16_t bClick = emu_DebounceLocalKeys();
+    //emu_Input(bClick);     
+    if (vbl) {
+        vbl = false;
+    } else {
+        vbl = true;
+    }   
+    return true;
+}
 
+PICO_DSP tft;
 static int skip=0;
 
 int main(void) {
-    vreg_set_voltage(VREG_VOLTAGE_1_05);
+//    vreg_set_voltage(VREG_VOLTAGE_1_05);
 //    set_sys_clock_khz(125000, true);    
 //    set_sys_clock_khz(150000, true);    
 //    set_sys_clock_khz(133000, true);    
 //    set_sys_clock_khz(200000, true);    
-//    set_sys_clock_khz(225000, true);    
-    set_sys_clock_khz(250000, true);    
-
+    set_sys_clock_khz(225000, true);    
+//    set_sys_clock_khz(250000, true);
     stdio_init_all();
-#ifdef USE_VGA    
-//    tft.begin(VGA_MODE_400x240);
-    tft.begin(VGA_MODE_320x240);
-#else
-    tft.begin();
-#endif 
+
     emu_init();
-    while (true) {
+    char * filename;
+#ifdef FILEBROWSER
+    while (true) {      
         if (menuActive()) {
             uint16_t bClick = emu_DebounceLocalKeys();
             int action = handleMenu(bClick);
-            char * filename = menuSelection();   
-            if (action == ACTION_RUNTFT) {
-              toggleMenu(false);
-              emu_start();        
-              emu_Init(filename);     
-              tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
-              tft.startDMA();      
-            }  
+            filename = menuSelection();   
+            if (action == ACTION_RUN) {
+              break;    
+            }
             tft.waitSync();
         }
-        else {  
-            emu_Step(); 
-            uint16_t bClick = emu_DebounceLocalKeys();
-            emu_Input(bClick);      
-        }
-        //int c = getchar_timeout_us(0);
-        //switch (c) {
-        //    case ' ':
-        //        printf("test: %d\n", 1);
-        //        break;
-        //}
+    }
+#endif    
+    emu_start();
+    emu_Init(filename);
+    tft.startRefresh();
+    //struct repeating_timer timer;
+    //add_repeating_timer_ms(5, repeating_timer_callback, NULL, &timer);    
+    while (true) {
+        uint16_t bClick = emu_DebounceLocalKeys();
+        emu_Input(bClick);  
+        emu_Step();        
     }
 }
 
-static unsigned char  palette8[PALETTE_SIZE];
 static unsigned short palette16[PALETTE_SIZE];
-
 void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index)
 {
     if (index<PALETTE_SIZE) {
-        palette8[index]  = RGBVAL8(r,g,b);
         palette16[index]  = RGBVAL16(r,g,b);        
+    }
+}
+
+void emu_DrawLinePal16(unsigned char * VBuf, int width, int height, int line) 
+{
+    if (skip == 0) {
+         tft.writeLinePal(width,height,line, VBuf, palette16);
+    }
+}
+
+void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line)
+{
+    if (skip == 0) {
+        tft.writeLine(width,height,line, VBuf);
     }
 }
 
@@ -84,43 +94,34 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    //tft.waitSync(); 
+    volatile bool vb=vbl; 
+    //while (vbl==vb) {};
+#ifdef USE_VGA
+    //tft.waitSync();            
+#else                      
+    //volatile bool vb=vbl;
+    //while (vbl==vb) {};
+#endif
 }
 
-void emu_DrawLine(unsigned char * VBuf, int width, int height, int line) 
-{
-    if (skip == 0) {
-#ifdef USE_VGA                        
-         tft.writeLine(width,height,line, VBuf, palette8);
-#else
-         tft.writeLine(width,height,line, VBuf, palette16);
-#endif      
-    }  
-}  
 
+/*
 void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line) 
 {
     if (skip == 0) {
 #ifdef USE_VGA                        
-      tft.writeLine(width,height,line, VBuf);
+      tft.writeLine(width,height,line, VBuf);      
 #endif      
     }
 } 
-
-void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line) 
-{
-    if (skip == 0) {
-#ifdef USE_VGA        
-        tft.writeLine16(width,height,line, VBuf);
-#endif        
-    }
-}  
 
 void emu_DrawScreen(unsigned char * VBuf, int width, int height, int stride) 
 {
     if (skip == 0) {
 #ifdef USE_VGA                
         tft.writeScreen(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette8);
+#else
+        tft.writeScreen(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette16);
 #endif
     }
 }
@@ -134,6 +135,7 @@ void * emu_LineBuffer(int line)
 {
     return (void*)tft.getLineBuffer(line);    
 }
+*/
 
 
 #ifdef HAS_SND
