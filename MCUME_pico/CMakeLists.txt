@@ -8,14 +8,14 @@ include(pico_sdk_import.cmake)
 
 #set(TARGET testkeymax)
 #set(TARGET pico20)
-#set(TARGET pico64)
+set(TARGET pico64)
 #set(TARGET pico81)
 #set(TARGET picospeccy)
 #set(TARGET pico800)
 #set(TARGET pico5200)
 #set(TARGET picocolem)
 #set(TARGET picoo2em)
-set(TARGET picovcs)
+#set(TARGET picovcs)
 
 project(${TARGET} C CXX)
 

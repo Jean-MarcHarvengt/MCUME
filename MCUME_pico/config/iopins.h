@@ -47,7 +47,7 @@
 #define I2C_SCL_IO      15? 
 #define I2C_SDA_IO      14?
 */
-#else
+#else /* end MCUME_REV1 */
 
 #if (defined(PICOMPUTER) && defined(USE_VGA) )
 
@@ -58,7 +58,7 @@
    CSYNC */
 #define VGA_COLORBASE   0
 #define VGA_SYNCBASE    8
-#else
+#else /* end PICOMPUTER && USE_VGA () */
 
 #ifdef PICOZX
 
@@ -70,7 +70,7 @@
 #define VGA_COLORBASE   0
 #define VGA_SYNCBASE    6
 
-#else
+#else /* PICOZX */
 // Speaker
 #define AUDIO_PIN       0
 // VGA
@@ -110,12 +110,13 @@
 #define TFT_CS          21
 #define TFT_BACKLIGHT   20
 
-#else
+#else /* end PICOMPUTERMAX */
 #define TFT_RST         21
 #define TFT_CS          255
 #define TFT_BACKLIGHT   20
 #endif
-#else
+
+#else /* end PICOMPUTER */
 // MCUME_REV2 (ILI)
 #define TFT_RST         21
 #define TFT_CS          17
@@ -158,8 +159,8 @@
 #define KROWIN4         17
 #define KROWIN5         18
 #define KROWIN6         19
+#else /* end USE_VGA (RETROVGA)*/
 
-#else
 // Keyboard matrix 
 //Cols (out)
 #define KCOLOUT1        1

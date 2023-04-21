@@ -1334,6 +1334,7 @@ int keypressed = emu_ReadKeys();
 #ifdef USE_VGA    
     tft.begin(MODE_VGA_320x240);
 #else
+
 #ifdef PICOZX    
   // Force VGA if LEFT/RIGHT pressed
   if (keypressed & MASK_JOY2_UP)
@@ -1360,34 +1361,24 @@ int keypressed = emu_ReadKeys();
       tft.begin(MODE_TFT_320x240);    
     }     
   }
-#else
+#else /* end PICOZX */
   tft.begin(MODE_TFT_320x240);    
 #endif 
 
 #endif
 
+#ifndef USE_VGA    
 #ifdef PICOMPUTER
   // Flip screen if UP pressed
   if (keypressed & MASK_JOY2_UP)
   {
-#ifdef PICOMPUTERMAX
-#ifndef USE_VGA    
     tft.flipscreen(true);
-#endif
-#else
-    tft.flipscreen(true);
-#endif
   }
   else 
   {
-#ifdef PICOMPUTERMAX
-#ifndef USE_VGA    
     tft.flipscreen(false);
-#endif
-#else
-    tft.flipscreen(false);
-#endif
   }
+#endif
 #endif
 
   if (keypressed & MASK_JOY2_DOWN) {
