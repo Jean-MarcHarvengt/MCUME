@@ -491,6 +491,7 @@ int emu_ReadKeys(void)
   if ( !gpio_get(PIN_KEY_USER4) ) retval |= MASK_KEY_USER4;
 #endif
 
+
 #if (defined(PICOMPUTER) || defined(PICOZX) )
   keymatrix_hitrow = -1;
   unsigned char row;
@@ -539,8 +540,6 @@ int emu_ReadKeys(void)
     keymatrixtmp[i] = row;
   }
 
-
-  
 #ifdef SWAP_ALT_DEL
   // Swap ALT and DEL  
   unsigned char alt = keymatrixtmp[0] & 0x02;
@@ -564,15 +563,17 @@ int emu_ReadKeys(void)
     keymatrix[i] = row;
   }
 
-
 #ifdef PICOZX
-  key_fn = false;
-  key_alt = false;
+  //row = keymatrix[6];
   if ( row & 0x02 ) retval |= MASK_KEY_USER1;
   if ( row & 0x10 ) retval |= MASK_KEY_USER2;
   if ( row & 0x20 ) retval |= MASK_KEY_USER3;
   if ( row & 0x40 ) retval |= MASK_KEY_USER4;
   row = keymatrix[0];
+  key_fn = false;
+  key_alt = false;
+  if ( row & 0x20 ) {key_fn = true; keymatrix[0] &= ~0x20;}
+  if ( row & 0x40 ) {key_alt = true;keymatrix[0] &= ~0x40; }
   //19,20,21,22,26,27,28  
 #if INVX
   if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
@@ -589,10 +590,8 @@ int emu_ReadKeys(void)
   if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
 #endif
   if ( row & 0x04 ) retval |= MASK_JOY2_BTN;
-  if ( row & 0x20 ) key_fn = true;
-  if ( row & 0x40 ) key_alt = true;
 
-#else
+#else // end PICOZX 
   //6,9,15,8,7,22
 #if INVX
   if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
@@ -690,11 +689,10 @@ int emu_ReadKeys(void)
       gpio_put(KLED, 0);
     }     
   } 
-#endif 
 #endif
 
-  if ( key_fn ) retval |= MASK_KEY_USER2;
-  if ( ( key_fn ) && (keymatrix[0] == 0x02 )) retval |= MASK_KEY_USER1;
+#endif
+
 
 #endif
 
@@ -739,7 +737,7 @@ int emu_ReadI2CKeyboard(void) {
     unsigned short match = ((unsigned short)keymatrix_hitrow<<8) | keymatrix[keymatrix_hitrow];  
     for (int i=0; i<sizeof(matkeys)/sizeof(unsigned short); i++) {
       if (match == matkeys[i]) {
-        hundred_ms_cnt = 0;    
+        hundred_ms_cnt = 0;
         return (keys[i]);
       }
     }

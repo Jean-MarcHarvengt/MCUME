@@ -26,7 +26,7 @@ const unsigned short key_map1[] = {
   'Q','W','E','R','T','Y','U','I','O','P',
   'A','S','D','F','G','H','J','K','L',0x0D,
   0,'Z','X','C','V','B','N','M',0,' ',
-  0,0,0,0,157,29   // L R
+  0,0,0,0,157,29 // L R
   };  
 
 const unsigned short key_map2[] = {
@@ -42,7 +42,7 @@ const unsigned short key_map3[] = {
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0
+  145,157,29,17,0,0 // U L R D
   };
 
 const unsigned short matkeys[] = {
