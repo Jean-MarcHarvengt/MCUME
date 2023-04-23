@@ -995,16 +995,22 @@ void PICO_DSP::writeLinePal(int width, int height, int y, uint8_t *buf, dsp_pixe
 }
 
 void PICO_DSP::writeScreenPal(int width, int height, int stride, uint8_t *buf, dsp_pixel *palette16) {
-  uint8_t *buffer=buf;
   uint8_t *src; 
   int i,j,y=0;
+  int sy = 0;  
+  int systep=(1<<8);
+  int h = height;
+  if (height <= ( (2*fb_height)/3)) {
+    systep=(systep*height)/fb_height;
+    h = fb_height;
+  }  
   if (gfxmode == MODE_TFT_320x240) {
     if (width*2 <= fb_width) {
-      for (j=0; j<height; j++)
+      for (j=0; j<h; j++)
       {
         uint16_t * block=blocks[y>>6];
         uint16_t * dst=&block[(y&0x3F)*fb_stride];        
-        src=buffer;
+        src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
           uint16_t val = palette16[*src++];
@@ -1012,54 +1018,31 @@ void PICO_DSP::writeScreenPal(int width, int height, int stride, uint8_t *buf, d
           *dst++ = val;
         }
         y++;
-        if (height*2 <= fb_height) {
-          block=blocks[y>>6];
-          dst=&block[(y&0x3F)*fb_stride];          
-          src=buffer;
-          for (i=0; i<width; i++)
-          {
-            uint16_t val = palette16[*src++];
-            *dst++ = val;
-            *dst++ = val;
-          }
-          y++;      
-        } 
-        buffer += stride;      
+        sy+=systep;  
       }
     }
     else if (width <= fb_width) {
-      for (j=0; j<height; j++)
+      for (j=0; j<h; j++)
       {
         uint16_t * block=blocks[y>>6];
-        uint16_t * dst=&block[(y&0x3F)*fb_stride+(fb_width-width)/2];         
-        src=buffer;
+        uint16_t * dst=&block[(y&0x3F)*fb_stride+(fb_width-width)/2];        
+        src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
           uint16_t val = palette16[*src++];
           *dst++ = val;
         }
         y++;
-        if (height*2 <= fb_height) {
-          block=blocks[y>>6];
-          dst=&block[(y&0x3F)*fb_stride+(fb_width-width)/2];        
-          src=buffer;
-          for (i=0; i<width; i++)
-          {
-            uint16_t val = palette16[*src++];
-            *dst++ = val;
-          }
-          y++;
-        }      
-        buffer += stride;  
+        sy+=systep;  
       }
     }
   }       
   else { // VGA
     if (width*2 <= fb_width) {
-      for (j=0; j<height; j++)
+      for (j=0; j<h; j++)
       {
-        vga_pixel * dst=&framebuffer[y*fb_stride];       
-        src=buffer;
+        vga_pixel * dst=&framebuffer[y*fb_stride];                
+        src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
           uint16_t pix = palette16[*src++];
@@ -1067,44 +1050,23 @@ void PICO_DSP::writeScreenPal(int width, int height, int stride, uint8_t *buf, d
           *dst++ = VGA_RGB(R16(pix),G16(pix),B16(pix));
         }
         y++;
-        if (height*2 <= fb_height) {
-          vga_pixel * dst=&framebuffer[y*fb_stride];          
-          src=buffer;
-          for (i=0; i<width; i++)
-          {
-            uint16_t pix = palette16[*src++];
-            *dst++ = VGA_RGB(R16(pix),G16(pix),B16(pix));
-            *dst++ = VGA_RGB(R16(pix),G16(pix),B16(pix));
-          }
-          y++;      
-        } 
-        buffer += stride;      
+        sy+=systep;  
       }
     }
     else if (width <= fb_width) {
-      for (j=0; j<height; j++)
+      for (j=0; j<h; j++)
       {
-        vga_pixel * dst=&framebuffer[y*fb_stride +(fb_width-width)/2];
-        src=buffer;
+        vga_pixel * dst=&framebuffer[y*fb_stride+(fb_width-width)/2];                
+        src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
           uint16_t pix = palette16[*src++];
           *dst++ = VGA_RGB(R16(pix),G16(pix),B16(pix));
         }
         y++;
-        if (height*2 <= fb_height) {
-         vga_pixel * dst=&framebuffer[y*fb_stride +(fb_width-width)/2];
-          src=buffer;
-          for (i=0; i<width; i++)
-          {
-            uint16_t pix = palette16[*src++];
-            *dst++ = VGA_RGB(R16(pix),G16(pix),B16(pix));
-          }
-          y++;
-        }      
-        buffer += stride;  
+        sy+=systep;  
       }
-    }   
+    }
   }
 }
 
