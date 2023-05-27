@@ -50,7 +50,7 @@
 #define IFF_HALT    0x80       /* 1: CPU HALTed              */
 
 /** Simple Datatypes *****************************************/
-/** NOTICE: sizeof(byte)=1 and sizeof(word)=2               **/
+/** NOTICE: sizeof(byte)=1 and sizeof(WORD)=2               **/
 /*************************************************************/
 #ifndef BYTE_TYPE_DEFINED
 #define BYTE_TYPE_DEFINED
@@ -58,8 +58,8 @@ typedef unsigned char byte;
 #endif
 #ifndef WORD_TYPE_DEFINED
 #define WORD_TYPE_DEFINED
-#ifndef word 
-typedef unsigned short word;
+#ifndef WORD 
+typedef unsigned short WORD;
 #endif
 #endif
 typedef signed char offset;
@@ -75,7 +75,7 @@ typedef union
 #else
   struct { byte h,l; } B;
 #endif
-  word W;
+  WORD W;
 } pair;
 
 typedef struct
@@ -88,10 +88,10 @@ typedef struct
   int IPeriod,ICount; /* Set IPeriod to number of CPU cycles */
                       /* between calls to LoopZ80()          */
   int IBackup;        /* Private, don't touch                */
-  word IRequest;      /* Set to address of pending IRQ       */
+  WORD IRequest;      /* Set to address of pending IRQ       */
   byte IAutoReset;    /* Set to 1 to autom. reset IRequest   */
   byte TrapBadOps;    /* Set to 1 to warn of illegal opcodes */
-  word Trap;          /* Set Trap to address to trace from   */
+  WORD Trap;          /* Set Trap to address to trace from   */
   byte Trace;         /* Set Trace=1 to start tracing        */
   void *User;         /* Arbitrary user data (ID,RAM*,etc.)  */
 } Z80;
@@ -107,34 +107,34 @@ void ResetZ80(register Z80 *R);
 /** This function will execute a single Z80 opcode. It will **/
 /** then return next PC, and current register values in R.  **/
 /*************************************************************/
-word ExecZ80(register Z80 *R);
+WORD ExecZ80(register Z80 *R);
 
 /** IntZ80() *************************************************/
 /** This function will generate interrupt of given vector.  **/
 /*************************************************************/
-void IntZ80(register Z80 *R,register word Vector);
+void IntZ80(register Z80 *R,register WORD Vector);
 
 /** RunZ80() *************************************************/
 /** This function will run Z80 code until an LoopZ80() call **/
 /** returns INT_QUIT. It will return the PC at which        **/
 /** emulation stopped, and current register values in R.    **/
 /*************************************************************/
-word RunZ80(register Z80 *R);
+WORD RunZ80(register Z80 *R);
 
 /** RdZ80()/WrZ80() ******************************************/
 /** These functions are called when access to RAM occurs.   **/
 /** They allow to control memory access.                    **/
 /************************************ TO BE WRITTEN BY USER **/
-void WrZ80(register word Addr,register byte Value);
-byte RdZ80(register word Addr);
+void WrZ80(register WORD Addr,register byte Value);
+byte RdZ80(register WORD Addr);
 
 /** InZ80()/OutZ80() *****************************************/
 /** Z80 emulation calls these functions to read/write from  **/
 /** I/O ports. There can be 65536 I/O ports, but only first **/
 /** 256 are usually used.                                   **/
 /************************************ TO BE WRITTEN BY USER **/
-void OutZ80(register word Port,register byte Value);
-byte InZ80(register word Port);
+void OutZ80(register WORD Port,register byte Value);
+byte InZ80(register WORD Port);
 
 /** PatchZ80() ***********************************************/
 /** Z80 emulation calls this function when it encounters a  **/
@@ -162,6 +162,6 @@ byte DebugZ80(register Z80 *R);
 /** (0x0038, 0x0066, etc.) or INT_NONE for no interrupt.    **/
 /** Return INT_QUIT to exit the emulation loop.             **/
 /************************************ TO BE WRITTEN BY USER **/
-word LoopZ80(register Z80 *R, int * ras);
+WORD LoopZ80(register Z80 *R, int * ras);
 
 #endif /* Z80_H */

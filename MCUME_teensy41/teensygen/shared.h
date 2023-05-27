@@ -4,7 +4,6 @@
 
 
 #define LSB_FIRST     1
-#define SOUND_PRESENT 1
 //#define ALIGN_LONG 1
 #define GENESIS_HACKS 1
 

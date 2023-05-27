@@ -16,6 +16,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "shared.h"
+#include "platform_config.h"
 
 t_bitmap bitmap;
 t_input input;
@@ -30,13 +31,13 @@ int system_init(int sample_rate)
     vdc_init();
     psg_init();
     render_init();
-#ifdef SOUND_PRESENT
+#ifdef HAS_SND
     audio_init(sample_rate);
 #endif
     return (1);
 }
 
-#ifdef SOUND_PRESENT
+#ifdef HAS_SND
 void audio_init(int rate)
 {
     memset(&pcesnd, 0, sizeof(pcesnd));

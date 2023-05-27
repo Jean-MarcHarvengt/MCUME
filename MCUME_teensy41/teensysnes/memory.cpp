@@ -624,9 +624,9 @@ bool8 S9xMemoryInit (void)
 	memset(&Memory, 0, sizeof(Memory));
 
 	Memory.RAM  = (uint8 *) emu_Malloc(0x20000); // calloc(1, 0x20000); // 128k
-	Memory.VRAM = (uint8 *) emu_Malloc(0x10000); //calloc(1, 0x10000); // 64k
+	Memory.VRAM = (uint8 *) emu_SMalloc(0x10000); //calloc(1, 0x10000); // 64k Malloc?
 	Memory.SRAM = (uint8 *) emu_Malloc(0x8000); //calloc(1, 0x8000);  // 32k
-	Memory.ROM_MAX_SIZE = 0x500000;
+	Memory.ROM_MAX_SIZE = 0x600000;
 	//Memory.ROM  = (uint8 *) calloc(1, Memory.ROM_MAX_SIZE);
 	// Note: we don't care if ROM alloc fails. It's just to grab a large heap block
 	//       before it gets fragmented. The actual useful alloc is done in S9xLoadROM()

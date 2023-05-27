@@ -488,11 +488,11 @@ Byte in_bus(void){
 
 		switch(mode) {
 			case 1:			    
-                if (key & MASK_JOY2_RIGHT) d &= 0xF7;
-                if (key & MASK_JOY2_LEFT) d &= 0xFD;
-                if (key & MASK_JOY2_UP) d &= 0xFE;
-                if (key & MASK_JOY2_DOWN) d &= 0xFB;
-                if (key & MASK_JOY2_BTN) d &= 0xEF;
+                if ( (key & MASK_JOY2_LEFT) || (key & MASK_JOY1_LEFT) ) d &= 0xF7;
+                if ( (key & MASK_JOY2_RIGHT) || (key & MASK_JOY1_RIGHT) ) d &= 0xFD;
+                if ( (key & MASK_JOY2_UP) || (key & MASK_JOY1_UP) ) d &= 0xFE;
+                if ( (key & MASK_JOY2_DOWN) || (key & MASK_JOY1_DOWN) ) d &= 0xFB;
+                if ( (key & MASK_JOY2_BTN) || (key & MASK_JOY1_BTN) ) d &= 0xEF;
 				break;
         
 			case 2: 

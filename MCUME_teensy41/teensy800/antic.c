@@ -41,7 +41,7 @@ UWORD Screen_atari[ATARI_WIDTH / 2]; // = NULL;
 
 #define DRAWLINE() \
     if ( (ANTIC_ypos > 8) && (ANTIC_ypos < 248)) { \
-      emu_DrawLine((unsigned char *)&Screen_atari[32/sizeof(Screen_atari[0])], 320, 240, ANTIC_ypos-8); \
+      emu_DrawLinePal16((unsigned char *)&Screen_atari[32/sizeof(Screen_atari[0])], 320, 240, ANTIC_ypos-8); \
     }
 
 

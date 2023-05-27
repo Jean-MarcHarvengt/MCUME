@@ -1,4 +1,10 @@
-HEX can be found in bin directory.
+Select target board in platform_config.h file. 
+Default is TEECOMPUTER. 
+Comment out for MCUMEVGA (see wiring in schematics subdirectory)
+Soldering the PSRAM (PT8211) below the Teensy4.1 is mandatory!!!!
 
 All compiled with Arduino 1.8.19 + Teensyduino 1.56
-Except UAE TEECOMPUTER for TFT that needs Arduino 1.8.13 + 1.54
+Chose optimize:smallest code and USB keyboard layout if needed. 
+
+Default CPU speed 600MZ except for TeenyUAE and TeensySNES that need 816MHz.
+TeensySNES has USB disabled!

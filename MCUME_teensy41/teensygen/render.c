@@ -9,9 +9,6 @@
 #include "shared.h"
 #include "platform_config.h"
 
-#ifdef HAS_T4_VGA 
-#include "vga_t_dma.h"
-#endif
 extern void emu_DrawLine16(unsigned short *src, int width , int height, int line); 
 extern void emu_printf(char * text);
 

@@ -5,18 +5,10 @@ extern "C" {
 #include "platform_config.h"
 }
 
-#ifdef HAS_T4_VGA
-#include "vga_t_dma.h"
-typedef uint8_t Pixel;
-#else
-#include "tft_t_dma.h"
 typedef uint16_t Pixel;
-#endif
 
-#define WIN_W TFT_WIDTH
-#define WIN_H TFT_HEIGHT
-
-//#include <stdio.h>
+#define WIN_W 320 //TFT_WIDTH
+#define WIN_H 240 //TFT_HEIGHT
 
 
 // definitions for easy access to registers
@@ -70,6 +62,8 @@ static uint16_t remap[16] = {
   0x1c00
 };
 
+static Pixel linebuf[WIN_W];
+
 MOS6561::MOS6561() : IC(), curRow(0), frameReady(true) {
 	// Set clock speed
 	this->setClockSpeed(1108000);
@@ -102,10 +96,11 @@ void MOS6561::initialize() {
 void MOS6561::renderBorder(uint16_t raster){
 	if (raster < WIN_H) {
 		Pixel  bcol = vicPalette[REG_BORDER_COLOUR];
-		Pixel *  dst = (Pixel *)emu_LineBuffer(raster);
+		Pixel * dst = &linebuf[0];
 		for (int x=0; x < WIN_W; x++) {
 		  *dst++ = bcol;
-		}  
+		}
+		emu_DrawLine16(&linebuf[0], WIN_W, WIN_H, raster);
 	}
 }
 
@@ -137,7 +132,7 @@ void MOS6561::renderLine(uint16_t raster, uint16_t row, uint8_t rowHeight, uint8
 		cols[bakcol] = vicPalette[REG_BACKGROUND_COLOUR];
 
 		// Border Left
-		Pixel *  dst = (Pixel *)emu_LineBuffer(raster);
+		Pixel * dst = &linebuf[0];
 		for (int x=0; x < bWidth; x++) {
 		  *dst++ = cols[borcol];
 		}
@@ -179,7 +174,8 @@ void MOS6561::renderLine(uint16_t raster, uint16_t row, uint8_t rowHeight, uint8
 		// Border Right
 		for (int x=0; x < bWidth; x++) {
 		  *dst++ = cols[borcol];
-		}      
+		} 
+		emu_DrawLine16(&linebuf[0], WIN_W, 1, raster);     
 	}  
 }
   
@@ -214,7 +210,7 @@ void MOS6561::renderRow(uint16_t raster, uint16_t row, uint8_t rowHeight)
 
 		for (int line=0; line < rowHeight; line++) {
 			// Border Left
-			Pixel *  dst = (Pixel *)emu_LineBuffer(curRow*rowHeight+line+raster);
+			Pixel *  dst = &linebuf[0];
 			for (int x=0; x < bWidth; x++) {
 			  *dst++ = cols[borcol];
 			}
@@ -230,25 +226,25 @@ void MOS6561::renderRow(uint16_t raster, uint16_t row, uint8_t rowHeight)
 			  uint8_t multiColour = colPointer[x] & 0x8;
 			  cols[forcol] = vicPalette[colour];	  
 			  if (!multiColour) {
-				Pixel * dest = dst;
-				for (int a = 0; a < 8; a++) {
-				  if ((characterByte << a) & 0x80) {
-					*dest++ = cols[forcol];
-				  }
-				  else {
-					*dest++ = cols[bakcol];
-				  }
-				}
+					Pixel * dest = dst;
+					for (int a = 0; a < 8; a++) {
+					  if ((characterByte << a) & 0x80) {
+							*dest++ = cols[forcol];
+					  }
+					  else {
+							*dest++ = cols[bakcol];
+					  }
+					}
 			  }
 			  else {
-				Pixel * dest = dst;
-				cols[auxcol] = vicPalette[REG_AUXILIARY_COLOUR];	  
-				for (int a = 0; a < 8; a += 2) {
-					// Set colour
-					Pixel col = cols[((characterByte << a) & 0xC0) >> 6];
-					*dest++ = col;
-					*dest++ = col;
-				}
+					Pixel * dest = dst;
+					cols[auxcol] = vicPalette[REG_AUXILIARY_COLOUR];	  
+					for (int a = 0; a < 8; a += 2) {
+						// Set colour
+						Pixel col = cols[((characterByte << a) & 0xC0) >> 6];
+						*dest++ = col;
+						*dest++ = col;
+					}
 			  }
 			  dst +=8;
 			}
@@ -256,7 +252,8 @@ void MOS6561::renderRow(uint16_t raster, uint16_t row, uint8_t rowHeight)
 			// Border Right
 			for (int x=0; x < bWidth; x++) {
 			  *dst++ = cols[borcol];
-			}      
+			}
+			emu_DrawLine16(&linebuf[0], WIN_W, 1, curRow*rowHeight+line+raster);      
 		}
 	}  
 }

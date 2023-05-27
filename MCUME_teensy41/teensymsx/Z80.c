@@ -33,15 +33,15 @@
 /*************************************************************/
 #ifdef COLEM
 extern byte *Page[];
-INLINE byte RdZ80(word A) { return(Page[A>>15][A&0x7FFF]); }
+INLINE byte RdZ80(WORD A) { return(Page[A>>15][A&0x7FFF]); }
 #endif
 #ifdef MG
 extern byte *Page[];
-INLINE byte RdZ80(word A) { return(Page[A>>13][A&0x1FFF]); }
+INLINE byte RdZ80(WORD A) { return(Page[A>>13][A&0x1FFF]); }
 #endif
 #ifdef FMSX
 extern byte *RAM[],PSL[],SSLReg;
-INLINE byte RdZ80(word A)
+INLINE byte RdZ80(WORD A)
 {
   if(A!=0xFFFF) return(RAM[A>>13][A&0x1FFF]);
   else return((PSL[3]==3)? ~SSLReg:RAM[7][0x1FFF]);
@@ -478,7 +478,7 @@ void ResetZ80(Z80 *R)
 /** This function will execute a single Z80 opcode. It will **/
 /** then return next PC, and current register values in R.  **/
 /*************************************************************/
-word ExecZ80(Z80 *R)
+WORD ExecZ80(Z80 *R)
 {
   register byte I;
   register pair J;
@@ -501,7 +501,7 @@ word ExecZ80(Z80 *R)
 /** IntZ80() *************************************************/
 /** This function will generate interrupt of given vector.  **/
 /*************************************************************/
-void IntZ80(Z80 *R,word Vector)
+void IntZ80(Z80 *R,WORD Vector)
 {
   if((R->IFF&IFF_1)||(Vector==INT_NMI))
   {
@@ -534,7 +534,7 @@ void IntZ80(Z80 *R,word Vector)
     if(R->IFF&IFF_IM2)
     {
       /* Make up the vector address */
-      Vector=(Vector&0xFF)|((word)(R->I)<<8);
+      Vector=(Vector&0xFF)|((WORD)(R->I)<<8);
       /* Read the vector */
       R->PC.B.l=RdZ80(Vector++);
       R->PC.B.h=RdZ80(Vector);
@@ -567,7 +567,7 @@ void IntZ80(Z80 *R,word Vector)
 /** returns INT_QUIT. It will return the PC at which        **/
 /** emulation stopped, and current register values in R.    **/
 /*************************************************************/
-word RunZ80(Z80 *R)
+WORD RunZ80(Z80 *R)
 {
   register byte I;
   register pair J;

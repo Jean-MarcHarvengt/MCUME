@@ -1705,7 +1705,7 @@ void emu_init(void)
 
 #ifdef TEECOMPUTER
 #ifndef HAS_T4_VGA
-    tft.flipscreen(false);
+    tft.flipscreen(true);
 #endif
 #endif
   int keypressed = emu_ReadKeys();

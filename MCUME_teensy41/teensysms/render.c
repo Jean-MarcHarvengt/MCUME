@@ -1,4 +1,5 @@
 #include "shared.h"
+#include "emuapi.h"
 
 /* Background drawing function */
 static void (*render_bg)(int line);
@@ -36,9 +37,6 @@ static int vp_vstart;
 static int vp_vend;
 static int vp_hstart;
 static int vp_hend;
-
-extern void emu_DrawLine(unsigned short *src, int width , int height, int line); 
-extern void emu_printf(char * text);
 
 /* Macros to access memory 32-bits at a time (from MAME's drawgfx.c) */
 
@@ -174,7 +172,7 @@ void render_line(int line)
     }
     for (int i=0; i<BMP_WIDTH ;i++)
       internal_buffer[i] &= 0x1F;
-    emu_DrawLine(&internal_buffer[BMP_X_OFFSET], BMP_WIDTH , BMP_HEIGHT, line);
+    emu_DrawLinePal16(&internal_buffer[BMP_X_OFFSET], BMP_WIDTH , BMP_HEIGHT, line);
 }
 
 

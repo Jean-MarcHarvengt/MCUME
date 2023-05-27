@@ -105,7 +105,7 @@ void fm_write(int address, int data)
             int16 *tempBuffer[2];       
             tempBuffer[0] = snd.fm.buffer[0] + snd.fm.lastStage;
             tempBuffer[1] = snd.fm.buffer[1] + snd.fm.lastStage;
-            YM2612UpdateOne(0, (int16 **)tempBuffer, snd.fm.curStage - snd.fm.lastStage);
+            YM2612UpdateOne(0, *(int16 **)tempBuffer, snd.fm.curStage - snd.fm.lastStage);
             snd.fm.lastStage = snd.fm.curStage;
         }
 
@@ -167,4 +167,3 @@ void psg_write(int data)
         SN76496Write(0, data);
     }
 }
-

@@ -51,12 +51,9 @@ typedef uint64_t      uint64;
 #define FALSE	0
 #endif
 
-#ifndef HAS_T4_VGA
-#define GFX16    1
-typedef uint16 SNESPixel;
-#else
+//#define GFX16    1
+//typedef uint16 SNESPixel;
 typedef uint8 SNESPixel;
-#endif
 
 
 #if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(__x86_64__) || defined(__alpha__) || defined(__MIPSEL__) || defined(_M_IX86) || defined(_M_X64) || defined(_XBOX1) || defined(__arm__) || defined(ANDROID) || defined(__aarch64__) || (defined(__BYTE_ORDER__) && __BYTE_ORDER == __ORDER_LITTLE_ENDIAN__) || defined(IS_LITTLE_ENDIAN)

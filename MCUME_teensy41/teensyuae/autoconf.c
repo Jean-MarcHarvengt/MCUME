@@ -260,5 +260,3 @@ void set_uae_int_flag (void)
 {
     rtarea[0xFFFB] = uae_int_requested;
 }
-
-

@@ -4,8 +4,6 @@
 
 #define XOFFSET       0x20
 #define LSB_FIRST     1
-#define SOUND_PRESENT 1
-
 
 #include "pcetypes.h"
 #include "h6280.h"

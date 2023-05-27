@@ -65,7 +65,8 @@ static bitmap_t *_make_bitmap(uint8 *data_addr, bool hw, int width,
    */
    //printf("setting up bitmap %d\n",(int)bitmap);
    for (i = 0; i < height; i++) {
-      bitmap->line[i] = emu_LineBuffer(i);
+      
+      bitmap->line[i] = emu_Malloc(pitch); //emu_LineBuffer(i);
    }      
 
    return bitmap;

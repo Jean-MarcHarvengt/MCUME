@@ -60,11 +60,8 @@ typedef uint16_t UWORD;
 typedef int32_t SLONG;
 typedef uint32_t ULONG;
 
-#ifdef HAS_T4_VGA
-typedef UBYTE HandyPixel;
-#else
+//typedef UBYTE HandyPixel;
 typedef UWORD HandyPixel;
-#endif   
 
 extern ULONG crc32_le(ULONG crc, UBYTE const * buf, ULONG len);
 
@@ -102,8 +99,12 @@ extern ULONG crc32_le(ULONG crc, UBYTE const * buf, ULONG len);
 #define HANDY_FILETYPE_RAW      4
 
 #define HANDY_SCREEN_WIDTH   160
-#define HANDY_SCREEN_STRIDE  emu_LineStride()
 #define HANDY_SCREEN_HEIGHT  102
+
+#define OUTPUT_SCREEN_WIDTH  160
+#define OUTPUT_SCREEN_HEIGHT (HANDY_SCREEN_HEIGHT*2)
+#define OUTPUT_SCREEN_STRIDE 160
+
 //
 // Define the global variable list
 //

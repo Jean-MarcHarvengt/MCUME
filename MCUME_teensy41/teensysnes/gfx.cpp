@@ -1538,13 +1538,13 @@ bool8 S9xGraphicsInit (void)
 
 	S9xInitTileRenderer();
 
-  GFX.Screen = (SNESPixel*)emu_LineBuffer(0)+(emu_LineWidth()-256)/2;
-  //GFX.SubScreen = GFX.Screen;
+  GFX.Screen = (SNESPixel *) emu_Malloc(GFX.ScreenSize * sizeof(SNESPixel));
 	GFX.SubScreen  = (SNESPixel *) emu_SMalloc(GFX.ScreenSize * sizeof(SNESPixel));
-
-	GFX.ZBuffer    = (uint8 *)  emu_Malloc(GFX.ScreenSize);
+  memset((unsigned char*)GFX.Screen, 0, GFX.ScreenSize * sizeof(SNESPixel));
+  memset((unsigned char*)GFX.SubScreen, 0, GFX.ScreenSize * sizeof(SNESPixel));
+  GFX.ZBuffer    = (uint8 *)  emu_Malloc(GFX.ScreenSize);
 	GFX.SubZBuffer = (uint8 *)  emu_Malloc(GFX.ScreenSize);
-	GFX.ZERO       = (SNESPixel *) GFX.SubScreen; // This will cause garbage but for now it's okay
+	//GFX.ZERO       = (SNESPixel *) GFX.SubScreen; // This will cause garbage but for now it's okay
 	IPPU.TileCacheData = (uint8 *) emu_SMalloc(4096 * 64);
 
 	if (!GFX.SubScreen || !GFX.ZBuffer || !GFX.SubZBuffer || !IPPU.TileCacheData)
@@ -1556,7 +1556,7 @@ bool8 S9xGraphicsInit (void)
 	#if 0 // TO DO: pre-compute GFX.ZERO
 
 	// Lookup table for 1/2 color subtraction
-	memset(GFX.ZERO, 0, 0x10000 * sizeof(uint16));
+	//memset(GFX.ZERO, 0, 0x10000 * sizeof(uint16));
 	for (uint8 r = 0; r <= MAX_RED; r++)
 	{
 		uint8 r2 = (r & 0x10) ? (r & ~0x10) : (0);

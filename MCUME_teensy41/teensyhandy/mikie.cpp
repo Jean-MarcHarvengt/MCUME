@@ -106,7 +106,7 @@ CMikie::CMikie(CSystem& parent, ULONG displayformat, ULONG samplerate)
    mpRamPointer=NULL;
    mDisplayFormat=displayformat;
    mAudioSampleRate=samplerate;
-   mDisplayPitch=HANDY_SCREEN_STRIDE * sizeof(HandyPixel);
+   mDisplayPitch=OUTPUT_SCREEN_STRIDE * sizeof(HandyPixel);
 
    mUART_CABLE_PRESENT=FALSE;
    mpUART_TX_CALLBACK=NULL;
@@ -840,13 +840,6 @@ void CMikie::BuildPalette()
    //
    TPALETTE Spot;
 
-#ifdef HAS_T4_VGA
-   for(Spot.Index=0;Spot.Index<4096;Spot.Index++) {
-      mColourMap[Spot.Index]=((Spot.Colours.Red<<4)&0xE0);
-      mColourMap[Spot.Index]|=((Spot.Colours.Green<<1)&0x1c);
-      mColourMap[Spot.Index]|=((Spot.Colours.Blue>>2)&003);
-   }
-#else
    for(Spot.Index=0;Spot.Index<4096;Spot.Index++) {
       mColourMap[Spot.Index]=((Spot.Colours.Red<<12)&0xf000) | ((Spot.Colours.Red<<8)&0x0800);
       mColourMap[Spot.Index]|=((Spot.Colours.Green<<7)&0x0780) | ((Spot.Colours.Green<<3)&0x0060);
@@ -858,7 +851,6 @@ void CMikie::BuildPalette()
          mColourMap[i] = mColourMap[i] << 8 | mColourMap[i] >> 8;
       }
    }
-#endif
 
    // Reset screen related counters/vars
    mTIM_0_CURRENT=0;
@@ -882,10 +874,18 @@ inline void CMikie::ResetDisplayPtr()
    switch(mDisplayRotate)
    {
       case MIKIE_ROTATE_L:
-         mpDisplayCurrent=gPrimaryFrameBuffer+(mDisplayPitch*(HANDY_SCREEN_WIDTH-1)) + sizeof(HandyPixel)*(320-HANDY_SCREEN_HEIGHT*2)/2;
+#ifdef DOUBLE_SCREEN
+         mpDisplayCurrent=gPrimaryFrameBuffer+(mDisplayPitch*(HANDY_SCREEN_WIDTH-1)) + sizeof(HandyPixel)*(OUTPUT_SCREEN_WIDTH-HANDY_SCREEN_HEIGHT*2)/2;
+#else
+         mpDisplayCurrent=gPrimaryFrameBuffer+(mDisplayPitch*(HANDY_SCREEN_WIDTH-1)) + sizeof(HandyPixel)*(OUTPUT_SCREEN_WIDTH-HANDY_SCREEN_HEIGHT)/2;
+#endif
          break;
       case MIKIE_ROTATE_R:
-         mpDisplayCurrent=gPrimaryFrameBuffer + sizeof(HandyPixel)*(320 -(320-HANDY_SCREEN_HEIGHT*2)/2);
+#ifdef DOUBLE_SCREEN
+         mpDisplayCurrent=gPrimaryFrameBuffer + sizeof(HandyPixel)*(OUTPUT_SCREEN_WIDTH -(OUTPUT_SCREEN_WIDTH-HANDY_SCREEN_HEIGHT*2)/2);
+#else
+         mpDisplayCurrent=gPrimaryFrameBuffer + sizeof(HandyPixel)*(OUTPUT_SCREEN_WIDTH -(OUTPUT_SCREEN_WIDTH-HANDY_SCREEN_HEIGHT)/2);
+#endif
          break;
       default:
          mpDisplayCurrent=gPrimaryFrameBuffer;
@@ -953,98 +953,178 @@ inline ULONG CMikie::DisplayRenderLine(void)
       // Assign the temporary pointer;
       bitmap_tmp=(HandyPixel*)mpDisplayCurrent;
 
-		switch(mDisplayRotate)
-		{
-      
-         case MIKIE_ROTATE_L:
-            for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
-            {
-               source=mpRamPointer[mLynxAddr];
-               if(mDISPCTL_Flip)
-               {
-                  mLynxAddr--;
-                  *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmap_tmp+1)=mColourMap[mPalette[source&0x0f].Index];
-                  bitmap_tmp-=HANDY_SCREEN_STRIDE;
-                  *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmap_tmp+1)=mColourMap[mPalette[source>>4].Index];
-                  bitmap_tmp-=HANDY_SCREEN_STRIDE;
-               }
-               else
-               {
-                  mLynxAddr++;
-                  *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmap_tmp+1)=mColourMap[mPalette[source>>4].Index];
-                  bitmap_tmp-=HANDY_SCREEN_STRIDE;
-                  *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmap_tmp+1)=mColourMap[mPalette[source&0x0f].Index];
-                  bitmap_tmp-=HANDY_SCREEN_STRIDE;
-               }
-            }
-            mpDisplayCurrent+=2*sizeof(HandyPixel);
-				break;
-			case MIKIE_ROTATE_R:
-            for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
-            {
-               source=mpRamPointer[mLynxAddr];
-               if(mDISPCTL_Flip)
-               {
-                  mLynxAddr--;
-                  *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmap_tmp-1)=mColourMap[mPalette[source&0x0f].Index];
-                  bitmap_tmp+=HANDY_SCREEN_STRIDE;
-                  *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmap_tmp-1)=mColourMap[mPalette[source>>4].Index];
-                  bitmap_tmp+=HANDY_SCREEN_STRIDE;
-               }
-               else
-               {
-                  mLynxAddr++;
-                  *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmap_tmp-1)=mColourMap[mPalette[source>>4].Index];
-                  bitmap_tmp+=HANDY_SCREEN_STRIDE;
-                  *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmap_tmp-1)=mColourMap[mPalette[source&0x0f].Index];
-                  bitmap_tmp+=HANDY_SCREEN_STRIDE;
-               }
-            }
-            mpDisplayCurrent-=2*sizeof(HandyPixel);
-				break;
-            
-			default:
-            HandyPixel *bitmappt=bitmap_tmp;
+#ifdef DOUBLE_SCREEN
+      switch(mDisplayRotate)
+      {
+        
+           case MIKIE_ROTATE_L:
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmap_tmp+1)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmap_tmp+1)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                 }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmap_tmp+1)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmap_tmp+1)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                 }
+              }
+              mpDisplayCurrent+=2*sizeof(HandyPixel);
+              break;
+          case MIKIE_ROTATE_R:
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmap_tmp-1)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmap_tmp-1)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                 }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmap_tmp-1)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmap_tmp-1)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                 }
+              }
+              mpDisplayCurrent-=2*sizeof(HandyPixel);
+              break;
+              
+          default:
+              HandyPixel *bitmappt=bitmap_tmp;
+  
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];                 
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                  }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
+                 }
+              }
+              mpDisplayCurrent+=mDisplayPitch*2;
+              break;
+        }
+#else
+      switch(mDisplayRotate)
+      {
+        
+           case MIKIE_ROTATE_L:
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                 }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp-=OUTPUT_SCREEN_STRIDE;
+                 }
+              }
+              mpDisplayCurrent+=sizeof(HandyPixel);
+              break;
+          case MIKIE_ROTATE_R:
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                 }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmap_tmp)=mColourMap[mPalette[source>>4].Index];;
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                    *(bitmap_tmp)=mColourMap[mPalette[source&0x0f].Index];
+                    bitmap_tmp+=OUTPUT_SCREEN_STRIDE;
+                 }
+              }
+              mpDisplayCurrent-=sizeof(HandyPixel);
+              break;
+              
+          default:
+              HandyPixel *bitmappt=bitmap_tmp;
+  
+              for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
+              {
+                 source=mpRamPointer[mLynxAddr];
+                 if(mDISPCTL_Flip)
+                 {
+                    mLynxAddr--;
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];                
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                  }
+                 else
+                 {
+                    mLynxAddr++;
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
+                    *(bitmappt+OUTPUT_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
+                    *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
+                 }
+              }
+              mpDisplayCurrent+=mDisplayPitch*2;
+              break;
+        }
+#endif
 
-            for(loop=0;loop<HANDY_SCREEN_WIDTH/2;loop++)
-            {
-               source=mpRamPointer[mLynxAddr];
-               if(mDISPCTL_Flip)
-               {
-                  mLynxAddr--;
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];                 
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
-                }
-               else
-               {
-                  mLynxAddr++;
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source>>4].Index];
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt+HANDY_SCREEN_STRIDE)=mColourMap[mPalette[source&0x0f].Index];
-                  *(bitmappt++)=mColourMap[mPalette[source&0x0f].Index];
-               }
-            }
-            mpDisplayCurrent+=mDisplayPitch*2;
-            break;
-		}
    }
    return work_done;
 }

@@ -5,11 +5,7 @@ extern "C" {
   #include "iopins.h"
 }
 
-#ifdef HAS_T4_VGA
-#include "vga_t_dma.h"
-#else
-#include "tft_t_dma.h"
-#endif
+#include <Arduino.h>
 
 #ifdef HAS_USB
 #include "USBHost_t36.h"  // Read this header first for key info
@@ -32,6 +28,8 @@ JoystickController joysticks[COUNT_JOYSTICKS](myusb);
 static bool emu_writeConfig(void);
 static bool emu_readConfig(void);
 static bool emu_eraseConfig(void);
+static bool emu_writeGfxConfig(char * display_type);
+static int  emu_readGfxConfig(void);
 
 static bool mouseDetected = false;
 static bool keyboardDetected = false;
@@ -42,6 +40,7 @@ static File file;
 
 #define MAX_FILES           64
 #define AUTORUN_FILENAME    "autorun.txt"
+#define GFX_CFG_FILENAME    "gfxmode.txt"
 
 #define MAX_FILENAME_SIZE   34
 #define MAX_MENULINES       9
@@ -61,7 +60,8 @@ static File file;
 #define MENU_VGA_XOFFSET    (MENU_FILE_XOFFSET+MENU_FILE_W+8)
 #define MENU_VGA_YOFFSET    (MENU_VBAR_YOFFSET+MENU_FILE_H-32-37)
 
-extern TFT_T_DMA tft;
+#include "t4_dsp.h"
+T4_DSP tft;
 
 static int nbFiles=0;
 static int curFile=0;
@@ -73,6 +73,8 @@ static char selected_filename[MAX_FILENAME_SIZE]="";
 static char second_selected_filename[MAX_FILENAME_SIZE]="";
 static bool menuRedraw=true;
 static bool autorun=false;
+static bool vgahires=false;
+
 
 static const unsigned short * keys;
 #ifdef TEECOMPUTER
@@ -360,9 +362,10 @@ int emu_ReadKeys(void)
 #endif
   if ( row & 0x02 ) retval |= MASK_JOY2_BTN;
 
+
 #ifdef EXTPAD
-  if ( fn_pressed ) retval |= MASK_KEY_USER1;
   if ( sh_pressed ) retval |= MASK_KEY_USER3;
+  if ( fn_pressed ) retval |= MASK_KEY_USER1;
   digitalWrite(KLED, 0);
 #else
   // Handle LED flash
@@ -646,7 +649,7 @@ int emu_setKeymap(int index) {
 }
 
 int emu_GetMouse(int *x, int *y, int *buts) {
-#ifdef HAS_USBKEY
+#if defined(HAS_USB) && (HAS_USBKEY) 
   if (mouse1.available()) {
     *buts = mouse1.getButtons();
     *x = mouse1.getMouseX();
@@ -660,7 +663,7 @@ int emu_GetMouse(int *x, int *y, int *buts) {
 }
 
 int emu_GetJoystick(void) {
-#ifdef HAS_USBJOY
+#if defined(HAS_USB) && (HAS_USBJOY)   
   for (int joystick_index = 0; joystick_index < COUNT_JOYSTICKS; joystick_index++) {
     if (joysticks[joystick_index].available()) {
       uint64_t axis_mask = joysticks[joystick_index].axisMask();
@@ -675,7 +678,7 @@ int emu_GetJoystick(void) {
   return 0;
 }
 
-#ifdef HAS_USBKEY
+#if defined(HAS_USB) && (HAS_USBKEY) 
 void OnPress(auto key)
 {
   keyboardDetected = true;
@@ -819,7 +822,7 @@ int emu_KeyboardDetected(void) {
   return (keyboardDetected?1:0); 
 }
 
-#ifdef HAS_USBMIDI
+#if defined(HAS_USB) && (HAS_USBMIDI) 
 static unsigned char midiBuffer[16];
 static unsigned char midiLastCmd=0;
 static int midiDataCnt=0;
@@ -827,7 +830,7 @@ static int midiCmdNbParam=0;
 #endif
 
 void emu_MidiOnDataReceived(unsigned char value) {
-#ifdef HAS_USBMIDI
+#if defined(HAS_USB) && (HAS_USBMIDI) 
 //Serial.println(value, HEX);    
 //10000000 = 128 = note off
 //10010000 = 144 = note on
@@ -995,6 +998,7 @@ void emu_MidiOnDataReceived(unsigned char value) {
 /********************************
  * Menu file loader UI
 ********************************/ 
+#ifdef FILEBROWSER
 static int readNbFiles(void) {
   int totalFiles = 0;
 
@@ -1024,8 +1028,6 @@ static int readNbFiles(void) {
   return totalFiles;  
 }  
 
-
-
 void backgroundMenu(void) {
     menuRedraw=true;  
     tft.fillScreenNoDma(RGBVAL16(0x00,0x00,0x00));
@@ -1035,11 +1037,13 @@ void backgroundMenu(void) {
 int handleMenu(uint16_t bClick)
 {
   if (autorun) {
+      toggleMenu(false);
+      menuRedraw=false;    
       return (ACTION_RUN1);                    
   }  
   
   int action = ACTION_NONE;
-  if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_JOY1_BTN) ) {     
+  if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_JOY1_BTN) || ( bClick & MASK_KEY_USER2  ) ) {     
       char newpath[MAX_FILENAME_PATH];
       strcpy(newpath, selection);
       strcat(newpath, "/");
@@ -1050,17 +1054,31 @@ int handleMenu(uint16_t bClick)
       File file = SD.open(selection);
       if (file.isDirectory())  {
         curFile = 0;
-        nbFiles = readNbFiles();             
+        nbFiles = readNbFiles();
+        menuRedraw=true;             
       }
-      else {
-        action = ACTION_RUN1;
+      else 
+      {
 #ifdef TEECOMPUTER
-        if (key_extmode) {
+        if ( (key_extmode) || ( key_sh) )  {
           emu_writeConfig();
         }
+        if ( tft.getMode() < MODE_VGA_320x240) { 
+          if ( bClick & MASK_KEY_USER2  ) {
+            if (vgahires) {    
+              tft.begin(MODE_VGA_640x480);
+            }
+            else {
+              tft.begin(MODE_VGA_320x240);
+            }            
+          } 
+        }
+        //emu_SwapJoysticks(0);
 #endif                       
+        toggleMenu(false);
+        menuRedraw=false;    
+        return (ACTION_RUN1);                    
       }
-      menuRedraw=true;
   }
   else if ( bClick & MASK_KEY_USER1 ) {
       menuRedraw=true;
@@ -1069,19 +1087,14 @@ int handleMenu(uint16_t bClick)
       strcat(second_selection, "/");
       strcat(second_selection, second_selected_filename);      
       action = ACTION_RUN2;    
-  }
-  else if ( bClick & MASK_KEY_USER2  ) {
-      menuRedraw=true;  
-      //action = ACTION_RUN3;    
-      emu_SwapJoysticks(0);
-  }  
+  } 
   else if ( (bClick & MASK_JOY2_UP) || (bClick & MASK_JOY1_UP) ) {
     if (curFile!=0) {
       menuRedraw=true;
       curFile--;
     }
   }
-  else if ( (bClick & MASK_JOY2_RIGHT) || (bClick & MASK_JOY1_RIGHT) ) {
+  else if ( (bClick & MASK_JOY2_LEFT) || (bClick & MASK_JOY1_LEFT) ) {
     if ((curFile-9)>=0) {
       menuRedraw=true;
       curFile -= 9;
@@ -1096,7 +1109,7 @@ int handleMenu(uint16_t bClick)
       menuRedraw=true;
     }
   }
-  else if ( (bClick & MASK_JOY2_LEFT) || (bClick & MASK_JOY1_LEFT) ) {
+  else if ( (bClick & MASK_JOY2_RIGHT) || (bClick & MASK_JOY1_RIGHT) ) {
     if ((curFile<(nbFiles-9)) && (nbFiles)) {
       curFile += 9;
       menuRedraw=true;
@@ -1153,12 +1166,12 @@ int handleMenu(uint16_t bClick)
   return (action);  
 }
 
-bool menuActive(void) 
+int menuActive(void) 
 {
-  return (menuOn);
+  return (menuOn?1:0);
 }
 
-void toggleMenu(bool on) {
+void toggleMenu(int on) {
   if (on) {
     menuOn=true;
     backgroundMenu();
@@ -1176,7 +1189,7 @@ char * menuSecondSelection(void)
 {
   return (second_selection);  
 }
-
+#endif
 
 /********************************
  * OSKB handling
@@ -1196,7 +1209,7 @@ static void lineOSKB(int xoff, bool bottom, char * str, int row)
   int i=0;
   int fb_width,fb_height,fbstride;
 
-  tft.get_frame_buffer_size(&fb_width, &fb_height, &fbstride);
+  fbstride = tft.get_frame_buffer_size(&fb_width, &fb_height);
   int ypos = (bottom?(fb_height-2*8):0);
   int line = row + (bottom?2:0);
   while ((c[1] = *cpt++))
@@ -1205,7 +1218,7 @@ static void lineOSKB(int xoff, bool bottom, char * str, int row)
     if (row&1) bg = (i&1)?RGBVAL16(0xff,0xff,0xff):RGBVAL16(0xe0,0xe0,0xe0);
     else bg = (i&1)?RGBVAL16(0xe0,0xe0,0xe0):RGBVAL16(0xff,0xff,0xff);
     if ( (cxpos == i) && (cypos == line) ) bg = RGBVAL16(0x00,0xff,0xff);
-    tft.drawTextNoDma(OSKBXOFF+xoff+24*i,OSKBYOFF+ypos+8*row , &c[0], RGBVAL16(0x00,0x00,0x00), bg, false);
+    tft.drawText(OSKBXOFF+xoff+24*i,OSKBYOFF+ypos+8*row , &c[0], RGBVAL16(0x00,0x00,0x00), bg, false);
     i++;
   } 
 }
@@ -1303,7 +1316,7 @@ int handleOSKB(void) {
   return retval; 
 }
 
-void toggleOSKB(bool forceon) {
+void toggleOSKB(int forceon) {
   if (forceon) {
     oskbOn = true;
     drawOSKB();
@@ -1384,6 +1397,17 @@ int emu_FileRead(void * buf, int size, int handler)
   return (file.read(buf, size));
 #else
   return (getFileHandler(handler).read(buf, size));
+#endif
+}
+
+int emu_FileWrite(void * buf, int size, int handler)
+{
+//  emu_printf("emu_FileWrite");
+//  emu_printi(handler);
+#ifdef HCFH  
+  return (file.write(buf, size));
+#else
+  return (getFileHandler(handler).write(buf, size));
 #endif
 }
 
@@ -1545,6 +1569,48 @@ static bool emu_readConfig(void)
 static bool emu_eraseConfig(void)
 {
   SD.remove (ROMSDIR "/" AUTORUN_FILENAME);
+}
+
+static bool emu_writeGfxConfig(char * display_type)
+{
+  bool retval = false;
+  SD.remove ("/" GFX_CFG_FILENAME);
+  if (strcmp(display_type, "VGA")) {
+    if ((lofile = SD.open("/" GFX_CFG_FILENAME, O_CREAT | O_WRITE)))
+    {
+      if (lofile.write(display_type, strlen(display_type)) != strlen(display_type)) {
+        emu_printf("GFX config write failed");
+      }
+      else {
+        retval = true;
+      }
+      lofile.close();
+    }    
+  }
+  return retval;  
+}
+
+#define CFG_VGA 0
+#define CFG_ILI 1
+#define CFG_ST  2
+
+static int emu_readGfxConfig(void)
+{
+  int retval = CFG_VGA; // No file = VGA
+  if ((lofile = SD.open("/" GFX_CFG_FILENAME, O_READ)))
+  {
+    unsigned int filesize = lofile.size();
+    if (filesize == 2)      // "ST"
+    {
+      retval = CFG_ST;
+    }
+    else if (filesize == 3) // "ILI"
+    {
+      retval = CFG_ILI;
+    }
+    lofile.close();
+  }
+  return retval;
 }
 
 /********************************
@@ -1728,11 +1794,137 @@ FRESULT f_mkdir (const char* path)
 
 
 /********************************
- * Initialization
+ * GFX wrapper
 ********************************/ 
-void emu_init(void)
+static unsigned short palette16[PALETTE_SIZE];
+static IntervalTimer myTimer;
+volatile boolean vbl=true;
+volatile boolean vgatimervsync=false;
+static void (*vblCallback)(void) = nullptr;
+static int skip=0;
+ 
+static void vblCount() { 
+  if (vbl) {
+    vbl = false;
+  } else {
+    vbl = true;
+  }
+}
+
+void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index)
+{
+  if (index<PALETTE_SIZE) {
+    palette16[index] = RGBVAL16(r,g,b);    
+  }
+}
+
+void emu_DrawVsync(void)
+{
+  volatile boolean vb=vbl;
+  skip += 1;
+  skip &= VID_FRAME_SKIP;
+  if ( tft.getMode() >= MODE_VGA_320x240 ) {
+    if (vgatimervsync) {
+      while (vbl==vb) {};
+    }
+    else {
+      tft.waitSync();
+    }
+  }
+  else {
+    while (vbl==vb) {};
+  }
+  if (vblCallback != nullptr) {
+    vblCallback();
+  }   
+}
+
+void emu_DrawScreenPal16(unsigned char * VBuf, int width, int height, int stride) 
+{
+  if (skip == 0) {
+    tft.writeScreenPal(width,height-TFT_VBUFFER_YCROP,stride, VBuf+(TFT_VBUFFER_YCROP/2)*stride, palette16);
+  }
+}
+void emu_DrawLinePal16(unsigned char * VBuf, int width, int height, int line) 
+{
+  if (skip == 0) {
+     tft.writeLinePal(width,height,line, VBuf, palette16);
+  }
+}
+
+void emu_DrawLine16(unsigned short * VBuf, int width, int height, int line)
+{
+  if (skip == 0) {
+    tft.writeLine(width,height,line, VBuf);
+  }
+}
+
+void emu_DrawLine8(unsigned char * VBuf, int width, int height, int line)
+{
+  if (skip == 0) {
+    tft.writeLine8(width,height,line, VBuf, palette16);
+  }
+}
+
+int emu_IsVga(void)
+{
+  return (tft.getMode() >= MODE_VGA_320x240?1:0);
+}
+
+int emu_IsVgaHires(void)
+{
+  return (tft.getMode() >= MODE_VGA_640x240?1:0);
+}
+
+int emu_FrameSkip(void)
+{
+  return skip;
+}
+
+
+/********************************
+ * AUDIO wrapper
+********************************/ 
+#ifdef HAS_SND
+
+#include "AudioPlaySystem.h"
+AudioPlaySystem mymixer;
+
+void emu_sndInit() {
+  Serial.println("sound init");  
+  mymixer.begin_audio(256, mymixer.snd_Mixer);
+  mymixer.start();
+}
+
+void emu_sndPlaySound(int chan, int volume, int freq)
+{
+  if (chan < 6) {
+    mymixer.sound(chan, freq, volume); 
+  }
+  /*
+  Serial.print(chan);
+  Serial.print(":" );  
+  Serial.print(volume);  
+  Serial.print(":" );  
+  Serial.println(freq); 
+  */ 
+}
+
+void emu_sndPlayBuzz(int size, int val) {
+  mymixer.buzz(size,val); 
+  //Serial.print((val==1)?1:0); 
+  //Serial.print(":"); 
+  //Serial.println(size); 
+}
+#endif
+
+/********************************
+ * Initialization
+********************************/
+void emu_init(int hires)
 {
   Serial.begin(115200);
+  vgahires = hires;
 
 #ifdef HAS_USB
   myusb.begin();
@@ -1742,50 +1934,109 @@ void emu_init(void)
 #endif
 #endif
 
-  while (!SD.begin(SD_CS))
+#ifdef FILEBROWSER
+  if (!SD.begin(SD_CS))
   {
-    Serial.println("SD begin failed, retrying...");
-    delay(1000);    
+    Serial.println("No SD card detected");   
   }
   strcpy(selection,ROMSDIR);
-  
   FileHandlersInit();
-  
   nbFiles = readNbFiles(); 
-
-  Serial.print("SD initialized, files found: ");
   Serial.println(nbFiles);
+#endif
 
   emu_InitJoysticks();
 #ifdef SWAP_JOYSTICK
-  joySwapped = true;   
+  joySwapped = true;
 #else
-  joySwapped = false;   
+  joySwapped = false;
 #endif
 
-#ifdef TEECOMPUTER
-#ifndef HAS_T4_VGA
-    tft.flipscreen(false);
-#endif
-#endif
   int keypressed = emu_ReadKeys();
+#ifdef HAS_T4_VGA
+  if (vgahires) {    
+    tft.begin(MODE_VGA_640x480);
+  }
+  else {
+    tft.begin(MODE_VGA_320x240);
+  }
+#else
+  int gfx_mode = CFG_VGA; // default
+#ifdef FILEBROWSER
+  gfx_mode = emu_readGfxConfig();
+#endif
+  // Force VGA if UP pressed
+  if (keypressed & MASK_JOY2_UP)
+  {
+#ifdef FILEBROWSER
+    emu_writeGfxConfig("VGA");
+#endif
+    gfx_mode = CFG_VGA;
+  }
+  else {
+    if (keypressed & MASK_JOY2_LEFT)
+    {
+#ifdef FILEBROWSER
+      emu_writeGfxConfig("ST");
+#endif
+      gfx_mode = CFG_ST;
+    }
+    else if (keypressed & MASK_JOY2_RIGHT)
+    {
+#ifdef FILEBROWSER
+      emu_writeGfxConfig("ILI");
+#endif
+      gfx_mode = CFG_ILI;
+    }
+  }
+  if (gfx_mode == CFG_VGA) {
+    if (vgahires) {    
+      tft.begin(MODE_VGA_640x480);
+    }
+    else {
+      tft.begin(MODE_VGA_320x240);
+    }
+  }
+  else
+  {
+    tft.begin(gfx_mode == CFG_ILI?MODE_TFTILI_320x240:MODE_TFTST_320x240);
+  }  
+#endif  
+
   if (keypressed & MASK_JOY2_DOWN) {
     tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
     tft.drawTextNoDma(64,48,    (char*)" AUTURUN file erased", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
+#ifdef FILEBROWSER
     emu_eraseConfig();
     delay(1000);
+#endif
   }
   else {
+#ifdef FILEBROWSER
     if (emu_readConfig()) {
       autorun = true;
     }
+#endif
   }  
 
+#ifdef FILEBROWSER
   toggleMenu(true);
+#endif
 }
 
 
-void emu_start(void)
+void emu_start(int vblms, void * callback, int forcetimervsync)
 {
+  vgatimervsync = forcetimervsync?true:false;
+  tft.fillScreenNoDma( RGBVAL16(0x00,0x00,0x00) );
+  tft.startRefresh(); 
+  if (callback != nullptr) {
+    vblCallback = callback;    
+  }
+  
+  myTimer.begin(vblCount, vblms);
+#ifdef HAS_SND
+  emu_sndInit();
+#endif   
   usbnavpad = 0;
 }

@@ -7,15 +7,8 @@ extern "C" {
 #include <Arduino.h>
 #include "bios-font.h"
 
-#ifdef HAS_T4_VGA
-#include "vga_t_dma.h"
-typedef uint8_t Pixel;
-#define RGBVAL(r,g,b)  RGBVAL8(r,g,b)
-#else
-#include "tft_t_dma.h"
 typedef uint16_t Pixel;
 #define RGBVAL(r,g,b)  RGBVAL16(r,g,b)
-#endif
 
 #include "globals.h"
 #include "applevm.h"
@@ -83,14 +76,15 @@ void PlfDisplay::redraw()
 {
 }
 
-
+static Pixel linebuffer[DISPLAYWIDTH];
+ 
 void PlfDisplay::blit(AiieRect r)
 {
   uint8_t *videoBuffer = g_vm->videoBuffer; // FIXME: poking deep
   uint16_t pixel;
   for (uint8_t y=r.top; y<=r.bottom; y++) {
-    Pixel * scrlinept = (Pixel *)emu_LineBuffer(y);
-    scrlinept += (TFT_WIDTH - (r.right - r.left))/2;
+    Pixel * scrlinept = &linebuffer[0];  // (Pixel *)emu_LineBuffer(y);
+    scrlinept += (DISPLAYWIDTH - (r.right - r.left))/2;
     for (uint16_t x=r.left; x<=r.right; x++) {
       pixel = y * (DISPLAYRUN >> 1) + (x >> 1);
       uint8_t colorIdx;
@@ -101,6 +95,7 @@ void PlfDisplay::blit(AiieRect r)
       }
       scrlinept[x] = loresPixelColors[colorIdx];
     }
+    emu_DrawLine16(&linebuffer[0], DISPLAYWIDTH, 200 /*DISPLAYHEIGHT*/, y);
   }
 }
 

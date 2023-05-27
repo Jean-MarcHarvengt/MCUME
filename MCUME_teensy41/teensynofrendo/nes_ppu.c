@@ -1031,7 +1031,7 @@ static void ppu_renderscanline(bitmap_t *bmp, int scanline, bool draw_flag)
       ppu_fakeoam(scanline);
 
    if (draw_flag)
-      emu_DrawLine(buf, 256, 240, scanline);    
+      emu_DrawLinePal16(buf, 256, 240, scanline);    
 }
 
 

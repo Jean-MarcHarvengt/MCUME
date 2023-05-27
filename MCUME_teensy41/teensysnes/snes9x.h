@@ -23,8 +23,7 @@
 #define RETRO_LESS_ACCURATE_APU 0
 #define RETRO_COMBINED_MEMORY_MAP 1
 
-//#define SNES_STRIDE					320
-#define SNES_WIDTH					emu_LineStride() //256
+#define SNES_WIDTH					256
 #define SNES_HEIGHT					224
 #define SNES_HEIGHT_EXTENDED		224 // 239 This will cause problem in some games, but it saves a lot of memory...
 

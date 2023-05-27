@@ -69,11 +69,7 @@
 #define BORDER_LEFT           0
 #define BORDER_RIGHT          0
 
-#ifdef HAS_T4_VGA
-typedef uint8_t tpixel;
-#else
 typedef uint16_t tpixel;
-#endif
 
 #define MAXCYCLESSPRITES0_2       3
 #define MAXCYCLESSPRITES3_7       5
@@ -1606,12 +1602,7 @@ g-Zugriff
 
 
   }
-
-#ifdef HAS_T4_VGA
-  emu_DrawLine8(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
-#else
   emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
-#endif
 
 
 

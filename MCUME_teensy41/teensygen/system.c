@@ -23,8 +23,14 @@ t_input input;
 t_snd snd;
 static int sound_tbl[262];
 
-#define SND_SIZE (snd.buffer_size * sizeof(int16))
 
+
+#define SND_SIZE (snd.buffer_size * sizeof(int16))
+#define MAX_SND_SIZE 1024
+
+static int16 * fm_buffer1[MAX_SND_SIZE];
+static int16 * fm_buffer2[MAX_SND_SIZE];
+static int16 * psg_buffer[MAX_SND_SIZE];
 
 int audio_init(int rate)
 {
@@ -49,16 +55,21 @@ int audio_init(int rate)
     snd.buffer_size = (rate / 60);
     snd.sample_rate = rate;
 
+    snd.fm.buffer[0] = &fm_buffer1[0];
+    snd.fm.buffer[1] = &fm_buffer2[0];
+    snd.psg.buffer = &psg_buffer[0];
+
+
     /* Allocate sound buffers */
-    snd.fm.buffer[0] = emu_Malloc(SND_SIZE);
-    snd.fm.buffer[1] = emu_Malloc(SND_SIZE);
-    snd.psg.buffer = emu_Malloc(SND_SIZE);
+    //snd.fm.buffer[0] = emu_Malloc(SND_SIZE);
+    //snd.fm.buffer[1] = emu_Malloc(SND_SIZE);
+    //snd.psg.buffer = emu_Malloc(SND_SIZE);
 
     /* Make sure we could allocate everything */
-    if(!snd.fm.buffer[0] || !snd.fm.buffer[1] || !snd.psg.buffer)
-    {
-        return (0);
-    }
+    //if(!snd.fm.buffer[0] || !snd.fm.buffer[1] || !snd.psg.buffer)
+    //{
+    //    return (0);
+    //}
 
     /* Initialize sound chip emulation */
     SN76496_sh_start(zclk, 100, rate);
@@ -96,9 +107,13 @@ void system_reset(void)
         YM2612ResetChip(0);
         //memset(snd.buffer[0], 0, SND_SIZE);
         //memset(snd.buffer[1], 0, SND_SIZE);
-        memset(snd.fm.buffer[0], 0, SND_SIZE);
-        memset(snd.fm.buffer[1], 0, SND_SIZE);
-        memset(snd.psg.buffer, 0, SND_SIZE);
+     //   memset(snd.fm.buffer[0], 0, SND_SIZE);
+     //   memset(snd.fm.buffer[1], 0, SND_SIZE);
+     //   memset(snd.psg.buffer, 0, SND_SIZE);
+
+        memset(&fm_buffer1[0], 0, MAX_SND_SIZE);
+        memset(&fm_buffer2[0], 0, MAX_SND_SIZE);
+        memset(&psg_buffer[0], 0, MAX_SND_SIZE);     
     }
 }
 
@@ -228,15 +243,26 @@ void audio_play_sample(int16 *bufl, int16 *bufr, int length)
  
     length = length/2;
 
+    snd.fm.buffer[0] = &fm_buffer1[0];
+    snd.fm.buffer[1] = &fm_buffer2[0];
+    snd.psg.buffer = &psg_buffer[0];
+
+
 
     int16 *tempBuffer[2];
     tempBuffer[0] = snd.fm.buffer[0];
     tempBuffer[1] = snd.fm.buffer[1];
-    YM2612UpdateOne(0, (int16 **)tempBuffer, length);
+    //return;
     
-    tempBuffer[0] = snd.psg.buffer;
-    SN76496Update(0, tempBuffer[0], length);
+    //YM2612UpdateOne(0, (int16 **)tempBuffer, length);
 
+    //tempBuffer[0] = snd.psg.buffer;
+    //SN76496Update(0, tempBuffer[0], length);
+    
+    //SN76496Update(0, &psg_buffer[0], length);
+
+
+    
     for(i = 0; i < length /*snd.buffer_size*/; i += 1)
     {
         int16 psg = snd.psg.buffer[i] / 2;

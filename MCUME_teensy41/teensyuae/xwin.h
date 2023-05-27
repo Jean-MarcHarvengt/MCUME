@@ -7,13 +7,8 @@
   */
 
 #include "platform_config.h"  
-#ifdef HAS_T4_VGA
-typedef unsigned char xcolnr;
-#else
+
 typedef unsigned short xcolnr;
-#endif
-
-
 
 typedef int (*allocfunc_type)(int, int, int, xcolnr *);
 
@@ -71,5 +66,3 @@ extern struct vidbuf_description gfxvidinfo;
 /* For ports using tui.c, this should be built by graphics_setup(). */
 extern struct bstring *video_mode_menu;
 extern void vidmode_menu_selected(int);
-
-

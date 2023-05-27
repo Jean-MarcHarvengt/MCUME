@@ -150,7 +150,7 @@ static __inline__ void fuzzy_memset_le32_1 (void *p, uae_u32 c, int offset, int 
      case 2: p2[0] = c; p2[1] = c; break;
      case 1: p2[0] = c; break;
      case 0: break;
-     default: printf("Hit the programmer.\n"); break;
+     default: /*printf("Hit the programmer.\n");*/ break;
     }
 }
 
@@ -195,5 +195,3 @@ extern frame_time_t vsynctime, vsyncmintime;
 #if defined(AMIGA) && defined(__GNUC__)
 #include "md-amiga/amiga-kludges.h"
 #endif
-
-

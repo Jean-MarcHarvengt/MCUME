@@ -6,7 +6,6 @@
 
 //#define ALIGN_DWORD 1
 #define LSB_FIRST 1
-#define SOUND_PRESENT 1
 
 /* Data types */
 
@@ -57,4 +56,3 @@ typedef signed short int FMSAMPLE;
 #include "system.h"
 
 #endif /* _SHARED_H_ */
-

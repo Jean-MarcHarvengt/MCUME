@@ -12,10 +12,8 @@
 #include "gfx.h"
 //#include "snapshot.h"
 
-
 struct SSettings Settings;
 char String[513];
-
 
 void S9xInitSettings(void)
 {
@@ -61,6 +59,19 @@ void s9x_init(void) {
   Settings.ReverseStereo = false;
   Settings.PAL = true; //false;
 
+  if ( !emu_IsVga() ) {
+    int index = 0;
+    for (int r=0; r<8; r++) {      
+      for (int g=0; g<8; g++) {      
+        for (int b=0; b<4; b++) {
+          if (index < PALETTE_SIZE) {
+            emu_SetPaletteEntry(r<<5, g<<5, b<<6, index++); 
+          }    
+        }
+      }
+    }
+  }
+
 	if (!S9xMemoryInit())
 		emu_printf("Memory init failed!");
 
@@ -99,6 +110,9 @@ void s9x_step(void) {
   }
   //IPPU.RenderThisFrame = (((++frames_counter) & Settings.SkipFrames) == Settings.SkipFrames);
 		//GFX.Screen = (uint16*)currentUpdate->buffer;
+  for (int j=0; j<SNES_HEIGHT; j++) {
+      emu_DrawLine8(&GFX.Screen[SNES_WIDTH*j], SNES_WIDTH, SNES_HEIGHT, j);
+  }
 }
 
 
@@ -115,7 +129,6 @@ const char * S9xBasename (const char *) {
 }      
 
 void S9xExit(void) {
-
 }
 
 

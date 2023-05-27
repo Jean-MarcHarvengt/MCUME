@@ -29,8 +29,6 @@ typedef ULONG uaecptr;
 #define REGPARAM2
 #endif
 
-
-#define SOUND_PRESENT 1
 #define M68K_SPEED 8
 //#define HAS_BOGOMEM 1
 //#define HAS_MEMDISK  1
@@ -39,4 +37,3 @@ typedef ULONG uaecptr;
 #define HAS_FILESYS 1  
 
 #endif /* _DTYPES_H_ */
-

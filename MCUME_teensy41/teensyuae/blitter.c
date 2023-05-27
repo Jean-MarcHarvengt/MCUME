@@ -11,7 +11,6 @@
 #include "gensound.h"
 #include "sounddep/sound.h"
 #include "events.h"
-#include "uae.h"
 #include "memory.h"
 #include "custom.h"
 #include "readcpu.h"
@@ -462,4 +461,3 @@ void maybe_blit(void)
     eventtab[ev_blitter].active = 0;
     regs.spcflags &= ~SPCFLAG_BLTNASTY;
 }
-

@@ -149,4 +149,3 @@ struct SndDriverStruct
 extern struct SndDriverStruct SndDriver;
 
 #endif /* SOUND_H */
-
