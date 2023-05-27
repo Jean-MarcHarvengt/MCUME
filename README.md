@@ -14,6 +14,7 @@ Mai 2023: add multi display support to T-COMPUTER and PICOZX platforms
 - When configured for non VGA display, you can always push to VGA by pressing ALT iso TAB key to start (on T-COMPUTER) 
 - Add FMSX and SNES emulators to T-COMPUTER. 
 - Port of all PICO emulators to the new PICOZX platform of BOBRICIUS
+<br>
 
 February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU:<br>
 - T-COMPUTER has VGA and TFT video out, Audio out, USB input, embedded 42 keys keyboard and a DB9 joystick input!
