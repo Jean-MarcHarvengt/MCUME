@@ -4,6 +4,17 @@
 </p>
 
 # News
+Mai 2023: add multi display support to T-COMPUTER and PICOZX platforms
+- You can now configure at boot the display to use for each emulator (Teensy41 or PICO)
+- No need for different binaries depending on the display (VGA,ILI and ST displays are all suported)
+- Config is stored on the SDCARD
+- Press Up while booting to force VGA output at startup (will erase display config => default VGA)
+- Press Left while booting to force ST7789 output at startup (will write config)
+- Press Right while booting to force ILI9341 output at startup (will write config)
+- When configured for non VGA display, you can always push to VGA by pressing ALT iso TAB key to start (on T-COMPUTER) 
+- Add FMSX and SNES emulators to T-COMPUTER. 
+- Port of all PICO emulators to the new PICOZX platform of BOBRICIUS
+
 February 2022: introducing T(TEE)-COMPUTER platform based on Teensy41 MCU:<br>
 - T-COMPUTER has VGA and TFT video out, Audio out, USB input, embedded 42 keys keyboard and a DB9 joystick input!
 - now supported on T-COMPUTER: Apple2, Vic20, C64, Atari800, ZX81, ZXSpectrum, Atari ST, Amiga, Colecovision, Odyssey, NES, SMS, Genesis and Doom.
