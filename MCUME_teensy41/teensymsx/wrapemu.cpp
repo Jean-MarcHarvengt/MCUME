@@ -270,7 +270,9 @@ char *ROMNames[MAXMAPPERS+1] =
 };
 
 static byte JoyState;
-
+static int hk = 0;
+static int k = 0;
+static int iusbhk; // USB keyboard key
 
 static unsigned char linebuffer[WIDTH];
 
@@ -292,9 +294,23 @@ static void * loc_Malloc(int size) {
 */
 
 void emu_KeyboardOnDown(int keymodifer, int key) {
+  int keyCode = -1;
+  if ((key >=0xc0) && (key <=0xdf)) {
+    keyCode = ((key-0xc0) & 0x1f) + 0x7f;
+  }
+  else {
+    keyCode = key & 0x7f;
+  }
+  
+  //emu_printi(keyCode);
+  
+  if (keyCode != -1) {
+    iusbhk = keyCode;
+  }  
 }
 
 void emu_KeyboardOnUp(int keymodifer, int key) {
+  iusbhk = 0;
 }
 
 void msx_Init(void)
@@ -319,9 +335,6 @@ void msx_Init(void)
   emu_printf("Allocating MEM done");
 }
 
-
-static int hk = 0;
-static int k = 0;
 
 
 void msx_Input(int click) {
@@ -1146,52 +1159,256 @@ void msx_Start(char * Cartridge)
   emu_printf("init done");
 }
 
-struct { byte Pos,Mask; } Keys[] =
+//International Matrix (WIP) codes
+
+#define INV_KEY { 0xff,0xff }
+#define AK_0  {0,0x01} //'0'
+#define AK_1  {0,0x02} //'1'
+#define AK_2  {0,0x04} //'2'
+#define AK_3  {0,0x08} //'3'
+#define AK_4  {0,0x10} //'4'
+#define AK_5  {0,0x20} //'5'
+#define AK_6  {0,0x40} //'6'
+#define AK_7  {0,0x80} //'7'
+#define AK_8  {1,0x01} //'8'
+#define AK_9  {1,0x02} //'9'
+#define AK_Q  {4,0x40} //'q'
+#define AK_W  {5,0x10} //'w'
+#define AK_E  {3,0x04} //'e'
+#define AK_R  {4,0x80} //'r'
+#define AK_T  {5,0x02} //'t'
+#define AK_Y  {5,0x40} //'y'
+#define AK_U  {5,0x04} //'u'
+#define AK_I  {3,0x40} //'i'
+#define AK_O  {4,0x10} //'o'
+#define AK_P  {4,0x20} //'p'
+#define AK_A  {2,0x40} //'a'
+#define AK_S  {5,0x01} //'s'
+#define AK_D  {3,0x02} //'d'
+#define AK_F  {3,0x08} //'f'
+#define AK_G  {3,0x10} //'g'
+#define AK_H  {3,0x20} //'h'
+#define AK_J  {3,0x80} //'j'
+#define AK_K  {4,0x01} //'k'
+#define AK_L  {4,0x02} //'l'
+#define AK_Z  {5,0x80} //'z'
+#define AK_X  {5,0x20} //'x'
+#define AK_C  {3,0x01} //'c'
+#define AK_V  {5,0x08} //'v'
+#define AK_B  {2,0x80} //'b'
+#define AK_N  {4,0x08} //'n'
+#define AK_M  {4,0x04} //'m'
+
+#define AK_F1         {6,0x20} // 'F1'
+#define AK_F2         {6,0x40} // 'F2'
+#define AK_F3         {6,0x80} // 'F3'
+#define AK_F4         {7,0x01} // 'F4'
+#define AK_F5         {7,0x02} // 'F5'
+#define AK_F6         INV_KEY  // 'F6'
+#define AK_F7         INV_KEY  // 'F7'
+#define AK_F8         INV_KEY  // 'F8'
+#define AK_F9         INV_KEY  // 'F9'
+#define AK_F10        INV_KEY  // 'F10'
+
+#define AK_DEL        {8,0x08} // 'DEL'
+#define AK_ENT        {7,0x80} // 'return'   
+#define AK_COMMA      {2,0x04} // ','
+#define AK_BS         {7,0x20} // 'BackSpace'
+#define AK_SPC        {8,0x01} // ' '
+#define AK_TAB        {7,0x08} // 'TAB'
+#define AK_UP         {8,0x20} // 'Up'
+#define AK_DN         {8,0x40} // 'Down'
+#define AK_LF         {8,0x10} // 'Left'
+#define AK_RT         {8,0x80} // 'Right'
+
+#define AK_ESC        {7,0x04} // 'ESC'
+#define AK_QUOTE      {2,0x01} //{2,0x20} // 'QUOTE'
+#define AK_NUMBERSIGN INV_KEY  // '&'
+#define AK_NPLPAREN   INV_KEY  // '('
+#define AK_NPRPAREN   INV_KEY  // ')'
+#define AK_NPMUL      {9,0x01}  // '*'
+#define AK_NPADD      {9,0x02}  // '+'
+#define AK_NPSUB      {1,0x04} // '-'
+#define AK_PERIOD     {2,0x08} // '.'
+#define AK_NPDIV      {2,0x10} // '/'
+#define AK_SEMICOLON  {1,0x80} // ';'
+#define AK_LTGT       INV_KEY  // '>'
+#define AK_EQUAL      {1,0x08} // '='
+#define AK_LBRACKET   {1,0x20} // '['
+#define AK_BACKSLASH  {1,0x10} // '＼'
+#define AK_RBRACKET   {1,0x40} // ']'
+#define AK_BACKQUOTE  {2,0x02} // '`'
+#define AK_DOUBLEQUOTE  {2,0x02} // '`'
+#define AK_COLON      INV_KEY  // ':'
+#define AK_DOLLAR     INV_KEY  // '$'
+#define AK_DIESE      INV_KEY  // '#'
+#define AK_AROBAS     INV_KEY  // '@'
+
+struct { byte Pos,Mask; } keyboardAsciiConv[] = // QWERTY Keyboard
 {
-  {0,0x01}, //'0'
-  {0,0x02}, //'1'
-  {0,0x04}, //'2'
-  {0,0x08}, //'3'
-  {0,0x10}, //'4'
-  {0,0x20}, //'5'
-  {0,0x40}, //'6'
-  {0,0x80}, //'7'
-  {1,0x01}, //'8'
-  {1,0x02}, //'9'
+/* 0x00 */ INV_KEY,
+/* 0x01 */ INV_KEY,
+/* 0x02 */ INV_KEY,
+/* 0x03 */ INV_KEY,
+/* 0x04 */ INV_KEY,
+/* 0x05 */ INV_KEY,
+/* 0x06 */ INV_KEY,
+/* 0x07 */ INV_KEY,
+/* 0x08 */ INV_KEY,
+/* 0x09 */ AK_TAB,
+/* 0x0A */ AK_ENT,
+/* 0x0B */ INV_KEY,
+/* 0x0C */ INV_KEY,
+/* 0x0D */ INV_KEY,
+/* 0x0E */ INV_KEY,
+/* 0x0F */ INV_KEY,
+/* 0x10 */ INV_KEY,
+/* 0x11 */ INV_KEY,
+/* 0x12 */ INV_KEY,
+/* 0x13 */ INV_KEY,
+/* 0x14 */ INV_KEY,
+/* 0x15 */ INV_KEY,
+/* 0x16 */ INV_KEY,
+/* 0x17 */ INV_KEY,
+/* 0x18 */ INV_KEY,
+/* 0x19 */ INV_KEY,
+/* 0x1A */ INV_KEY,
+/* 0x1B */ AK_ESC,
+/* 0x1C */ INV_KEY,
+/* 0x1D */ INV_KEY,
+/* 0x1E */ INV_KEY,
+/* 0x1F */ INV_KEY,
+/* 0x20 */ AK_SPC,
+/* 0x21 */ INV_KEY, // exclamation mark
+/* 0x22 */ AK_DOUBLEQUOTE, // double quote
+/* 0x23 */ AK_DIESE, // diese
+/* 0x24 */ AK_DOLLAR, // dollar
+/* 0x25 */ INV_KEY, // procent
+/* 0x26 */ AK_NUMBERSIGN, // and
+/* 0x27 */ AK_QUOTE,
+/* 0x28 */ AK_NPLPAREN,
+/* 0x29 */ AK_NPRPAREN,
+/* 0x2A */ AK_NPMUL,
+/* 0x2B */ AK_NPADD,
+/* 0x2C */ AK_COMMA,
+/* 0x2D */ AK_NPSUB,
+/* 0x2E */ AK_PERIOD,
+/* 0x2F */ AK_NPDIV,
+/* 0x30 */ AK_0,
+/* 0x31 */ AK_1,
+/* 0x32 */ AK_2,
+/* 0x33 */ AK_3,
+/* 0x34 */ AK_4,
+/* 0x35 */ AK_5,
+/* 0x36 */ AK_6,
+/* 0x37 */ AK_7,
+/* 0x38 */ AK_8,
+/* 0x39 */ AK_9,
+/* 0x3A */ AK_COLON, // colon :
+/* 0x3B */ AK_SEMICOLON, // semi colon
+/* 0x3C */ AK_LTGT, // <
+/* 0x3D */ AK_EQUAL, // =
+/* 0x3E */ INV_KEY, // >
+/* 0x3F */ INV_KEY, // ?
+/* 0x40 */ AK_AROBAS, // Arobas
+/* 0x41 */ INV_KEY, // capital A
+/* 0x42 */ INV_KEY,
+/* 0x43 */ INV_KEY,
+/* 0x44 */ INV_KEY,
+/* 0x45 */ INV_KEY,
+/* 0x46 */ INV_KEY,
+/* 0x47 */ INV_KEY,
+/* 0x48 */ INV_KEY,
+/* 0x49 */ INV_KEY,
+/* 0x4A */ INV_KEY,
+/* 0x4B */ INV_KEY,
+/* 0x4C */ INV_KEY,
+/* 0x4D */ INV_KEY,
+/* 0x4E */ INV_KEY,
+/* 0x4F */ INV_KEY,
+/* 0x50 */ INV_KEY,
+/* 0x51 */ INV_KEY,
+/* 0x52 */ INV_KEY,
+/* 0x53 */ INV_KEY,
+/* 0x54 */ INV_KEY,
+/* 0x55 */ INV_KEY,
+/* 0x56 */ INV_KEY,
+/* 0x57 */ INV_KEY,
+/* 0x58 */ INV_KEY,
+/* 0x59 */ INV_KEY,
+/* 0x5A */ INV_KEY,
+/* 0x5B */ AK_LBRACKET, // open crochet
+/* 0x5C */ AK_BACKSLASH, // back slash
+/* 0x5D */ AK_RBRACKET, // close crochet
+/* 0x5E */ INV_KEY, // circonflex
+/* 0x5F */ INV_KEY, // underscore
+/* 0x60 */ AK_BACKQUOTE,
+/* 0x61 */ AK_A,
+/* 0x62 */ AK_B,
+/* 0x63 */ AK_C,
+/* 0x64 */ AK_D,
+/* 0x65 */ AK_E,
+/* 0x66 */ AK_F,
+/* 0x67 */ AK_G,
+/* 0x68 */ AK_H,
+/* 0x69 */ AK_I,
+/* 0x6A */ AK_J,
+/* 0x6B */ AK_K,
+/* 0x6C */ AK_L,
+/* 0x6D */ AK_M,
+/* 0x6E */ AK_N,
+/* 0x6F */ AK_O,
+/* 0x70 */ AK_P,
+/* 0x71 */ AK_Q,
+/* 0x72 */ AK_R,
+/* 0x73 */ AK_S,
+/* 0x74 */ AK_T,
+/* 0x75 */ AK_U,
+/* 0x76 */ AK_V,
+/* 0x77 */ AK_W,
+/* 0x78 */ AK_X,
+/* 0x79 */ AK_Y,
+/* 0x7A */ AK_Z,
+/* 0x7B */ INV_KEY,
+/* 0x7C */ INV_KEY,
+/* 0x7D */ INV_KEY,
+/* 0x7E */ INV_KEY,
+/* 0x7F */ AK_BS,
 
-  {4,0x40}, //'q'
-  {5,0x10}, //'w'
-  {3,0x04}, //'e'
-  {4,0x80}, //'r'
-  {5,0x02}, //'t'
-  {5,0x40}, //'y'
-  {5,0x04}, //'u'
-  {3,0x40}, //'i'
-  {4,0x10}, //'o'
-  {4,0x20}, //'p'
-
-  {2,0x40}, //'a'
-  {5,0x01}, //'s'
-  {3,0x02}, //'d'
-  {3,0x08}, //'f'
-  {3,0x10}, //'g'
-  {3,0x20}, //'h'
-  {3,0x80}, //'j'
-  {4,0x01}, //'k'
-  {4,0x02}, //'l'
-  {7,0x80}, //'return'   
-
-  {2,0x04}, //','
-  {5,0x80}, //'z'
-  {5,0x20}, //'x'
-  {3,0x01}, //'c'
-  {5,0x08}, //'v'
-  {2,0x80}, //'b'
-  {4,0x08}, //'n'
-  {4,0x04}, //'m'
-  {7,0x20}, // 'BackSpace'
-  {8,0x01}  //' '
-};  
+/* 0x80 */ INV_KEY,
+/* 0x81 */ AK_F1,
+/* 0x82 */ AK_F2,
+/* 0x83 */ AK_F3,
+/* 0x84 */ AK_F4,
+/* 0x85 */ AK_F5,
+/* 0x86 */ AK_F6,
+/* 0x87 */ AK_F7,
+/* 0x88 */ AK_F8,
+/* 0x89 */ AK_F9,
+/* 0x8A */ AK_F10,
+/* 0x8B */ INV_KEY,
+/* 0x8C */ INV_KEY,
+/* 0x8D */ INV_KEY,
+/* 0x8E */ INV_KEY,
+/* 0x8F */ INV_KEY,
+/* 0x90 */ INV_KEY,
+/* 0x91 */ INV_KEY,
+/* 0x92 */ INV_KEY,
+/* 0x93 */ INV_KEY,
+/* 0x94 */ AK_DEL,
+/* 0x95 */ INV_KEY,
+/* 0x96 */ AK_RT,
+/* 0x97 */ AK_LF,
+/* 0x98 */ AK_DN,
+/* 0x99 */ AK_UP,
+/* 0x9A */ INV_KEY,
+/* 0x9B */ INV_KEY,
+/* 0x9C */ INV_KEY,
+/* 0x9D */ INV_KEY,
+/* 0x9E */ INV_KEY,
+/* 0x9F */ INV_KEY
+};
+ 
 
 void msx_Step(void) {
   JoyState = 0;
@@ -1202,9 +1419,17 @@ void msx_Step(void) {
   if ( (k & MASK_JOY2_BTN) || (k & MASK_JOY1_BTN) ) JoyState|=0x10; 
   if (k & MASK_KEY_USER2) JoyState|=0x20;  
 
+  if (iusbhk) hk = iusbhk;
+  
   if (hk != 0) {
-    emu_printh(hk);
-    KeyMap[Keys[hk-1].Pos] &=~ Keys[hk-1].Mask;   
+    //emu_printh(hk);
+
+    byte row = keyboardAsciiConv[hk].Pos;
+    byte col = keyboardAsciiConv[hk].Mask;
+    if ( (row != 0xff) && (col != 0xff) ) {
+      KeyMap[row] &=~ col;   
+    }
+    //KeyMap[Keys[hk-1].Pos] &=~ Keys[hk-1].Mask;   
   }
   else  {
     memset(KeyMap,0xFF,16);

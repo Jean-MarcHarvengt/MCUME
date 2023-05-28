@@ -40,11 +40,11 @@ const unsigned short key_map1[]={
 #define keylables_map0_2 (char *)" zxcvbnm,.;/"
 #define keylables_map0_3 (char *)" +\x10-"
 const unsigned short key_map0[] = {
-  0x0A +1,0x0B +1,0x0C +1,0x0D +1,0x0E +1,0x0F +1,0x10 +1,0x11 +1,0x12 +1,0x13 +1,0x26 +1,  //lowecase
-  0,0x14 +1,0x15 +1,0x16 +1,0x17 +1,0x18 +1,0x19 +1,0x1A +1,0x1B +1,0x1C +1,0x1D +1,
-  0,0x1F +1,0x20 +1,0x21 +1,0x22 +1,0x23 +1,0x24 +1,0x25 +1,0x1E +1,0,0,0,
-  0,0,0,0, //U L R D
-  0,0,0x27 +1,0
+  'q','w','e','r','t','y','u','i','o','p',0x7F,
+  0,'a','s','d','f','g','h','j','k','l',0x0A,
+  0,'z','x','c','v','b','n','m',',','.',';','/',
+  0,0,0,0,
+  0,'+',' ','-'
   };
 
 #define keylables_map1_0 (char *)"1234567890 "
@@ -53,12 +53,11 @@ const unsigned short key_map0[] = {
 #define keylables_map1_3 (char *)"    "
 
 const unsigned short key_map1[] = {
-  1+1,2+1,3+1,4+1,5+1,6+1,7+1,8+1,9+1,0+1,0, // digit keys
-//  '1','2','3','4','5','6','7','8','9','0',0, // digit keys
-  0, 0,0,0,0,0,0,0,0,0,0,
+  '1','2','3','4','5','6','7','8','9','0',0, // digit keys
+  0x09, 0,0,0,0,0,0,0,0,0,0,
   0, 0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,
-  0,0,' ',0
+  0x99,0x97,0x96,0x98, //U L R D
+  0,'+',' ','-'
   };
 
 #define keylables_map2_0 (char *)"!\"#$%^&*()@"
@@ -66,12 +65,11 @@ const unsigned short key_map1[] = {
 #define keylables_map2_2 (char *)"        <>:?"
 #define keylables_map2_3 (char *)" =\x10_"
 const unsigned short key_map2[] = {
-//  '!','"','#','$','%','^','&','*','(',')','@',   // shiftothers
-  0, 0,0,0,0,0,0,0,0,0,0,
+  '!','"','#','$','%','^','&','*','(',')','@',   // shiftothers
   0, 0,0,0,0,0,0,0,0,0,0,
   0, 0,0,0,0,0,0,0,'<','>',':','?',
-  0,0,0,0,
-  0,0,0,0
+  0x99,0x97,0x96,0x98, //U L R D
+  0,'=',' ','_'
   };  
 
 #define keylables_map3_0 (char *)"\x11\x12\x13\x14\x15\x16\x17\x18   "
@@ -80,7 +78,7 @@ const unsigned short key_map2[] = {
 #define keylables_map3_3 (char *)"    "
 
 const unsigned short key_map3[] = {
-  0, 0,0,0,0,0,0,0,0,0,0,
+  0x81, 0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x8A,0x8B,0,
   0, 0,0,0,0,0,0,0,0,0,0,
   0, 0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,
