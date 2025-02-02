@@ -77,6 +77,7 @@ public:
 #ifdef HAS_SND  
   void begin_audio(int samplesize, void (*callback)(short * stream, int len));
   void end_audio();
+  void * get_buffer_audio();
 #endif
 
   // framebuffer/screen operation

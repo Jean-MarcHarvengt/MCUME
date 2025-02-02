@@ -1337,7 +1337,7 @@ static void pwm_audio_handle_buffer(void)
   }
   audio_sample *buf = audio_buffers[last_audio_buffer];
   last_audio_buffer = cur_audio_buffer;
-  if (fillsamples != NULL) fillsamples(buf, snd_nb_samples);
+  fillsamples(buf, snd_nb_samples);
 }
 
 static void pwm_audio_reset(void)
@@ -1468,7 +1468,7 @@ static void pwm_audio_init(int buffersize, void (*callback)(audio_sample * strea
 
 static void core1_func_tft() {
     while (true) {
-        pwm_audio_handle_buffer();
+        if (fillsamples != NULL) pwm_audio_handle_buffer();
         __dmb();
     }
 }
@@ -1482,6 +1482,13 @@ void PICO_DSP::begin_audio(int samplesize, void (*callback)(short * stream, int 
 void PICO_DSP::end_audio()
 {
 }
+
+void * PICO_DSP::get_buffer_audio(void)
+{
+  void *buf = audio_buffers[cur_audio_buffer==0?1:0];
+  return buf; 
+}
+
 #endif
 
  

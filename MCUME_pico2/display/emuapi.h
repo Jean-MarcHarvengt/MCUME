@@ -74,6 +74,7 @@ extern int emu_oskbActive(void);
 
 extern void emu_sndPlaySound(int chan, int volume, int freq);
 extern void emu_sndPlayBuzz(int size, int val);
+extern void * emu_sndGetBuffer(void);
 extern void emu_sndInit();
 extern void emu_resetus(void);
 extern int emu_us(void);

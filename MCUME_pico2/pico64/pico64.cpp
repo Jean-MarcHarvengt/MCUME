@@ -43,7 +43,7 @@ int main(void) {
 #ifdef HAS_USBPIO
     set_sys_clock_khz(140000, true);
 #else
-    set_sys_clock_khz(250000, true);
+    set_sys_clock_khz(280000, true);
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
 #endif
 
@@ -66,7 +66,7 @@ int main(void) {
     emu_Init(filename);
     tft.startRefresh();
     struct repeating_timer timer;
-    add_repeating_timer_ms(25, repeating_timer_callback, NULL, &timer);    
+    add_repeating_timer_ms(20, repeating_timer_callback, NULL, &timer);    
     while (true) {
         //uint16_t bClick = emu_DebounceLocalKeys();
         //emu_Input(bClick);  
@@ -103,7 +103,9 @@ void emu_DrawVsync(void)
 #ifdef HAS_USBPIO
 #else
 #ifdef USE_VGA
-    tft.waitSync();            
+//    tft.waitSync();            
+    volatile bool vb=vbl;
+    while (vbl==vb) {};
 #else                      
     volatile bool vb=vbl;
     while (vbl==vb) {};

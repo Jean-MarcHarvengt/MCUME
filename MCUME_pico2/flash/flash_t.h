@@ -26,6 +26,7 @@ extern "C"
 extern unsigned char * flash_start;
 extern unsigned char * flash_end;
 extern int flash_load(const char * filename);
+extern int flash_load_bswap(const char * filename);
 extern int flash_verify(unsigned char * buf,int size);
 
 #ifdef __cplusplus

@@ -43,11 +43,12 @@ int main(void) {
 //    set_sys_clock_khz(225000, truxe);    
 //    set_sys_clock_khz(250000, true);  
 
-    set_sys_clock_khz(125000, true);
-
-//    set_sys_clock_khz(280000, true);
-//    *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
-
+#ifdef HAS_USBPIO
+    set_sys_clock_khz(140000, true);
+#else
+    set_sys_clock_khz(280000, true);
+    *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
+#endif
 
      emu_init();
  
@@ -108,15 +109,15 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    
-    if ( emu_IsVga() ) {
-        tft.waitSync(); 
-    }
-    else {
-        volatile bool vb=vbl; 
-        while (vbl==vb) {};
-    }
-    
+#ifdef HAS_USBPIO
+#else
+#ifdef USE_VGA
+    tft.waitSync();            
+#else                      
+    volatile bool vb=vbl;
+    while (vbl==vb) {};
+#endif
+#endif    
 }
 
 /*
@@ -168,8 +169,13 @@ void * emu_LineBuffer(int line)
 AudioPlaySystem mymixer;
 
 void emu_sndInit() {
-  tft.begin_audio(256, mymixer.snd_Mixer);
+  tft.begin_audio(888*2, mymixer.snd_Mixer);
   mymixer.start();    
+}
+
+void * emu_sndGetBuffer(void)
+{
+    return tft.get_buffer_audio();
 }
 
 void emu_sndPlaySound(int chan, int volume, int freq)

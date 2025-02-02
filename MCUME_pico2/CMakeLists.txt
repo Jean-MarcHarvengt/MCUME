@@ -19,10 +19,10 @@ include(pico_sdk_import.cmake)
 #set(TARGET picovcs)
 #set(TARGET picogb)
 #set(TARGET picopce)
-set(TARGET picosms)
+#set(TARGET picosms)
+set(TARGET picogen)
 
 #set(TARGET pico5200)
-#set(TARGET picogen)
 
 project(${TARGET} C CXX)
 
@@ -262,21 +262,6 @@ set(PICO8086_SOURCES
 	)
 endif()
 
-if( ${TARGET} MATCHES "picopceold" )
-set(PICOPCE_SOURCES 
-		picopce/emu.cpp 
-		picopce/h6280.c
-		picopce/memory.c
-		picopce/pce.c
-		picopce/psg.c
-		picopce/render.c
-		picopce/system.c
-		picopce/vce.c
-		picopce/vdc.c
-		picopce/picopce.cpp
-	)
-endif()
-
 if( ${TARGET} MATCHES "picopce" )
 set(PICOPCE_SOURCES 
 		picopce/emu.cpp 
@@ -304,33 +289,6 @@ set(PICOMSX_SOURCES
 		picomsx/YM2413.c
 		picomsx/Z80.c
 		picomsx/picomsx.cpp
-	)
-endif()
-
-if( ${TARGET} MATCHES "picogenold" )
-set(PICOGEN_SOURCES 
-		picogen/emu.cpp 
-		picogen/fm.c
-		picogen/genesis.c
-		picogen/io.c
-		picogen/m68kcpu.c
-		picogen/m68kopac.c
-		picogen/m68kopdm.c
-		picogen/m68kopnz.c
-		picogen/m68kops_pre.c
-		picogen/m68kops.c
-		picogen/mem68k.c
-		picogen/membnk.c
-		picogen/memory.c
-		picogen/memvdp.c
-		picogen/memz80.c
-		picogen/render.c
-		picogen/sn76496.c
-		picogen/sound.c
-		picogen/system.c
-		picogen/vdp.c
-		picogen/z80.c
-		picogen/picogen.cpp
 	)
 endif()
 
