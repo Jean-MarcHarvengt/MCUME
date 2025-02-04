@@ -6,6 +6,7 @@
 extern "C" {
 #include "pce-go/pce-go.h"
 #include "pce-go/pce.h"
+#include <pce-go/psg.h>
 }
 
 #include "flash_t.h"
@@ -15,6 +16,11 @@ void emu_KeyboardOnDown(int keymodifer, int key) {
 
 void emu_KeyboardOnUp(int keymodifer, int key) {
 }
+
+#define AUDIO_SAMPLE_RATE 22050
+#define AUDIO_BUFFER_LENGTH (AUDIO_SAMPLE_RATE / 60 + 1)
+
+alignas(4) int audio_buffer[AUDIO_BUFFER_LENGTH];
 
 
 void pce_Init(void)
@@ -40,14 +46,11 @@ void pce_Start(char * filename)
 
   int size = flash_load(filename);
   PalettePCE(0);
-  InitPCE(22050, false, (const void *)flash_start, (size_t)size);
+  InitPCE(AUDIO_SAMPLE_RATE, true, (const void *)flash_start, (size_t)size);
 
-#ifdef SOUND_PRESENT
 #ifdef HAS_SND  
-  emu_sndInit();
+  emu_sndInit(); 
 #endif  
-#else
-#endif
 
   emu_printf("pce_Start done");
 }
@@ -77,12 +80,16 @@ void pce_Step(void) {
           
   PCE.Joypad.regs[0] = buttons; 
 
-  //psg_update((int16_t *) audio_buffer, AUDIO_BUFFER_LENGTH, 0xff);
-  //i2s_dma_write(&i2s_config, (const int16_t *) audio_buffer);
-
   //emu_DrawVsync();   
 }
 
 void SND_Process(void *stream, int len) {
-//  psg_update((int16*)stream, 0, len);  
+  int16_t * buf = (int16_t *) audio_buffer;
+  psg_update(buf, AUDIO_BUFFER_LENGTH, 0xff);
+  audio_sample * snd_buf =  (audio_sample *)stream;
+  for (int h = 0; h < len*2; h += 2) {            
+      int16_t s1 = buf[h]>>8; 
+      int16_t s2 =  buf[h+1]>>8;
+      *snd_buf++ = ((s1+s2)/2)+128;
+  } 
 } 

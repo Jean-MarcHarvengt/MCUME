@@ -114,12 +114,9 @@ void sms_Start(char * filename)
 
 
 #ifdef HAS_SND
-#ifdef SOUND_PRESENT
   system_init(22050);  
   emu_sndInit();
-#else
-  system_init(0);
-#endif  
+  sms.use_fm = true;
 #else
   system_init(0);
 #endif
@@ -150,20 +147,26 @@ void sms_Step(void)
     input.pad[0] |= INPUT_BUTTON2;
   }
 
-//    if(check_key(KEY_DEL))  input.system |= INPUT_HARD_RESET;
-//    if(check_key(KEY_TAB))  input.system |= (IS_GG) ? INPUT_HARD_RESET : INPUT_SOFT_RESET;
-  if (k & MASK_KEY_USER2)  input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
+  //if (k & MASK_KEY_USER4)  input.system |= INPUT_HARD_RESET;
+  //if (k & MASK_KEY_USER1)  input.system |= (IS_GG) ? INPUT_HARD_RESET : INPUT_SOFT_RESET;
+  if (k & MASK_KEY_USER1)  input.pad[0] |= INPUT_BUTTON2;
+  //if (k & MASK_KEY_USER2)  input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
   
   sms_frame(0); 
-  //emu_printi(emu_FrameSkip());
 
   emu_DrawVsync();    
 }
 
-void SND_Process(void *stream, int len) {
-#ifdef SOUND_PRESENT
 #ifdef HAS_SND
-//  audio_play_sample(stream, 0, len);
-#endif  
+static int16 sndl[512];
+static int16 sndr[512];
+#endif
+
+void SND_Process(void *stream, int len) {
+#ifdef HAS_SND
+  audio_sample * snd_buf =  (audio_sample *)stream;
+  audio_play_sample(&sndl[0], &sndr[0], len);
+  for (int i = 0; i< len; i++ )
+    *snd_buf++ = ((sndl[i]>>8)+(sndr[i]>>8))/2+128;
 #endif  
 } 

@@ -322,9 +322,9 @@ void * emu_LineBuffer(int line)
 #ifdef HAS_SND
 #include "AudioPlaySystem.h"
 AudioPlaySystem mymixer;
-
+#define AUDIO_BUFFER_LEN  (22050/50)
 void emu_sndInit() {
-  tft.begin_audio(256, mymixer.snd_Mixer);
+  tft.begin_audio(AUDIO_BUFFER_LEN*2, mymixer.snd_Mixer);
   mymixer.start();    
 }
 

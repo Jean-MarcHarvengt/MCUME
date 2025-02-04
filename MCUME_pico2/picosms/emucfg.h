@@ -5,7 +5,7 @@
 #define VID_FRAME_SKIP       0x0
 #define TFT_VBUFFER_YCROP    0
 #define SINGLELINE_RENDERING 1
-//#define CUSTOM_SND           1
+#define CUSTOM_SND           1
 //#define TIMER_REND           1
 #define EXTRA_HEAP           0x10
 #define FILEBROWSER

@@ -24,7 +24,7 @@ bool show_fps = true;
 bool limit_fps = true;
 bool interlace = true;
 bool frameskip = true;
-int z80_enable_mode = 2;
+static int z80_enable_mode = 2;
 bool sn76489_enabled = true;
 extern unsigned short button_state[3];
 
@@ -126,8 +126,8 @@ void gen_Step(void) {
     ym2612_clock = 0;
     ym2612_index = 0;        
     scan_line = 0;
-     //if (z80_enable_mode == 1)
-        //z80_run(lines_per_frame * VDP_CYCLES_PER_LINE);
+    if (z80_enable_mode == 1)
+        z80_run(lines_per_frame * VDP_CYCLES_PER_LINE);
 
     //printf("m(%x)\n", frame);
     while (scan_line < lines_per_frame) {
@@ -249,6 +249,8 @@ void gen_Step(void) {
 
 void SND_Process(void *stream, int len) {
     if (audio_enabled) {
+        //if ( (z80_enable_mode == 3) && (system_clock == 0) )
+        //    z80_run(262 * VDP_CYCLES_PER_LINE);
         ym2612_run(262 * VDP_CYCLES_PER_LINE);
         gwenesis_SN76489_run(262 * VDP_CYCLES_PER_LINE);
         audio_sample * snd_buf =  (audio_sample *)stream;

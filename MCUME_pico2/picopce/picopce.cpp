@@ -169,8 +169,11 @@ void * emu_LineBuffer(int line)
 #include "AudioPlaySystem.h"
 AudioPlaySystem mymixer;
 
+#define AUDIO_SAMPLE_RATE 22050
+#define AUDIO_BUFFER_LENGTH (AUDIO_SAMPLE_RATE / 60 + 1)
+
 void emu_sndInit() {
-  tft.begin_audio(256, mymixer.snd_Mixer);
+  tft.begin_audio(AUDIO_BUFFER_LENGTH*2, mymixer.snd_Mixer);
   mymixer.start();    
 }
 

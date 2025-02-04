@@ -3,4 +3,8 @@
 
 #define FLASH_STORE_START 0x100000  
 
+#ifdef HAS_USBPIO
+//#undef HAS_SND
+#endif
+
 #endif

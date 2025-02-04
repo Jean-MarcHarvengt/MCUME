@@ -19,8 +19,8 @@ include(pico_sdk_import.cmake)
 #set(TARGET picovcs)
 #set(TARGET picogb)
 #set(TARGET picopce)
-#set(TARGET picosms)
-set(TARGET picogen)
+set(TARGET picosms)
+#set(TARGET picogen)
 
 #set(TARGET pico5200)
 
