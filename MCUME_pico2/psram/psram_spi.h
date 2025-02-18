@@ -58,6 +58,8 @@ SOFTWARE.
 #include "hardware/sync.h"
 #endif
 #include <string.h>
+ 
+//#define PSRAM_ASYNC 1
 
 #include "psram_spi.pio.h"
 
@@ -400,6 +402,7 @@ static uint8_t write16_command[] = {
  * @param addr Address to write to.
  * @param val Value to write.
  */
+
 __force_inline static void psram_write16(psram_spi_inst_t* spi, uint32_t addr, uint16_t val) {
     write16_command[3] = addr >> 16;
     write16_command[4] = addr >> 8;

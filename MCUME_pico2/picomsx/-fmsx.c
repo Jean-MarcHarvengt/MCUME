@@ -334,6 +334,300 @@ void msx_Input(int click) {
 
 
 
+static int SoundRate    = 0;
+static int MasterVolume = 200;
+static int MasterSwitch = (1<<SND_CHANNELS)-1;
+static int LoopFreq     = 25;
+static int NoiseGen     = 1;
+
+static struct   
+{
+  int Type;                       /* Channel type (SND_*)             */
+  int Freq;                       /* Channel frequency (Hz)           */
+  int Volume;                     /* Channel volume (0..255)          */
+
+  signed char Data[SND_SAMPLESIZE]; /* Wave data (-128..127 each)     */
+  int Length;                     /* Wave length in Data              */
+  int Rate;                       /* Wave playback rate (or 0Hz)      */
+  int Pos;                        /* Wave current position in Data    */
+
+  int Count;                      /* Phase counter                    */
+} CH[SND_CHANNELS];
+
+
+
+
+static void handleSoundCmd(unsigned char * Buf, int len)
+{
+  unsigned char R;
+  int J;
+
+  switch(R=Buf[0])
+  {
+    case 0xFF: MasterVolume=Buf[1];
+               MasterSwitch=Buf[2]+Buf[3]*256;
+               break;
+    case 0xFE: R=Buf[1];
+               J=Buf[2]+Buf[3]*256+2;
+               /* If everything is correct... */
+               if((R<SND_CHANNELS)&&(J<SND_SAMPLESIZE))
+                 //if(read(PipeFD[0],Buf,2)==2)
+                 //{
+                   J-=2;
+                   CH[R].Type   = SND_WAVE;
+                   CH[R].Rate   = Buf[0]+Buf[1]*256;
+                   CH[R].Length = J;
+                   CH[R].Count  = 0;
+                   CH[R].Pos    = 0;
+                   memcpy(CH[R].Data,&Buf[4],J);
+                   J=0;
+                   //I=read(PipeFD[0],CH[R].Data,J);
+                   //if(I>0) J-=I;
+                 //}
+
+               break;
+    case 0xFC: R=Buf[1];
+               if(R<SND_CHANNELS) CH[R].Type=Buf[2];
+               break;
+    default:   if(R<SND_CHANNELS)
+               {
+                 CH[R].Volume = Buf[1];
+                 CH[R].Freq   = Buf[2]+Buf[3]*256;
+               }
+               break;
+  }
+}
+
+static int Wave[SND_BUFSIZE];
+
+static void mixaudio(char * dest, int size) {
+  register int J,I,K,L,M,N,L1,L2,A1,A2,V;
+
+  /* Waveform generator */
+  for(J=0,M=MasterSwitch;M&&(J<SND_CHANNELS);J++,M>>=1)
+    if(CH[J].Freq&&(V=CH[J].Volume)&&(M&1))
+      switch(CH[J].Type)
+      {
+        case SND_NOISE: /* White Noise */
+          /* For high frequencies, recompute volume */
+          if(CH[J].Freq<=SoundRate) K=0x10000*CH[J].Freq/SoundRate;
+          else { V=V*SoundRate/CH[J].Freq;K=0x10000; }
+          L1=CH[J].Count;
+          V<<=7;
+          for(I=0;I<size;I++)
+          {
+            L1+=K;
+            if(L1&0xFFFF0000)
+            {
+              L1&=0xFFFF;
+              if((NoiseGen<<=1)&0x80000000) NoiseGen^=0x08000001;  
+            }
+            Wave[I]+=NoiseGen&1? V:-V;
+          }
+          CH[J].Count=L1;
+          break;
+            
+        case SND_WAVE: /* Custom Waveform */
+          /* Waveform data must have correct length! */
+          if(CH[J].Length<=0) break;
+          /* Start counting */
+          K  = CH[J].Rate>0? (SoundRate<<15)/CH[J].Freq/CH[J].Rate
+                           : (SoundRate<<15)/CH[J].Freq/CH[J].Length;
+          L1 = CH[J].Pos%CH[J].Length;
+          L2 = CH[J].Count;
+          A1 = CH[J].Data[L1]*V;
+          /* If expecting interpolation... */
+          if(L2<K)
+          {
+            /* Compute interpolation parameters */
+            A2 = CH[J].Data[(L1+1)%CH[J].Length]*V;
+            L  = (L2>>15)+1;
+            N  = ((K-(L2&0x7FFF))>>15)+1;
+          } 
+          /* Add waveform to the buffer */  
+          for(I=0;I<size;I++)
+            if(L2<K)
+            {
+              /* Interpolate linearly */
+              Wave[I]+=A1+L*(A2-A1)/N;
+              /* Next waveform step */
+              L2+=0x8000;  
+              /* Next interpolation step */
+              L++;
+            }
+            else
+            {
+              L1 = (L1+L2/K)%CH[J].Length;
+              L2 = (L2%K)+0x8000;
+              A1 = CH[J].Data[L1]*V;
+              Wave[I]+=A1;
+              /* If expecting interpolation... */
+              if(L2<K)
+              {
+                /* Compute interpolation parameters */
+                A2 = CH[J].Data[(L1+1)%CH[J].Length]*V;
+                L  = 1;
+                N  = ((K-L2)>>15)+1;  
+              }
+            }
+          /* End counting */
+          CH[J].Pos   = L1;
+          CH[J].Count = L2;
+          break;
+              
+        case SND_MELODIC:  /* Melodic Sound   */
+        case SND_TRIANGLE: /* Triangular Wave */
+        default:           /* Default Sound   */
+          /* Triangular wave has twice less volume */
+          if(CH[J].Type==SND_TRIANGLE) V=(V+1)>>1;
+          /* Do not allow frequencies that are too high */
+          if(CH[J].Freq>=SoundRate/3) break;
+          K=0x10000*CH[J].Freq/SoundRate;
+          L1=CH[J].Count;
+          V<<=7;
+          for(I=0;I<size;I++)
+          {
+            L2=L1+K;
+            Wave[I]+=L1&0x8000? (L2&0x8000? V:0):(L2&0x8000? 0:-V);
+            L1=L2;
+          }
+          CH[J].Count=L1;  
+          break;
+      }
+
+#define AUDIO_CONV(A) (128+(A))
+
+    /* Mix and convert waveforms */   
+    for(J=0;J<size;J++)
+    {
+      I=(Wave[J]*MasterVolume)>>16;
+      I=I<-128? -128:I>127? 127:I;
+      *dest++ = AUDIO_CONV(I);
+      //*dest++ = I;
+      Wave[J]=0;
+    }
+
+
+
+}
+
+/** Generate sound of given frequency (Hz) and volume       **/
+/** (0..255) via given channel.                             **/
+/*************************************************************/
+static void DSound(int Channel,int NewFreq,int NewVolume)
+{
+  unsigned char Buf[4];
+
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return;
+  if(!SoundRate||!(MasterSwitch&(1<<Channel))) return;
+  if(!NewVolume||!NewFreq) { NewVolume=0;NewFreq=0; }
+
+  if((CH[Channel].Volume!=NewVolume)||(CH[Channel].Freq!=NewFreq))
+  {
+    CH[Channel].Volume = NewVolume;
+    CH[Channel].Freq   = NewFreq;
+
+    Buf[0]=Channel;
+    Buf[1]=NewVolume;
+    Buf[2]=NewFreq&0xFF;
+    Buf[3]=NewFreq>>8;
+    handleSoundCmd(Buf, 4);
+
+//    write(PipeFD[1],Buf,4);
+  }
+}
+
+/** Set master volume (0..255) and turn channels on/off.    **/
+/** Each bit in Toggle corresponds to a channel (1=on).     **/
+/*************************************************************/
+static void DSetChannels(int MVolume,int MSwitch)
+{
+  unsigned char Buf[4];
+  int J;
+
+  if(!SoundRate) return;
+
+  /* Sending new MasterVolume/MasterSwitch */
+  Buf[0]=0xFF;
+  Buf[1]=MVolume;
+  Buf[2]=MSwitch&0xFF;
+  Buf[3]=MSwitch>>8;
+  handleSoundCmd(Buf, 4);
+//  write(PipeFD[1],Buf,4);
+
+  /* Switching channels on/off */
+  for(J=0;J<SND_CHANNELS;J++)
+    if((MSwitch^MasterSwitch)&(1<<J))
+    {
+      /* Modifying channel #J */
+      Buf[0]=J;
+
+      /* Set volume/frequency */
+      if(!(MSwitch&(1<<J))) Buf[1]=Buf[2]=Buf[3]=0;
+      else
+      {
+        Buf[1]=CH[J].Volume;
+        Buf[2]=CH[J].Freq&0xFF;
+        Buf[3]=CH[J].Freq>>8;
+      }
+ 
+      /* Write out */
+      handleSoundCmd(Buf, 4);
+//      write(PipeFD[1],Buf,4);
+    }
+
+  /* Set new MasterSwitch value */
+  MasterSwitch=MSwitch;
+  MasterVolume=MVolume;
+}
+
+/** Set sound type (SND_NOISE/SND_MELODIC) for a given      **/
+/** channel.                                                **/
+/*************************************************************/
+static void DSetSound(int Channel,int NewType)
+{
+  unsigned char Buf[4];
+
+  if(!SoundRate) return;
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return;
+  CH[Channel].Type=NewType;
+
+  Buf[0]=0xFC;
+  Buf[1]=Channel;
+  Buf[2]=NewType&0xFF;
+  Buf[3]=NewType>>8;
+  handleSoundCmd(Buf, 4);
+//  write(PipeFD[1],Buf,4);
+}
+
+/** Set waveform for a given channel. The channel will be   **/
+/** marked with sound type SND_WAVE. Set Rate=0 if you want **/
+/** waveform to be an instrument or set it to the waveform  **/
+/** own playback rate.                                      **/
+/*************************************************************/
+static void DSetWave(int Channel,const signed char *Data,int Length,int Rate)
+{
+  unsigned char Buf[6+SND_SAMPLESIZE];
+
+  if(!SoundRate) return;
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return;
+  if((Length<=0)||(Length>SND_SAMPLESIZE)) return;
+
+  Buf[0]=0xFE;
+  Buf[1]=Channel;
+  Buf[2]=Length&0xFF;
+  Buf[3]=Length>>8;
+  Buf[4]=Rate&0xFF;
+  Buf[5]=Rate>>8;
+  memcpy(Buf+6,Data,Length);
+  handleSoundCmd(Buf, 6+Length);
+//  write(PipeFD[1],Buf,6+Length);
+}
+
+static void DDrum(int Type,int Force)
+{
+}
+
 
 void msx_Start(char * Cartridge)
 {
@@ -391,7 +685,22 @@ void msx_Start(char * Cartridge)
 
 #ifdef HAS_SND  
   emu_sndInit();
-  InitSound(22050,0);
+  SndDriver.SetSound    = DSetSound;
+  SndDriver.Drum        = DDrum;
+  SndDriver.SetChannels = DSetChannels;
+  SndDriver.Sound       = DSound;
+  SndDriver.SetWave     = DSetWave;
+
+  //int J;
+  /* Reset all channels */
+  for(J=0;J<SND_CHANNELS;J++)
+  {
+    CH[J].Type   = SND_MELODIC;
+    CH[J].Count  = 0;
+    CH[J].Volume = 0;
+    CH[J].Freq   = 0;
+  }  
+  SoundRate = 22050;  
 #endif  
   /* Zero everyting */
 #ifdef unused  
@@ -1065,20 +1374,13 @@ void msx_Step(void) {
 
 
 
-#ifdef HAS_SND
-static int wave[256];
-#endif
+
 
 void SND_Process(void *stream, int len) {
 #ifdef HAS_SND
-  audio_sample * snd_buf =  (audio_sample *)stream;
-  memset(wave,0,256*sizeof(wave[0]));
-  RenderAudio(&wave[0], len);
-  for (int i = 0; i< len; i++ )
-    *snd_buf++ = (wave[i]>>8)+128;
-#endif  
+  mixaudio(stream, len); 
+#endif
 } 
-
 
 
 

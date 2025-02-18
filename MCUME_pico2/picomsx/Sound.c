@@ -6,7 +6,7 @@
 /** and functions needed to log soundtrack into a MIDI      **/
 /** file. See Sound.h for declarations.                     **/
 /**                                                         **/
-/** Copyright (C) Marat Fayzullin 1996-2003                 **/
+/** Copyright (C) Marat Fayzullin 1996-2021                 **/
 /**     You are not allowed to distribute this software     **/
 /**     commercially. Please, notify me, if you make any    **/
 /**     changes to this file.                               **/
@@ -16,8 +16,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef UNIX
+#if defined(UNIX) || defined(MAEMO) || defined(STMP3700) || defined(NXC2600) || defined(ANDROID)
 #include <unistd.h>
+#endif
+
+#if defined(ANDROID)
+/* On Android, may need to open files for writing at an */
+/* alternative location, if the requested location is   */
+/* not available. OpenRealFile() WILL NOT USE ZLIB.     */
+#define fopen OpenRealFile
 #endif
 
 typedef unsigned char byte;
@@ -29,39 +36,98 @@ struct SndDriverStruct SndDriver =
   (void (*)(int,int))0,
   (void (*)(int,int))0,
   (void (*)(int,int,int))0,
-  (void (*)(int,const signed char *,int,int))0
+  (void (*)(int,const signed char *,int,int))0,
+  (const signed char *(*)(int))0
 };
 
-#ifdef unused
 static const struct { byte Note;word Wheel; } Freqs[4096] =
 {
 #include "MIDIFreq.h"
 };
-#endif
 
-static const int Programs[5] =
+static const int Programs[] =
 {
   80,  /* SND_MELODIC/SND_RECTANGLE */
   80,  /* SND_TRIANGLE */
   122, /* SND_NOISE */
   122, /* SND_PERIODIC */
-  80   /* SND_WAVE */
+  80,  /* SND_WAVE */
 };
 
-#ifdef unused
 static struct
 {
   int Type;
   int Note;
   int Pitch;
   int Level;
-} CH[MIDI_CHANNELS];
+  int Power;
+} MidiCH[MIDI_CHANNELS] =
+{
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 },
+  { -1,-1,-1,-1,256 }
+};
 
-static const char *LogName  = 0;
-static int  Logging   = MIDI_OFF;
-static int  TickCount = 0;
-static int  LastMsg   = -1;
-static FILE *MIDIOut  = 0;
+static struct
+{
+  int Type;                       /* Channel type (SND_*)             */
+  int Freq;                       /* Channel frequency (Hz)           */
+  int Volume;                     /* Channel volume (0..255)          */
+
+  const signed char *Data;        /* Wave data (-128..127 each)       */
+  int Length;                     /* Wave length in Data              */
+  int Rate;                       /* Wave playback rate (or 0Hz)      */
+  int Pos;                        /* Wave current position in Data    */  
+
+  int Count;                      /* Phase counter                    */
+} WaveCH[SND_CHANNELS] =
+{
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 },
+  { SND_MELODIC,0,0,0,0,0,0,0 }
+};
+
+/** RenderAudio() Variables *******************************************/
+static int SndRate    = 0;        /* Sound rate (0=Off)               */
+static int NoiseGen   = 0x10000;  /* Noise generator seed             */
+static int NoiseOut   = 16;       /* NoiseGen bit used for output     */
+static int NoiseXor   = 14;       /* NoiseGen bit used for XORing     */
+int MasterSwitch      = 0xFFFF;   /* Switches to turn channels on/off */
+int MasterVolume      = 192;      /* Master volume                    */
+
+/** MIDI Logging Variables ********************************************/
+static const char *LogName = 0;   /* MIDI logging file name           */
+static int  Logging   = MIDI_OFF; /* MIDI logging state (MIDI_*)      */
+static int  TickCount = 0;        /* MIDI ticks since WriteDelta()    */
+static int  LastMsg   = -1;       /* Last MIDI message                */
+static int  DrumOn    = 0;        /* 1: MIDI drums are ON             */
+static FILE *MIDIOut  = 0;        /* MIDI logging file handle         */
 
 static void MIDISound(int Channel,int Freq,int Volume);
 static void MIDISetSound(int Channel,int Type);
@@ -77,7 +143,11 @@ static void WriteTempo(int Freq);
 /** percussion instruments only and doesn't sound nice.     **/
 /*************************************************************/
 #define SHIFT(Ch) (Ch==15? 9:Ch>8? Ch+1:Ch)
-#endif
+
+/** GetSndRate() *********************************************/
+/** Get current sampling rate used for synthesis.           **/
+/*************************************************************/
+unsigned int GetSndRate(void) { return(SndRate); }
 
 /** Sound() **************************************************/
 /** Generate sound of given frequency (Hz) and volume       **/
@@ -86,17 +156,27 @@ static void WriteTempo(int Freq);
 /*************************************************************/
 void Sound(int Channel,int Freq,int Volume)
 {
-  if(Channel<0) return;
+  /* All parameters have to be valid */
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return;
   Freq   = Freq<0? 0:Freq;
   Volume = Volume<0? 0:Volume>255? 255:Volume;
+
+  /* Modify channel parameters */ 
+  WaveCH[Channel].Volume = Volume;
+  WaveCH[Channel].Freq   = Freq;
+
+  /* When disabling sound, reset waveform */
+  if(!Freq||!Volume)
+  {
+    WaveCH[Channel].Pos    = 0;
+    WaveCH[Channel].Count  = 0;
+  }
 
   /* Call sound driver if present */
   if(SndDriver.Sound) (*SndDriver.Sound)(Channel,Freq,Volume);
 
-#ifdef unused
   /* Log sound to MIDI file */
   MIDISound(Channel,Freq,Volume);
-#endif  
 }
 
 /** Drum() ***************************************************/
@@ -106,14 +186,14 @@ void Sound(int Channel,int Freq,int Volume)
 /*************************************************************/
 void Drum(int Type,int Force)
 {
+  /* Drum force has to be valid */
   Force = Force<0? 0:Force>255? 255:Force;
 
+  /* Call sound driver if present */
   if(SndDriver.Drum) (*SndDriver.Drum)(Type,Force);
 
-#ifdef unused
   /* Log drum to MIDI file */
   MIDIDrum(Type,Force);
-#endif  
 }
 
 /** SetSound() ***********************************************/
@@ -122,14 +202,17 @@ void Drum(int Type,int Force)
 /*************************************************************/
 void SetSound(int Channel,int Type)
 {
-  if(Channel<0) return;
+  /* Channel has to be valid */
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return;
 
+  /* Set wave channel type */
+  WaveCH[Channel].Type = Type;
+
+  /* Call sound driver if present */
   if(SndDriver.SetSound) (*SndDriver.SetSound)(Channel,Type);
 
-#ifdef unused
   /* Log instrument change to MIDI file */
   MIDISetSound(Channel,Type);
-#endif  
 }
 
 /** SetChannels() ********************************************/
@@ -139,9 +222,27 @@ void SetSound(int Channel,int Type)
 /*************************************************************/
 void SetChannels(int Volume,int Switch)
 {
+  /* Volume has to be valid */
   Volume = Volume<0? 0:Volume>255? 255:Volume;
 
+  /* Call sound driver if present */
   if(SndDriver.SetChannels) (*SndDriver.SetChannels)(Volume,Switch);
+
+  /* Modify wave master settings */ 
+  MasterVolume = Volume;
+  MasterSwitch = Switch&((1<<SND_CHANNELS)-1);
+}
+
+/** SetNoise() ***********************************************/
+/** Initialize random noise generator to the given Seed and **/
+/** then take random output from OUTBit and XOR it with     **/
+/** XORBit.                                                 **/
+/*************************************************************/
+void SetNoise(int Seed,int OUTBit,int XORBit)
+{
+  NoiseGen = Seed;
+  NoiseOut = OUTBit;
+  NoiseXor = XORBit;
 }
 
 /** SetWave() ************************************************/
@@ -152,26 +253,66 @@ void SetChannels(int Volume,int Switch)
 /*************************************************************/
 void SetWave(int Channel,const signed char *Data,int Length,int Rate)
 {
-  if((Channel<0)||(Length<=0)) return;
+  unsigned int I,J;
 
+  /* Channel and waveform length have to be valid */
+  if((Channel<0)||(Channel>=SND_CHANNELS)||(Length<=0)) return;
+
+  /* Set wave channel parameters */
+  WaveCH[Channel].Type   = SND_WAVE;
+  WaveCH[Channel].Length = Length;
+  WaveCH[Channel].Rate   = Rate;
+  WaveCH[Channel].Pos    = Length? WaveCH[Channel].Pos%Length:0;
+  WaveCH[Channel].Count  = 0;
+  WaveCH[Channel].Data   = Data;
+
+  /* Call sound driver if present */
   if(SndDriver.SetWave) (*SndDriver.SetWave)(Channel,Data,Length,Rate);
 
-#ifdef unused
   /* Log instrument change to MIDI file */
-  MIDISetSound(Channel,Rate? -1:SND_MELODIC);
-#endif  
+  MIDISetSound(Channel,Rate? -1:SND_WAVE);
+
+  /* Compute overall waveform power for MIDI */
+  if(Rate) I=0;
+  else
+  {
+    for(J=I=0;J<Length;++J) I+=Data[J]>0? Data[J]:-Data[J];
+    I = (I<<1)/Length;
+    I = I>256? 256:I;
+  }
+
+  /* Will use power value when computing MIDI volume */
+  MidiCH[Channel].Power = I;
 }
 
-#ifdef unused
+/** GetWave() ************************************************/
+/** Get current read position for the buffer set with the   **/
+/** SetWave() call. Returns 0 if no buffer has been set, or **/
+/** if there is no playrate set (i.e. wave is instrument).  **/
+/*************************************************************/
+const signed char *GetWave(int Channel)
+{
+  /* Channel has to be valid */
+  if((Channel<0)||(Channel>=SND_CHANNELS)) return(0);
+
+  /* If driver present, call it */
+  if(SndDriver.GetWave) return((*SndDriver.GetWave)(Channel));
+
+  /* Return current read position */
+  return(
+    WaveCH[Channel].Rate&&(WaveCH[Channel].Type==SND_WAVE)?
+    WaveCH[Channel].Data+WaveCH[Channel].Pos:0
+  );
+}
+
 /** InitMIDI() ***********************************************/
 /** Initialize soundtrack logging into MIDI file FileName.  **/
 /** Repeated calls to InitMIDI() will close current MIDI    **/
 /** file and continue logging into a new one.               **/ 
 /*************************************************************/
-
 void InitMIDI(const char *FileName)
 {
-  int WasLogging,J;
+  int WasLogging;
 
   /* Must pass a name! */
   if(!FileName) return;
@@ -182,15 +323,13 @@ void InitMIDI(const char *FileName)
   /* If MIDI logging in progress, close current file */
   if(MIDIOut) TrashMIDI();
 
-  /* Clear instrument types */
-  for(J=0;J<MIDI_CHANNELS;J++) CH[J].Type=-1;
-
   /* Set log file name and ticks/second parameter, no logging yet */
-  //LogName   = FileName;
+  LogName   = FileName;
   Logging   = MIDI_OFF;
   LastMsg   = -1;
   TickCount = 0;
   MIDIOut   = 0;
+  DrumOn    = 0;
 
   /* If was logging, restart */
   if(WasLogging) MIDILogging(MIDI_ON);
@@ -218,6 +357,7 @@ void TrashMIDI(void)
   fputc((Length>>16)&0xFF,MIDIOut);
   fputc((Length>>8)&0xFF,MIDIOut);
   fputc(Length&0xFF,MIDIOut);
+
   /* Done logging */
   fclose(MIDIOut);
   Logging   = MIDI_OFF;
@@ -259,7 +399,7 @@ int MIDILogging(int Switch)
 
         /* Clear all storage */
         for(J=0;J<MIDI_CHANNELS;J++)
-          CH[J].Note=CH[J].Pitch=CH[J].Level=-1;
+          MidiCH[J].Note=MidiCH[J].Pitch=MidiCH[J].Level=-1;
 
         /* Open new file and write out the header */
         MIDIOut=fopen(LogName,"wb");
@@ -289,10 +429,10 @@ int MIDILogging(int Switch)
 
         /* Write instrument changes */
         for(J=0;J<MIDI_CHANNELS;J++)
-          if((CH[J].Type>=0)&&(CH[J].Type&0x10000))
+          if((MidiCH[J].Type>=0)&&(MidiCH[J].Type&0x10000))
           {
-            I=CH[J].Type&~0x10000;
-            CH[J].Type=-1;
+            I=MidiCH[J].Type&~0x10000;
+            MidiCH[J].Type=-1;
             MIDISetSound(J,I);
           }
       }
@@ -322,18 +462,25 @@ void MIDISound(int Channel,int Freq,int Volume)
   if(!Logging||!MIDIOut||(Channel>=MIDI_CHANNELS-1)||(Channel<0)) return;
   /* Frequency must be in range */
   if((Freq<MIDI_MINFREQ)||(Freq>MIDI_MAXFREQ)) Freq=0;
-  /* Volume must be in range */
-  if(Volume<0) Volume=0; else if(Volume>255) Volume=255;
   /* Instrument number must be valid */
-  if(CH[Channel].Type<0) Freq=0;
+  if(MidiCH[Channel].Type<0) Freq=0;
+
+  /* MIDI sound volume values are in 0..127 range */
+  /* SND_TRIANGLE has 1/2 volume of SND_MELODIC   */
+  /* SND_WAVE may have different effective volume */
+  Volume =
+    MidiCH[Channel].Type==SND_TRIANGLE? ((Volume+3)>>2)
+  : MidiCH[Channel].Type==SND_WAVE?     (((Volume*MidiCH[Channel].Power)+511)>>9)
+  : ((Volume+1)>>1);
+
+  /* Volume must be in range */
+  if(Volume<0) Volume=0; else if(Volume>127) Volume=127;
 
   if(!Volume||!Freq) NoteOff(Channel);
   else
   {
-    /* SND_TRIANGLE is twice quieter than SND_MELODIC */
-    if(CH[Channel].Type==SND_TRIANGLE) Volume=(Volume+1)/2;
     /* Compute MIDI note parameters */
-    MIDIVolume = (127*Volume+128)/255;
+    MIDIVolume = Volume;
     MIDINote   = Freqs[Freq/3].Note;
     MIDIWheel  = Freqs[Freq/3].Wheel;
 
@@ -341,10 +488,10 @@ void MIDISound(int Channel,int Freq,int Volume)
     NoteOn(Channel,MIDINote,MIDIVolume);
 
     /* Change pitch */
-    if(CH[Channel].Pitch!=MIDIWheel)
+    if(MidiCH[Channel].Pitch!=MIDIWheel)
     {
       MIDIMessage(0xE0+SHIFT(Channel),MIDIWheel&0x7F,(MIDIWheel>>7)&0x7F);
-      CH[Channel].Pitch=MIDIWheel;
+      MidiCH[Channel].Pitch=MIDIWheel;
     }
   }
 }
@@ -358,13 +505,13 @@ void MIDISetSound(int Channel,int Type)
   if((Channel>=MIDI_CHANNELS-1)||(Channel<0)) return;
 
   /* If instrument changed... */
-  if(CH[Channel].Type!=Type)
+  if(MidiCH[Channel].Type!=Type)
   {
     /* If logging off or file closed, drop out */
-    if(!Logging||!MIDIOut) CH[Channel].Type=Type|0x10000;
+    if(!Logging||!MIDIOut) MidiCH[Channel].Type=Type|0x10000;
     else
     {
-      CH[Channel].Type=Type;
+      MidiCH[Channel].Type=Type;
       if(Type<0) NoteOff(Channel);
       else
       {
@@ -384,7 +531,11 @@ void MIDIDrum(int Type,int Force)
   if(!Logging||!MIDIOut) return;
   /* The only non-MIDI drum is a click ("Low Wood Block") */
   Type=Type&DRM_MIDI? (Type&0x7F):77;
-  MIDIMessage(0x99,Type,(Force&0xFF)/2);
+  /* Release previous drum */
+  if(DrumOn) MIDIMessage(0x89,DrumOn,127);
+  /* Hit next drum */
+  if(Type) MIDIMessage(0x99,Type,(Force&0xFF)>>1);
+  DrumOn=Type;
 }
 
 /** MIDIMessage() ********************************************/
@@ -414,12 +565,12 @@ void NoteOn(byte Channel,byte Note,byte Level)
   Note  = Note>0x7F? 0x7F:Note;
   Level = Level>0x7F? 0x7F:Level;
 
-  if((CH[Channel].Note!=Note)||(CH[Channel].Level!=Level))
+  if((MidiCH[Channel].Note!=Note)||(MidiCH[Channel].Level!=Level))
   {
-    if((CH[Channel].Note>=0)&&(CH[Channel].Note!=Note)) NoteOff(Channel);
+    if(MidiCH[Channel].Note>=0) NoteOff(Channel);
     MIDIMessage(0x90+SHIFT(Channel),Note,Level);
-    CH[Channel].Note=Note;
-    CH[Channel].Level=Level;
+    MidiCH[Channel].Note=Note;
+    MidiCH[Channel].Level=Level;
   }
 }
 
@@ -428,10 +579,10 @@ void NoteOn(byte Channel,byte Note,byte Level)
 /*************************************************************/
 void NoteOff(byte Channel)
 {
-  if(CH[Channel].Note>=0)
+  if(MidiCH[Channel].Note>=0)
   {
-    MIDIMessage(0x80+SHIFT(Channel),CH[Channel].Note,127);
-    CH[Channel].Note=-1;
+    MIDIMessage(0x80+SHIFT(Channel),MidiCH[Channel].Note,127);
+    MidiCH[Channel].Note=-1;
   }
 }
 
@@ -476,4 +627,279 @@ void WriteTempo(int Freq)
   fputc((J>>8)&0xFF,MIDIOut);
   fputc(J&0xFF,MIDIOut);
 }
+
+/** InitSound() **********************************************/
+/** Initialize RenderSound() with given parameters.         **/
+/*************************************************************/
+unsigned int InitSound(unsigned int Rate,unsigned int Latency)
+{
+  int I;
+
+  /* Shut down current sound */
+  TrashSound();
+
+  /* Initialize internal variables (keeping MasterVolume/MasterSwitch!) */
+  SndRate = 0;
+
+  /* Reset sound parameters */
+  for(I=0;I<SND_CHANNELS;I++)
+  {
+    /* NOTICE: Preserving Type value! */
+    WaveCH[I].Count  = 0;
+    WaveCH[I].Volume = 0;
+    WaveCH[I].Freq   = 0;
+  }
+
+  /* Initialize platform-dependent audio */
+#if defined(WINDOWS)
+  Rate = WinInitSound(Rate,Latency);
+#else
+  Rate = 22050; //InitAudio(Rate,Latency);
 #endif
+
+  /* Rate=0 means silence */
+  if(!Rate) { SndRate=0;return(0); }
+
+  /* Done */
+  SetChannels(MasterVolume,MasterSwitch);
+  return(SndRate=Rate);
+}
+
+/** TrashSound() *********************************************/
+/** Shut down RenderSound() driver.                         **/
+/*************************************************************/
+void TrashSound(void)
+{
+  /* Sound is now off */
+  SndRate = 0;
+  /* Shut down platform-dependent audio */
+#if !defined(NO_AUDIO_PLAYBACK)
+#if defined(WINDOWS)
+  WinTrashSound();
+#else
+  //TrashAudio();
+#endif
+#endif
+}
+
+#if !defined(NO_AUDIO_PLAYBACK)
+/** RenderAudio() ********************************************/
+/** Render given number of melodic sound samples into an    **/
+/** integer buffer for mixing.                              **/
+/*************************************************************/
+void RenderAudio(int *Wave,unsigned int Samples)
+{
+  register int J,K,I,L1,L2,V,A1;
+#ifdef WAVE_INTERPOLATION
+  /* Keep GCC happy about variable initialization */
+  register int A2 = 0;
+  register int L  = 0;
+  register int N  = 0;
+#endif
+
+  /* Exit if wave sound not initialized */
+  if(SndRate<8192) return;
+
+  /* Waveform generator */
+  for(J=0;J<SND_CHANNELS;J++)
+    if(WaveCH[J].Freq&&(V=WaveCH[J].Volume)&&(MasterSwitch&(1<<J)))
+      switch(WaveCH[J].Type)
+      {
+        case SND_WAVE: /* Custom Waveform */
+          /* Waveform data must have correct length! */
+          if(WaveCH[J].Length<=0) break;
+          /* Start counting */
+          K  = WaveCH[J].Rate>0?
+               (SndRate<<15)/WaveCH[J].Freq/WaveCH[J].Rate
+             : (SndRate<<15)/WaveCH[J].Freq/WaveCH[J].Length;
+          /* Do not allow high frequencies (GBC Frogger) */
+          if(K<0x8000) break;
+          L1 = WaveCH[J].Pos%WaveCH[J].Length;
+          L2 = WaveCH[J].Count;
+          A1 = WaveCH[J].Data[L1]*V;
+#if !defined(WAVE_INTERPOLATION)
+          /* Add waveform to the buffer */
+          for(I=0;I<Samples;I++)
+          {
+            /* If next step... */
+            if(L2>=K)
+            {
+              L1 = (L1+L2/K)%WaveCH[J].Length;
+              A1 = WaveCH[J].Data[L1]*V;
+              L2 = L2%K;
+            }
+            /* Output waveform */
+            Wave[I]+=A1;
+            /* Next waveform step */
+            L2+=0x8000;
+          }
+#else /* WAVE_INTERPOLATION */
+          /* If expecting interpolation... */
+          if(L2<K)
+          {
+            /* Compute interpolation parameters */
+            A2 = WaveCH[J].Data[(L1+1)%WaveCH[J].Length]*V;
+            L  = (L2>>15)+1;
+            N  = ((K-(L2&0x7FFF))>>15)+1;
+          }
+          /* Add waveform to the buffer */
+          for(I=0;I<Samples;I++)
+            if(L2<K)
+            {
+              /* Interpolate linearly */
+              Wave[I]+=A1+L*(A2-A1)/N;
+              /* Next waveform step */
+              L2+=0x8000;
+              /* Next interpolation step */
+              L++;
+            }
+            else
+            {
+              L1 = (L1+L2/K)%WaveCH[J].Length;
+              L2 = (L2%K)+0x8000;
+              A1 = WaveCH[J].Data[L1]*V;
+              Wave[I]+=A1;
+              /* If expecting interpolation... */
+              if(L2<K)
+              {
+                /* Compute interpolation parameters */
+                A2 = WaveCH[J].Data[(L1+1)%WaveCH[J].Length]*V;
+                L  = 1;
+                N  = ((K-L2)>>15)+1;
+              }
+            }
+#endif /* WAVE_INTERPOLATION */
+          /* End counting */
+          WaveCH[J].Pos   = L1;
+          WaveCH[J].Count = L2;
+          break;
+
+        case SND_NOISE: /* White Noise */
+          /* For high frequencies, recompute volume */
+          if(WaveCH[J].Freq<SndRate)
+            K=((unsigned int)WaveCH[J].Freq<<16)/SndRate;
+          else
+          {
+            V = V*SndRate/WaveCH[J].Freq;
+            K = 0x10000;
+          }
+          L1=WaveCH[J].Count;
+          for(I=0;I<Samples;I++)
+          {
+            /* Use NoiseOut bit for output */
+            Wave[I]+=((NoiseGen>>NoiseOut)&1? 127:-128)*V;
+            L1+=K;
+            if(L1&0xFFFF0000)
+            {
+              /* XOR NoiseOut and NoiseXOR bits and feed them back */
+              NoiseGen=
+                (((NoiseGen>>NoiseOut)^(NoiseGen>>NoiseXor))&1)
+              | ((NoiseGen<<1)&((2<<NoiseOut)-1));
+              L1&=0xFFFF;
+            }
+          }
+          WaveCH[J].Count=L1;
+          break;
+
+        case SND_MELODIC:  /* Melodic Sound   */
+        case SND_TRIANGLE: /* Triangular Wave */
+        default:           /* Default Sound   */
+          /* Do not allow frequencies that are too high */
+          if(WaveCH[J].Freq>=SndRate/2) break;
+          K=0x10000*WaveCH[J].Freq/SndRate;
+          L1=WaveCH[J].Count;
+#if !defined(SLOW_MELODIC_AUDIO)
+          for(I=0;I<Samples;I++,L1+=K)
+            Wave[I]+=((L1-K)^(L1+K))&0x8000? 0:(L1&0x8000? 127:-128)*V;
+#else /* SLOW_MELODIC_AUDIO */
+          for(I=0;I<Samples;I++,L1+=K)
+          {
+            L2 = L1+K;
+            A1 = L1&0x8000? 127:-128;
+            if((L1^L2)&0x8000)
+              A1=A1*(0x8000-(L1&0x7FFF)-(L2&0x7FFF))/K;
+            Wave[I]+=A1*V;
+          }
+#endif /* SLOW_MELODIC_AUDIO */
+          WaveCH[J].Count=L1&0xFFFF;
+          break;
+      }
+}
+
+/** PlayAudio() **********************************************/
+/** Normalize and play given number of samples from the mix **/
+/** buffer. Returns the number of samples actually played.  **/
+/*************************************************************/
+unsigned int PlayAudio(int *Wave,unsigned int Samples)
+{
+  sample Buf[256];
+  unsigned int I,J,K;
+  int D;
+
+  /* Exit if wave sound not initialized */
+  if(SndRate<8192) return(0);
+
+  /* Check if the buffer contains enough free space */
+  J = GetFreeAudio();
+  if(J<Samples) Samples=J;
+
+  /* Spin until all samples played or WriteAudio() fails */
+  for(K=I=J=0;(K<Samples)&&(I==J);K+=I)
+  {
+    /* Compute number of samples to convert */
+    J = sizeof(Buf)/sizeof(sample);
+    J = Samples-K>J? J:Samples-K;
+
+    /* Convert samples */
+    for(I=0;I<J;++I)
+    {
+      D      = ((*Wave++)*MasterVolume)>>8;
+      D      = D>32767? 32767:D<-32768? -32768:D;
+#if defined(BPU16)
+      Buf[I] = D+32768;
+#elif defined(BPS16)
+      Buf[I] = D;
+#elif defined(BPU8)
+      Buf[I] = (D>>8)+128;
+#else
+      Buf[I] = D>>8;
+#endif
+    }
+
+    /* Play samples */
+    I = WriteAudio(Buf,J);
+  }
+
+  /* Return number of samples played */
+  return(K);
+}
+
+/** RenderAndPlayAudio() *************************************/
+/** Render and play a given number of samples. Returns the  **/
+/** number of samples actually played.                      **/
+/*************************************************************/
+unsigned int RenderAndPlayAudio(unsigned int Samples)
+{
+  int Buf[256];
+  unsigned int J,I;
+
+  /* Exit if wave sound not initialized */
+  if(SndRate<8192) return(0);
+
+  J       = GetFreeAudio();
+  Samples = Samples<J? Samples:J;
+ 
+  /* Render and play sound */
+  for(I=0;I<Samples;I+=J)
+  {
+    J = Samples-I;
+    J = J<sizeof(Buf)/sizeof(Buf[0])? J:sizeof(Buf)/sizeof(Buf[0]);
+    memset(Buf,0,J*sizeof(Buf[0]));
+    RenderAudio(Buf,J);
+    if(PlayAudio(Buf,J)<J) { I+=J;break; }
+  }
+
+  /* Return number of samples rendered */
+  return(I);
+}
+#endif /* !NO_AUDIO_PLAYBACK */

@@ -111,10 +111,10 @@ static int conv_table_uk[128][2] =
     {KBD_KEY_F6 , KBD_KEY_F6}, /* 0x3f */ \
     {KBD_KEY_F7 , KBD_KEY_F7}, /* 0x40 */ \
     {KBD_KEY_F8 , KBD_KEY_F8}, /* 0x41 */ \
-    {0     , 0      }, /* 0x42 */ \
-    {0     , 0      }, /* 0x43 */ \
-    {0     , 0      }, /* 0x44 */ \
-    {0     , 0      }, /* 0x45 */ \
+    {KBD_KEY_F9 , KBD_KEY_F9}, /* 0x42 */ \
+    {KBD_KEY_F10 , KBD_KEY_F10}, /* 0x43 */ \
+    {KBD_KEY_F11 , KBD_KEY_F11}, /* 0x44 */ \
+    {KBD_KEY_F12 , KBD_KEY_F12}, /* 0x45 */ \
     {0     , 0      }, /* 0x46 */ \
     {0     , 0      }, /* 0x47 */ \
     {0     , 0      }, /* 0x48 */ \
@@ -222,10 +222,10 @@ static int conv_table_be[128][2] =
     {KBD_KEY_F6 , KBD_KEY_F6}, /* 0x3f */ \
     {KBD_KEY_F7 , KBD_KEY_F7}, /* 0x40 */ \
     {KBD_KEY_F8 , KBD_KEY_F8}, /* 0x41 */ \
-    {0     , 0      }, /* 0x42 */ \
-    {0     , 0      }, /* 0x43 */ \
-    {0     , 0      }, /* 0x44 */ \
-    {0     , 0      }, /* 0x45 */ \
+    {KBD_KEY_F9 , KBD_KEY_F9}, /* 0x42 */ \
+    {KBD_KEY_F10 , KBD_KEY_F10}, /* 0x43 */ \
+    {KBD_KEY_F11 , KBD_KEY_F11}, /* 0x44 */ \
+    {KBD_KEY_F12 , KBD_KEY_F12}, /* 0x45 */ \
     {0     , 0      }, /* 0x46 */ \
     {0     , 0      }, /* 0x47 */ \
     {0     , 0      }, /* 0x48 */ \

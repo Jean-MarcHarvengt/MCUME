@@ -6,18 +6,18 @@
 #define TFT_VBUFFER_YCROP    0
 #define SINGLELINE_RENDERING 1
 #define CUSTOM_SND           1
-#define CUSTOM_SND_C         1
 //#define TIMER_REND           1
-#define EXTRA_HEAP           0x1
+#define EXTRA_HEAP           0x10
 #define FILEBROWSER
 
-// Title:     <                        >
-#define TITLE "      MSX Emulator      "
-#define ROMSDIR "msx"
 
-#define emu_Init(ROM) {msx_Init(); msx_Start(ROM);}
-#define emu_Step(x) {msx_Step();}
-#define emu_Input(x) {msx_Input(x);}
+// Title:     <                                        >
+#define TITLE "           AtariST Emulator             "
+#define ROMSDIR "st"
+
+#define emu_Init(ROM) {ast_Init(); ast_Start(ROM);}
+#define emu_Step(x) {ast_Step();}
+#define emu_Input(x) {ast_Input(x);}
 
 #ifdef KEYMAP_PRESENT
    

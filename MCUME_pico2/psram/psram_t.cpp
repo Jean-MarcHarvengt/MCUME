@@ -10,12 +10,12 @@
 
 #include "psram_spi.h"
 
+#ifdef PSCACHE 
 Page PSRAM_T::pages[MAX_PAGES];
 uint8_t PSRAM_T::nbPages=0;
 int8_t PSRAM_T::top=0;
 int8_t PSRAM_T::last=0;
-
-
+#endif
 
 
 #define RAM_READ  0xB
@@ -29,17 +29,20 @@ PSRAM_T::PSRAM_T(uint8_t cs, uint8_t mosi, uint8_t sclk, uint8_t miso)
 {
 }
 
-
 void PSRAM_T::begin(void)
 {
   psram_spi = psram_spi_init(pio2, 0);
 }
 
 
-
 uint8_t PSRAM_T::psram_read(uint32_t addr) 
 {
   return psram_read8(&psram_spi, addr);
+}
+
+uint16_t PSRAM_T::psram_read_w(uint32_t addr) 
+{
+  return psram_read16(&psram_spi, addr);
 }
 
 
@@ -53,6 +56,11 @@ void PSRAM_T::psram_read_n(uint32_t addr, uint8_t * val, int n)
 void PSRAM_T::psram_write(uint32_t addr, uint8_t val) 
 {
   psram_write8(&psram_spi, addr, val); 
+}
+
+void PSRAM_T::psram_write_w(uint32_t addr, uint16_t val) 
+{
+  psram_write16(&psram_spi, addr, val); 
 }
 
 static uint8_t resp[PAGE_SIZE];
@@ -71,14 +79,15 @@ void PSRAM_T::psram_write_n(uint32_t addr, uint8_t * val, int n)
 void PSRAM_T::pswrite(uint32_t addr, uint8_t val) 
 {
   psram_write(addr, val);
-  //return;
+#ifdef PSCACHE  
   uint32_t curPage=addr&(~(PAGE_SIZE-1));
   for (int i=0; i<nbPages; i++) {
     if (pages[i].pageid == curPage) {
       pages[i].page[addr&(PAGE_SIZE-1)] = val;
       break;
     }
-  }   
+  }  
+#endif   
 }
 
 
@@ -86,8 +95,7 @@ void PSRAM_T::pswrite(uint32_t addr, uint8_t val)
 
 uint8_t PSRAM_T::psread(uint32_t addr) 
 {
-  //uint8_t val = psram_read(addr);
-  //return val;
+#ifdef PSCACHE  
   uint32_t curPage=addr&(~(PAGE_SIZE-1));
   uint32_t offs = addr&(PAGE_SIZE-1);
 
@@ -136,10 +144,14 @@ uint8_t PSRAM_T::psread(uint32_t addr)
   //emu_printi(curPage);
   psram_read_n(curPage,&(pages[top].page[0]),PAGE_SIZE);   
   return pages[top].page[offs];
+#else
+  return psram_read(addr);
+#endif
 }
 
 uint16_t PSRAM_T::psread_w(uint32_t addr) 
 {
+#ifdef PSCACHE
   uint32_t curPage=addr&(~(PAGE_SIZE-1));
   uint32_t offs = addr&(PAGE_SIZE-1);
 
@@ -188,5 +200,23 @@ uint16_t PSRAM_T::psread_w(uint32_t addr)
   //emu_printi(curPage);
   psram_read_n(curPage,&(pages[top].page[0]),PAGE_SIZE);   
   return (pages[top].page[offs+1]<<8) + pages[top].page[offs];
+#else
+  return psram_read_w(addr);
+#endif  
+}
+
+void PSRAM_T::pswrite_w(uint32_t addr, uint16_t val)
+{
+  psram_write_w(addr, val);
+#ifdef PSCACHE 
+  uint32_t curPage=addr&(~(PAGE_SIZE-1));
+  for (int i=0; i<nbPages; i++) {
+    if (pages[i].pageid == curPage) {
+      pages[i].page[addr&(PAGE_SIZE-1)] = val&0xff;
+      pages[i].page[(addr+1)&(PAGE_SIZE-1)] = val>>8 ;
+      break;
+    }
+  }
+#endif
 }
 

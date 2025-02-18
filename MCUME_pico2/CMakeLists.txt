@@ -19,8 +19,9 @@ include(pico_sdk_import.cmake)
 #set(TARGET picovcs)
 #set(TARGET picogb)
 #set(TARGET picopce)
-set(TARGET picosms)
+#set(TARGET picosms)
 #set(TARGET picogen)
+set(TARGET picocastaway)
 
 #set(TARGET pico5200)
 
@@ -334,6 +335,21 @@ set(PICOGB_SOURCES
 	)
 endif()
 
+if( ${TARGET} MATCHES "picocastaway" )
+set(PICOCASTAWAY_SOURCES 
+		picocastaway/emu.cpp 
+		picocastaway/blitter.cpp
+		picocastaway/famec.cpp
+		picocastaway/fdc.cpp
+		picocastaway/ikbd.cpp
+		picocastaway/m68k_intrf.cpp
+		picocastaway/mem.cpp
+		picocastaway/st.cpp
+		picocastaway/sound.cpp
+		picocastaway/picocastaway.cpp
+	)
+endif()
+
 if( ${TARGET} MATCHES "testio" )
 set(TESTIO_SOURCES 
 		testio/testio.cpp
@@ -398,10 +414,11 @@ add_executable(${TARGET}
 		${PICOPCE_SOURCES}
 		${PICOGB_SOURCES}
 		${PICOMSX_SOURCES}
+		${PICOCASTAWAY_SOURCES}
 		${TESTIO_SOURCES}
 		${TESTVGA_SOURCES}
 		${TESTKEYMAX_SOURCES}
-#		${PSRAM_SOURCES}
+		${PSRAM_SOURCES}
 		${FLASH_SOURCES}
 		${DISPLAY_SOURCES}
 		${FATSD_SOURCES}

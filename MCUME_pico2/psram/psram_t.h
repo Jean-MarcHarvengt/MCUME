@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "pico/stdlib.h"
 
+#define PSCACHE 1
+
+//#define PAGE_SIZE    16 //32 //2048 //1024
+//#define MAX_PAGES    8
 
 #define PAGE_SIZE    16 //32 //2048 //1024
 #define MAX_PAGES    8
@@ -30,11 +34,14 @@ class PSRAM_T
     void pswrite(uint32_t addr, uint8_t val);
     uint8_t psread(uint32_t addr);
     uint16_t psread_w(uint32_t addr);
+    void pswrite_w(uint32_t addr, uint16_t val);
    
   private:
     static uint8_t psram_read(uint32_t addr);
+    static uint16_t psram_read_w(uint32_t addr);
     static void psram_read_n(uint32_t addr, uint8_t * val, int n);
     static void psram_write(uint32_t addr, uint8_t val);
+    static void psram_write_w(uint32_t addr, uint16_t val); 
     static void psram_write_n(uint32_t addr, uint8_t * val, int n);
    
   protected:

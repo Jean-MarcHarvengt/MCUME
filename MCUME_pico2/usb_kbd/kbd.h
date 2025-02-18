@@ -26,7 +26,10 @@
 #define KBD_KEY_F6         1016
 #define KBD_KEY_F7         1017
 #define KBD_KEY_F8         1018
-
+#define KBD_KEY_F9         1019
+#define KBD_KEY_F10        1020
+#define KBD_KEY_F11        1021
+#define KBD_KEY_F12        1022
 
 #define KEY_PRESSED  1
 #define KEY_RELEASED 0

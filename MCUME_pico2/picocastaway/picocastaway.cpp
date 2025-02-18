@@ -7,13 +7,14 @@ extern "C" {
 }
 #include "keyboard_osd.h"
 
-extern "C" {
-#include "fmsx.h"
-}
+//extern "C" {
+#include "emu.h"
+//}
 #include <stdio.h>
 
 #include <stdio.h>
 #include "pico_dsp.h"
+
 
 volatile bool vbl=true;
 
@@ -34,6 +35,8 @@ static int skip=0;
 
 #include "hdmi_framebuffer.h"
 
+//psram_spi_inst_t* async_spi_inst;
+
 int main(void) {
 //    vreg_set_voltage(VREG_VOLTAGE_1_05);
 //    set_sys_clock_khz(125000, true);    
@@ -52,19 +55,13 @@ int main(void) {
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
 #endif
 
-/*
-    volatile uint32_t *qmi_m0_timing=(uint32_t *)0x400d000c;
-    vreg_disable_voltage_limit();
-    vreg_set_voltage(VREG_VOLTAGE_1_40);
-    sleep_ms(10);
-    *qmi_m0_timing = 0x60007204;
-    set_sys_clock_khz(140000, false);
-    *qmi_m0_timing = 0x60007303;
-*/
+
+    // Overclock!
+//    set_sys_clock_khz(280000, true);
+//    stdio_init_all();
 
      emu_init();
    
-
 
 
     char * filename;
@@ -182,9 +179,7 @@ void * emu_LineBuffer(int line)
 #ifdef HAS_SND
 #include "AudioPlaySystem.h"
 AudioPlaySystem mymixer;
-
-#define AUDIO_BUFFER_LEN  (256 ) //(22050/50)
-
+#define AUDIO_BUFFER_LEN  (22050/50)
 void emu_sndInit() {
   tft.begin_audio(AUDIO_BUFFER_LEN*2, mymixer.snd_Mixer);
   mymixer.start();    
