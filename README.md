@@ -232,7 +232,7 @@ Game console systems supported and status on various MCU platforms<br>
 | Colecovision                 | X | X | X | X | X | X | X | - |
 | Atari 5200                   | X | X | X | X | X | X | X | X |
 | Nintendo NES                 | X | 384KB roms! | X | X | X | X | - | - |
-| Vectrex                      | - | full speed! | X | X | - | slow | - |
+| Vectrex                      | - | full speed! | X | X | - | slow | - | - |
 | PC Engine                    | - | - | X | X | - | - | - | X |
 | Gameboy/GBColor              | - | 490KB roms| X | X | - | - | - | X |
 | Sega Master System/Game Gear | - | - | X | X | - | - | - | X |
