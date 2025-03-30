@@ -417,7 +417,6 @@ const unsigned char keyboardAsciiConv[] = // Ascii to ATARI keys
 static int ik;     // joypad key
 static int ihk;    // I2C keyboard key
 static int iusbhk; // USB keyboard key
-static int prevhk; // previous keyboard key
 
 void emu_KeyboardOnDown(int keymodifer, int key) {
   if (key <= 0x7f) iusbhk = key;
