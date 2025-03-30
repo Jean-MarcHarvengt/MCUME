@@ -6,10 +6,13 @@
 # News
 Mars 2025: Finally some updates! Add pico2 support for hyperpetpico HDMI and PICO2ZX (Bobricus)
 - HDMI now supported next to TFT (pico2 only)
-- USB HOST support
-- Port of new emulators: pcengine, sega master system, sega genesis (exp), gameboy, msx, pc8086, Atari 260ST(exp)
+- Add USB HOST (pico2 only)
+- Port of new emulators to pico2: pcengine, sega master system, sega genesis (exp), gameboy, msx, pc8086, Atari 260ST(exp)
 - (thanks for original authors of these, I only did the port)
-- Remarks
+- Instructions when using PICO2ZX
+  - gsgsg
+  - gsgsg
+<br>
 
 Mai 2023: add multi display support to T-COMPUTER and PICOZX platforms
 - You can now configure at boot the display to use for each emulator (Teensy41 or PICO)
