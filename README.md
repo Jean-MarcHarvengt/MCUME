@@ -8,12 +8,12 @@ Mars 2025: Finally some updates! Add pico2 support for hyperpetpico HDMI and PIC
 - HDMI now supported next to TFT (pico2 only)
 - Add USB HOST (pico2 only)
 - Port of new emulators to pico2: pcengine, sega master system, sega genesis (exp), gameboy, msx, pc8086, Atari 260ST(exp)
-- (thanks for original authors of these, I only did the port)
-- Instructions when using PICO2ZX
+- (thanks to the original authors of the code, I only did the port)
+- Instructions when using PICO2ZX:
   - use binaries in /bin ("pico2zx/tft_hdmi" if you have a TFT+HDMI or "pico2zx/hdmi_only" if only have HDMI)
+  - USR1 = KEMPSTON(>>>>) key, USR2 = MENU(QSAVE) key, USR3 = CURSOR(<<<<) key, DELETE and FIRE have same effect
   - arrow up + reset => use HDMI default (TFT+HDMI binaries)
   - arrow left/right + reset => use TFT default (TFT+HDMI binaries)
-  - USR1 = KEMPSTON(>>>>) key, USR2 = MENU(QSAVE) key, USR3 = CURSOR(<<<<) key, DELETE and FIRE have same effect
   - FIRE: launch game to TFT (TFT+HDMI binaries)
   - USR1: launch game to HDMI (TFT+HDMI binaries)
   - USR3: select + launch rom/game in AUTORUN
