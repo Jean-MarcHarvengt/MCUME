@@ -18,6 +18,11 @@ Mars 2025: Finally some updates! Add pico2 support for hyperpetpico HDMI and PIC
   - USR1: launch game to HDMI (TFT+HDMI binaries)
   - USR3: select + launch rom/game in AUTORUN
   - arrow down + reset => delete autorun mode
+- About USB:
+  - most used keys are mapped
+  - computer emulators starts in keyboard mode, F12 to toggle to joystick mode
+  - console emulators start in joystick mode
+  - joystick mode: FIRE=TAB, arrors for directions, USR3=SPACE, USR1=1 and USR2=2 usually  
 <br>
 
 Mai 2023: add multi display support to T-COMPUTER and PICOZX platforms
