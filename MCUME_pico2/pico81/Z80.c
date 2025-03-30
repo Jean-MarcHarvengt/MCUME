@@ -172,9 +172,9 @@ void ExecZ80(void)
          * at the moment so not worth it currently.
          */
         if (nrmvideo)
-          v=mem[((i&0xfe)<<8)|((op&63)<<3)|ulacharline];
+          v=zxmemory[((i&0xfe)<<8)|((op&63)<<3)|ulacharline];
         else
-          v=mem[(i<<8)|(r&0x80)|(radjust&0x7f)];
+          v=zxmemory[(i<<8)|(r&0x80)|(radjust&0x7f)];
         //if(taguladisp) v^=128;
         scrnbmp_new[y*(ZX_VID_FULLWIDTH/8)+x]=((op&128)?~v:v);
       }
@@ -420,14 +420,14 @@ void ResetZ80(void)
       } else {
         sp = 0x4000 - 4 + ramsize * 1024;
       }
-      mem[sp + 0] = 0x47;
-      mem[sp + 1] = 0x04;
-      mem[sp + 2] = 0xba;
-      mem[sp + 3] = 0x3f;
+      zxmemory[sp + 0] = 0x47;
+      zxmemory[sp + 1] = 0x04;
+      zxmemory[sp + 2] = 0xba;
+      zxmemory[sp + 3] = 0x3f;
       /* Now override if RAM configuration changes things
        * (there's a possibility these changes are unimportant) */
       if (ramsize == 16) {
-        mem[sp + 2] = 0x22;
+        zxmemory[sp + 2] = 0x22;
       }
     } else {
       static unsigned char bit1[9]={0xFF,0x80,0xFC,0x7F,0x00,0x80,0x00,0xFE,0xFF};
@@ -435,8 +435,8 @@ void ResetZ80(void)
     
       /* memory will already be zeroed at this point */
       
-      memcpy(mem+0x4000,bit1,9);
-      memcpy(mem+0x7ffc,bit2,4);
+      memcpy(zxmemory+0x4000,bit1,9);
+      memcpy(zxmemory+0x7ffc,bit2,4);
   
       a=0x0B; f=0x85; b=0x00; c=0xFF;
       d=0x43; e=0x99; h=0xC3; l=0x99;

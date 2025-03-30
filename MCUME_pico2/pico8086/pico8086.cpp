@@ -16,13 +16,13 @@ extern "C" {
 volatile bool vbl=true;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
+    uint16_t bClick = emu_DebounceLocalKeys();
+    emu_Input(bClick);         
     if (vbl) {
         vbl = false;
     } else {
         vbl = true;
     }
-    uint16_t bClick = emu_DebounceLocalKeys();
-    emu_Input(bClick);         
     return true;
 }
 
@@ -31,6 +31,7 @@ static int skip=0;
 
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
+#include "hardware/sync.h"
 
 #include "hdmi_framebuffer.h"
 
@@ -110,14 +111,22 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-    
-    if ( emu_IsVga() ) {
-        tft.waitSync(); 
+#ifdef HAS_USBPIO
+#else
+#ifdef USE_VGA
+    tft.waitSync();            
+#else                      
+    if (tft.getMode() == MODE_TFT_320x240) {                    
+        volatile bool vb=vbl;
+        while (vbl==vb) {
+            __dmb();         
+        }
     }
     else {
-        volatile bool vb=vbl; 
-        while (vbl==vb) {};
-    } 
+        tft.waitSync();            
+    }
+#endif
+#endif 
 }
 
 /*

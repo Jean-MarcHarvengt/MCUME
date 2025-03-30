@@ -1,6 +1,5 @@
 #include "dcastaway.h"
 
-#ifndef NO_SOUND
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -10,6 +9,7 @@
 #include "mem.h"
 #include "m68k_intrf.h"
 #include "sound.h"
+#ifndef NO_SOUND
 
 #define LONGLONG long long
 

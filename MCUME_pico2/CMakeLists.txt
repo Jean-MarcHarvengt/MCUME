@@ -6,7 +6,7 @@ include(pico_sdk_import.cmake)
 # We also need PICO EXTRAS
 #include(pico_extras_import.cmake)
 
-#set(TARGET testkeymax)
+set(TARGET testkeymax)
 #set(TARGET pico20)
 #set(TARGET pico64)
 #set(TARGET pico81)
@@ -14,6 +14,7 @@ include(pico_sdk_import.cmake)
 #set(TARGET picospeccy)
 #set(TARGET picomsx)
 #set(TARGET pico8086)
+#set(TARGET picocastaway)
 #set(TARGET picocolem)
 #set(TARGET picoo2em)
 #set(TARGET picovcs)
@@ -21,7 +22,6 @@ include(pico_sdk_import.cmake)
 #set(TARGET picopce)
 #set(TARGET picosms)
 #set(TARGET picogen)
-set(TARGET picocastaway)
 
 #set(TARGET pico5200)
 
@@ -455,7 +455,7 @@ ENDIF()
 target_compile_definitions(${TARGET} PUBLIC N_SD_CARDS=${N_SD_CARDS})
 
 
-pico_enable_stdio_uart(${TARGET} TRUE)
+pico_enable_stdio_uart(${TARGET} FALSE)
 #pico_enable_stdio_usb(${TARGET} TRUE)
 
 pico_add_extra_outputs(${TARGET})

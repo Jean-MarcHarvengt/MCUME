@@ -337,29 +337,28 @@ void hdmi_framebuffer(hdmi_framebuffer_obj_t *self, uint16_t width, uint16_t hei
     // 250 Mbps, which is very close to the bit clock for 480p 60Hz (252 MHz).
     // If we want the exact rate then we'll have to reconfigure PLLs.
 
-
     // Assign clock pair to two neighbouring pins:
-    hstx_ctrl_hw->bit[2] = HSTX_CTRL_BIT0_CLK_BITS;
-    hstx_ctrl_hw->bit[3] = HSTX_CTRL_BIT0_CLK_BITS | HSTX_CTRL_BIT0_INV_BITS;
-    for (uint lane = 0; lane < 3; ++lane) {
-      // For each TMDS lane, assign it to the correct GPIO pair based on the
-      // desired pinout:
-      static const int lane_to_output_bit[3] = {0, 6, 4};
-      int bit = lane_to_output_bit[lane];
-      // Output even bits during first half of each HSTX cycle, and odd bits
-      // during second half. The shifter advances by two bits each cycle.
-      uint32_t lane_data_sel_bits =
-          (lane * 10    ) << HSTX_CTRL_BIT0_SEL_P_LSB |
-          (lane * 10 + 1) << HSTX_CTRL_BIT0_SEL_N_LSB;
-      // The two halves of each pair get identical data, but one pin is inverted.
-      hstx_ctrl_hw->bit[bit    ] = lane_data_sel_bits;
-      hstx_ctrl_hw->bit[bit + 1] = lane_data_sel_bits | HSTX_CTRL_BIT0_INV_BITS;
-    }
-
+    hstx_ctrl_hw->bit[HDMI_CLK_PLUS]  = HSTX_CTRL_BIT0_CLK_BITS;
+    hstx_ctrl_hw->bit[HDMI_CLK_MINUS] = HSTX_CTRL_BIT0_CLK_BITS | HSTX_CTRL_BIT0_INV_BITS;
+    uint32_t lane_data_sel_bits;
+    // lane 0
+    lane_data_sel_bits = (0 * 10    ) << HSTX_CTRL_BIT0_SEL_P_LSB |
+                         (0 * 10 + 1) << HSTX_CTRL_BIT0_SEL_N_LSB;    
+    hstx_ctrl_hw->bit[HDMI_D0_PLUS]  = lane_data_sel_bits;
+    hstx_ctrl_hw->bit[HDMI_D0_MINUS] = lane_data_sel_bits | HSTX_CTRL_BIT0_INV_BITS;
+    // lane 1
+    lane_data_sel_bits = (1 * 10    ) << HSTX_CTRL_BIT0_SEL_P_LSB |
+                         (1 * 10 + 1) << HSTX_CTRL_BIT0_SEL_N_LSB;    
+    hstx_ctrl_hw->bit[HDMI_D1_PLUS]  = lane_data_sel_bits;
+    hstx_ctrl_hw->bit[HDMI_D1_MINUS] = lane_data_sel_bits | HSTX_CTRL_BIT0_INV_BITS;
+    // lane 2
+    lane_data_sel_bits = (2 * 10    ) << HSTX_CTRL_BIT0_SEL_P_LSB |
+                         (2 * 10 + 1) << HSTX_CTRL_BIT0_SEL_N_LSB;    
+    hstx_ctrl_hw->bit[HDMI_D2_PLUS]  = lane_data_sel_bits;
+    hstx_ctrl_hw->bit[HDMI_D2_MINUS] = lane_data_sel_bits | HSTX_CTRL_BIT0_INV_BITS;
     for (int i = 12; i <= 19; ++i) {
       gpio_set_function(i, (gpio_function_t)0); // HSTX
     }
-
 
     dma_channel_config c;
     c = dma_channel_get_default_config(self->dma_command_channel);

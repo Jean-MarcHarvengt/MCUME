@@ -71,7 +71,7 @@ int main(void) {
     emu_Init(filename);
     tft.startRefresh();
     struct repeating_timer timer;
-    add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);    
+    add_repeating_timer_ms(25, repeating_timer_callback, NULL, &timer);    
     while (true) {
         //uint16_t bClick = emu_DebounceLocalKeys();
         //emu_Input(bClick);  

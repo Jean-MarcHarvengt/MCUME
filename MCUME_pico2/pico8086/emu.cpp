@@ -13,16 +13,25 @@ uint8_t * LORAM;
 
 extern void timer_isr(void);
 
+#ifdef HAS_PSRAM
 #include "psram_t.h"
-
 PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
+#endif
 
 extern "C" unsigned char read_ram(int address) {
-  return (psram.psread(address));
+  if (address < NATIVE_RAM) return LOMEM[address]; 
+#ifdef HAS_PSRAM
+  else
+    return psram.psread(address);
+#endif
 }
 
 extern "C" void  write_ram(int address, unsigned char val)  {
-  psram.pswrite(address,val); 
+  if (address < NATIVE_RAM) LOMEM[address] = val;
+#ifdef HAS_PSRAM
+  else
+    psram.pswrite(address,val); 
+#endif
 }
 
 #define PALMULT8(x)  ((x)<<5)
@@ -504,12 +513,42 @@ extern void apc_Input(int bClick) {
 
   if (cnt-- < 0) {
     cnt=5;
-
+  //{
     hk = emu_ReadI2CKeyboard();
-    k = emu_ReadKeys(); 
+    switch (hk) {
+     case  0x7F:  hk = 0xFF08; break; //backspace
+     case  0x09:  hk = 0xFF09; break; //tab
+     case  0x0A:  hk = 0xFF0D; break; //enter
+     case  0X1B:  hk = 0xFF1B; break; //escape
+     case  0x90:  hk = 0xFF63; break; //KP 0 / insert
+     case  0x93:  hk = 0xFFFF; break; //KP . / delete
+     case  0x92:  hk = 0xFF55; break; //pgup
+     case  0x95:  hk = 0xFF56; break; //pgdn
+     case  0x91:  hk = 0xFF50; break; //home
+     case  0x94:  hk = 0xFF57; break; //end
+     case  0x81:  hk = 0xFFBE; break; //F1
+     case  0x82:  hk = 0xFFBF; break; //F2
+     case  0x83:  hk = 0xFFC0; break; //F3
+     case  0x84:  hk = 0xFFC1; break; //F4
+     case  0x85:  hk = 0xFFC2; break; //F5
+     case  0x86:  hk = 0xFFC3; break; //F6
+     case  0x87:  hk = 0xFFC4; break; //F7
+     case  0x88:  hk = 0xFFC5; break; //F8
+     case  0x89:  hk = 0xFFC6; break; //F9
+     case  0x8A:  hk = 0xFFC7; break; //F10
+     case  0x8B:  hk = 0xFFC8; break; //F11
+     case  0x8C:  hk = 0xFFC9; break; //F12
+     case  0x97:  hk = 0xFF51; break; //left
+     case  0x99:  hk = 0xFF52; break; //up
+     case  0x96:  hk = 0xFF53; break; //right
+     case  0x98:  hk = 0xFF54; break; //down    
+    }
 
+
+    k = emu_ReadKeys(); 
+/*
     if (nbkeys == 0) {
-      if (bClick & MASK_JOY2_BTN) {
+      if (bClick & MASK_KEY_USER2) {
           nbkeys = strlen(seq1);
           seq=seq1;   
           kcnt=0;
@@ -534,6 +573,7 @@ extern void apc_Input(int bClick) {
           toggle = false; 
       }
     }
+*/    
   }
 }
 
@@ -673,7 +713,9 @@ void apc_Step(void)
 
 void apc_Init(void)
 {
+#ifdef HAS_PSRAM  
   psram.begin();
+#endif  
   //RAM = (uint8_t*) malloc(RAM_SIZE);
   //if (!RAM) emu_printf("RAM malloc failed"); 
   LORAM = &LOMEM[0];

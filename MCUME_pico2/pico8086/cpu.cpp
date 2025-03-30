@@ -64,11 +64,7 @@ extern "C" void  write_ram(int address, unsigned char val);
 extern uint8_t * LORAM;
 
 void write86(uint32_t addr32, uint8_t value) {
-  if (addr32 < NATIVE_RAM) {
-    LORAM[addr32] = value;
-    return;
-  } 
-  else if (addr32 < RAM_SIZE) {
+  if (addr32 < RAM_SIZE) {
     write_ram(addr32, value);
     return;
   } 

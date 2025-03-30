@@ -497,6 +497,7 @@ void mode1 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 
 /*****************************************************************************************************/
 void mode2 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
+
   /*
      Standard-Bitmap-Modus (ECM / BMM / MCM = 0/1/0) ("HIRES")
      In diesem Modus (wie in allen Bitmap-Modi) liest der VIC die Grafikdaten aus einer 320×200-Bitmap,
@@ -626,6 +627,7 @@ void mode2 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 }
 /*****************************************************************************************************/
 void mode3 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
+
   /*
     Multicolor-Bitmap-Modus (ECM/BMM/MCM=0/1/1)
 
@@ -783,6 +785,7 @@ void mode3 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 }
 /*****************************************************************************************************/
 void mode4 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
+
   //ECM-Textmodus (ECM/BMM/MCM=1/0/0)
   /*
     Dieser Textmodus entspricht dem Standard-Textmodus, erlaubt es aber, für
@@ -901,6 +904,7 @@ void mode4 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 /*****************************************************************************************************/
 
 void mode5 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
+
   /*
     Ungültiger Textmodus (ECM/BMM/MCM=1/0/1)
 
@@ -1155,6 +1159,7 @@ void mode6 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
 }
 /*****************************************************************************************************/
 void mode7 (tpixel *p, const tpixel *pe, uint16_t *spl, const uint16_t vc) {
+ 
   /*
     Ungültiger Bitmap-Modus 2 (ECM/BMM/MCM=1/1/1)
 
@@ -1272,7 +1277,7 @@ typedef void (*modes_t)( tpixel *p, const tpixel *pe, uint16_t *spl, const uint1
 const modes_t modes[8] = {mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7};
 
 
-static tpixel linebuffer[SCREEN_WIDTH*2];
+static tpixel linebuffer[SCREEN_WIDTH*3];
 
 void vic_do(void) {
 
@@ -1393,7 +1398,7 @@ void vic_do(void) {
   }
 
   //max_x =  (!cpu.vic.CSEL) ? 40:38;
-  p = &linebuffer[0];
+  p = &linebuffer[SCREEN_WIDTH+0];
   pe = p + SCREEN_WIDTH;
   //Left Screenborder: Cycle 10
   spl = &cpu.vic.spriteLine[24];
@@ -1401,7 +1406,7 @@ void vic_do(void) {
 
 
   if (cpu.vic.borderFlag) {
-	cpu_clock(5);
+	  cpu_clock(5);
     fastFillLineNoSprites(p, pe + BORDER_RIGHT, cpu.vic.colors[0]);
     goto noDisplayIncRC ;
   }
@@ -1528,12 +1533,12 @@ g-Zugriff
  | "11": Schwarz (Vordergrund)           |
  +---------------------------------------+
 */ 
-	//Modes 1 & 3
+	  //Modes 1 & 3
     if (mode == 1 || mode == 3) {
-		modes[mode](p, pe, spl, vc);
+  		modes[mode](p, pe, spl, vc);
     } else {//TODO: all other modes
-	fastFillLine(p, pe, cpu.vic.palette[0], spl);
-	}
+  	fastFillLine(p, pe, cpu.vic.palette[0], spl);
+  	}
   }
 
   /*
@@ -1556,7 +1561,7 @@ g-Zugriff
   if (!cpu.vic.CSEL) {
     cpu_clock(1);
     uint16_t col = cpu.vic.colors[0];
-    p = &linebuffer[0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
+    p = &linebuffer[SCREEN_WIDTH+0]; // tft.getLineBuffer((r - FIRSTDISPLAYLINE));
 #if 0
     // Sprites im Rand
     uint16_t sprite;
@@ -1578,7 +1583,7 @@ g-Zugriff
 #endif
 
     //Rand rechts:
-    p = &linebuffer[SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
+    p = &linebuffer[SCREEN_WIDTH+SCREEN_WIDTH - 9 + BORDER_LEFT]; //tft.getLineBuffer((r - FIRSTDISPLAYLINE)) + SCREEN_WIDTH - 9 + BORDER_LEFT;
     pe = p + 9;
 
 #if 0
@@ -1598,8 +1603,9 @@ g-Zugriff
 
   }
 
-  emu_DrawLine16(&linebuffer[0], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
-  memset(&linebuffer[0],0,SCREEN_WIDTH*2);
+if ( ( (r - FIRSTDISPLAYLINE) < 240 ) && ( (r - FIRSTDISPLAYLINE) >= 0 ) )
+  emu_DrawLine16(&linebuffer[SCREEN_WIDTH], SCREEN_WIDTH, SCREEN_HEIGHT, (r - FIRSTDISPLAYLINE));
+  memset(&linebuffer[0],0,SCREEN_WIDTH*3);
 
 
 

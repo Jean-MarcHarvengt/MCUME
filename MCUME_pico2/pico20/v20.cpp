@@ -78,10 +78,9 @@ static void VIC_VOICE_HANDLE(int voice, int value, int shift)
 
 
 void SND_Process(void * stream, int len) {
+  unsigned short * dstbuffer = (unsigned short *)stream;
   int   o0, o1, o2, o3;
-
-  short * sndbuf =  (short *)stream;
-  for (int i = 0; i < len/2; i++)
+  for (int i = 0; i < len; i++)
   {
     /* addfptrs */
     psid.v[0].f += psid.v[0].fs;
@@ -96,10 +95,9 @@ void SND_Process(void * stream, int len) {
     o1 = (psid.v[1].f & 0x80000000) >> 2;
     o2 = (psid.v[2].f & 0x80000000) >> 2;
     o3 = (int)NVALUE(NSHIFT(psid.v[3].rv, psid.v[3].f >> 28)) << 22;
-    /* sample */
-    uint16_t s = ((int)((o0+o1+o2+o3)>>20)-0x800)*psid.vol;
-    *sndbuf++ =s;
-    *sndbuf++ =s;
+    uint16_t s = (((o0+o1+o2+o3)>>(16+10))*psid.vol)>>4;
+    //int s = ((int)((o0+o1+o2+o3)>>20)-0x800)*psid.vol;
+    *dstbuffer++ =s;
   } 
 }
 
@@ -254,10 +252,17 @@ void v20_Init(void)
   // load kernal rom
   for(int i=0; i<8192; i++) {
     vicmemory[0xE000+i] = kernalrom[i];
-  }
+  } 
+}
 
+
+
+void v20_Start(char * filename)
+{
+  loadROM(filename,0);
 
 #ifdef HAS_SND  
+  emu_sndInit();
   psid.speed1 = (1000000 << 8) / 22000;
   psid.v[3].rv = NSEED;
   for (int i = 0; i < NOISETABLESIZE; i++)
@@ -267,15 +272,7 @@ void v20_Init(void)
     noiseMSB[i] = (((i<<(7-(22-16)))&0x80)|((i<<(6-(20-16)))&0x40)
             |((i<<(5-(16-16)))&0x20));
   }  
-  emu_sndInit();
-#endif  
-}
-
-
-
-void v20_Start(char * filename)
-{
-  loadROM(filename,0);
+#endif 
 
   // Reset cpu
   mos.Reset();
@@ -348,7 +345,7 @@ void v20_Step(void)
   int hk=ihk;
   if (iusbhk) hk = iusbhk;
 
-#if (defined(PICOMPUTER) || defined(PICOZX) || defined(PICOHYPERPET) )
+#if (defined(PICO2ZX) || defined(PICOHYPERPET) )
   if (hk) {
     int scan = ascii2scan[hk];
     if (scan & 0x10000) mos6522.setShiftPressed(true);
@@ -363,7 +360,7 @@ void v20_Step(void)
 
 
   int k=ik; 
-#if (defined(PICOMPUTER) || defined(PICOZX) || defined(PICOHYPERPET) )
+#if (defined(PICO2ZX) || defined(PICOHYPERPET) )
   // Ignore joypad if shift is pressed!!!
 //  if ( !(k & MASK_KEY_USER2) )
   if ( hk == 0 )
@@ -401,7 +398,7 @@ void v20_Step(void)
     } 
   }  
 
-#if (defined(PICOMPUTER) || defined(PICOZX) || defined(PICOHYPERPET))
+#if (defined(PICO2ZX) || defined(PICOHYPERPET))
 #else
   if ( !(pik & MASK_KEY_USER1) && (k & MASK_KEY_USER1) ) {
     mos6522.setKeyPressed(0xEF7F);

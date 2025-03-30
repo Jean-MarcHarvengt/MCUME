@@ -4,9 +4,14 @@
 //  #define RAM_SIZE 0xF8000 // 512k //655360UL
 //  #define NATIVE_RAM (0X28000) //  128k+32768 //231424UL
 
+#include "platform_config.h"
 
-
+#ifdef HAS_PSRAM
 #define RAM_SIZE 0x80000 // 512k //655360UL
+#else
+#define RAM_SIZE 0x40000 // 256k
+#endif
+
 #define NATIVE_RAM (0X40000) //  256k
 #define NATIVE_START 0UL
 

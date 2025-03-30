@@ -2,5 +2,6 @@
 #define _PROGRAM_CONFIG_H_
 
 #define KEYBOARD_ACTIVATED 1
+//#define OVERRULE_HEIGHT 192
 
 #endif

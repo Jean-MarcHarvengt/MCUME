@@ -64,9 +64,12 @@ static char selected_filename[MAX_FILENAME_SIZE]="";
 static char files[MAX_FILES][MAX_FILENAME_SIZE];
 static bool menuRedraw=true;
 
-#if (defined(PICOMPUTER) || defined(PICOZX) )
+#if ( defined(PICO2ZX) )
+#define RN 6
+#define CN 8
+static uint8_t rows[RN] = {KROWIN0,KROWIN1,KROWIN2,KROWIN3,KROWIN4,KROWIN5}; 
+static unsigned char keymatrix[RN];
 static const unsigned short * keys;
-static unsigned char keymatrix[7];
 static int keymatrix_hitrow=-1;
 static bool key_fn=false;
 static bool key_alt=false;
@@ -502,209 +505,78 @@ int emu_ReadKeys(void)
   if ( !gpio_get(PIN_KEY_USER4) ) retval |= MASK_KEY_USER4;
 #endif
 
-
-#if (defined(PICOMPUTER) || defined(PICOZX) )
-  keymatrix_hitrow = -1;
-  unsigned char row;
-#ifdef PICOZX  
-  unsigned short cols[7]={KCOLOUT1,KCOLOUT2,KCOLOUT3,KCOLOUT4,KCOLOUT5,KCOLOUT6,KCOLOUT7};
-  unsigned char keymatrixtmp[7];
-  for (int i=0;i<7;i++){
-#else  
-  unsigned short cols[6]={KCOLOUT1,KCOLOUT2,KCOLOUT3,KCOLOUT4,KCOLOUT5,KCOLOUT6};
-  unsigned char keymatrixtmp[6];
-  for (int i=0;i<6;i++){
-#endif
-    gpio_set_dir(cols[i], GPIO_OUT);
-    gpio_put(cols[i], 0);
-#ifdef SWAP_ALT_DEL
-    sleep_us(1);
-    //__asm volatile ("nop\n"); // 4-8ns
-#endif
-    row=0; 
-#ifdef PICOZX  
-    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
-    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
-    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
-    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
-    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
-    row |= (gpio_get(KROWIN3) ? 0 : 0x08);
-    row |= (gpio_get(KROWIN4) ? 0 : 0x02);
-    row |= (gpio_get(KROWIN5) ? 0 : 0x10);
-    row |= (gpio_get(KROWIN6) ? 0 : 0x20);
-    row |= (gpio_get(KROWIN7) ? 0 : 0x40);
-#else
-    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
-    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
-    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
-    row |= (gpio_get(KROWIN2) ? 0 : 0x01);
-    row |= (gpio_get(KROWIN4) ? 0 : 0x02);
-    row |= (gpio_get(KROWIN1) ? 0 : 0x04);
-    row |= (gpio_get(KROWIN3) ? 0 : 0x08);
-    row |= (gpio_get(KROWIN5) ? 0 : 0x10);
-    row |= (gpio_get(KROWIN6) ? 0 : 0x20);
-#endif    
-    //gpio_set_dir(cols[i], GPIO_OUT);
-    gpio_put(cols[i], 1);
-    gpio_set_dir(cols[i], GPIO_IN);
-    gpio_disable_pulls(cols[i]); 
-    keymatrixtmp[i] = row;
+#if ( defined(PICO2ZX) )
+#define SAM  4
+#define STIM 50  
+  uint8_t row0=0;
+  uint8_t row1=0;
+  uint8_t row2=0;
+  uint8_t row3=0;
+  uint8_t row4=0;
+  uint8_t row5=0;  
+  uint8_t bit=1; 
+  gpio_put(RP_DAT, 1);
+  for (int j=0;j<SAM;j++) row0 |= (gpio_get(KROWIN0) ? 0 : bit);
+  for (int j=0;j<SAM;j++) row1 |= (gpio_get(KROWIN1) ? 0 : bit);
+  for (int j=0;j<SAM;j++) row2 |= (gpio_get(KROWIN2) ? 0 : bit);
+  for (int j=0;j<SAM;j++) row3 |= (gpio_get(KROWIN3) ? 0 : bit);
+  for (int j=0;j<SAM;j++) row4 |= (gpio_get(KROWIN4) ? 0 : bit);
+  for (int j=0;j<SAM;j++) row5 |= (gpio_get(KROWIN5) ? 0 : bit);
+  bit = bit << 1;
+  gpio_put(RP_CLK, 0);
+  sleep_us(STIM);
+  for(int i = 0; i < (CN-1); i++) {
+    gpio_put(RP_CLK, 1);
+    sleep_us(STIM); 
+    for (int j=0;j<SAM;j++) row0 |= (gpio_get(KROWIN0) ? 0 : bit);
+    for (int j=0;j<SAM;j++) row1 |= (gpio_get(KROWIN1) ? 0 : bit);
+    for (int j=0;j<SAM;j++) row2 |= (gpio_get(KROWIN2) ? 0 : bit);
+    for (int j=0;j<SAM;j++) row3 |= (gpio_get(KROWIN3) ? 0 : bit);
+    for (int j=0;j<SAM;j++) row4 |= (gpio_get(KROWIN4) ? 0 : bit);
+    for (int j=0;j<SAM;j++) row5 |= (gpio_get(KROWIN5) ? 0 : bit);    
+    gpio_put(RP_CLK, 0);
+    sleep_us(STIM);
+    bit = bit << 1;
   }
-
-#ifdef SWAP_ALT_DEL
-  // Swap ALT and DEL  
-  unsigned char alt = keymatrixtmp[0] & 0x02;
-  unsigned char del = keymatrixtmp[5] & 0x20;
-  keymatrixtmp[0] &= ~0x02;
-  keymatrixtmp[5] &= ~0x20;
-  if (alt) keymatrixtmp[5] |= 0x20;
-  if (del) keymatrixtmp[0] |= 0x02;
-#endif
-
-
-#ifdef PICOZX  
-  for (int i=0;i<7;i++){
-#else  
-  bool alt_pressed=false;
-  if ( keymatrixtmp[5] & 0x20 ) {alt_pressed=true; keymatrixtmp[5] &= ~0x20;};
-  for (int i=0;i<6;i++){
-#endif
-    row = keymatrixtmp[i];
-    if (row) keymatrix_hitrow=i;
-    keymatrix[i] = row;
-  }
-
-#ifdef PICOZX
-  //row = keymatrix[6];
-  if ( row & 0x02 ) retval |= MASK_KEY_USER1;
-  if ( row & 0x10 ) retval |= MASK_KEY_USER2;
-  if ( row & 0x20 ) retval |= MASK_KEY_USER3;
-  if ( row & 0x40 ) retval |= MASK_KEY_USER4;
-  row = keymatrix[0];
+  gpio_put(RP_DAT, 0);
+  gpio_put(RP_CLK, 1);
+  sleep_us(STIM);
   key_fn = false;
   key_alt = false;
-  if ( row & 0x20 ) {key_fn = true; keymatrix[0] &= ~0x20;}
-  if ( row & 0x40 ) {key_alt = true;keymatrix[0] &= ~0x40; }
-  //19,20,21,22,26,27,28  
+  if ( row4 & 0x20 ) {key_fn = true; row4 &= ~0x20;}
+  if ( row3 & 0x80 ) {key_alt = true; row3 &= ~0x80;}
+  keymatrix[0] = row0;
+  keymatrix[1] = row1;
+  keymatrix[2] = row2;
+  keymatrix[3] = row3;  
+  keymatrix[4] = row4;
+  keymatrix[5] = row5;  
+
+  if ( row5 & 0x01 ) retval |= MASK_KEY_USER1;
+  if ( row5 & 0x04 ) retval |= MASK_KEY_USER2;
+  if ( row5 & 0x02 ) retval |= MASK_KEY_USER3;
+
 #if INVX
-  if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
-  if ( row & 0x1  ) retval |= MASK_JOY2_RIGHT;
+  if ( row5 & 0x10  ) retval |= MASK_JOY2_LEFT;
+  if ( row5 & 0x40  ) retval |= MASK_JOY2_RIGHT;
 #else
-  if ( row & 0x1  ) retval |= MASK_JOY2_LEFT;
-  if ( row & 0x2  ) retval |= MASK_JOY2_RIGHT;
+  if ( row5 & 0x40  ) retval |= MASK_JOY2_LEFT;
+  if ( row5 & 0x10  ) retval |= MASK_JOY2_RIGHT;
 #endif
 #if INVY
-  if ( row & 0x8  ) retval |= MASK_JOY2_DOWN;
-  if ( row & 0x10  ) retval |= MASK_JOY2_UP;  
+  if ( row5 & 0x20  ) retval |= MASK_JOY2_DOWN;
+  if ( row5 & 0x08  ) retval |= MASK_JOY2_UP;  
 #else
-  if ( row & 0x10  ) retval |= MASK_JOY2_DOWN;
-  if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
+  if ( row5 & 0x08  ) retval |= MASK_JOY2_DOWN;
+  if ( row5 & 0x20  ) retval |= MASK_JOY2_UP;  
 #endif
-  if ( row & 0x04 ) retval |= MASK_JOY2_BTN;
+  if ( row5 & 0x80 ) retval |= MASK_JOY2_BTN;  
 
-#else // end PICOZX 
-  //6,9,15,8,7,22
-#if INVX
-  if ( row & 0x2  ) retval |= MASK_JOY2_LEFT;
-  if ( row & 0x1  ) retval |= MASK_JOY2_RIGHT;
-#else
-  if ( row & 0x1  ) retval |= MASK_JOY2_LEFT;
-  if ( row & 0x2  ) retval |= MASK_JOY2_RIGHT;
-#endif
-#if INVY
-  if ( row & 0x8  ) retval |= MASK_JOY2_DOWN;
-  if ( row & 0x4  ) retval |= MASK_JOY2_UP;  
-#else
-  if ( row & 0x4  ) retval |= MASK_JOY2_DOWN;
-  if ( row & 0x8  ) retval |= MASK_JOY2_UP;  
-#endif
-  if ( row & 0x10 ) retval |= MASK_JOY2_BTN;
 
-  if ( key_fn ) retval |= MASK_KEY_USER2;
-  if ( ( key_fn ) && (keymatrix[0] == 0x02 )) retval |= MASK_KEY_USER1;
-
-  // Handle LED flash
-  uint32_t time_ms=to_ms_since_boot (get_absolute_time());
-  if ((time_ms-last_t_ms) > 100) {
-    last_t_ms = time_ms;
-    if (ledflash_toggle == false) {
-      ledflash_toggle = true;
-    }
-    else {
-      ledflash_toggle = false;
-    }  
-  }  
- 
-  if ( alt_pressed ) {
-    if (key_fn == false) 
-    {
-      // Release to Press transition
-      if (hundred_ms_cnt == 0) {
-        keypress_t_ms=time_ms;
-        hundred_ms_cnt += 1; // 1
-      }  
-      else {
-        hundred_ms_cnt += 1; // 2
-        if (hundred_ms_cnt >= 2) 
-        { 
-          hundred_ms_cnt = 0;
-          /* 
-          if ( (time_ms-keypress_t_ms) < 500) 
-          {
-            if (key_alt == false) 
-            {
-              key_alt = true;
-            }
-            else 
-            {
-              key_alt = false;
-            } 
-          }
-          */
-        }        
-      }
-    }
-    else {
-      // Keep press
-      if (hundred_ms_cnt == 1) {
-        if ((to_ms_since_boot (get_absolute_time())-keypress_t_ms) > 2000) 
-        {
-          if (key_alt == false) 
-          {
-            key_alt = true;
-          }
-          else 
-          {
-            key_alt = false;
-          } 
-          hundred_ms_cnt = 0; 
-        }
-      } 
-    } 
-    key_fn = true;
+  keymatrix_hitrow = -1;
+  for (int i=0;i<RN;i++){
+    if (keymatrix[i]) keymatrix_hitrow=i;
   }
-  else  {
-    key_fn = false;    
-  }
-
-#ifdef KLED
-  // Handle LED
-  if (key_alt == true) {
-    gpio_put(KLED, (ledflash_toggle?1:0));
-  }
-  else {
-    if (key_fn == true) {
-      gpio_put(KLED, 1);
-    }
-    else {
-      gpio_put(KLED, 0);
-    }     
-  } 
-#endif
-
-#endif
-
-
 #endif
 
   //Serial.println(retval,HEX);
@@ -736,7 +608,7 @@ unsigned short emu_DebounceLocalKeys(void)
 
 int emu_ReadI2CKeyboard(void) {
   int retval=0;
-#if (defined(PICOMPUTER) || defined(PICOZX) )
+#if ( defined(PICO2ZX) )
   if (key_alt) {
     keys = (const unsigned short *)key_map3;
   }
@@ -766,7 +638,7 @@ int emu_ReadI2CKeyboard(void) {
 
 unsigned char emu_ReadI2CKeyboard2(int row) {
   int retval=0;
-#if (defined(PICOMPUTER) || defined(PICOZX) )
+#if ( defined(PICO2ZX) )
   retval = keymatrix[row];
 #endif
   return retval;
@@ -878,88 +750,29 @@ void emu_InitJoysticks(void) {
 #endif
 #endif
 
-#if (defined(PICOMPUTER) || defined(PICOZX) ) 
-  // keyboard LED
-#ifdef KLED  
-  gpio_init(KLED);
-  gpio_set_dir(KLED, GPIO_OUT);
-  gpio_put(KLED, 1);
-#endif
-  // Output (rows)
-  gpio_init(KCOLOUT1);
-  gpio_init(KCOLOUT2);
-  gpio_init(KCOLOUT3);
-  gpio_init(KCOLOUT4);
-  gpio_init(KCOLOUT5);
-  gpio_init(KCOLOUT6);
-#ifdef PICOZX
-  gpio_init(KCOLOUT7);
-#endif  
-  gpio_set_dir(KCOLOUT1, GPIO_OUT); 
-  gpio_set_dir(KCOLOUT2, GPIO_OUT); 
-  gpio_set_dir(KCOLOUT3, GPIO_OUT); 
-  gpio_set_dir(KCOLOUT4, GPIO_OUT); 
-  gpio_set_dir(KCOLOUT5, GPIO_OUT); 
-  gpio_set_dir(KCOLOUT6, GPIO_OUT);
-#ifdef PICOZX
-  gpio_set_dir(KCOLOUT7, GPIO_OUT);
-#endif   
-  gpio_put(KCOLOUT1, 1);
-  gpio_put(KCOLOUT2, 1);
-  gpio_put(KCOLOUT3, 1);
-  gpio_put(KCOLOUT4, 1);
-  gpio_put(KCOLOUT5, 1);
-  gpio_put(KCOLOUT6, 1);
-#ifdef PICOZX
-  gpio_put(KCOLOUT7, 1);
-#endif   
-  // but set as input floating when not used!
-  gpio_set_dir(KCOLOUT1, GPIO_IN); 
-  gpio_set_dir(KCOLOUT2, GPIO_IN); 
-  gpio_set_dir(KCOLOUT3, GPIO_IN); 
-  gpio_set_dir(KCOLOUT4, GPIO_IN); 
-  gpio_set_dir(KCOLOUT5, GPIO_IN); 
-  gpio_set_dir(KCOLOUT6, GPIO_IN);
-#ifdef PICOZX
-  gpio_set_dir(KCOLOUT7, GPIO_IN);
-#endif   
-  gpio_disable_pulls(KCOLOUT1); 
-  gpio_disable_pulls(KCOLOUT2); 
-  gpio_disable_pulls(KCOLOUT3); 
-  gpio_disable_pulls(KCOLOUT4); 
-  gpio_disable_pulls(KCOLOUT5); 
-  gpio_disable_pulls(KCOLOUT6);
-#ifdef PICOZX
-  gpio_disable_pulls(KCOLOUT7);
-#endif   
-  // Input pins (cols)
-  gpio_init(KROWIN1);
-  gpio_init(KROWIN2);
-  gpio_init(KROWIN3);
-  gpio_init(KROWIN4);
-  gpio_init(KROWIN5);
-  gpio_init(KROWIN6);
-#ifdef PICOZX
-  gpio_init(KROWIN7);
-#endif   
-  gpio_set_dir(KROWIN1,GPIO_IN);  
-  gpio_set_dir(KROWIN2,GPIO_IN);  
-  gpio_set_dir(KROWIN3,GPIO_IN);  
-  gpio_set_dir(KROWIN4,GPIO_IN);  
-  gpio_set_dir(KROWIN5,GPIO_IN);  
-  gpio_set_dir(KROWIN6,GPIO_IN);  
-#ifdef PICOZX
-  gpio_set_dir(KROWIN7,GPIO_IN);  
-#endif 
-  gpio_pull_up(KROWIN1);
-  gpio_pull_up(KROWIN2);
-  gpio_pull_up(KROWIN3);
-  gpio_pull_up(KROWIN4);
-  gpio_pull_up(KROWIN5);
-  gpio_pull_up(KROWIN6);
-#ifdef PICOZX
-  gpio_pull_up(KROWIN7);
-#endif 
+#if ( defined(PICO2ZX) )
+  gpio_init(RP_DAT);
+  gpio_set_dir(RP_DAT, GPIO_OUT);
+  gpio_init(RP_CLK);
+  gpio_set_dir(RP_CLK, GPIO_OUT);
+  gpio_put(RP_DAT, 1);
+  gpio_put(RP_CLK, 0);
+  sleep_ms(1);
+  for(int i = 0; i < CN; i++) {
+    gpio_put(RP_CLK, 1);
+    sleep_ms(1);
+    gpio_put(RP_CLK, 0);
+    sleep_ms(1);
+  }
+  gpio_put(RP_DAT, 0);
+  sleep_ms(1);
+  gpio_put(RP_CLK, 1);
+  sleep_ms(1);
+  for(int i = 0; i < RN; ++i) {
+    gpio_init(rows[i]);
+    gpio_set_dir(rows[i], GPIO_IN);
+    gpio_pull_up(rows[i]);
+  }
 #endif
 }
 
@@ -1051,7 +864,7 @@ int handleMenu(uint16_t bClick)
       return (ACTION_RUN);
   }
 
-  if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_KEY_USER1) || (bClick & MASK_KEY_USER4) ) {
+  if ( (bClick & MASK_JOY2_BTN) || (bClick & MASK_KEY_USER1) || (bClick & MASK_KEY_USER3) ) {
     char newpath[MAX_FILENAME_PATH];
     strcpy(newpath, selection);
     strcat(newpath, "/");
@@ -1069,20 +882,15 @@ int handleMenu(uint16_t bClick)
     }
     else
     {
-#ifdef PICOMPUTER
-      if (key_alt) {
-        emu_writeConfig();
-      }
-#endif
-#ifdef PICOZX
-      if (bClick & MASK_KEY_USER4) {
+#ifdef PICO2ZX
+      if (bClick & MASK_KEY_USER3) {
         emu_writeConfig();
       }
 #endif
       menuLeft();
       toggleMenu(false);
       menuRedraw=false;
-#ifdef PICOZX
+#ifdef PICO2ZX
       if ( tft.getMode() != MODE_VGA_320x240) {   
         if ( (bClick & MASK_KEY_USER1) ) {
           tft.begin(MODE_VGA_320x240);
@@ -1445,11 +1253,13 @@ void emu_init(void)
 
 #ifdef HAS_USBHOST
   printf("Init USB...\n");
-  printf("USB D+/D- on GP%d and GP%d\r\n", PIO_USB_DP_PIN_DEFAULT, PIO_USB_DP_PIN_DEFAULT+1);
-  printf("TinyUSB Host HID Controller Example\r\n");
   tuh_init(BOARD_TUH_RHPORT);
 #endif
-
+#ifdef HAS_USBPIO  
+  printf("USB D+/D- on GP%d and GP%d\r\n", PIO_USB_DP_PIN_DEFAULT, PIO_USB_DP_PIN_DEFAULT+1);
+  printf("TinyUSB Host HID Controller Example\r\n");
+#endif
+  
 #ifdef FILEBROWSER
 //  sd_init_driver(); 
 
@@ -1490,7 +1300,7 @@ int keypressed = emu_ReadKeys();
     tft.begin(MODE_VGA_320x240);
 #else
 
-#ifdef PICOZX    
+#ifdef PICO2ZX    
   // Force VGA if LEFT/RIGHT pressed
   if (keypressed & MASK_JOY2_UP)
   {
@@ -1516,27 +1326,13 @@ int keypressed = emu_ReadKeys();
       tft.begin(MODE_TFT_320x240);    
     }     
   }
-#else /* end PICOZX */
+#else /* end PICO2ZX */
   tft.begin(MODE_TFT_320x240);    
 #endif 
 
 #endif
 
-#ifndef USE_VGA    
-#ifdef PICOMPUTER
-  // Flip screen if UP pressed
-  if (keypressed & MASK_JOY2_UP)
-  {
-    tft.flipscreen(true);
-  }
-  else 
-  {
-    tft.flipscreen(false);
-  }
-#endif
-#endif
-
-  if (keypressed & MASK_JOY2_DOWN) {
+  if ( (keypressed & MASK_JOY2_DOWN) ){
     tft.fillScreenNoDma( RGBVAL16(0xff,0x00,0x00) );
     tft.drawTextNoDma(64,48,    (char*)" AUTURUN file erased", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);
     tft.drawTextNoDma(64,48+24, (char*)"Please reset the board!", RGBVAL16(0xff,0xff,0x00), RGBVAL16(0xff,0x00,0x00), true);

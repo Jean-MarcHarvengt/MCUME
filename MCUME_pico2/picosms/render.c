@@ -37,7 +37,6 @@ static int vp_vend;
 static int vp_hstart;
 static int vp_hend;
 
-extern void emu_DrawLine16(unsigned short *src, int width , int height, int line);
 extern void emu_DrawLinePal16(unsigned char * VBuf, int width, int height, int line); 
 extern void emu_printf(char * text);
 

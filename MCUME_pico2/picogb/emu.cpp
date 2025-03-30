@@ -18,12 +18,6 @@ static gb_s gb;
 static palette_t palette16; // Colour palette
 #define RGB565_TO_RGB888(rgb565) ((((rgb565) & 0xF800) << 8) | (((rgb565) & 0x07E0) << 5) | (((rgb565) & 0x001F) << 3))
 
-void emu_KeyboardOnDown(int keymodifer, int key) {
-}
-
-void emu_KeyboardOnUp(int keymodifer, int key) {
-}
-
 void gb_error(struct gb_s* gb, const enum gb_error_e gb_err, const uint16_t addr) {
     const char* gb_err_str[4] = {
         "UNKNOWN",
@@ -80,12 +74,28 @@ void gbc_Init(void)
 }
 
 
-static int hk = 0;
 static int k = 0;
+static int ihk = 0;
+static int iusbhk; // USB keyboard key
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+  if (key <= 0x7f) iusbhk = key;
+  //else if (key == KBD_KEY_UP) iusbhk = 0xD7;  
+  //else if (key == KBD_KEY_LEFT) iusbhk = 0xD8;  
+  //else if (key == KBD_KEY_RIGHT) iusbhk = 0xD9;  
+  //else if (key == KBD_KEY_DOWN) iusbhk = 0xDA;  
+  //else if (key == KBD_KEY_BS) iusbhk = 0x7F;  
+  else
+    iusbhk = 0;
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+  iusbhk = 0;
+}
 
 
 void gbc_Input(int click) {
-  hk = emu_ReadI2CKeyboard();
+  ihk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys();    
 }
 
@@ -121,6 +131,21 @@ void gbc_Start(char * filename)
 
 void gbc_Step(void) {
   gb_run_frame(&gb);
+
+  int hk = ihk;
+  if (iusbhk) hk = iusbhk;
+
+  switch(hk) {
+    case '1':
+      k = MASK_KEY_USER1;
+      break;
+    case '2':
+      k = MASK_KEY_USER2;
+      break;
+    default:
+      break;
+  };
+
   gb.direct.joypad_bits.up = !(( k & MASK_JOY1_UP) || ( k & MASK_JOY2_UP));
   gb.direct.joypad_bits.down = !(( k & MASK_JOY1_DOWN) || ( k & MASK_JOY2_DOWN));
   gb.direct.joypad_bits.right = !(( k & MASK_JOY1_LEFT) || ( k & MASK_JOY2_LEFT));
@@ -129,6 +154,8 @@ void gbc_Step(void) {
   gb.direct.joypad_bits.b = !(k & MASK_JOY2_BTN);
   gb.direct.joypad_bits.select = !(k & MASK_KEY_USER1);
   gb.direct.joypad_bits.start = !(k & MASK_KEY_USER2);
+
+
 
   emu_DrawVsync();   
 }

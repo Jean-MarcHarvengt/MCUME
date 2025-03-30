@@ -9,6 +9,7 @@
 
 #define WIDTH  320
 #define HEIGHT 192
+#define MAX_RAM 0xc000
 
 #define CYCLES_PER_FRAME 69888 //3500000/50
 
@@ -76,7 +77,8 @@ const byte map_qw[8][5] = {
     { 5,17,16,225,44}, // bnm <symbshift=RSHift> <space>
 };
 
-static byte Z80_RAM[0xC000];                    // 48k RAM
+//static byte Z80_RAM[0xC000];                    // 48k RAM
+static byte Z80_RAM[MAX_RAM];                    // 128k RAM
 static Z80 myCPU;
 static byte * volatile VRAM=Z80_RAM;            // What will be displayed. Generally ZX VRAM, can be changed for alt screens.
 
@@ -365,9 +367,8 @@ static void InitKeyboard(void){
   memset(key_ram, 0xff, sizeof(key_ram));   
 }
 
-static void UpdateKeyboard (int asckey)
-{
-  int hk = keyboardAsciiConv[asckey]; 
+static void UpdateKeyboard (int hk)
+{ 
   memset(key_ram, 0xff, sizeof(key_ram));    
   {
     //if (k & MASK_KEY_USER1) hk = 39;
@@ -388,7 +389,7 @@ static void UpdateKeyboard (int asckey)
 }
 
 
-#define MAX_Z80SIZE 49152
+#define MAX_Z80SIZE MAX_RAM
 
 
 int endsWith(const char * s, const char * suffix)
@@ -487,7 +488,7 @@ void spec_Step(void) {
 
   int k=ik; //emu_GetPad();
   int hk = ihk;
-  if (iusbhk) hk = iusbhk;
+  if (iusbhk) hk = keyboardAsciiConv[iusbhk];
 
   kempston_ram = 0x00;
   if (k & MASK_JOY2_BTN)

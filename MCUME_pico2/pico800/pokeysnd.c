@@ -364,7 +364,15 @@ void POKEYSND_SetMzQuality(int quality)	/* specially for win32, perhaps not need
 
 void SND_Process(void *sndbuffer, int sndn)
 {
-	POKEYSND_Process_ptr(sndbuffer, sndn);
+	pokeysnd_process_8(sndbuffer, sndn);
+	char *scrbuffer = sndbuffer;
+	short *dstbuffer = sndbuffer;
+	int i;
+	for (i = sndn-1; i >= 0; i--) {
+		short s = scrbuffer[i];
+    dstbuffer[i]=s;
+	}
+
 #if defined(PBI_XLD) || defined (VOICEBOX)
 	VOTRAXSND_Process(sndbuffer,sndn);
 #endif

@@ -13,9 +13,12 @@ extern "C" {
 #include <stdio.h>
 #include "pico_dsp.h"
 
-volatile bool vbl=true;
+static bool timer_running=false;
+static volatile bool vbl=true;
 
 bool repeating_timer_callback(struct repeating_timer *t) {   
+    uint16_t bClick = emu_DebounceLocalKeys();
+    emu_Input(bClick);  
     if (vbl) {
         vbl = false;
     } else {
@@ -29,6 +32,9 @@ static int skip=0;
 
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
+#include "hardware/sync.h"
+ 
+static unsigned short palette16[PALETTE_SIZE];
 
 int main(void) {
 //    vreg_set_voltage(VREG_VOLTAGE_1_05);
@@ -67,14 +73,12 @@ int main(void) {
     emu_Init(filename);
     tft.startRefresh();
     struct repeating_timer timer;
-    add_repeating_timer_ms(15, repeating_timer_callback, NULL, &timer);    
+    add_repeating_timer_ms(20, repeating_timer_callback, NULL, &timer);
+    timer_running=true;
     while (true) {
-        uint16_t bClick = emu_DebounceLocalKeys();
-        emu_Input(bClick);  
-        emu_Step();        
+        emu_Step();
     }
 }
-static unsigned short palette16[PALETTE_SIZE];
 void emu_SetPaletteEntry(unsigned char r, unsigned char g, unsigned char b, int index)
 {
     if (index<PALETTE_SIZE) {
@@ -109,9 +113,16 @@ void emu_DrawVsync(void)
 #else
 #ifdef USE_VGA
     tft.waitSync();            
-#else                      
-    volatile bool vb=vbl;
-    while (vbl==vb) {};
+#else     
+    if (tft.getMode() == MODE_TFT_320x240) {                    
+        volatile bool vb=vbl;
+        while (vbl==vb) {
+            __dmb();         
+        }
+    }
+    else {
+        tft.waitSync();            
+    }
 #endif
 #endif    
 }

@@ -22,7 +22,7 @@ typedef unsigned char  byte;
 #define AY_TYPE_ZONX		2
 
 
-extern unsigned char * mem;
+extern unsigned char * zxmemory;
 extern unsigned char *memptr[64];
 extern int memattr[64];
 extern unsigned long tstates,tsmax;

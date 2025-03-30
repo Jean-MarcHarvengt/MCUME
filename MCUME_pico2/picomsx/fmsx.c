@@ -1075,7 +1075,7 @@ void SND_Process(void *stream, int len) {
   memset(wave,0,256*sizeof(wave[0]));
   RenderAudio(&wave[0], len);
   for (int i = 0; i< len; i++ )
-    *snd_buf++ = (wave[i]>>8)+128;
+    *snd_buf++ = (wave[i]/16+32767)>>8;
 #endif  
 } 
 

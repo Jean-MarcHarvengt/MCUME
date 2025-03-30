@@ -55,7 +55,9 @@ typedef struct
   unsigned int vol;
 } Channel;
 
-static Channel chan[6] = {
+static Channel chan[8] = {
+  {0,0,0},
+  {0,0,0},
   {0,0,0},
   {0,0,0},
   {0,0,0},
@@ -77,12 +79,16 @@ static void snd_Reset(void)
   chan[3].vol = 0;
   chan[4].vol = 0;
   chan[5].vol = 0;
+  chan[6].vol = 0;
+  chan[7].vol = 0;
   chan[0].sinc = 0;
   chan[1].sinc = 0;
   chan[2].sinc = 0;
   chan[3].sinc = 0;
   chan[4].sinc = 0;
   chan[5].sinc = 0;
+  chan[6].sinc = 0;
+  chan[7].sinc = 0;
 #endif
 }
 
@@ -110,28 +116,33 @@ void AudioPlaySystem::snd_Mixer(short *  stream, int len )
     int i;
     long s;     
     //len = len >> 1;   
-    short v0=chan[0].vol;
-    short v1=chan[1].vol;
-    short v2=chan[2].vol;
-    short v3=chan[3].vol;
-    short v4=chan[4].vol;
-    short v5=chan[5].vol;
+    long v0=chan[0].vol;
+    long v1=chan[1].vol;
+    long v2=chan[2].vol;
+    long v3=chan[3].vol;
+    long v4=chan[4].vol;
+    long v5=chan[5].vol;
+    long v6=chan[6].vol;
+    long v7=chan[7].vol;
     for (i=0;i<len;i++)
     {
-      s =((v0*square[(chan[0].spos>>8)&0x3f])>>11);
-      s+=((v1*square[(chan[1].spos>>8)&0x3f])>>11);
-      s+=((v2*square[(chan[2].spos>>8)&0x3f])>>11);
-      s+=((v3*noise[(chan[3].spos>>8)&(NOISEBSIZE-1)])>>11);
-      s+=((v4*noise[(chan[4].spos>>8)&(NOISEBSIZE-1)])>>11);
-      s+=((v5*noise[(chan[5].spos>>8)&(NOISEBSIZE-1)])>>11);         
-      *stream++ = (short)(s>>8 /*+ 32767*/);
-      //*stream++ = (short)(s);
+      s =v0*(square[(chan[0].spos>>8)&0x3f]+32767);
+      s+=v1*(square[(chan[1].spos>>8)&0x3f]+32767);
+      s+=v2*(square[(chan[2].spos>>8)&0x3f]+32767);
+      s+=v3*(noise[(chan[3].spos>>8)&(NOISEBSIZE-1)]+32767);
+      s+=v4*(noise[(chan[4].spos>>8)&(NOISEBSIZE-1)]+32767);
+      s+=v5*(noise[(chan[5].spos>>8)&(NOISEBSIZE-1)]+32767);         
+      s+=v6*(square[(chan[6].spos>>8)&0x3f]+32767);
+      s+=v7*(square[(chan[7].spos>>8)&0x3f]+32767);
+      *stream++ = (short)(s >> (8+4+8)); // 8bits unsigned on 16bits
       chan[0].spos += chan[0].sinc;
       chan[1].spos += chan[1].sinc;
       chan[2].spos += chan[2].sinc;
       chan[3].spos += chan[3].sinc;  
       chan[4].spos += chan[4].sinc;  
       chan[5].spos += chan[5].sinc;  
+      chan[6].spos += chan[6].sinc;  
+      chan[7].spos += chan[7].sinc;  
     }
 #endif         
   }
@@ -169,7 +180,7 @@ bool AudioPlaySystem::isPlaying(void)
 
 void AudioPlaySystem::sound(int C, int F, int V) {
 #ifndef CUSTOM_SND 
-  if (C < 6) {
+  if (C < 8) {
     chan[C].vol = V;
     chan[C].sinc = F>>1; 
   }

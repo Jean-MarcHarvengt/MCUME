@@ -1,4 +1,8 @@
+#include "platform_config.h"
 
+#ifndef HAS_PSRAM
+#define ALL_IN_RAM  1
+#endif
 //#define ALL_IN_RAM  1
 //#define PSRAM_FAKE  1
 

@@ -1,3 +1,6 @@
+#include "iopins.h"
+
+#ifdef HAS_PSRAM
 /******************************************************************************
 
 rp2040-psram
@@ -232,3 +235,4 @@ int test_psram(psram_spi_inst_t* psram_spi, int increment) {
     printf("32 bit: PSRAM read in %d us, %d B/s (target 1411200 B/s)\n", psram_elapsed, (uint32_t)psram_speed);
     return 0;
 }
+#endif

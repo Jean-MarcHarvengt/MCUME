@@ -46,24 +46,33 @@ static unsigned short screen_line[320];
 void gwenesis_io_get_buttons() {
 }
 
-void emu_KeyboardOnDown(int keymodifer, int key) {
-}
-
-void emu_KeyboardOnUp(int keymodifer, int key) {
-}
-
-
 void gen_Init(void)
 {
   emu_printf("gen_Init");  
   emu_printf("gen_Init done");
 }
 
-static int hk = 0;
 static int k = 0;
+static int ihk = 0;
+static int iusbhk; // USB keyboard key
+
+void emu_KeyboardOnDown(int keymodifer, int key) {
+  if (key <= 0x7f) iusbhk = key;
+  //else if (key == KBD_KEY_UP) iusbhk = 0xD7;  
+  //else if (key == KBD_KEY_LEFT) iusbhk = 0xD8;  
+  //else if (key == KBD_KEY_RIGHT) iusbhk = 0xD9;  
+  //else if (key == KBD_KEY_DOWN) iusbhk = 0xDA;  
+  //else if (key == KBD_KEY_BS) iusbhk = 0x7F;  
+  else
+    iusbhk = 0;
+}
+
+void emu_KeyboardOnUp(int keymodifer, int key) {
+  iusbhk = 0;
+}
 
 void gen_Input(int click) {
-  hk = emu_ReadI2CKeyboard();
+  ihk = emu_ReadI2CKeyboard();
   k = emu_ReadKeys();    
 }
 
@@ -213,6 +222,16 @@ void gen_Step(void) {
     // reset m68k cycles to the begin of next frame cycle
     m68k.cycles -= system_clock;
 
+  int hk = ihk;
+  if (iusbhk) hk = iusbhk;
+
+  switch(hk) {
+    case '1':
+      k = MASK_KEY_USER1;
+      break;
+    default:
+      break;
+  };
 
   button_state[0]=0;
   if (( k & MASK_JOY1_RIGHT) || ( k & MASK_JOY2_RIGHT)) {

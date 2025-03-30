@@ -1,8 +1,9 @@
 #ifndef DCASTAWAY_SOUND_H
 #define DCASTAWAY_SOUND_H
 
-#include "dcastaway.h"
+#include "platform_config.h"
 #ifndef NO_SOUND
+#include "dcastaway.h"
 
 
 #include<stdio.h>

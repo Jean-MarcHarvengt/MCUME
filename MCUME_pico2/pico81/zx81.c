@@ -1,5 +1,3 @@
-
-#define PROGMEM
 #include "z80.h"
 //#include "Arduino.h"
 #include "zx80rom.h"
@@ -12,22 +10,22 @@
 #define MEMORYRAM_SIZE 0x10000
 
 static AY8910 ay;
-//byte memo[ MEMORYRAM_SIZE ];
-byte * mem = 0;
+static byte memory[ MEMORYRAM_SIZE ];
+static int unexpanded=0;
+static int signal_int_flag=0;
+unsigned char * zxmemory;
 unsigned char *memptr[64];
 int memattr[64];
-int unexpanded=0;
 int nmigen=0,hsyncgen=0,vsync=0;
 int vsync_visuals=0;
-int signal_int_flag=0;
 int interrupted=0;
 int ramsize=32; //32;
+int zx80=0;
+int autoload=1;
 
 /* the keyboard state and other */
 static byte keyboard[ 8 ] = {0xff,0xff,0xff,0xff, 0xff,0xff,0xff,0xff};;
-static byte * XBuf=0; 
-int zx80=0;
-int autoload=1;
+static byte XBuf[ WIDTH*8 ]; 
 
 
 struct { unsigned char R,G,B; } Palette[2] = {
@@ -312,32 +310,32 @@ const short keyboardAsciiConv[] = // Ascii to Spectrum keys
 /* 0x3E */ 16+64,    // >
 /* 0x3F */ 6+64,     // ?
 /* 0x40 */ INV_KEY,    // @
-/* 0x41 */ INV_KEY,  // A
-/* 0x42 */ INV_KEY,  // B
-/* 0x43 */ INV_KEY,  // C
-/* 0x44 */ INV_KEY,  // D
-/* 0x45 */ INV_KEY,  // E
-/* 0x46 */ INV_KEY,  // F
-/* 0x47 */ INV_KEY,  // G
-/* 0x48 */ INV_KEY,  // H
-/* 0x49 */ INV_KEY,  // I
-/* 0x4A */ INV_KEY,  // J
-/* 0x4B */ INV_KEY,  // K
-/* 0x4C */ INV_KEY,  // L
-/* 0x4D */ INV_KEY,  // M
-/* 0x4E */ INV_KEY,  // N
-/* 0x4F */ INV_KEY,  // O
-/* 0x50 */ INV_KEY,  // P
-/* 0x51 */ INV_KEY,  // Q
-/* 0x52 */ INV_KEY,  // R
-/* 0x53 */ INV_KEY,  // S
-/* 0x54 */ INV_KEY,  // T
-/* 0x55 */ INV_KEY,  // U
-/* 0x56 */ INV_KEY,  // V
-/* 0x57 */ INV_KEY,  // W
-/* 0x58 */ INV_KEY,  // X
-/* 0x59 */ INV_KEY,  // Y
-/* 0x5A */ INV_KEY,  // Z
+/* 0x41 */ 4,        // A
+/* 0x42 */ 5,        // B
+/* 0x43 */ 6,        // C
+/* 0x44 */ 7,        // D
+/* 0x45 */ 8,        // E
+/* 0x46 */ 9,        // F
+/* 0x47 */ 10,       // G
+/* 0x48 */ 11,       // H
+/* 0x49 */ 12,       // I
+/* 0x4A */ 13,       // J
+/* 0x4B */ 14,       // K
+/* 0x4C */ 15,       // L
+/* 0x4D */ 16,       // M
+/* 0x4E */ 17,       // N
+/* 0x4F */ 18,       // O
+/* 0x50 */ 19,       // P
+/* 0x51 */ 20,       // Q
+/* 0x52 */ 21,       // R
+/* 0x53 */ 22,       // S
+/* 0x54 */ 23,       // T
+/* 0x55 */ 24,       // U
+/* 0x56 */ 25,       // V
+/* 0x57 */ 26,       // W
+/* 0x58 */ 27,       // X
+/* 0x59 */ 28,       // Y
+/* 0x5A */ 29,       // Z
 /* 0x5B */ INV_KEY,  // square bracket open
 /* 0x5C */ INV_KEY,  // baclslach
 /* 0x5D */ INV_KEY,  // square braquet close
@@ -410,15 +408,12 @@ const short keyboardAsciiConv[] = // Ascii to Spectrum keys
 /* 0xDF */ INV_KEY
 };
 
-static void updateKeyboard (int asckey)
+static void updateKeyboard (int hk)
 {
-  int hk = keyboardAsciiConv[asckey]; 
-
   memset(keyboard, 0xff, sizeof(keyboard));    
   {
     int shift = hk;
-    if (hk >=128) hk -= 128;
-    else if (hk >=64) hk -= 64;    
+    if (hk >=64) hk -= 64;    
     // scan all possibilities
     for (int j=0;j<8;j++) {
       for(int i=0;i<5;i++){
@@ -427,8 +422,7 @@ static void updateKeyboard (int asckey)
         }   
       }  
     } 
-    if (shift >=64) keyboard[0] &= ~ (1<<0);  // SHift 
-    //else if (shift >=64) keyboard[7] &= ~ (1<<1);  // SHift symboles       
+    if (shift >=64) keyboard[0] &= ~ (1<<0);  // SHift      
   } 
 }
 
@@ -477,7 +471,7 @@ static void handleKeyBuf(void)
 void reset81()
 {
   interrupted=2;  /* will cause a reset */
-  memset(mem+0x4000,0,0xc000);  
+  memset(zxmemory+0x4000,0,0xc000);  
 }
 
 void load_p(int a)
@@ -510,7 +504,7 @@ void load_p(int a)
   }
 
   autoload=0;
-  emu_FileRead(mem + (zx80?0x4000:0x4009), size, f);
+  emu_FileRead(zxmemory + (zx80?0x4000:0x4009), size, f);
   emu_FileClose(f);
 
   if(zx80)
@@ -527,24 +521,24 @@ void save_p(int a)
 void zx81hacks()
 {
   /* patch save routine */
-  mem[0x2fc]=0xed; mem[0x2fd]=0xfd;
-  mem[0x2fe]=0xc3; mem[0x2ff]=0x07; mem[0x300]=0x02;
+  zxmemory[0x2fc]=0xed; zxmemory[0x2fd]=0xfd;
+  zxmemory[0x2fe]=0xc3; zxmemory[0x2ff]=0x07; zxmemory[0x300]=0x02;
 
   /* patch load routine */
-  mem[0x347]=0xeb;
-  mem[0x348]=0xed; mem[0x349]=0xfc;
-  mem[0x34a]=0xc3; mem[0x34b]=0x07; mem[0x34c]=0x02;
+  zxmemory[0x347]=0xeb;
+  zxmemory[0x348]=0xed; zxmemory[0x349]=0xfc;
+  zxmemory[0x34a]=0xc3; zxmemory[0x34b]=0x07; zxmemory[0x34c]=0x02;
 }
 
 void zx80hacks()
 {
   /* patch save routine */
-  mem[0x1b6]=0xed; mem[0x1b7]=0xfd;
-  mem[0x1b8]=0xc3; mem[0x1b9]=0x83; mem[0x1ba]=0x02;
+  zxmemory[0x1b6]=0xed; zxmemory[0x1b7]=0xfd;
+  zxmemory[0x1b8]=0xc3; zxmemory[0x1b9]=0x83; zxmemory[0x1ba]=0x02;
 
   /* patch load routine */
-  mem[0x206]=0xed; mem[0x207]=0xfc;
-  mem[0x208]=0xc3; mem[0x209]=0x83; mem[0x20a]=0x02;
+  zxmemory[0x206]=0xed; zxmemory[0x207]=0xfc;
+  zxmemory[0x208]=0xc3; zxmemory[0x209]=0x83; zxmemory[0x20a]=0x02;
 }
 
 static void initmem()
@@ -554,11 +548,11 @@ static void initmem()
 
   if(zx80)
   {
-    memset(mem+0x1000,0,0xf000);
+    memset(zxmemory+0x1000,0,0xf000);
   }
   else
   {
-    memset(mem+0x2000,0,0xe000);
+    memset(zxmemory+0x2000,0,0xe000);
   }
 
 
@@ -567,7 +561,7 @@ static void initmem()
   for(f=0;f<16;f++)
   {
     memattr[f]=memattr[32+f]=0;
-    memptr[f]=memptr[32+f]=mem+1024*count;
+    memptr[f]=memptr[32+f]=zxmemory+1024*count;
     count++;
     if(count>=(zx80?4:8)) count=0;
   }
@@ -579,7 +573,7 @@ static void initmem()
   for(f=16;f<32;f++)
   {
     memattr[f]=memattr[32+f]=1;
-    memptr[f]=memptr[32+f]=mem+1024*(16+count);
+    memptr[f]=memptr[32+f]=zxmemory+1024*(16+count);
     count++;
     if(count>=ramsize) count=0;
   }
@@ -633,19 +627,19 @@ static void initmem()
       for(f=8;f<16;f++)
       {
         memattr[f]=1;         /* It's now writable */
-        memptr[f]=mem+1024*f;
+        memptr[f]=zxmemory+1024*f;
       }
     case 48:
       for(f=48;f<64;f++)
       {
         memattr[f]=1;
-        memptr[f]=mem+1024*f;
+        memptr[f]=zxmemory+1024*f;
       }
     case 32:
       for(f=32;f<48;f++)
       {
         memattr[f]=1;
-        memptr[f]=mem+1024*f;
+        memptr[f]=zxmemory+1024*f;
       }
       break;
   }
@@ -679,7 +673,6 @@ void z81_Init(void)
   emu_sndInit(); 
 #endif 
   
-  if (XBuf == 0) XBuf = (byte *)emu_Malloc(WIDTH*8);
   /* Set up the palette */
   int J;
   for(J=0;J<2;J++)
@@ -687,7 +680,7 @@ void z81_Init(void)
 
 
   emu_printf("Allocating RAM");
-  if (mem == 0) mem = emu_Malloc(MEMORYRAM_SIZE); //&memo[0];
+  if (zxmemory == 0) zxmemory = &memory[0]; //emu_Malloc(MEMORYRAM_SIZE);
   
   Reset8910(&ay,3500000,0);
   
@@ -695,15 +688,15 @@ void z81_Init(void)
   int siz=(zx80?4096:8192);  
   if(zx80)
   {
-    memcpy( mem + 0x0000, zx80rom, siz );    
+    memcpy( zxmemory + 0x0000, zx80rom, siz );    
   }
   else 
   {
-    memcpy( mem + 0x0000, zx81rom, siz );   
+    memcpy( zxmemory + 0x0000, zx81rom, siz );   
   }
-  memcpy(mem+siz,mem,siz);
+  memcpy(zxmemory+siz,zxmemory,siz);
   if(zx80)
-    memcpy(mem+siz*2,mem,siz*2);
+    memcpy(zxmemory+siz*2,zxmemory,siz*2);
     
   initmem();
  
@@ -721,8 +714,8 @@ void z81_Step(void)
 
   int k  = ik;
   int hk = ihk;
-  if (iusbhk) hk = iusbhk;
-    
+  if (iusbhk) hk = keyboardAsciiConv[iusbhk];
+
   updateKeyboard(hk);
 
   Loop8910(&ay,20);

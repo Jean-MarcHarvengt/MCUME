@@ -1,3 +1,6 @@
+#include "platform_config.h"
+
+#ifdef HAS_PSRAM
 /*
   PSRAM driver for IPS6404
 */
@@ -219,4 +222,4 @@ void PSRAM_T::pswrite_w(uint32_t addr, uint16_t val)
   }
 #endif
 }
-
+#endif

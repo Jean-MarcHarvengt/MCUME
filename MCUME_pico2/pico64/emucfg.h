@@ -20,75 +20,39 @@
 
 #ifdef KEYMAP_PRESENT
    
-#ifdef PICOZX
+#ifdef PICO2ZX
 const unsigned short key_map1[] = {
-  '1','2','3','4','5','6','7','8','9','0',
+  '1','2','3','4','5','6','7','8','9','0',127,
   'Q','W','E','R','T','Y','U','I','O','P',
   'A','S','D','F','G','H','J','K','L',0x0D,
   0,'Z','X','C','V','B','N','M',0,' ',
-  0,0,0,0,150,152 // L R
+  0,0,0,0,127,0 // L R
   };  
 
 const unsigned short key_map2[] = {
-  '!','@','#','$','%','&','\'','(',')','_',
+  '!','@','#','$','%','&','\'','(',')','_',127,
   0,0,0,'<','>',0,0,0,';','"',
   0,0,0,0,0,'^','-','+','=',0x0D,
   0,':',0,'?','\/','*',',','.',0,' ',
-  153,151,150,152, //U L R D
+  153,151,150,152,0,0 //U L R D
   };  
 
 const unsigned short key_map3[] = {
-  133,134,135,136,137,138,139,140,0,0, // function keys
+  129,130,131,132,133,134,135,136,0,0,0, // function keys
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
-  153,151,150,152, //U L R D
+  153,151,150,152,0,0 //U L R D
   };
 
 const unsigned short matkeys[] = {
-  0x104,0x101,0x108,0x102,0x110,0x120,0x140,0x204,0x201,0x208, // row 1
-  0x202,0x210,0x220,0x240,0x304,0x301,0x308,0x302,0x310,0x320, // row 2
-  0x340,0x404,0x401,0x408,0x402,0x410,0x420,0x440,0x504,0x501, // row 3
-  0x020,0x508,0x502,0x510,0x520,0x540,0x604,0x601,0x040,0x608, // row 4
-  0x008,0x001,0x002,0x010,0x620,0x640 }; // cursor keys up, left, right, down, <<<, >>>
+  0x401,0x301,0x201,0x101,0x001,0x008,0x108,0x208,0x308,0x408,0x580, // row 1
+  0x402,0x302,0x202,0x102,0x002,0x010,0x110,0x210,0x310,0x410, // row 2
+  0x404,0x304,0x204,0x104,0x004,0x040,0x140,0x240,0x340,0x440, // row 3
+  0x420,0x320,0x220,0x120,0x020,0x080,0x180,0x280,0x380,0x480, // row 4
+  0x520,0x540,0x510,0x508,0x502,0x504 }; // cursor keys up, left, right, down, <<<, >>>
+#endif
 
-#else   
-#define keylables_map1_0 (char *)"qwertyuiop\x1a"
-#define keylables_map1_1 (char *)" asdfghjkl\x19"
-#define keylables_map1_2 (char *)" zxcvbnm.\x10 "
-const unsigned short key_map1[] = {
-  'Q','W','E','R','T','Y','U','I','O','P',157,
-  0,'A','S','D','F','G','H','J','K','L',0x0D,
-  0,'Z','X','C','V','B','N','M','.',' ',
-  0,0,0,0
-  };  
-
-#define keylables_map2_0 (char *)"1234567890 "
-#define keylables_map2_1 (char *)" !@#$%+&*- "
-#define keylables_map2_2 (char *)" ()?/\"<>,: "
-const unsigned short key_map2[] = {
-  '1','2','3','4','5','6','7','8','9','0',0,
-  0, '!','@','#','$','%','+','&','*','-','\/',
-  0, '(',')','?','\/','"','<','>',',',':',
-  145,157,29,17 //U L R D
-  };  
-
-#define keylables_map3_0 (char *)"\x11\x12\x13\x14\x15\x16\x17\x18   "
-#define keylables_map3_1 (char *)"           "
-#define keylables_map3_2 (char *)"        ;= "
-const unsigned short key_map3[] = {
-  133,134,135,136,137,138,139,140,0,0,0, // function keys
-  0, 0,0,0,0,0,0,0,0,0,0,
-  0, 0,0,0,0,0,0,0,';','=',
-  0,0,0,0
-  };
-
-const unsigned short matkeys[] = {
-  0x020,0x120,0x220,0x320,0x420,0x408,0x308,0x208,0x108,0x008,0x002, // row 1
-  0x510,0x010,0x110,0x210,0x310,0x410,0x401,0x301,0x201,0x101,0x001, // row 2
-  0x520,0x102,0x202,0x302,0x402,0x404,0x304,0x204,0x104,0x004, // row 3
-  0x508,0x501,0x502,0x504 }; // cursor keys
-#endif 
 #endif
 
 #endif

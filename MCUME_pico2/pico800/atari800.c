@@ -15,7 +15,7 @@
 #include "pia.h"
 #include "colours.h"
 #include "emuapi.h"
-#if HAS_SND
+#ifdef HAS_SND
 #include "pokeysnd.h"
 #endif
 #include "kbd.h"
@@ -292,7 +292,7 @@ const unsigned char keyboardAsciiConv[] = // Ascii to ATARI keys
 /* 0x27 */ INV_KEY,  // ' singlequote
 /* 0x28 */ 112,      // ( bracket left
 /* 0x29 */ 114,      // ) bracket right
-/* 0x2A */ 0x0E,     // * mult
+/* 0x2A */ 0x07,     // * mult
 /* 0x2B */ 0x06,     // + plus
 /* 0x2C */ 0x20,     // , comma
 /* 0x2D */ 0x0E,     // - minus
@@ -453,7 +453,7 @@ void at8_Init(void)
     emu_SetPaletteEntry(R32(colourtable[i]), G32(colourtable[i]), B32(colourtable[i]), i);
   }
 
-#if HAS_SND
+#ifdef HAS_SND
   emu_sndInit();
   POKEYSND_Init(POKEYSND_FREQ_17_APPROX, 44100, 1, POKEYSND_BIT16);
 #endif
