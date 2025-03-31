@@ -17,7 +17,7 @@
 #include "hardware/irq.h"
 #include <string.h>
 
-#include "PICO_DSP.h"
+#include "pico_dsp.h"
 #include "font8x8.h"
 #include "include.h"
 
