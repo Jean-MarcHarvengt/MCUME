@@ -81,8 +81,11 @@
  * audio_write() functions are provided, define ENABLE_SOUND to a non-zero value
  * before including peanut_gb.h in order for these functions to be used.
  */
+extern "C" uint8_t audio_read(uint16_t addr);
+extern "C" void audio_write(uint16_t addr, uint8_t value);
+
 #ifndef ENABLE_SOUND
-# define ENABLE_SOUND 0
+# define ENABLE_SOUND 1
 #endif
 
 /* Enable LCD drawing. On by default. May be turned off for testing purposes. */

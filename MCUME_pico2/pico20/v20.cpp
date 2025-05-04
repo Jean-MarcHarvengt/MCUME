@@ -94,7 +94,7 @@ void SND_Process(void * stream, int len) {
     o0 = (psid.v[0].f & 0x80000000) >> 2;
     o1 = (psid.v[1].f & 0x80000000) >> 2;
     o2 = (psid.v[2].f & 0x80000000) >> 2;
-    o3 = (int)NVALUE(NSHIFT(psid.v[3].rv, psid.v[3].f >> 28)) << 22;
+    o3 = (int)NVALUE(NSHIFT(psid.v[3].rv, psid.v[3].f >> 28)) << 21;
     uint16_t s = (((o0+o1+o2+o3)>>(16+10))*psid.vol)>>4;
     //int s = ((int)((o0+o1+o2+o3)>>20)-0x800)*psid.vol;
     *dstbuffer++ =s;
@@ -360,11 +360,9 @@ void v20_Step(void)
 
 
   int k=ik; 
-#if (defined(PICO2ZX) || defined(PICOHYPERPET) )
-  // Ignore joypad if shift is pressed!!!
-//  if ( !(k & MASK_KEY_USER2) )
-  if ( hk == 0 )
-#endif
+//#if ( defined(PICO2ZX) )
+//  if ( hk == 0 )
+//#endif
   {
     if ( !(pik & MASK_JOY2_BTN) && (k & MASK_JOY2_BTN) ) {
       mos6522.setJoyStickPressed(MOS6522::Vic20JoyStickButton::Fire, true);

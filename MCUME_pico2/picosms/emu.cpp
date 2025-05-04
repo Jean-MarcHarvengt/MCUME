@@ -9,35 +9,15 @@ extern "C" {
 
 static int rom_offset = 0;
 
-#ifdef HAS_PSRAM
-
-#include "psram_t.h"
-
-PSRAM_T psram = PSRAM_T(PSRAM_CS, PSRAM_MOSI, PSRAM_SCLK, PSRAM_MISO);
-
-extern "C" uint8 read_rom(int address) {
-  return (psram.psread(address+rom_offset));
-}
-
-extern "C" void  write_rom(int address, uint8 val)  {
-  psram.pswrite(address,val); 
-}
-#else
 #include "flash_t.h"
 
 extern "C" uint8 read_rom(int address) {
   return flash_start[address+rom_offset];
 }
 
-#endif
-
-
 void sms_Init(void)
 {
   emu_printf("Allocating MEM");   
-#ifdef HAS_PSRAM
-  psram.begin();
-#endif
   mem_init();    
   emu_printf("Allocating MEM done");
 }
@@ -74,29 +54,7 @@ void sms_Start(char * filename)
 {
   emu_printf("load and init");  
 
-#ifdef HAS_PSRAM
-  int size = 0;
-  int pos = 0;
-  int n;
-  int i;
-  char * buf = (char*)cache;
-  int f = emu_FileOpen(filename,"r+b");
-  if (f) {
-    while ( (n = emu_FileRead(buf,CACHE_SIZE,f) ) ) {
-      size += n;
-      for (int i=0; i<n; i++) {
-        write_rom(pos++,buf[i]);
-      }
-      emu_printi(pos);            
-      //emu_printi(n);          
-    }
-    emu_FileClose(f);
-  }
-#else
   int size = flash_load(filename);
-#endif
-
-
 
   if((size / 512) & 1)
   {

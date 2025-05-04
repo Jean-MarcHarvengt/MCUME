@@ -43,12 +43,8 @@ int main(void) {
 //    set_sys_clock_khz(225000, true);    
 //    set_sys_clock_khz(250000, true);  
 
-#ifdef HAS_USBPIO
-    set_sys_clock_khz(140000, true);
-#else
     set_sys_clock_khz(250000, true);
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
-#endif
 
     emu_init();
     char * filename;
@@ -109,15 +105,12 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-#ifdef HAS_USBPIO
-#else
 #ifdef USE_VGA
     tft.waitSync();            
 #else                      
     volatile bool vb=vbl;
     while (vbl==vb) {};
-#endif
-#endif    
+#endif   
 }
 
 

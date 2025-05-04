@@ -14,7 +14,7 @@ include(pico_sdk_import.cmake)
 #set(TARGET picospeccy)
 #set(TARGET picomsx)
 #set(TARGET pico8086)
-#set(TARGET picocastaway)
+set(TARGET picocastaway)
 #set(TARGET picocolem)
 #set(TARGET picoo2em)
 #set(TARGET picovcs)
@@ -22,7 +22,8 @@ include(pico_sdk_import.cmake)
 #set(TARGET picopce)
 #set(TARGET picosms)
 #set(TARGET picogen)
-set(TARGET pico5200)
+#set(TARGET pico5200)
+#set(TARGET picovectrex)
 
 project(${TARGET} C CXX)
 
@@ -334,6 +335,16 @@ set(PICOGB_SOURCES
 	)
 endif()
 
+if( ${TARGET} MATCHES "picovectrex" )
+set(PICOVECTREX_SOURCES 
+		picovectrex/emu.cpp 
+		picovectrex/e6809.c
+		picovectrex/e8910.c
+		picovectrex/vecx.c
+		picovectrex/picovectrex.cpp
+	)
+endif()
+
 if( ${TARGET} MATCHES "picocastaway" )
 set(PICOCASTAWAY_SOURCES 
 		picocastaway/emu.cpp 
@@ -406,6 +417,7 @@ add_executable(${TARGET}
 		${PICOCOLEM_SOURCES}
 		${PICOO2EM_SOURCES}
 		${PICOVCS_SOURCES}
+		${PICOVECTREX_SOURCES}
 		${PICOSPECCY_SOURCES}
 		${PICONOFRENDO_SOURCES}
 		${PICOSMS_SOURCES}
@@ -446,7 +458,7 @@ target_compile_definitions(${TARGET} PRIVATE PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_S
 
 
 #target_compile_definitions(${TARGET} PRIVATE CFG_TUSB_DEBUG=2)
-#target_compile_options(${TARGET} PUBLIC -O3)
+target_compile_options(${TARGET} PUBLIC -O2)
 #target_compile_options(${TARGET} PUBLIC -Wall -Wextra -Wno-unused-function -Wno-unused-parameter)
 IF (NOT DEFINED N_SD_CARDS)
     SET(N_SD_CARDS 1)

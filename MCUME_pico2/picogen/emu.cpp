@@ -19,11 +19,13 @@ extern "C" {
 
 #include "flash_t.h"
 
+#define FS_MASK 1
+
 // SETTINGS
 bool show_fps = true;
 bool limit_fps = true;
 bool interlace = true;
-bool frameskip = true;
+bool frameskip = false;
 static int z80_enable_mode = 2;
 bool sn76489_enabled = true;
 extern unsigned short button_state[3];
@@ -146,8 +148,8 @@ void gen_Step(void) {
                 z80_run(system_clock + VDP_CYCLES_PER_LINE);
         /* Video */
         // Interlace mode
-        //if (drawFrame && !interlace || (frame % 2 == 0 && scan_line % 2) || scan_line % 2 == 0) {
-        if (drawFrame)  {
+        if (drawFrame && !interlace || (frame % 2 == 0 && scan_line % 2) || scan_line % 2 == 0) {
+        //if (drawFrame)  {
             gwenesis_vdp_set_buffer(&screen_line[0]);
             gwenesis_vdp_render_line(scan_line); /* render scan_line */
             if (scan_line < screen_height ) emu_DrawLine16(&screen_line[0], 320, screen_height, scan_line);
@@ -182,12 +184,12 @@ void gen_Step(void) {
         if (!is_pal && scan_line == screen_height + 1) {
             z80_irq_line(0);
             // FRAMESKIP every 3rd frame
-            //drawFrame = frameskip && frame % 3 != 0;
-            // if (frameskip && frame % 3 == 0) {
-            //     drawFrame = 0;
-            // } else {
-            //     drawFrame = 1;
-            // }
+            drawFrame = frameskip && frame % FS_MASK != 0;
+            if (frameskip && frame % 3 == 0) {
+                drawFrame = 0;
+            } else {
+                drawFrame = 1;
+            }
         }
 
         system_clock += VDP_CYCLES_PER_LINE;

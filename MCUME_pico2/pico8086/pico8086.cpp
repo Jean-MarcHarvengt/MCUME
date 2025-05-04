@@ -111,8 +111,6 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-#ifdef HAS_USBPIO
-#else
 #ifdef USE_VGA
     tft.waitSync();            
 #else                      
@@ -126,7 +124,6 @@ void emu_DrawVsync(void)
         tft.waitSync();            
     }
 #endif
-#endif 
 }
 
 /*

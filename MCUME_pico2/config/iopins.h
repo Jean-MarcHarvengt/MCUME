@@ -4,6 +4,7 @@
 #include "platform_config.h"
 
 #define VGA_DMA_CHANNEL 2 // requires 2 channels
+#define TFT_DMA_CHANNEL 2 // requires 1 channel
 #define AUD_DMA_CHANNEL 4 // requires 1 or 3 channels
 #define PSR_DMA_CHANNEL 7 // requires 2 channels (PSRAM)
 

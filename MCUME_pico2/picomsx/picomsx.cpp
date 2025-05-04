@@ -48,26 +48,10 @@ int main(void) {
 //    set_sys_clock_khz(225000, truxe);    
 //    set_sys_clock_khz(250000, true);  
 
-#ifdef HAS_USBPIO
-    set_sys_clock_khz(140000, true);
-#else
     set_sys_clock_khz(250000, true);
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
-#endif
 
-/*
-    volatile uint32_t *qmi_m0_timing=(uint32_t *)0x400d000c;
-    vreg_disable_voltage_limit();
-    vreg_set_voltage(VREG_VOLTAGE_1_40);
-    sleep_ms(10);
-    *qmi_m0_timing = 0x60007204;
-    set_sys_clock_khz(140000, false);
-    *qmi_m0_timing = 0x60007303;
-*/
-
-     emu_init();
-   
-
+    emu_init();
 
 
     char * filename;
@@ -125,8 +109,6 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-#ifdef HAS_USBPIO
-#else
 #ifdef USE_VGA
     tft.waitSync();            
 #else                      
@@ -139,7 +121,6 @@ void emu_DrawVsync(void)
     else {
         tft.waitSync();            
     }
-#endif
 #endif    
 }
 

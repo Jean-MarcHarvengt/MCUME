@@ -16,6 +16,8 @@ extern "C" {
 volatile bool vbl=true;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
+    uint16_t bClick = emu_DebounceLocalKeys();
+    emu_Input(bClick);    
     if (vbl) {
         vbl = false;
     } else {
@@ -43,12 +45,8 @@ int main(void) {
 //    set_sys_clock_khz(225000, truxe);    
 //    set_sys_clock_khz(250000, true);  
 
-#ifdef HAS_USBPIO
-    set_sys_clock_khz(140000, true);
-#else
     set_sys_clock_khz(250000, true);
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
-#endif
 
      emu_init();
  
@@ -70,10 +68,8 @@ int main(void) {
     emu_Init(filename);
     tft.startRefresh();
     struct repeating_timer timer;
-    add_repeating_timer_ms(25, repeating_timer_callback, NULL, &timer);    
-    while (true) {
-        uint16_t bClick = emu_DebounceLocalKeys();
-        emu_Input(bClick);  
+    add_repeating_timer_ms(16, repeating_timer_callback, NULL, &timer);    
+    while (true) { 
         emu_Step();               
     }
 }
@@ -109,14 +105,11 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-#ifdef HAS_USBPIO
-#else
 #ifdef USE_VGA
     tft.waitSync();            
 #else                      
     volatile bool vb=vbl;
     while (vbl==vb) {};
-#endif
 #endif    
 }
 
@@ -169,7 +162,7 @@ void * emu_LineBuffer(int line)
 AudioPlaySystem mymixer;
 
 void emu_sndInit() {
-  tft.begin_audio(256, mymixer.snd_Mixer);
+  tft.begin_audio(512, mymixer.snd_Mixer);
   mymixer.start();    
 }
 

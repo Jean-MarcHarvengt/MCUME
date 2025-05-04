@@ -44,7 +44,6 @@ static gfx_mode_t gfxmode = MODE_UNDEFINED;
 #endif
 #endif
 
-#define LINES_PER_BLOCK  64
 #define NR_OF_BLOCK      4
 
 #define TFT_SWRESET    0x01
@@ -112,11 +111,14 @@ static uint8_t nbTransfer = 0;
 #define VGA_RGB(r,g,b)   ( (((r>>5)&0x07)<<5) | (((g>>5)&0x07)<<2) | (((b>>6)&0x3)<<0) )
 #endif
 
-// 8 bits 320x240 frame buffer => 64K
+// 8 bits frame buffer
 static vga_pixel * visible_framebuffer = NULL;
 static vga_pixel * framebuffer = NULL;
 static vga_pixel * fb0 = NULL;
 static vga_pixel * fb1 = NULL;
+
+// 16 bits TFT frame buffer
+static uint16_t * tft_fb = NULL;
 
 static int  fb_width;
 static int  fb_height;
@@ -410,7 +412,7 @@ static void dma_isr() {
 static void setDmaStruct() {
   // Setup the control channel
   if (dma_tx == 0)  {
-    dma_tx = dma_claim_unused_channel(true);
+    dma_tx = TFT_DMA_CHANNEL; //dma_claim_unused_channel(true);
   }    
   dmaconfig = dma_channel_get_default_config(dma_tx);
   channel_config_set_transfer_data_size(&dmaconfig, DMA_SIZE_16);
@@ -428,6 +430,7 @@ static void setDmaStruct() {
   ); 
 
   irq_set_exclusive_handler(DMA_IRQ_0, dma_isr);
+  //irq_set_priority (DMA_IRQ_0, 0);   
   dma_channel_set_irq0_enabled(dma_tx, true);
   irq_set_enabled(DMA_IRQ_0, true);
   dma_hw->ints0 = 1u << dma_tx;  
@@ -435,36 +438,19 @@ static void setDmaStruct() {
 
 void PICO_DSP::startRefresh(void) {
   if (gfxmode == MODE_TFT_320x240) {
-    uint32_t remaining = TFT_HEIGHT*TFT_WIDTH*2;
-    int i=0;
-    nbTransfer = 0;
-    while (remaining > 0) {
-      uint16_t * fb = blocks[i];
-      int32_t len = (remaining >= (LINES_PER_BLOCK*TFT_WIDTH*2)?LINES_PER_BLOCK*TFT_WIDTH*2:remaining);     
-      switch (i) {
-        case 0:
-          if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);       
-          break;
-        case 1:
-          if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);      
-          break;
-        case 2:
-          if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);      
-          break;
-        case 3:
-          if (fb == 0) fb = (uint16_t*)((int)malloc(len+64)&0xffffffe0);       
-          break;
-      }
+    tft_fb = (uint16_t *)malloc(TFT_HEIGHT*TFT_WIDTH*2);
+    if (!tft_fb) {
+      fillScreenNoDma(RGBVAL16(0xFF,0xFF,0x00));
+      printf("TFT FB allocaltion failed\n");
+      while(1) sleep_ms(10000);    
+    }
+    uint16_t * fb = tft_fb;
+    nbTransfer = NR_OF_BLOCK;
+    int len = (TFT_HEIGHT*TFT_WIDTH)/nbTransfer; 
+    for (int i=0;i<NR_OF_BLOCK;i++) {
       blocks[i] = fb;
-      blocklens[i] = len/2;
-      if (blocks[i] == 0) {
-        fillScreenNoDma(RGBVAL16(0xFF,0xFF,0x00));
-        printf("FB allocaltion failed for block %d\n",i);
-        sleep_ms(10000);    
-      }
-      nbTransfer++;
-      remaining -= len;    
-      i++;
+      blocklens[i] = len;
+      fb += len;
     }                
     curTransfer = 0;  
     rstop = 0;     
@@ -550,8 +536,7 @@ void PICO_DSP::fillScreen(dsp_pixel color) {
   if (gfxmode == MODE_TFT_320x240) {
     for (j=0; j<TFT_HEIGHT; j++)
     {
-      uint16_t * block=blocks[j>>6];
-      uint16_t * dst=&block[(j&0x3F)*fb_stride];
+      uint16_t * dst=&tft_fb[j*fb_stride];
       for (i=0; i<fb_width; i++)
       {
         *dst++ = color;
@@ -576,8 +561,7 @@ void PICO_DSP::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, dsp_pixel co
   if (gfxmode == MODE_TFT_320x240) {
     for (j=0; j<h; j++)
     {
-      uint16_t * block=blocks[l>>6];
-      uint16_t * dst=&block[(l&0x3F)*fb_stride+x];
+      uint16_t * dst=&tft_fb[l*fb_stride+x];
       for (i=0; i<w; i++)
       {
         *dst++ = color;
@@ -602,7 +586,6 @@ void PICO_DSP::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, dsp_pixel co
 void PICO_DSP::drawText(int16_t x, int16_t y, const char * text, dsp_pixel fgcolor, dsp_pixel bgcolor, bool doublesize) {
   if (gfxmode == MODE_TFT_320x240) {
     uint16_t c;
-    uint16_t * block;
     uint16_t * dst;
     fgcolor = fgcolor;
     bgcolor = bgcolor;
@@ -613,8 +596,7 @@ void PICO_DSP::drawText(int16_t x, int16_t y, const char * text, dsp_pixel fgcol
       {     
         unsigned char bits;
         if (doublesize) {
-          block=blocks[l>>6];
-          dst=&block[(l&0x3F)*fb_stride+x];         
+          dst=&tft_fb[l*fb_stride+x]; 
           bits = *charpt;     
           if (bits&0x01) *dst++=fgcolor;
           else *dst++=bgcolor;
@@ -641,8 +623,7 @@ void PICO_DSP::drawText(int16_t x, int16_t y, const char * text, dsp_pixel fgcol
           else *dst++=bgcolor;
           l++;       
         }
-        block=blocks[l>>6];
-        dst=&block[(l&0x3F)*fb_stride+x]; 
+        dst=&tft_fb[l*fb_stride+x];
         bits = *charpt++;     
         if (bits&0x01) *dst++=fgcolor;
         else *dst++=bgcolor;
@@ -788,8 +769,7 @@ void PICO_DSP::drawSprite(int16_t x, int16_t y, const dsp_pixel *bitmap, uint16_
   if (gfxmode == MODE_TFT_320x240) {
     for (int row=0;row<arh; row++)
     {
-      uint16_t * block=blocks[l>>6];
-      uint16_t * dst=&block[(l&0x3F)*fb_stride+arx];  
+      uint16_t * dst=&tft_fb[l*fb_stride+arx];   
       bmp_ptr = (uint16_t*)bitmap;
       for (int col=0;col<arw; col++)
       {
@@ -822,8 +802,7 @@ void PICO_DSP::drawSprite(int16_t x, int16_t y, const dsp_pixel *bitmap) {
 
 void PICO_DSP::writeLine(int width, int height, int y, dsp_pixel *buf) {
   if (gfxmode == MODE_TFT_320x240) {
-    uint16_t * block=blocks[y>>6];
-    uint16_t * dst=&block[(y&0x3F)*fb_stride];
+    uint16_t * dst=&tft_fb[y*fb_stride]; 
     if (width > fb_width) {
 #ifdef TFT_LINEARINT   
       int delta = (width/(width-fb_width))-1;   
@@ -910,8 +889,7 @@ void PICO_DSP::writeLine(int width, int height, int y, dsp_pixel *buf) {
 void PICO_DSP::writeLinePal(int width, int height, int y, uint8_t *buf, dsp_pixel *palette) {
   if (gfxmode == MODE_TFT_320x240) {
     if ( (height<fb_height) && (height > 2) ) y += (fb_height-height)/2;
-    uint16_t * block=blocks[y>>6];
-    uint16_t * dst=&block[(y&0x3F)*fb_stride];
+    uint16_t * dst=dst=&tft_fb[y*fb_stride]; 
     if (width > fb_width) {
 #ifdef TFT_LINEARINT    
       int delta = (width/(width-fb_width))-1;
@@ -1006,8 +984,7 @@ void PICO_DSP::writeScreenPal(int width, int height, int stride, uint8_t *buf, d
     if (width*2 <= fb_width) {
       for (j=0; j<h; j++)
       {
-        uint16_t * block=blocks[y>>6];
-        uint16_t * dst=&block[(y&0x3F)*fb_stride];        
+        uint16_t * dst=&tft_fb[y*fb_stride];        
         src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
@@ -1022,8 +999,7 @@ void PICO_DSP::writeScreenPal(int width, int height, int stride, uint8_t *buf, d
     else if (width <= fb_width) {
       for (j=0; j<h; j++)
       {
-        uint16_t * block=blocks[y>>6];
-        uint16_t * dst=&block[(y&0x3F)*fb_stride+(fb_width-width)/2];        
+        uint16_t * dst=&tft_fb[y*fb_stride+(fb_width-width)/2];         
         src=&buf[(sy>>8)*stride];
         for (i=0; i<width; i++)
         {
@@ -1344,7 +1320,6 @@ static void pwm_audio_reset(void)
 {
   memset((void*)snd_buffer,0, snd_nb_samples*sizeof(uint8_t));
 }
-
 
 /********************************
  * Initialization

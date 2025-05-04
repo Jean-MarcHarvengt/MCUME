@@ -14,8 +14,6 @@ extern "C" {
 
 #include <stdio.h>
 #include "pico_dsp.h"
-//#include "psram_spi.h"
-
 
 volatile bool vbl=true;
 
@@ -39,8 +37,6 @@ static int skip=0;
 
 #include "hdmi_framebuffer.h"
 
-//psram_spi_inst_t* async_spi_inst;
-
 int main(void) {
 //    vreg_set_voltage(VREG_VOLTAGE_1_05);
 //    set_sys_clock_khz(125000, true);    
@@ -52,162 +48,10 @@ int main(void) {
 //    set_sys_clock_khz(225000, truxe);    
 //    set_sys_clock_khz(250000, true);  
 
-#ifdef HAS_USBPIO
-    set_sys_clock_khz(140000, true);
-#else
     set_sys_clock_khz(250000, true);
     *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
-#endif
 
-
-    // Overclock!
-//    set_sys_clock_khz(280000, true);
-//    stdio_init_all();
-
-     emu_init();
-   
-
-
-
-
-/*
-
-
-    psram_spi_inst_t psram_spi = psram_spi_init(pio2, 0);
-
-
-uint32_t psram_begin, psram_elapsed;
-    float psram_speed;
-
-    printf("Testing PSRAM...\n");
-
-
-    // **************** 8 bits testing ****************
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); ++addr) {
-        psram_write8(&psram_spi, addr, (addr & 0xFF));
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("8 bit: PSRAM write 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-
-    //psram_begin = time_us_32();
-    //for (uint32_t addr = 0; addr < (8 * 1024 * 1024); ++addr) {
-    //    psram_write8_async(&psram_spi, addr, (addr & 0xFF));
-    //}
-    //psram_elapsed = time_us_32() - psram_begin;
-    //psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    //printf("8 bit: PSRAM write async 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); ++addr) {
-        uint8_t result = psram_read8(&psram_spi, addr);
-        if ((uint8_t)(addr & 0xFF) != result) {
-            printf("\nPSRAM failure at address %x (%x != %x)\n", addr, addr & 0xFF, result);
-            return 1;
-        }
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("8 bit: PSRAM read 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    // **************** 16 bits testing ****************
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 2) {
-        psram_write16(&psram_spi, addr, (((addr + 1) & 0xFF) << 8) | (addr & 0xFF));
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("16 bit: PSRAM write 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 2) {
-        uint16_t result = psram_read16(&psram_spi, addr);
-        if ((uint16_t)(
-                (((addr + 1) & 0xFF) << 8) |
-                (addr & 0xFF)) != result
-        ) {
-            printf("PSRAM failure at address %x (%x != %x) ", addr, (
-                (((addr + 1) & 0xFF) << 8) |
-                (addr & 0xFF)), result
-            );
-            return 1;
-        }
-    }
-    psram_elapsed = (time_us_32() - psram_begin);
-    psram_speed = 1000000.0 * 8 * 1024 * 1024 / psram_elapsed;
-    printf("16 bit: PSRAM read 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    // **************** 32 bits testing ****************
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 4) {
-        psram_write32(
-            &psram_spi, addr,
-            (uint32_t)(
-                (((addr + 3) & 0xFF) << 24) |
-                (((addr + 2) & 0xFF) << 16) |
-                (((addr + 1) & 0xFF) << 8)  |
-                (addr & 0XFF))
-        );
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("32 bit: PSRAM write 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 4) {
-        uint32_t result = psram_read32(&psram_spi, addr);
-        if ((uint32_t)(
-            (((addr + 3) & 0xFF) << 24) |
-            (((addr + 2) & 0xFF) << 16) |
-            (((addr + 1) & 0xFF) << 8)  |
-            (addr & 0XFF)) != result
-        ) {
-            printf("PSRAM failure at address %x (%x != %x) ", addr, (
-                (((addr + 3) & 0xFF) << 24) |
-                (((addr + 2) & 0xFF) << 16) |
-                (((addr + 1) & 0xFF) << 8)  |
-                (addr & 0XFF)), result
-            );
-            return 1;
-        }
-    }
-    psram_elapsed = (time_us_32() - psram_begin);
-    psram_speed = 1000000.0 * 8 * 1024 * 1024 / psram_elapsed;
-    printf("32 bit: PSRAM read 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    // **************** n bits testing ****************
-    uint8_t write_data[256];
-    for (size_t i = 0; i < 256; ++i) {
-        write_data[i] = i;
-    }
-    psram_begin = time_us_32();
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 256) {
-        for (uint32_t step = 0; step < 256; step += 16) {
-            psram_writen(&psram_spi, addr + step, write_data + step, 16);
-        }
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("128 bit: PSRAM write 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-    psram_begin = time_us_32();
-    uint8_t read_data[16];
-    for (uint32_t addr = 0; addr < (8 * 1024 * 1024); addr += 256) {
-        for (uint32_t step = 0; step < 256; step += 16) {
-            psram_readn(&psram_spi, addr + step, read_data, 16);
-            if (memcmp(read_data, write_data + step, 16) != 0) {
-                printf("PSRAM failure at address %x", addr);
-                return 1;
-            }
-        }
-    }
-    psram_elapsed = time_us_32() - psram_begin;
-    psram_speed = 1000000.0 * 8 * 1024.0 * 1024 / psram_elapsed;
-    printf("128 bit: PSRAM read 8MB in %d us, %d B/s\n", psram_elapsed, (uint32_t)psram_speed);
-
-*/
+    emu_init();
 
     char * filename;
 #ifdef FILEBROWSER
@@ -264,8 +108,6 @@ void emu_DrawVsync(void)
 {
     skip += 1;
     skip &= VID_FRAME_SKIP;
-#ifdef HAS_USBPIO
-#else
 #ifdef USE_VGA
     tft.waitSync();            
 #else                      
@@ -278,7 +120,6 @@ void emu_DrawVsync(void)
     else {
         tft.waitSync();            
     }
-#endif
 #endif    
 }
 

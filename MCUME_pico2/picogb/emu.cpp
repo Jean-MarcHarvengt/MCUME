@@ -3,6 +3,7 @@
 #include "emuapi.h"
 #include "iopins.h" 
 
+
 extern "C" {
 #include "minigb_apu/minigb_apu.h"
 #include "palettes/gbcolors.h"
@@ -14,6 +15,8 @@ extern "C" {
 
 static uint8_t ram[32768];
 static gb_s gb;
+struct minigb_apu_ctx apu_ctx = {};
+
 
 static palette_t palette16; // Colour palette
 #define RGB565_TO_RGB888(rgb565) ((((rgb565) & 0xF800) << 8) | (((rgb565) & 0x07E0) << 5) | (((rgb565) & 0x001F) << 3))
@@ -106,15 +109,13 @@ void gbc_Start(char * filename)
 
   int size = flash_load(filename);
 
-#ifdef SOUND_PRESENT
-#ifdef HAS_SND  
-  emu_sndInit();
-#endif  
-#else
-#endif
   /* Initialise GB context. */
   gb_init_error_e ret = gb_init(&gb, &gb_rom_read, &gb_cart_ram_read,
                                 &gb_cart_ram_write, &gb_error, nullptr);
+
+
+  gb.direct.interlace = false;
+  gb.direct.frame_skip = true;
 
   auto_assign_palette(palette16, gb_colour_hash(&gb), gb_get_rom_name(&gb, filename));
   //manual_assign_palette(palette16, 0);
@@ -125,7 +126,14 @@ void gbc_Start(char * filename)
           emu_SetPaletteEntry(val>>16, (val>>8) & 0xff, val & 0xff, i * 4 + j);
       }
 
-  gb_init_lcd(&gb, &lcd_draw_line);  
+  gb_init_lcd(&gb, &lcd_draw_line); 
+#ifdef HAS_SND 
+  emu_sndInit();
+  minigb_apu_audio_init(&apu_ctx);
+//  audio_init();
+#endif
+
+
   emu_printf("gbc_Start done");
 }
 
@@ -160,6 +168,26 @@ void gbc_Step(void) {
   emu_DrawVsync();   
 }
 
+
+#ifdef HAS_SND
+extern "C" uint8_t audio_read(uint16_t addr) {
+  return minigb_apu_audio_read(&apu_ctx, addr);
+} 
+
+extern "C" void audio_write(uint16_t addr, uint8_t value) {
+  minigb_apu_audio_write(&apu_ctx, addr, value);
+} 
+static audio_sample_t snd[AUDIO_SAMPLES_TOTAL];
+
+//static int16_t snd[512];
+#endif
+
 void SND_Process(void *stream, int len) {
-//  psg_update((int16*)stream, 0, len);  
+#ifdef HAS_SND
+  audio_sample * snd_buf =  (audio_sample *)stream;
+  //audio_callback(NULL,&snd[0],len);
+  minigb_apu_audio_callback(&apu_ctx, snd); 
+  for (int i = 0; i< len*2; i+=2 )
+    *snd_buf++ = (((snd[i]>>8)+(snd[i+1]>>8))/8+128);
+#endif
 } 
