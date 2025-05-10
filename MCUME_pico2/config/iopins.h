@@ -6,7 +6,7 @@
 #define VGA_DMA_CHANNEL 2 // requires 2 channels
 #define TFT_DMA_CHANNEL 2 // requires 1 channel
 #define AUD_DMA_CHANNEL 4 // requires 1 or 3 channels
-#define PSR_DMA_CHANNEL 7 // requires 2 channels (PSRAM)
+#define PSR_DMA_CHANNEL 5 // requires 2 channels (PSRAM)
 
 //#####################################################
 
@@ -87,13 +87,8 @@
 // Second SPI bus and DMA not conflicting with USB
 #define SD_SPIREG       spi0
 
-
-#define PSRAM_PIN_SCK       10
-#define PSRAM_PIN_MOSI      11
-#define PSRAM_PIN_MISO      8 
-#define PSRAM_PIN_CS        9
-
-#define PSRAM_ASYNC         1
+#define PSRAM_SPIREG      spi1
+//#define PSRAM_ASYNC         1
 #define PSRAM_SCLK          10
 #define PSRAM_MOSI          11
 #define PSRAM_MISO          8 

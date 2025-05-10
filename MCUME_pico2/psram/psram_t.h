@@ -15,7 +15,7 @@
 //#define PAGE_SIZE    16 //32 //2048 //1024
 //#define MAX_PAGES    8
 
-#define PAGE_SIZE    16 //32 //2048 //1024
+#define PAGE_SIZE    4 //16 //32 //2048 //1024
 #define MAX_PAGES    8
 
 
@@ -42,7 +42,7 @@ class PSRAM_T
     static void psram_read_n(uint32_t addr, uint8_t * val, int n);
     static void psram_write(uint32_t addr, uint8_t val);
     static void psram_write_w(uint32_t addr, uint16_t val); 
-    static void psram_write_n(uint32_t addr, uint8_t * val, int n);
+    //static void psram_write_n(uint32_t addr, uint8_t * val, int n);
    
   protected:
     static uint8_t _cs, _miso, _mosi, _sclk;

@@ -19,7 +19,7 @@
 //#define LOHRES         1
 //#define ROTATE_SCREEN  1
 //#define FLIP_SCREEN  1
-//#define HAS_PSRAM      1
+#define HAS_PSRAM      1
 
 #endif
 

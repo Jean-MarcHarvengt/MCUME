@@ -399,7 +399,6 @@ set(FATSD_SOURCES
 
 
 set(PSRAM_SOURCES 
-		psram/psram_spi.c
 		psram/psram_t.cpp
 	)
 

@@ -370,6 +370,10 @@ void emu_KeyboardOnDown(int keymodifer, int key) {
   //else if (key == KBD_KEY_RIGHT) keyCode = 0x96; // 150
   //else if (key == KBD_KEY_BS) keyCode = 0x7F; // 127
   //else if (key == KBD_KEY_ESC) keyCode = 0x1F; // 31  
+  else if (key >= KBD_KEY_F11) {
+    if (isMouse) isMouse = false;
+    else isMouse = true;    
+  }
   else
     keyCode = keyboardAsciiConv[key & 0x7f];
   IkbdKeyPress ( keyCode );
