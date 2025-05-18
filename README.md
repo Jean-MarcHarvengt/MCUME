@@ -4,6 +4,13 @@
 </p>
 
 # News
+Mai 2025: Few more updates 
+- Fix sound issues in most emulators for PICO2ZX
+- add Apple2 emulation (based on AIIE emulator)
+- add PSRAM support to Castaway (Atari ST) for the hyperpetpico HDMI (slow but better compatibility)
+- fix USB_PIO issue on hyperpetpico HDMI (thanks to the PIO_USB author for the RP2350 fix when overclocked) 
+<br>
+
 Mars 2025: Finally some updates! Add pico2 support for hyperpetpico HDMI and PICO2ZX (Bobricus)
 - HDMI now supported next to TFT (pico2 only)
 - Add USB HOST (pico2 only)
@@ -216,7 +223,7 @@ Computer systems supported and status on various MCU platforms<br>
 | Atari 800   | X | X | X | X | X | X | X | X |
 | C64         | X | X | X | X | X | X | X | X |
 | VIC20       |   |   |   | X |   |   | X | X |
-| Apple2      |   |   |   | X |   |   |   | - |
+| Apple2      |   |   |   | X |   |   |   | X |
 | Atari 520ST | - | full speed! | X | X (640x400!) | - | slow | - | - |
 | Atari 260ST | - | - | - | - | - | - | - | X |
 | 8086 XT PC  | - | full speed! | X | X | - | slow | - | X |
