@@ -14,7 +14,8 @@ include(pico_sdk_import.cmake)
 #set(TARGET picospeccy)
 #set(TARGET picomsx)
 #set(TARGET pico8086)
-set(TARGET picocastaway)
+#set(TARGET picocastaway)
+set(TARGET picoaiie)
 #set(TARGET picocolem)
 #set(TARGET picoo2em)
 #set(TARGET picovcs)
@@ -360,6 +361,30 @@ set(PICOCASTAWAY_SOURCES
 	)
 endif()
 
+if( ${TARGET} MATCHES "picoaiie" )
+set(PICOAIIE_SOURCES 
+		picoaiie/appledisplay.cpp 
+		picoaiie/applekeyboard.cpp
+		picoaiie/applemmu.cpp
+		picoaiie/applevm.cpp
+		picoaiie/cpu.cpp
+		picoaiie/diskii.cpp
+		picoaiie/globals.cpp
+		picoaiie/lcg.cpp
+		picoaiie/nibutil.cpp
+		picoaiie/plf-clock.cpp
+		picoaiie/plf-display.cpp
+		picoaiie/plf-filemanager.cpp
+		picoaiie/plf-keyboard.cpp
+		picoaiie/plf-paddles.cpp
+		picoaiie/plf-speaker.cpp
+		picoaiie/RingBuf.cpp
+		picoaiie/widgets.cpp
+		picoaiie/wrapemu.cpp
+		picoaiie/picoaiie.cpp
+	)
+endif()
+
 if( ${TARGET} MATCHES "testio" )
 set(TESTIO_SOURCES 
 		testio/testio.cpp
@@ -425,6 +450,7 @@ add_executable(${TARGET}
 		${PICOGB_SOURCES}
 		${PICOMSX_SOURCES}
 		${PICOCASTAWAY_SOURCES}
+		${PICOAIIE_SOURCES}
 		${TESTIO_SOURCES}
 		${TESTVGA_SOURCES}
 		${TESTKEYMAX_SOURCES}

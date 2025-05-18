@@ -79,21 +79,25 @@
 #define PIN_KEY_USER2   27 
 
 // SD
+// Second SPI bus and DMA not conflicting with USB
+#define SD_SPIREG       spi0
 #define SD_SCLK         6
 #define SD_MOSI         7
 #define SD_MISO         4 
 #define SD_CS           5
 #define SD_DETECT       255
-// Second SPI bus and DMA not conflicting with USB
-#define SD_SPIREG       spi0
 
+// PSRAM SPI
 #define PSRAM_SPIREG      spi1
 //#define PSRAM_ASYNC         1
 #define PSRAM_SCLK          10
 #define PSRAM_MOSI          11
 #define PSRAM_MISO          8 
 #define PSRAM_CS            9
-#define PSRAM_SPIREG    	spi1
+// PSRAM QSPI
+//#define PSRAM_CS            0
+//#define PSRAM_SCLK          1
+//#define PSRAM_DAT0          8 //9,10,11 
 
 // HDMI
 #define HDMI_D0_PLUS    0 // GPIO12
