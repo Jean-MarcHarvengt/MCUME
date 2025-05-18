@@ -5,10 +5,10 @@
 
 # News
 Mai 2025: Few more updates 
-- Fix sound issues in most emulators for PICO2ZX
+- Fix sound issues in most emulators for the PICO2ZX
 - add Apple2 emulation (based on AIIE emulator)
 - add PSRAM support to Castaway (Atari ST) for the hyperpetpico HDMI (slow but better compatibility)
-- fix USB_PIO issue on hyperpetpico HDMI (thanks to the PIO_USB author for the RP2350 fix when overclocked) 
+- fix USB_PIO issue on the hyperpetpico HDMI (thanks to the PIO_USB author for the RP2350 fix when overclocked) 
 <br>
 
 Mars 2025: Finally some updates! Add pico2 support for hyperpetpico HDMI and PICO2ZX (Bobricus)
