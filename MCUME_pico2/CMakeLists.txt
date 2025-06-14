@@ -7,6 +7,7 @@ include(pico_sdk_import.cmake)
 #include(pico_extras_import.cmake)
 
 #set(TARGET testkeymax)
+set(TARGET testpsram)
 #set(TARGET pico20)
 #set(TARGET pico64)
 #set(TARGET pico81)
@@ -15,7 +16,7 @@ include(pico_sdk_import.cmake)
 #set(TARGET picomsx)
 #set(TARGET pico8086)
 #set(TARGET picocastaway)
-set(TARGET picoaiie)
+#set(TARGET picoaiie)
 #set(TARGET picocolem)
 #set(TARGET picoo2em)
 #set(TARGET picovcs)
@@ -404,6 +405,12 @@ set(TESTKEYMAX_SOURCES
 	)
 endif()
 
+if( ${TARGET} MATCHES "testpsram" )
+set(TESTPSRAM_SOURCES 
+		testpsram/testpsram.cpp
+	)
+endif()
+
 set(DISPLAY_SOURCES 
 		display/pico_dsp.cpp		
 		display/hdmi_framebuffer.cpp		
@@ -454,6 +461,7 @@ add_executable(${TARGET}
 		${TESTIO_SOURCES}
 		${TESTVGA_SOURCES}
 		${TESTKEYMAX_SOURCES}
+		${TESTPSRAM_SOURCES}
 		${PSRAM_SOURCES}
 		${FLASH_SOURCES}
 		${DISPLAY_SOURCES}

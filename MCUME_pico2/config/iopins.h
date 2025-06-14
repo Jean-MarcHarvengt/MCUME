@@ -90,14 +90,16 @@
 // PSRAM SPI
 #define PSRAM_SPIREG      spi1
 //#define PSRAM_ASYNC         1
-#define PSRAM_SCLK          10
-#define PSRAM_MOSI          11
-#define PSRAM_MISO          8 
-#define PSRAM_CS            9
+#define PSRAM_SCLK          1  //1 //1 //10
+
+#define PSRAM_MOSI          8 //11 //8 //11
+#define PSRAM_MISO          9  //8  //9 //8 
+
+#define PSRAM_CS            0 //0 //0 //9
 // PSRAM QSPI
 //#define PSRAM_CS            0
 //#define PSRAM_SCLK          1
-//#define PSRAM_DAT0          8 //9,10,11 
+#define PSRAM_SIO0          8 //9,10,11 
 
 // HDMI
 #define HDMI_D0_PLUS    0 // GPIO12

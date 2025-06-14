@@ -32,10 +32,7 @@ static int skip=0;
 
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-
 #include "hdmi_framebuffer.h"
-
-//psram_spi_inst_t* async_spi_inst;
 
 int main(void) {
 //    vreg_set_voltage(VREG_VOLTAGE_1_05);
@@ -45,19 +42,16 @@ int main(void) {
 //    set_sys_clock_khz(200000, true);    
 //    set_sys_clock_khz(210000, true);    
 //    set_sys_clock_khz(230000, true);    
-//    set_sys_clock_khz(225000, truxe);    
-//    set_sys_clock_khz(250000, true);  
-
-    set_sys_clock_khz(280000, true);
-    *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
+//    set_sys_clock_khz(225000, truxe);
 
     // Overclock!
 //    set_sys_clock_khz(280000, true);
+    set_sys_clock_khz(260000, true); // for PSRAM tolerance 
+    *((uint32_t *)(0x40010000+0x58)) = 2 << 16; //CLK_HSTX_DIV = 2 << 16; // HSTX clock/2
+
+    // Overclock!
 //    stdio_init_all();
-
      emu_init();
-   
-
 
     char * filename;
 #ifdef FILEBROWSER

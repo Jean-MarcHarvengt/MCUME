@@ -24,34 +24,45 @@ int8_t PSRAM_T::last=0;
 
 static psram_spi_inst_t psram_spi;
 
-psram_spi_inst_t psram_spi_init_clkdiv(PIO pio, int sm, float clkdiv, bool fudge) {
+psram_spi_inst_t psram_spi_init_clkdiv(PIO pio, int sm, float clkdiv, bool fudge, bool qspi) {
     psram_spi_inst_t spi;
     spi.pio = pio;
-    spi.offset = pio_add_program(spi.pio, fudge ? &spi_psram_fudge_program : &spi_psram_program);
+    if (!qspi)    
+      spi.offset = pio_add_program(spi.pio, fudge ? &spi_psram_fudge_program : &spi_psram_program);
+    
     if (sm == -1) {
         spi.sm = pio_claim_unused_sm(spi.pio, true);
     } else {
         spi.sm = sm;
     }
 
-    //gpio_set_drive_strength(PSRAM_PIN_CS, GPIO_DRIVE_STRENGTH_4MA);
-    //gpio_set_drive_strength(PSRAM_PIN_SCK, GPIO_DRIVE_STRENGTH_4MA);
-    //gpio_set_drive_strength(PSRAM_PIN_MOSI, GPIO_DRIVE_STRENGTH_4MA);
-    
-    gpio_init(PSRAM_SCLK);
-    gpio_pull_up(PSRAM_SCLK);
-    gpio_init(PSRAM_MISO);
-    gpio_pull_up(PSRAM_MISO);
-    gpio_init(PSRAM_MOSI);
-    gpio_pull_up(PSRAM_MOSI);
-    gpio_init(PSRAM_CS);
-    gpio_pull_up(PSRAM_CS);
+    //gpio_set_drive_strength(PSRAM_CS, GPIO_DRIVE_STRENGTH_4MA);
+    //gpio_set_drive_strength(PSRAM_SCLK, GPIO_DRIVE_STRENGTH_4MA);
+    //gpio_set_drive_strength(PSRAM_MOSI, GPIO_DRIVE_STRENGTH_4MA);
 
-    /* gpio_set_slew_rate(PSRAM_PIN_CS, GPIO_SLEW_RATE_FAST); */
-    /* gpio_set_slew_rate(PSRAM_PIN_SCK, GPIO_SLEW_RATE_FAST); */
-    /* gpio_set_slew_rate(PSRAM_PIN_MOSI, GPIO_SLEW_RATE_FAST); */
+    //gpio_init(PSRAM_SCLK);
+    //gpio_pull_up(PSRAM_SCLK);
+    //gpio_init(PSRAM_MISO);
+    //gpio_pull_up(PSRAM_MISO);
+    //gpio_init(PSRAM_MOSI);
+    //gpio_pull_up(PSRAM_MOSI);
+    //gpio_init(PSRAM_CS);
+    //gpio_pull_up(PSRAM_CS);
 
-    pio_spi_psram_cs_init(spi.pio, spi.sm, spi.offset, 8 /*n_bits*/, clkdiv, fudge, PSRAM_CS, PSRAM_MOSI, PSRAM_MISO);
+     //gpio_set_slew_rate(PSRAM_CS, GPIO_SLEW_RATE_FAST); 
+     //gpio_set_slew_rate(PSRAM_SCLK, GPIO_SLEW_RATE_FAST); 
+     //gpio_set_slew_rate(PSRAM_MOSI, GPIO_SLEW_RATE_FAST); 
+
+
+    //gpio_set_function(PSRAM_CS, GPIO_FUNC_SPI);
+    //gpio_set_function(PSRAM_MISO, GPIO_FUNC_SPI);
+    //gpio_set_function(PSRAM_SCLK, GPIO_FUNC_SPI);
+    //gpio_set_function(PSRAM_MOSI, GPIO_FUNC_SPI);
+
+    if (qspi) 
+      pio_qspi_psram_cs_init(spi.pio, spi.sm, pio_add_program(spi.pio,&qspi_psram_program), 8 /*n_bits*/, clkdiv, PSRAM_CS, PSRAM_SIO0);
+    else
+      pio_spi_psram_cs_init(spi.pio, spi.sm, spi.offset, 8 /*n_bits*/, clkdiv, fudge, PSRAM_CS, PSRAM_MOSI, PSRAM_MISO);
 
     // Write DMA channel setup
     spi.write_dma_chan = PSR_DMA_CHANNEL; //dma_claim_unused_channel(true);
@@ -73,22 +84,31 @@ psram_spi_inst_t psram_spi_init_clkdiv(PIO pio, int sm, float clkdiv, bool fudge
     dma_channel_set_read_addr(spi.read_dma_chan, &spi.pio->rxf[spi.sm], false);
     dma_channel_set_config(spi.read_dma_chan, &spi.read_dma_chan_config, false);
 
-
-    uint8_t psram_reset_en_cmd[] = {
-        8,      // 8 bits to write
-        0,      // 0 bits to read
-        0x66u   // Reset enable command
-    };
-    pio_spi_write_read_dma_blocking(&spi, psram_reset_en_cmd, 3, 0, 0);
-    busy_wait_us(50);
-    uint8_t psram_reset_cmd[] = {
-        8,      // 8 bits to write
-        0,      // 0 bits to read
-        0x99u   // Reset command
-    };
-    pio_spi_write_read_dma_blocking(&spi, psram_reset_cmd, 3, 0, 0);
-    busy_wait_us(100);
-    
+    if (!qspi) {
+      uint8_t psram_reset_en_cmd[] = {
+          8,      // 8 bits to write
+          0,      // 0 bits to read
+          0x66u   // Reset enable command
+      };
+      pio_spi_write_read_dma_blocking(&spi, psram_reset_en_cmd, 3, 0, 0);
+      busy_wait_us(50);
+      uint8_t psram_reset_cmd[] = {
+          8,      // 8 bits to write
+          0,      // 0 bits to read
+          0x99u   // Reset command
+      };
+      pio_spi_write_read_dma_blocking(&spi, psram_reset_cmd, 3, 0, 0);
+      busy_wait_us(100);
+#ifdef QSPI    
+      uint8_t psram_qspi_cmd[] = {
+          8,      // 8 bits to write
+          0,      // 0 bits to read
+          0x35u   // enter quad command
+      };
+      pio_spi_write_read_dma_blocking(&spi, psram_qspi_cmd, 3, 0, 0);
+      busy_wait_us(500);    
+#endif 
+    }   
     return spi;
 };
 
@@ -107,7 +127,14 @@ void PSRAM_T::begin(void)
 {
 
 #ifdef PIO_SPI
-  psram_spi = psram_spi_init_clkdiv(pio2, 0, 1.0, true);
+  psram_init_nib();
+  psram_spi = psram_spi_init_clkdiv(pio2, 0, 1.0, true, false);
+  //pio_sm_set_enabled(pio2, 0, false);
+  //psram_spi = psram_spi_init_clkdiv(pio2, 1, 1.0, true, false);
+#ifdef QSPI
+  pio_sm_set_enabled(pio2, 0, false);
+  psram_spi = psram_spi_init_clkdiv(pio2, 1, 1.0, true, true);
+#endif
 #else
   gpio_init(PSRAM_SCLK);
   gpio_pull_up(PSRAM_SCLK);

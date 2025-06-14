@@ -79,6 +79,7 @@ static inline void pio_spi_psram_cs_init(PIO pio, uint sm, uint prog_offs, uint 
     pio_sm_set_consecutive_pindirs(pio, sm, pin_mosi, 1, true);
     pio_sm_set_consecutive_pindirs(pio, sm, pin_miso, 1, false);
     pio_gpio_init(pio, pin_mosi);
+    pio_gpio_init(pio, pin_miso);
     pio_gpio_init(pio, pin_cs);
     pio_gpio_init(pio, pin_cs + 1);
 

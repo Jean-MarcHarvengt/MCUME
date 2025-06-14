@@ -10,7 +10,7 @@
 #include "pico.h"
 #include "pico/stdlib.h"
 
-#define PSCACHE 1
+//#define PSCACHE 1
 
 //#define PAGE_SIZE    16 //32 //2048 //1024
 //#define MAX_PAGES    8

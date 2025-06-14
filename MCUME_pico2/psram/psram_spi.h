@@ -65,7 +65,9 @@ extern "C" {
 
 #define PIO_SPI 1
 #define PSRAM_WAITDMA 1
+//#define QSPI 1
 
+static uint8_t nibconv[256];
 
 /**
  * @brief A struct that holds the configuration for the PSRAM interface.
@@ -139,6 +141,11 @@ __force_inline static void __time_critical_func(pio_spi_write_blocking)(
     }
 }
 
+
+static uint8_t wrbuffer[16];
+//#define CINIT 0b00000000
+#define CINIT 0b01110111
+
 /**
  * @brief Write raw data to the PSRAM SPI PIO, driven by DMA without CPU
  * involvement. 
@@ -159,7 +166,34 @@ __force_inline static void __time_critical_func(pio_spi_write_dma_blocking)(
     dma_channel_wait_for_finish_blocking(spi->write_dma_chan);
     dma_channel_wait_for_finish_blocking(spi->read_dma_chan);
 #endif // PSRAM_WAITDMA
-    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, src, src_len);
+    int i=0;
+    int k=0;
+#ifdef QSPI    
+    wrbuffer[k++]=src[i++];
+    wrbuffer[k++]=src[i++];
+    uint8_t c=src[i++];
+    uint8_t d=CINIT;
+    if (c & 0b10000000) d |= 0b1000000;
+    if (c & 0b01000000) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00100000) d |= 0b1000000;
+    if (c & 0b00010000) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00001000) d |= 0b1000000;
+    if (c & 0b00000100) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00000010) d |= 0b1000000;
+    if (c & 0b00000010) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    while (i<src_len) wrbuffer[k++]=nibconv[src[i++]];
+#else
+    while (i<src_len) wrbuffer[k++]=src[i++];
+#endif
+    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, wrbuffer, k);
+//    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, src, src_len);
     dma_channel_wait_for_finish_blocking(spi->write_dma_chan);
 }
 
@@ -188,7 +222,34 @@ __force_inline static void __time_critical_func(pio_spi_write_read_dma_blocking)
     dma_channel_wait_for_finish_blocking(spi->write_dma_chan);
     dma_channel_wait_for_finish_blocking(spi->read_dma_chan);
 #endif // PSRAM_WAITDMA
-    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, src, src_len);
+    int i=0;
+    int k=0;
+#ifdef QSPI    
+    wrbuffer[k++]=src[i++];
+    wrbuffer[k++]=src[i++];
+    uint8_t c=src[i++];
+    uint8_t d=CINIT;
+    if (c & 0b10000000) d |= 0b1000000;
+    if (c & 0b01000000) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00100000) d |= 0b1000000;
+    if (c & 0b00010000) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00001000) d |= 0b1000000;
+    if (c & 0b00000100) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    d=CINIT;
+    if (c & 0b00000010) d |= 0b1000000;
+    if (c & 0b00000010) d |= 0b0001000;
+    wrbuffer[k++] = d;
+    while (i<src_len) wrbuffer[k++]=nibconv[src[i++]];
+#else
+    while (i<src_len) wrbuffer[k++]=src[i++];
+#endif    
+    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, wrbuffer, k);
+//    dma_channel_transfer_from_buffer_now(spi->write_dma_chan, src, src_len);
     dma_channel_transfer_to_buffer_now(spi->read_dma_chan, dst, dst_len);
     dma_channel_wait_for_finish_blocking(spi->write_dma_chan);
     dma_channel_wait_for_finish_blocking(spi->read_dma_chan);
@@ -233,11 +294,26 @@ psram_spi_inst_t psram_spi_init_clkdiv(PIO pio, int sm, float clkdiv, bool fudge
  */
 psram_spi_inst_t psram_spi_init(PIO pio, int sm);
 
+#ifdef QSPI
+#define READ_CMD 0xebu
+#define WRITE_CMD 0x38u
+//#define READ_CMD 0x0bu
+//#define WRITE_CMD 0x02u
+#else
+#define READ_CMD 0x0bu
+#define WRITE_CMD 0x02u
+#endif
+
 
 static uint8_t write8_command[] = {
+#ifdef QSPI
+    40/4,       // 40 bits write
+    0,          // 0 bits read
+#else
     40,         // 40 bits write
     0,          // 0 bits read
-    0x02u,      // Write command
+#endif 
+    WRITE_CMD,  // Write command
     0, 0, 0,    // Address
     0           // 8 bits data
 };
@@ -267,9 +343,14 @@ __force_inline static void psram_write8(psram_spi_inst_t* spi, uint32_t addr, ui
 };
 
 static uint8_t read8_command[] = {
+#ifdef QSPI
+    40/4,       // 40 bits write
+    8/4,        // 8 bits read
+#else
     40,         // 40 bits write
     8,          // 8 bits read
-    0x0bu,      // Fast read command
+#endif   
+    READ_CMD,   // Fast read command
     0, 0, 0,    // Address
     0           // 8 delay cycles
 };
@@ -302,9 +383,14 @@ __force_inline static uint8_t psram_read8(psram_spi_inst_t* spi, uint32_t addr) 
 };
 
 static uint8_t write16_command[] = {
+#ifdef QSPI
+    48/4,       // 48 bits write
+    0,          // 0 bits read
+#else
     48,         // 48 bits write
     0,          // 0 bits read
-    0x02u,      // Write command
+#endif    
+    WRITE_CMD,  // Write command
     0, 0, 0,    // Address
     0, 0        // 16 bits data
 };
@@ -336,9 +422,14 @@ __force_inline static void psram_write16(psram_spi_inst_t* spi, uint32_t addr, u
 };
 
 static uint8_t read16_command[] = {
+#ifdef QSPI
+    40/4,       // 40 bits write
+    16/4,       // 16 bits read
+#else
     40,         // 40 bits write
     16,         // 16 bits read
-    0x0bu,      // Fast read command
+#endif    
+    READ_CMD,   // Fast read command
     0, 0, 0,    // Address
     0           // 8 delay cycles
 };
@@ -371,12 +462,18 @@ __force_inline static uint16_t psram_read16(psram_spi_inst_t* spi, uint32_t addr
     return val;
 };
 
+/*
 static uint8_t write_command[] = {
     0,          // n bits write
     0,          // 0 bits read
-    0x02u,      // Fast write command
+#ifdef QSPI
+    0x38u,      // Write QUAD command
+#else
+    0x02u,      // Write command
+#endif
     0, 0, 0     // Address
 };
+*/
 /**
  * @brief Write @c count bytes of data to a given address to the PSRAM SPI PIO,
  * driven by DMA without CPU involvement, blocking until the write is
@@ -403,9 +500,14 @@ __force_inline static void psram_writen(psram_spi_inst_t* spi, const uint32_t ad
 */
 
 static uint8_t read_command[] = {
+#ifdef QSPI
+    40/4,       // 40 bits write
+    0,          // n bits read
+#else
     40,         // 40 bits write
     0,          // n bits read
-    0x0bu,      // Fast read command
+#endif   
+    READ_CMD,   // Fast read command
     0, 0, 0,    // Address
     0           // 8 delay cycles
 };
@@ -420,7 +522,11 @@ static uint8_t read_command[] = {
  * @param count Number of bytes to read.
  */
 __force_inline static void psram_readn(psram_spi_inst_t* spi, const uint32_t addr, uint8_t* dst, const size_t count) {
+#ifdef QSPI
+    read_command[1] = count * 2;
+#else
     read_command[1] = count * 8;
+#endif
     read_command[3] = addr >> 16;
     read_command[4] = addr >> 8;
     read_command[5] = addr;
@@ -430,7 +536,30 @@ __force_inline static void psram_readn(psram_spi_inst_t* spi, const uint32_t add
 #endif
 };
 
+static uint8_t nib[16] = {
+    0b0000, 
+    0b1000, 
+    0b0100, 
+    0b1100, 
+    0b0010, 
+    0b1010, 
+    0b0110, 
+    0b1110, 
+    0b0001, 
+    0b1001, 
+    0b0101, 
+    0b1101, 
+    0b0011, 
+    0b1011, 
+    0b0111, 
+    0b1111
+};
 
+static void psram_init_nib(void) {
+    for (unsigned int i=0; i<256;i++) {
+        nibconv[i]=(nib[i>>4]<<4)+nib[i&0xf];
+    }    
+};
 
 #ifdef __cplusplus
 }
